@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ChartContainer } from "@axicharts/charts";
 import { SankeyChart, SAMPLE_SANKEY_FLOW } from "@axicharts/charts-sankey";
 import "@axicharts/charts-sankey/register";
-import { cleanTheme } from "@axicharts/charts-theme";
+import { cleanTheme, industrialTheme } from "@axicharts/charts-theme";
 
 const meta = {
   title: "Plugins/Sankey",
@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C5 community plugin `@axicharts/charts-sankey` — ECharts Sankey flow registered via `registerChartType`.",
+          "C5 community plugin `@axicharts/charts-sankey` — ECharts Sankey flow with theme-aware palette and ChartContainer sizing.",
       },
     },
   },
@@ -24,6 +24,14 @@ type Story = StoryObj<typeof meta>;
 export const EnergyAllocation: Story = {
   render: (): ReactElement => (
     <ChartContainer theme={cleanTheme} width={480} height={260}>
+      <SankeyChart {...SAMPLE_SANKEY_FLOW} />
+    </ChartContainer>
+  ),
+};
+
+export const IndustrialFlow: Story = {
+  render: (): ReactElement => (
+    <ChartContainer theme={industrialTheme} width={480} height={260}>
       <SankeyChart {...SAMPLE_SANKEY_FLOW} />
     </ChartContainer>
   ),

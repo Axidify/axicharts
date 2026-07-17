@@ -4,6 +4,7 @@ export {
   type ChartConfig,
   type ChartLayoutContextValue,
 } from "./container/ChartLayoutContext";
+export { useOptionalChartLayout } from "./container/useOptionalChartLayout";
 export { LineChart, type LineChartProps } from "./line/LineChart";
 export { AreaChart, type AreaChartProps } from "./area/AreaChart";
 export { BarChart, type BarChartProps } from "./bar/BarChart";

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render } from "@testing-library/react";
+import { ChartContainer } from "@axicharts/charts";
 import { getChartType, registerBuiltinChartTypes } from "@axicharts/charts/registry";
 import { SankeyChart, SAMPLE_SANKEY_FLOW } from "./SankeyChart";
 import { registerSankeyChart } from "./registerCore";
@@ -10,6 +11,15 @@ describe("SankeyChart", () => {
       <SankeyChart nodes={SAMPLE_SANKEY_FLOW.nodes} links={SAMPLE_SANKEY_FLOW.links} />,
     );
     expect(container.querySelector('[aria-label="Sankey flow diagram"]')).toBeTruthy();
+  });
+
+  it("fills chart container dimensions", () => {
+    const { container } = render(
+      <ChartContainer width={320} height={200}>
+        <SankeyChart nodes={SAMPLE_SANKEY_FLOW.nodes} links={SAMPLE_SANKEY_FLOW.links} />
+      </ChartContainer>,
+    );
+    expect(container.querySelector(".axicharts-sankey")).toBeTruthy();
   });
 });
 

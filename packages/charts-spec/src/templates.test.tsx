@@ -33,6 +33,7 @@ describe("pluginsWallTemplate", () => {
       panels: [
         {
           type: "tank",
+          title: "Storage",
           theme: "industrial",
           height: 200,
           width: 140,
@@ -42,6 +43,7 @@ describe("pluginsWallTemplate", () => {
     });
 
     const { container } = render(view);
+    expect(container.textContent).toContain("Storage");
     expect(container.textContent).toContain("Tank 9");
     expect(container.textContent).toContain("55%");
   });

@@ -493,11 +493,11 @@ export function pluginsWallTemplate(
     {
       style: {
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-        gap: 12,
+        gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+        gap: 16,
         alignItems: "end",
         maxWidth: 960,
-        padding: 12,
+        padding: 16,
         background: "#0f172a",
         borderRadius: 8,
         border: "1px solid #334155",

@@ -62,11 +62,40 @@ function wrapChart(
   const mode = options.mode ?? spec.mode;
   const height = options.height ?? spec.height ?? 240;
   const width = options.width ?? spec.width ?? "100%";
+  const dark = theme.name === "live" || theme.name === "industrial";
 
-  return createElement(
+  const panel = createElement(
     ChartContainer,
     { theme, mode, height, width, tagTones },
     chart,
+  );
+
+  if (!spec.title) return panel;
+
+  return createElement(
+    "div",
+    {
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+        minWidth: 0,
+      },
+    },
+    createElement(
+      "div",
+      {
+        style: {
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: "0.04em",
+          textTransform: "uppercase",
+          color: dark ? "#94a3b8" : "#64748b",
+        },
+      },
+      spec.title,
+    ),
+    panel,
   );
 }
 

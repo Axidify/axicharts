@@ -1,4 +1,7 @@
-import type { ReactElement } from "react";
+"use client";
+
+import { useMemo, useState, type ReactElement } from "react";
+import { useOptionalChartLayout } from "@axicharts/charts";
 
 export type GeoRegion = {
   id: string;
@@ -10,6 +13,8 @@ export type GeoRegion = {
   height: number;
 };
 
+export type GeoMapSurface = "light" | "dark";
+
 export type GeoMapChartProps = {
   regions: GeoRegion[];
   width?: number;
@@ -17,6 +22,8 @@ export type GeoMapChartProps = {
   min?: number;
   max?: number;
   showLabels?: boolean;
+  showScale?: boolean;
+  surface?: GeoMapSurface;
 };
 
 function resolveBounds(
@@ -33,15 +40,37 @@ function resolveBounds(
   };
 }
 
-function colorForValue(value: number, min: number, max: number): string {
+function colorForValue(
+  value: number,
+  min: number,
+  max: number,
+  surface: GeoMapSurface,
+): string {
   const fraction = (value - min) / (max - min);
   const clamped = Math.min(1, Math.max(0, fraction));
+  if (surface === "dark") {
+    const start = { r: 30, g: 58, b: 95 };
+    const end = { r: 56, g: 189, b: 248 };
+    const r = Math.round(start.r + (end.r - start.r) * clamped);
+    const g = Math.round(start.g + (end.g - start.g) * clamped);
+    const b = Math.round(start.b + (end.b - start.b) * clamped);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
   const start = { r: 219, g: 234, b: 254 };
   const end = { r: 29, g: 78, b: 216 };
   const r = Math.round(start.r + (end.r - start.r) * clamped);
   const g = Math.round(start.g + (end.g - start.g) * clamped);
   const b = Math.round(start.b + (end.b - start.b) * clamped);
   return `rgb(${r}, ${g}, ${b})`;
+}
+
+function resolveSurface(
+  explicit: GeoMapSurface | undefined,
+  themeName: string | undefined,
+): GeoMapSurface {
+  if (explicit) return explicit;
+  if (themeName === "live" || themeName === "industrial") return "dark";
+  return "light";
 }
 
 export const SAMPLE_GEO_REGIONS: GeoRegion[] = [
@@ -55,13 +84,45 @@ export const SAMPLE_GEO_REGIONS: GeoRegion[] = [
 
 export function GeoMapChart({
   regions,
-  width = 280,
-  height = 160,
+  width: widthProp,
+  height: heightProp,
   min,
   max,
   showLabels = true,
-}: GeoMapChartProps): ReactElement {
-  const bounds = resolveBounds(regions, min, max);
+  showScale = true,
+  surface: surfaceProp,
+}: GeoMapChartProps): ReactElement | null {
+  const layout = useOptionalChartLayout();
+  const width = Math.floor(widthProp ?? layout?.size.width ?? 280);
+  const height = Math.floor(heightProp ?? layout?.size.height ?? 160);
+  const [hoverId, setHoverId] = useState<string | null>(null);
+  const surface = resolveSurface(surfaceProp, layout?.theme.name);
+  const bounds = useMemo(() => resolveBounds(regions, min, max), [regions, min, max]);
+
+  if (layout && !layout.ready) return null;
+  if (width < 1 || height < 1) return null;
+
+  const scaleHeight = showScale ? 18 : 0;
+  const mapHeight = height - scaleHeight;
+  const palette = surface === "dark"
+    ? {
+        canvas: "#0f172a",
+        label: "#e2e8f0",
+        value: "#94a3b8",
+        stroke: "#475569",
+        hoverStroke: "#38bdf8",
+        scaleTrack: "#334155",
+        scaleText: "#94a3b8",
+      }
+    : {
+        canvas: "#f8fafc",
+        label: "#0f172a",
+        value: "#334155",
+        stroke: "#94a3b8",
+        hoverStroke: "#2563eb",
+        scaleTrack: "#e2e8f0",
+        scaleText: "#64748b",
+      };
 
   return (
     <svg
@@ -71,12 +132,18 @@ export function GeoMapChart({
       role="img"
       aria-label="Regional value map"
     >
-      <rect x={0} y={0} width={width} height={height} fill="#f8fafc" rx={8} />
+      <rect x={0} y={0} width={width} height={mapHeight} fill={palette.canvas} rx={8} />
       {regions.map((region) => {
-        const fill = colorForValue(region.value, bounds.min, bounds.max);
+        const fill = colorForValue(region.value, bounds.min, bounds.max, surface);
         const label = region.label ?? region.id;
+        const active = hoverId === region.id;
         return (
-          <g key={region.id}>
+          <g
+            key={region.id}
+            onMouseEnter={() => setHoverId(region.id)}
+            onMouseLeave={() => setHoverId(null)}
+            style={{ cursor: "default" }}
+          >
             <rect
               x={region.x}
               y={region.y}
@@ -84,8 +151,9 @@ export function GeoMapChart({
               height={region.height}
               rx={4}
               fill={fill}
-              stroke="#94a3b8"
-              strokeWidth={1}
+              stroke={active ? palette.hoverStroke : palette.stroke}
+              strokeWidth={active ? 2 : 1}
+              opacity={hoverId && !active ? 0.72 : 1}
             />
             {showLabels ? (
               <>
@@ -93,9 +161,10 @@ export function GeoMapChart({
                   x={region.x + region.width / 2}
                   y={region.y + region.height / 2 - 4}
                   textAnchor="middle"
-                  fill="#0f172a"
+                  fill={palette.label}
                   fontSize={10}
                   fontWeight={600}
+                  pointerEvents="none"
                 >
                   {label}
                 </text>
@@ -103,9 +172,10 @@ export function GeoMapChart({
                   x={region.x + region.width / 2}
                   y={region.y + region.height / 2 + 10}
                   textAnchor="middle"
-                  fill="#334155"
+                  fill={palette.value}
                   fontSize={9}
                   fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+                  pointerEvents="none"
                 >
                   {region.value}
                 </text>
@@ -114,6 +184,44 @@ export function GeoMapChart({
           </g>
         );
       })}
+      {showScale ? (
+        <g transform={`translate(12, ${mapHeight + 4})`}>
+          <defs>
+            <linearGradient id="axicharts-geo-scale" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop
+                offset="0%"
+                stopColor={colorForValue(bounds.min, bounds.min, bounds.max, surface)}
+              />
+              <stop
+                offset="100%"
+                stopColor={colorForValue(bounds.max, bounds.min, bounds.max, surface)}
+              />
+            </linearGradient>
+          </defs>
+          <rect
+            x={0}
+            y={0}
+            width={width - 24}
+            height={6}
+            rx={3}
+            fill="url(#axicharts-geo-scale)"
+            stroke={palette.scaleTrack}
+            strokeWidth={1}
+          />
+          <text x={0} y={16} fill={palette.scaleText} fontSize={9}>
+            {bounds.min}
+          </text>
+          <text
+            x={width - 24}
+            y={16}
+            textAnchor="end"
+            fill={palette.scaleText}
+            fontSize={9}
+          >
+            {bounds.max}
+          </text>
+        </g>
+      ) : null}
     </svg>
   );
 }

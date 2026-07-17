@@ -12,6 +12,7 @@ describe("compilePanel registered types", () => {
     const panel = compilePanel(
       {
         type: "tank",
+        title: "Storage",
         props: { level: 72, label: "Tank 7", warningAt: 75 },
         theme: "industrial",
         height: 200,
@@ -21,6 +22,7 @@ describe("compilePanel registered types", () => {
     );
 
     const { container } = render(panel);
+    expect(container.textContent).toContain("Storage");
     expect(container.textContent).toContain("Tank 7");
     expect(container.textContent).toContain("72%");
   });
