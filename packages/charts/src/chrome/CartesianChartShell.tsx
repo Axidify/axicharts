@@ -16,6 +16,7 @@ import {
   ensurePresentationStyles,
   presentationEnterStyle,
 } from "../presentation/motion";
+import { SyncHighlight } from "../sync/SyncHighlight";
 
 import type { TooltipRow } from "./Tooltip";
 
@@ -66,6 +67,7 @@ function CartesianChromeInner({
         }}
       >
         {plot}
+        {chrome.showCrosshair ? <SyncHighlight categories={categories} /> : null}
         {chrome.showCrosshair ? <Crosshair /> : null}
         {chrome.showTooltip ? (
           <Tooltip

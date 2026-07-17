@@ -314,7 +314,12 @@ export function App(): ReactElement {
           </button>
         </div>
         <main style={{ flex: 1, padding: 24, overflow: "auto" }}>
-          <RuntimeDashboard spec={activeSpec} presentation />
+          <RuntimeDashboard
+            spec={activeSpec}
+            presentation
+            alarmScopeId={activeDashboard.id}
+            alarmStorage={localStorage}
+          />
         </main>
       </div>
     );
@@ -446,7 +451,12 @@ export function App(): ReactElement {
           onDeleteDashboard={handleDeleteDashboard}
         />
         <main style={{ flex: 1, padding: 24, maxWidth: presentation ? 1100 : 900 }}>
-          <RuntimeDashboard spec={activeSpec} presentation={presentation} />
+          <RuntimeDashboard
+            spec={activeSpec}
+            presentation={presentation}
+            alarmScopeId={activeDashboard.id}
+            alarmStorage={localStorage}
+          />
           <PluginStrip />
         </main>
       </div>

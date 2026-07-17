@@ -30,7 +30,13 @@ export type {
   WebSocketDataSourceSpec,
 } from "./types";
 
-export { useAlarmState, type AlarmState } from "./useAlarmState";
+export { useAlarmState, type AlarmState, type UseAlarmStateOptions } from "./useAlarmState";
+export {
+  DEFAULT_ALARM_STATE_KEY,
+  loadPersistedAlarmScope,
+  savePersistedAlarmScope,
+  type PersistedAlarmScope,
+} from "./alarmStateStore";
 export { AlarmBanner, type AlarmBannerProps } from "./AlarmBanner";
 export { DashboardEmbed, type DashboardEmbedProps } from "./DashboardEmbed";
 export { MosaicWall, type MosaicWallProps } from "./MosaicWall";

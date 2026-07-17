@@ -16,6 +16,8 @@ export type RuntimeShellProps = {
   alarms?: AlarmItem[];
   interactiveAlarms?: boolean;
   alarmSurface?: "dark" | "light";
+  alarmScopeId?: string;
+  alarmStorage?: Pick<Storage, "getItem" | "setItem">;
 };
 
 export function RuntimeShell({
@@ -28,13 +30,18 @@ export function RuntimeShell({
   alarms: initialAlarms = [],
   interactiveAlarms = false,
   alarmSurface = "light",
+  alarmScopeId,
+  alarmStorage,
 }: RuntimeShellProps): ReactElement {
   const isStale = useIsStale(
     lastUpdatedAt,
     staleAfterMs,
     live && connection === "ready",
   );
-  const managed = useAlarmState(initialAlarms);
+  const managed = useAlarmState(initialAlarms, {
+    scopeId: interactiveAlarms ? alarmScopeId : undefined,
+    storage: interactiveAlarms ? alarmStorage : undefined,
+  });
   const alarms = interactiveAlarms ? managed.alarms : initialAlarms;
 
   return (

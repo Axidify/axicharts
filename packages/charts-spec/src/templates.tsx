@@ -169,57 +169,70 @@ export function ops2x2Template(
   const cells = (data.cells as OpsCell[]) ?? [];
 
   return createElement(
-    "div",
-    {
-      style: {
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: 6,
-        maxWidth: 720,
-      },
-    },
-    ...cells.map((cell) =>
-      createElement(
-        "div",
-        {
-          key: cell.title,
-          style: {
-            border: "1px solid #334155",
-            borderRadius: 6,
-            padding: "8px 10px",
-          },
+    ChartSyncGroup,
+    null,
+    createElement(
+      "div",
+      {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 6,
+          maxWidth: 720,
         },
+      },
+      ...cells.map((cell) =>
         createElement(
           "div",
           {
+            key: cell.title,
             style: {
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: 4,
-              fontSize: 12,
+              border: "1px solid #334155",
+              borderRadius: 6,
+              padding: "8px 10px",
             },
           },
-          createElement("span", { style: { color: "#94a3b8" } }, cell.title),
           createElement(
-            "span",
-            { style: { fontFamily: "ui-monospace, Menlo, monospace" } },
-            `${cell.data[cell.data.length - 1]?.toFixed(0) ?? "0"}${cell.suffix ?? ""}`,
+            "div",
+            {
+              style: {
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: 4,
+                fontSize: 12,
+              },
+            },
+            createElement("span", { style: { color: "#94a3b8" } }, cell.title),
+            createElement(
+              "span",
+              { style: { fontFamily: "ui-monospace, Menlo, monospace" } },
+              `${cell.data[cell.data.length - 1]?.toFixed(0) ?? "0"}${cell.suffix ?? ""}`,
+            ),
           ),
-        ),
-        shell(
-          theme,
-          "live",
-          56,
-          createElement(LineChart, {
-            categories,
-            series: [{ name: cell.title, data: cell.data, tone: cell.tone }],
-            fill: true,
-            showAxes: false,
-          }),
+          shell(
+            theme,
+            "live",
+            56,
+            createElement(LineChart, {
+              categories,
+              series: [{ name: cell.title, data: cell.data, tone: cell.tone }],
+              fill: true,
+              showAxes: false,
+            }),
+            slugifySyncId(cell.title),
+          ),
         ),
       ),
     ),
   );
+}
+
+function slugifySyncId(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 export function lineOverviewTemplate(

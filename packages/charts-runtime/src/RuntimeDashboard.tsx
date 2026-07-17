@@ -9,12 +9,16 @@ export type RuntimeDashboardProps = {
   spec: RuntimeDashboardSpec;
   className?: string;
   presentation?: boolean;
+  alarmScopeId?: string;
+  alarmStorage?: Pick<Storage, "getItem" | "setItem">;
 };
 
 export function RuntimeDashboard({
   spec,
   className,
   presentation = false,
+  alarmScopeId,
+  alarmStorage,
 }: RuntimeDashboardProps): ReactElement {
   if (spec.layout === "mosaic") {
     const wall = presentation
@@ -41,7 +45,11 @@ export function RuntimeDashboard({
 
   return (
     <div className={className} style={{ width: "100%", height: "100%" }}>
-      <DashboardEmbed dashboard={dashboard} />
+      <DashboardEmbed
+        dashboard={dashboard}
+        alarmScopeId={alarmScopeId}
+        alarmStorage={alarmStorage}
+      />
     </div>
   );
 }

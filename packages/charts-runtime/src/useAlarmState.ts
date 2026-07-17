@@ -1,4 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  loadPersistedAlarmScope,
+  savePersistedAlarmScope,
+} from "./alarmStateStore";
 import type { AlarmItem } from "./types";
 
 export type AlarmState = {
@@ -8,9 +12,42 @@ export type AlarmState = {
   reset: () => void;
 };
 
-export function useAlarmState(initialAlarms: AlarmItem[] = []): AlarmState {
+export type UseAlarmStateOptions = {
+  scopeId?: string;
+  storage?: Pick<Storage, "getItem" | "setItem">;
+  storageKey?: string;
+};
+
+export function useAlarmState(
+  initialAlarms: AlarmItem[] = [],
+  options: UseAlarmStateOptions = {},
+): AlarmState {
+  const { scopeId, storage, storageKey } = options;
+  const persist = Boolean(scopeId && storage);
   const [ackedIds, setAckedIds] = useState<Set<string>>(() => new Set());
   const [shelvedIds, setShelvedIds] = useState<Set<string>>(() => new Set());
+  const [hydrated, setHydrated] = useState(!persist);
+
+  useEffect(() => {
+    if (!persist || !scopeId || !storage) return;
+    const loaded = loadPersistedAlarmScope(storage, scopeId, storageKey);
+    setAckedIds(new Set(loaded.acked));
+    setShelvedIds(new Set(loaded.shelved));
+    setHydrated(true);
+  }, [persist, scopeId, storage, storageKey]);
+
+  useEffect(() => {
+    if (!persist || !hydrated || !scopeId || !storage) return;
+    savePersistedAlarmScope(
+      storage,
+      scopeId,
+      {
+        acked: [...ackedIds],
+        shelved: [...shelvedIds],
+      },
+      storageKey,
+    );
+  }, [persist, hydrated, scopeId, storage, storageKey, ackedIds, shelvedIds]);
 
   const ack = useCallback((id: string) => {
     setAckedIds((current) => new Set(current).add(id));

@@ -18,9 +18,15 @@ function resolveStaleAfterMs(dashboard: DashboardEmbedSpec): number | undefined 
 
 export type DashboardEmbedProps = {
   dashboard: DashboardEmbedSpec;
+  alarmScopeId?: string;
+  alarmStorage?: Pick<Storage, "getItem" | "setItem">;
 };
 
-export function DashboardEmbed({ dashboard }: DashboardEmbedProps): ReactElement {
+export function DashboardEmbed({
+  dashboard,
+  alarmScopeId,
+  alarmStorage,
+}: DashboardEmbedProps): ReactElement {
   const multiSources = dashboard.dataSources;
   const snapshots = useDataSources(multiSources);
   const singleSource =
@@ -58,6 +64,8 @@ export function DashboardEmbed({ dashboard }: DashboardEmbedProps): ReactElement
       alarmSurface={
         dashboard.theme === "industrial" || mode === "live" ? "dark" : "light"
       }
+      alarmScopeId={alarmScopeId}
+      alarmStorage={alarmStorage}
     >
       <Dashboard
         template={dashboard.template}

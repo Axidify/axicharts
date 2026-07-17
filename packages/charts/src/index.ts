@@ -79,6 +79,7 @@ export {
   useChartSync,
   useOptionalChartSync,
 } from "./sync/ChartSyncContext";
+export { SyncHighlight, type SyncHighlightProps } from "./sync/SyncHighlight";
 export { useEChartsInteraction } from "./sync/useEChartsInteraction";
 export {
   clearChartTypes,

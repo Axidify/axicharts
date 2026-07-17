@@ -42,7 +42,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C2 synced crosshair — hover either panel to align the category index across charts in a ChartSyncGroup.",
+          "C4 synced crosshair — hover either panel to align the category index across charts in a ChartSyncGroup. Follower panels dim non-active bands and show a sync highlight.",
       },
     },
   },
