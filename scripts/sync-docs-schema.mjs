@@ -19,6 +19,7 @@ for (const name of [
   "ops-embed.runtime.json",
   "ops-mosaic.runtime.json",
   "ops-dashboard.share.json",
+  "ops-workspace.workspace.json",
 ]) {
   cpSync(join(examplesSrc, name), join(examplesDest, name));
 }

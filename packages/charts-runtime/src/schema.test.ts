@@ -37,6 +37,9 @@ describe("runtime JSON schema", () => {
 
   it("accepts dashboard share export envelope", () => {
     expect(validateShareExportSchemaRaw(readExample("ops-dashboard.share.json")).ok).toBe(true);
+    expect(validateShareExportSchemaRaw(readExample("ops-workspace.workspace.json")).ok).toBe(
+      true,
+    );
   });
 
   it("accepts runtime specs with $schema hints", () => {

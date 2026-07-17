@@ -1,0 +1,90 @@
+{
+  "$schema": "https://axidify.github.io/axicharts/schema/share-export.schema.json",
+  "version": 1,
+  "kind": "workspace",
+  "exportedAt": "2026-01-01T00:00:00.000Z",
+  "name": "Ops program",
+  "dashboards": [
+    {
+      "name": "Line 3 embed",
+      "meta": {
+        "layout": "embed",
+        "feed": "static",
+        "template": "ops-2x2"
+      },
+      "spec": {
+        "layout": "embed",
+        "dashboard": {
+          "title": "Line 3",
+          "template": "ops-2x2",
+          "theme": "industrial",
+          "data": {
+            "categories": ["Mon", "Tue", "Wed", "Thu"],
+            "cells": [
+              { "title": "CPU", "data": [22, 28, 31, 34], "suffix": "%" },
+              { "title": "Memory", "data": [55, 58, 60, 59], "suffix": "%" },
+              { "title": "Errors", "data": [1, 2, 5, 3], "suffix": "/min", "tone": "warning" },
+              { "title": "p95", "data": [42, 38, 55, 49], "suffix": "ms" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Packaging mosaic",
+      "meta": {
+        "layout": "mosaic",
+        "feed": "static",
+        "mosaicPreset": "ops-finance"
+      },
+      "spec": {
+        "layout": "mosaic",
+        "wall": {
+          "title": "Packaging Line 3",
+          "theme": "industrial",
+          "columns": 2,
+          "dataSourceId": "ops",
+          "dataSources": [
+            {
+              "id": "ops",
+              "type": "static",
+              "data": {
+                "categories": ["Mon", "Tue", "Wed", "Thu"],
+                "cells": [
+                  { "title": "CPU", "data": [22, 28, 31, 34], "suffix": "%" },
+                  { "title": "Memory", "data": [55, 58, 60, 59], "suffix": "%" }
+                ]
+              }
+            },
+            {
+              "id": "finance",
+              "type": "static",
+              "data": {
+                "kpis": [
+                  { "value": "$1.33M", "label": "Net revenue" },
+                  { "value": "62.4%", "label": "Gross margin", "tone": "success" }
+                ],
+                "categories": ["Jan", "Feb", "Mar", "Apr"],
+                "revenue": [820, 932, 901, 1034]
+              }
+            }
+          ],
+          "cells": [
+            {
+              "id": "ops",
+              "template": "ops-2x2",
+              "title": "Line 3",
+              "dataSourceId": "ops"
+            },
+            {
+              "id": "finance",
+              "template": "finance-pnl",
+              "title": "Shift P&L",
+              "dataSourceId": "finance"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

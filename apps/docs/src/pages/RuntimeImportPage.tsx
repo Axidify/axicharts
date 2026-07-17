@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState, type ReactElement } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
+  dashboarderImportDeepLink,
   fetchImportPreset,
   hostedImportPresetUrl,
   HOSTED_IMPORT_PRESETS,
@@ -12,13 +13,24 @@ import {
 
 const base = import.meta.env.BASE_URL;
 
+function presetGalleryPath(presetId: string): string {
+  return `/runtime/import?preset=${encodeURIComponent(presetId)}`;
+}
+
 function sourceLabel(source: ImportPresetSource): string {
   if (source === "hosted") return "GitHub Pages";
   if (source === "local") return "docs mirror";
   return "bundled fixture";
 }
 
-function PresetCard({ preset }: { preset: HostedImportPreset }): ReactElement {
+function PresetCard({
+  preset,
+  highlighted,
+}: {
+  preset: HostedImportPreset;
+  highlighted: boolean;
+}): ReactElement {
+  const cardRef = useRef<HTMLElement | null>(null);
   const [json, setJson] = useState("");
   const [source, setSource] = useState<ImportPresetSource | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,9 +61,16 @@ function PresetCard({ preset }: { preset: HostedImportPreset }): ReactElement {
     };
   }, [preset.id]);
 
+  useEffect(() => {
+    if (!highlighted || !cardRef.current) return;
+    cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [highlighted, loading]);
+
   const validation = useMemo(() => validatePortableImportJson(json), [json]);
   const localUrl = localImportPresetUrl(preset, `${base}examples/`);
   const hostedUrl = hostedImportPresetUrl(preset);
+  const galleryLink = presetGalleryPath(preset.id);
+  const dashboarderLink = dashboarderImportDeepLink(preset.id);
 
   const copy = async (): Promise<void> => {
     if (!json) return;
@@ -62,11 +81,14 @@ function PresetCard({ preset }: { preset: HostedImportPreset }): ReactElement {
 
   return (
     <article
+      ref={cardRef}
+      id={`preset-${preset.id}`}
       style={{
-        border: "1px solid #e2e8f0",
+        border: highlighted ? "2px solid #2563eb" : "1px solid #e2e8f0",
         borderRadius: 10,
         background: "#ffffff",
         overflow: "hidden",
+        boxShadow: highlighted ? "0 0 0 4px rgba(37, 99, 235, 0.12)" : undefined,
       }}
     >
       <div
@@ -122,12 +144,18 @@ function PresetCard({ preset }: { preset: HostedImportPreset }): ReactElement {
                 {validation.semanticOk ? "ok" : "failed"}
               </span>
             </div>
-            <div style={{ fontSize: 12, marginBottom: 12 }}>
+            <div style={{ fontSize: 12, marginBottom: 12, lineHeight: 1.8 }}>
               <a href={localUrl} style={{ color: "#2563eb", marginRight: 12 }}>
                 Docs mirror
               </a>
-              <a href={hostedUrl} style={{ color: "#2563eb" }}>
+              <a href={hostedUrl} style={{ color: "#2563eb", marginRight: 12 }}>
                 GitHub Pages
+              </a>
+              <Link to={galleryLink} style={{ color: "#2563eb", marginRight: 12 }}>
+                Gallery deep link
+              </Link>
+              <a href={dashboarderLink} style={{ color: "#2563eb" }}>
+                Open in Dashboarder
               </a>
             </div>
             <pre
@@ -153,6 +181,9 @@ function PresetCard({ preset }: { preset: HostedImportPreset }): ReactElement {
 }
 
 export function RuntimeImportPage(): ReactElement {
+  const [searchParams] = useSearchParams();
+  const activePresetId = searchParams.get("preset");
+
   return (
     <div>
       <p style={{ marginTop: 0, fontSize: 13, color: "#64748b" }}>
@@ -160,15 +191,39 @@ export function RuntimeImportPage(): ReactElement {
       </p>
       <h1 style={{ marginTop: 8 }}>Import gallery</h1>
       <p style={{ color: "#475569", maxWidth: 720, lineHeight: 1.6 }}>
-        Shipped runtime and share export fixtures with <code>$schema</code> hints. The loader tries
-        GitHub Pages first, then the docs site mirror under <code>/examples/</code>, then bundled
-        fixtures in Dashboarder. Each card runs the same dual JSON Schema + semantic gate used by{" "}
+        Shipped runtime, dashboard, and workspace export fixtures with <code>$schema</code> hints.
+        Deep-link a preset with <code>?preset=ops-embed</code> or open directly in Dashboarder via{" "}
+        <code>?import=ops-embed</code>. Each card runs the dual JSON Schema + semantic gate used by{" "}
         <code>charts-runtime validate --all</code>.
       </p>
 
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 }}>
+        {HOSTED_IMPORT_PRESETS.map((preset) => (
+          <Link
+            key={preset.id}
+            to={presetGalleryPath(preset.id)}
+            style={{
+              fontSize: 12,
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: "1px solid #cbd5e1",
+              background: activePresetId === preset.id ? "#dbeafe" : "#f8fafc",
+              color: "#1e293b",
+              textDecoration: "none",
+            }}
+          >
+            {preset.label}
+          </Link>
+        ))}
+      </div>
+
       <div style={{ display: "grid", gap: 16, marginTop: 24 }}>
         {HOSTED_IMPORT_PRESETS.map((preset) => (
-          <PresetCard key={preset.id} preset={preset} />
+          <PresetCard
+            key={preset.id}
+            preset={preset}
+            highlighted={activePresetId === preset.id}
+          />
         ))}
       </div>
 

@@ -23,6 +23,7 @@ import {
 import type { DashboardPlan } from "@axicharts/charts-planner";
 import { EmbedDialog } from "./EmbedDialog";
 import { ImportDialog } from "./ImportDialog";
+import { findImportPreset, parseImportPresetQuery } from "@axicharts/charts-runtime/validation";
 import { PlannerPanel } from "./PlannerPanel";
 import { ShareDialog } from "./ShareDialog";
 import { PluginStrip } from "./PluginStrip";
@@ -110,6 +111,7 @@ export function App(): ReactElement {
   const [importOpen, setImportOpen] = useState(false);
   const [importJson, setImportJson] = useState("");
   const [importFilename, setImportFilename] = useState<string | undefined>();
+  const [importPresetId, setImportPresetId] = useState<string | undefined>();
 
   useEffect(() => {
     const loaded = loadWorkspaceStore(localStorage, undefined, defaultSeedSpec());
@@ -123,6 +125,15 @@ export function App(): ReactElement {
       setMosaicPreset,
     );
   }, []);
+
+  useEffect(() => {
+    if (!store) return;
+    const presetId = parseImportPresetQuery(window.location.search);
+    if (!presetId || !findImportPreset(presetId)) return;
+    setImportPresetId(presetId);
+    setImportOpen(true);
+    window.history.replaceState({}, "", window.location.pathname);
+  }, [store]);
 
   const builtSpec = useMemo(
     () => buildRuntimeSpec({ template, layout, feed, presentation, mosaicPreset }),
@@ -282,6 +293,7 @@ export function App(): ReactElement {
   const openImportDialog = (): void => {
     setImportJson("");
     setImportFilename(undefined);
+    setImportPresetId(undefined);
     setImportOpen(true);
   };
 
@@ -507,7 +519,11 @@ export function App(): ReactElement {
         open={importOpen}
         initialJson={importJson}
         initialFilename={importFilename}
-        onClose={() => setImportOpen(false)}
+        initialPresetId={importPresetId}
+        onClose={() => {
+          setImportOpen(false);
+          setImportPresetId(undefined);
+        }}
         onApply={applyImport}
       />
     </div>

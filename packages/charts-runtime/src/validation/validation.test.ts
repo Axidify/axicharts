@@ -2,7 +2,15 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { hostedImportPresetUrl, HOSTED_IMPORT_PRESETS, localImportPresetUrl } from "../schemaUrls";
+import {
+  dashboarderImportDeepLink,
+  findImportPreset,
+  hostedImportPresetUrl,
+  HOSTED_IMPORT_PRESETS,
+  importGalleryDeepLink,
+  localImportPresetUrl,
+  parseImportPresetQuery,
+} from "../schemaUrls";
 import { serializeDashboardExport } from "../workspace/share";
 import {
   detectImportShape,
@@ -34,6 +42,16 @@ describe("validatePortableImportJson", () => {
     expect(result.schemaOk).toBe(true);
     expect(result.semanticOk).toBe(true);
     expect(result.export?.name).toBe("Ops");
+  });
+
+  it("imports workspace bundle exports", () => {
+    const json = readExample("ops-workspace.workspace.json");
+    const result = validatePortableImportJson(json);
+    expect(result.shape).toBe("share");
+    expect(result.ok).toBe(true);
+    expect(result.export?.kind).toBe("workspace");
+    if (result.export?.kind !== "workspace") return;
+    expect(result.export.dashboards).toHaveLength(2);
   });
 
   it("imports bare runtime JSON with runtime-spec schema gate", () => {
@@ -110,5 +128,14 @@ describe("hosted import presets", () => {
     expect(localImportPresetUrl(preset, "/axicharts/examples/")).toBe(
       "/axicharts/examples/ops-embed.runtime.json",
     );
+  });
+
+  it("builds gallery and dashboarder deep links", () => {
+    expect(importGalleryDeepLink("ops-embed")).toBe("/runtime/import?preset=ops-embed");
+    expect(dashboarderImportDeepLink("ops-workspace")).toBe(
+      "http://localhost:3000/?import=ops-workspace",
+    );
+    expect(parseImportPresetQuery("?import=ops-mosaic")).toBe("ops-mosaic");
+    expect(findImportPreset("ops-workspace")?.filename).toBe("ops-workspace.workspace.json");
   });
 });

@@ -12,6 +12,12 @@ function listFixtures(suffix) {
     .map((name) => join(examplesDir, name));
 }
 
+function listShareFixtures() {
+  return readdirSync(examplesDir)
+    .filter((name) => name.endsWith(".share.json") || name.endsWith(".workspace.json"))
+    .map((name) => join(examplesDir, name));
+}
+
 let failed = false;
 
 for (const file of listFixtures(".runtime.json")) {
@@ -22,7 +28,7 @@ for (const file of listFixtures(".runtime.json")) {
   }
 }
 
-for (const file of listFixtures(".share.json")) {
+for (const file of listShareFixtures()) {
   const code = runCli(["validate", "--share", "--all", file]);
   if (code !== 0) {
     failed = true;
@@ -35,5 +41,5 @@ if (failed) {
 }
 
 process.stdout.write(
-  `ok (${listFixtures(".runtime.json").length} runtime, ${listFixtures(".share.json").length} share)\n`,
+  `ok (${listFixtures(".runtime.json").length} runtime, ${listShareFixtures().length} share)\n`,
 );

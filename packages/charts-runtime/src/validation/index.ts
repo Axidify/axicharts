@@ -5,6 +5,10 @@ import {
   HOSTED_IMPORT_PRESETS,
   hostedImportPresetUrl,
   localImportPresetUrl,
+  findImportPreset,
+  parseImportPresetQuery,
+  importGalleryDeepLink,
+  dashboarderImportDeepLink,
   type HostedImportPreset,
 } from "../schemaUrls";
 import {
@@ -36,6 +40,10 @@ export {
   HOSTED_IMPORT_PRESETS,
   hostedImportPresetUrl,
   localImportPresetUrl,
+  findImportPreset,
+  parseImportPresetQuery,
+  importGalleryDeepLink,
+  dashboarderImportDeepLink,
   RUNTIME_SPEC_SCHEMA_URL,
   SHARE_EXPORT_SCHEMA_URL,
   type HostedImportPreset,

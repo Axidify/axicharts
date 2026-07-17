@@ -47,6 +47,7 @@ export type ImportDialogProps = {
   open: boolean;
   initialJson?: string;
   initialFilename?: string;
+  initialPresetId?: string;
   onClose: () => void;
   onApply: (exported: ShareExport) => void;
 };
@@ -61,6 +62,7 @@ export function ImportDialog({
   open,
   initialJson = "",
   initialFilename,
+  initialPresetId,
   onClose,
   onApply,
 }: ImportDialogProps): ReactElement | null {
@@ -84,15 +86,6 @@ export function ImportDialog({
   const validation = useMemo(() => validatePortableImportJson(jsonText), [jsonText]);
   const hasInput = jsonText.trim().length > 0;
 
-  if (!open) return null;
-
-  const loadFile = async (file: File): Promise<void> => {
-    setPresetError(null);
-    setPresetSource(null);
-    setFilename(file.name);
-    setJsonText(await file.text());
-  };
-
   const loadPreset = async (presetId: string): Promise<void> => {
     const preset = HOSTED_IMPORT_PRESETS.find((item) => item.id === presetId);
     if (!preset) return;
@@ -114,6 +107,21 @@ export function ImportDialog({
     } finally {
       setLoadingPresetId(null);
     }
+  };
+
+  useEffect(() => {
+    if (open && initialPresetId) {
+      void loadPreset(initialPresetId);
+    }
+  }, [open, initialPresetId]);
+
+  if (!open) return null;
+
+  const loadFile = async (file: File): Promise<void> => {
+    setPresetError(null);
+    setPresetSource(null);
+    setFilename(file.name);
+    setJsonText(await file.text());
   };
 
   return (
