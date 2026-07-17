@@ -35,11 +35,34 @@ export type MockLiveDataSourceSpec = {
   mutate?: (data: Record<string, unknown>) => Record<string, unknown>;
 };
 
+export type MqttClientLike = {
+  on(event: string, listener: (...args: unknown[]) => void): void;
+  subscribe(topic: string, options?: unknown): void;
+  end(force?: boolean): void;
+};
+
+export type MqttConnectFn = (
+  url: string,
+  options?: { clientId?: string },
+) => MqttClientLike;
+
+export type MqttDataSourceSpec = {
+  id?: string;
+  type: "mqtt";
+  url: string;
+  topic: string;
+  staleAfterMs?: number;
+  clientId?: string;
+  connect?: MqttConnectFn;
+  parsePayload?: (raw: unknown) => Record<string, unknown>;
+};
+
 export type DataSourceSpec =
   | StaticDataSourceSpec
   | RestDataSourceSpec
   | WebSocketDataSourceSpec
-  | MockLiveDataSourceSpec;
+  | MockLiveDataSourceSpec
+  | MqttDataSourceSpec;
 
 export type DataSourceSnapshot = {
   data: Record<string, unknown>;
@@ -55,6 +78,33 @@ export type DashboardEmbedSpec = {
   theme?: ThemeName;
   mode?: ChartMode;
   template: TemplateId;
+  data?: Record<string, unknown>;
+  dataSource?: DataSourceSpec;
+  staleAfterMs?: number;
+};
+
+export type MosaicCellSpec = {
+  id: string;
+  template: TemplateId;
+  title?: string;
+  subtitle?: string;
+  theme?: ThemeName;
+  mode?: ChartMode;
+  data?: Record<string, unknown>;
+  dataPath?: string;
+  colSpan?: number;
+  rowSpan?: number;
+};
+
+export type MosaicWallSpec = {
+  version?: string;
+  title?: string;
+  subtitle?: string;
+  theme?: ThemeName;
+  mode?: ChartMode;
+  columns?: number;
+  gap?: number;
+  cells: MosaicCellSpec[];
   data?: Record<string, unknown>;
   dataSource?: DataSourceSpec;
   staleAfterMs?: number;

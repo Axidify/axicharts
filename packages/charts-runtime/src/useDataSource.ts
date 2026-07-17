@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { connectMockLiveSource } from "./adapters/mockLive";
+import { connectMqttSource } from "./adapters/mqtt";
 import { connectRestSource } from "./adapters/rest";
 import { connectStaticSource } from "./adapters/static";
 import { connectWebSocketSource } from "./adapters/websocket";
@@ -23,6 +24,8 @@ function connectSource(
       return connectWebSocketSource(spec, onUpdate);
     case "mock-live":
       return connectMockLiveSource(spec, onUpdate);
+    case "mqtt":
+      return connectMqttSource(spec, onUpdate);
     default:
       return () => {};
   }
