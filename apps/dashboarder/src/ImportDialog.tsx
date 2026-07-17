@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import {
   fetchImportPreset,
+  formatValidateFileCommand,
+  formatValidatePresetCommand,
   HOSTED_IMPORT_PRESETS,
   RUNTIME_SPEC_SCHEMA_URL,
   SHARE_EXPORT_SCHEMA_URL,
@@ -32,6 +34,23 @@ const panelStyle = {
   borderRadius: 12,
   padding: 20,
 };
+
+const validateHintBoxStyle = {
+  marginTop: 12,
+  padding: 12,
+  borderRadius: 8,
+  border: "1px solid #334155",
+  background: "#111827",
+  fontSize: 12,
+  color: "#94a3b8",
+  lineHeight: 1.7,
+} as const;
+
+const validateHintMonoStyle = {
+  marginTop: 6,
+  fontFamily: "ui-monospace, monospace",
+  fontSize: 11,
+} as const;
 
 const buttonStyle = {
   fontSize: 12,
@@ -71,6 +90,7 @@ export function ImportDialog({
   const [loadingPresetId, setLoadingPresetId] = useState<string | null>(null);
   const [presetError, setPresetError] = useState<string | null>(null);
   const [presetSource, setPresetSource] = useState<ImportPresetSource | null>(null);
+  const [loadedPresetId, setLoadedPresetId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -80,11 +100,17 @@ export function ImportDialog({
       setPresetError(null);
       setLoadingPresetId(null);
       setPresetSource(null);
+      setLoadedPresetId(null);
     }
   }, [open, initialJson, initialFilename]);
 
   const validation = useMemo(() => validatePortableImportJson(jsonText), [jsonText]);
   const hasInput = jsonText.trim().length > 0;
+  const validateHint = loadedPresetId
+    ? formatValidatePresetCommand(loadedPresetId)
+    : filename && validation.shape
+      ? formatValidateFileCommand(filename, validation.shape)
+      : null;
 
   const loadPreset = async (presetId: string): Promise<void> => {
     const preset = HOSTED_IMPORT_PRESETS.find((item) => item.id === presetId);
@@ -101,6 +127,7 @@ export function ImportDialog({
       setJsonText(result.json);
       setFilename(preset.filename);
       setPresetSource(result.source);
+      setLoadedPresetId(preset.id);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setPresetError(`Failed to load ${preset.label}: ${message}`);
@@ -120,6 +147,7 @@ export function ImportDialog({
   const loadFile = async (file: File): Promise<void> => {
     setPresetError(null);
     setPresetSource(null);
+    setLoadedPresetId(null);
     setFilename(file.name);
     setJsonText(await file.text());
   };
@@ -230,6 +258,7 @@ export function ImportDialog({
           onChange={(event) => {
             setPresetError(null);
             setPresetSource(null);
+            setLoadedPresetId(null);
             setJsonText(event.target.value);
           }}
           spellCheck={false}
@@ -256,6 +285,22 @@ export function ImportDialog({
             <ErrorList title="JSON Schema" errors={validation.schemaErrors} />
             <ErrorList title="Semantic" errors={validation.semanticErrors} />
           </>
+        ) : null}
+
+        {!hasInput ? (
+          <div style={validateHintBoxStyle}>
+            <div>Validate shipped presets in CI:</div>
+            {HOSTED_IMPORT_PRESETS.map((preset) => (
+              <div key={preset.id} style={validateHintMonoStyle}>
+                {formatValidatePresetCommand(preset.id)}
+              </div>
+            ))}
+          </div>
+        ) : validateHint ? (
+          <div style={validateHintBoxStyle}>
+            Validate this import:
+            <div style={validateHintMonoStyle}>{validateHint}</div>
+          </div>
         ) : null}
       </div>
     </div>

@@ -70,6 +70,17 @@ export function formatValidatePresetCommand(
   return `charts-runtime validate${shareFlag}${layerFlag} --preset ${presetId}`;
 }
 
+export function formatValidateFileCommand(
+  filePath: string,
+  shape: "share" | "runtime",
+  layer: "semantic" | "schema" | "all" = "all",
+): string {
+  const layerFlag = layer === "all" ? " --all" : layer === "schema" ? " --schema" : "";
+  const shareFlag = shape === "share" ? " --share" : "";
+  const quoted = filePath.includes(" ") ? `"${filePath}"` : filePath;
+  return `charts-runtime validate${shareFlag}${layerFlag} ${quoted}`;
+}
+
 export function hostedImportPresetUrl(preset: HostedImportPreset): string {
   return `${HOSTED_EXAMPLES_BASE_URL}${preset.filename}`;
 }

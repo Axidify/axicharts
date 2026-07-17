@@ -15,6 +15,7 @@ import {
   shareExportReferencePreset,
   runtimeEmbedReferencePreset,
   formatValidatePresetCommand,
+  formatValidateFileCommand,
   isShareImportPreset,
 } from "../schemaUrls";
 import { serializeDashboardExport } from "../workspace/share";
@@ -156,6 +157,12 @@ describe("hosted import presets", () => {
     );
     expect(formatValidatePresetCommand("ops-dashboard", "all")).toBe(
       "charts-runtime validate --share --all --preset ops-dashboard",
+    );
+    expect(formatValidateFileCommand("ops-embed.runtime.json", "runtime", "all")).toBe(
+      "charts-runtime validate --all ops-embed.runtime.json",
+    );
+    expect(formatValidateFileCommand("my export.share.json", "share", "schema")).toBe(
+      'charts-runtime validate --share --schema "my export.share.json"',
     );
   });
 

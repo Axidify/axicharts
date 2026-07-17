@@ -11,6 +11,7 @@ import {
 import {
   dashboarderImportDeepLink,
   docsImportGalleryDeepLink,
+  formatValidatePresetCommand,
   shareExportReferencePreset,
   validateShareExportDualJson,
 } from "@axicharts/charts-runtime/validation";
@@ -247,6 +248,9 @@ export function ShareDialog({
             <a href={dashboarderImportDeepLink(referencePreset.id)} style={{ color: "#93c5fd" }}>
               Import in app
             </a>
+            <div style={{ marginTop: 6, fontFamily: "ui-monospace, monospace", fontSize: 11 }}>
+              {formatValidatePresetCommand(referencePreset.id)}
+            </div>
           </div>
         ) : null}
       </div>
