@@ -1,25 +1,12 @@
-import type { ReactElement } from "react";
-import { RuntimeDashboard } from "@axicharts/charts-runtime";
+import type { ReactElement, ReactNode } from "react";
+import { RuntimeDashboard, serializeRuntimeSpec } from "@axicharts/charts-runtime";
+import {
+  ADAPTER_ROWS,
+  EMBED_RUNTIME_SPEC,
+  MOSAIC_RUNTIME_SPEC,
+} from "../demos/runtimeDemo";
 
-export function RuntimePage(): ReactElement {
-  return (
-    <div>
-      <h1 style={{ marginTop: 0 }}>Dashboard runtime</h1>
-      <p style={{ color: "#475569", maxWidth: 640 }}>
-        Bind live REST, historian, MQTT, or static data to charts-spec templates with stale and
-        alarm chrome.
-      </p>
-      <pre
-        style={{
-          padding: 14,
-          borderRadius: 8,
-          background: "#f1f5f9",
-          fontSize: 11,
-          overflow: "auto",
-          marginTop: 20,
-        }}
-      >
-        {`import { RuntimeDashboard } from "@axicharts/charts-runtime";
+const EMBED_CODE = `import { RuntimeDashboard } from "@axicharts/charts-runtime";
 
 <RuntimeDashboard
   spec={{
@@ -30,37 +17,148 @@ export function RuntimePage(): ReactElement {
       dataSource: { type: "rest", url: "/api/metrics", intervalMs: 2000 },
     },
   }}
-/>`}
-      </pre>
-      <div style={{ marginTop: 24, maxWidth: 720 }}>
-        <RuntimeDashboard
-          spec={{
-            layout: "embed",
-            dashboard: {
-              title: "prod-api-01",
-              subtitle: "Static demo",
-              template: "ops-2x2",
-              theme: "industrial",
-              mode: "live",
-              data: {
-                categories: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                cells: [
-                  { title: "CPU", data: [22, 28, 31, 34, 30, 34, 32], suffix: "%" },
-                  { title: "Memory", data: [55, 58, 60, 59, 61, 62, 61], suffix: "%" },
-                  {
-                    title: "Errors",
-                    data: [1, 2, 5, 3, 2, 4, 3],
-                    suffix: "/min",
-                    tone: "warning",
-                  },
-                  { title: "p95", data: [42, 38, 55, 49, 62, 58, 71], suffix: "ms" },
-                ],
-                alarms: [{ id: "cpu", message: "CPU above warn threshold", severity: "warning" }],
-              },
-            },
-          }}
-        />
+/>`;
+
+const MOSAIC_CODE = `import { RuntimeDashboard } from "@axicharts/charts-runtime";
+
+<RuntimeDashboard
+  spec={{
+    layout: "mosaic",
+    wall: {
+      columns: 2,
+      dataSources: [
+        { id: "ops", type: "rest", url: "/api/line3" },
+        { id: "kpi", type: "historian", url: "/api/tags", tags: ["throughput"] },
+      ],
+      cells: [
+        { id: "ops", template: "ops-2x2", dataSourceId: "ops" },
+        { id: "kpi", template: "line-overview", dataSourceId: "kpi" },
+      ],
+    },
+  }}
+/>`;
+
+function Section({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+}): ReactElement {
+  return (
+    <section
+      style={{
+        marginTop: 28,
+        border: "1px solid #e2e8f0",
+        borderRadius: 10,
+        background: "#ffffff",
+        overflow: "hidden",
+      }}
+    >
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid #e2e8f0" }}>
+        <strong>{title}</strong>
+        {subtitle ? (
+          <span style={{ marginLeft: 8, fontSize: 12, color: "#64748b" }}>{subtitle}</span>
+        ) : null}
       </div>
+      <div style={{ padding: 16 }}>{children}</div>
+    </section>
+  );
+}
+
+export function RuntimePage(): ReactElement {
+  const portableSpec = serializeRuntimeSpec(MOSAIC_RUNTIME_SPEC);
+
+  return (
+    <div>
+      <h1 style={{ marginTop: 0 }}>Dashboard runtime</h1>
+      <p style={{ color: "#475569", maxWidth: 640 }}>
+        Layer 3 embed SDK — bind REST, WebSocket, MQTT, historian, or static data to charts-spec
+        templates with stale overlays and alarm chrome.
+      </p>
+
+      <Section title="Data adapters" subtitle="connectSource + hooks">
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+          <thead>
+            <tr style={{ textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>
+              <th style={{ padding: "8px 6px" }}>Type</th>
+              <th style={{ padding: "8px 6px" }}>Use case</th>
+              <th style={{ padding: "8px 6px" }}>Key fields</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ADAPTER_ROWS.map((row) => (
+              <tr key={row.type} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                <td style={{ padding: "8px 6px" }}>
+                  <code>{row.type}</code>
+                </td>
+                <td style={{ padding: "8px 6px", color: "#475569" }}>{row.useCase}</td>
+                <td style={{ padding: "8px 6px", color: "#64748b", fontSize: 12 }}>
+                  {row.fields}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Section>
+
+      <Section title="Embed layout" subtitle="single dashboard template">
+        <div style={{ maxWidth: 720, marginBottom: 16 }}>
+          <RuntimeDashboard spec={EMBED_RUNTIME_SPEC} />
+        </div>
+        <pre
+          style={{
+            margin: 0,
+            padding: 14,
+            background: "#f8fafc",
+            fontSize: 11,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {EMBED_CODE}
+        </pre>
+      </Section>
+
+      <Section title="Mosaic wall" subtitle="multi-source cells">
+        <div style={{ maxWidth: 900, marginBottom: 16 }}>
+          <RuntimeDashboard spec={MOSAIC_RUNTIME_SPEC} />
+        </div>
+        <pre
+          style={{
+            margin: 0,
+            padding: 14,
+            background: "#f8fafc",
+            fontSize: 11,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {MOSAIC_CODE}
+        </pre>
+      </Section>
+
+      <Section title="Portable spec" subtitle="serializeRuntimeSpec / parseRuntimeSpec">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
+          Export runtime JSON for Dashboarder, GitOps, or agent planners — matches{" "}
+          <code>packages/charts-runtime/examples/ops-mosaic.runtime.json</code>.
+        </p>
+        <pre
+          style={{
+            margin: 0,
+            padding: 14,
+            background: "#0f172a",
+            color: "#e2e8f0",
+            fontSize: 11,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {portableSpec}
+        </pre>
+      </Section>
     </div>
   );
 }

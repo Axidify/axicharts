@@ -48,7 +48,8 @@ export function HomePage(): ReactElement {
             <Link to="/spec">see spec layer</Link>
           </li>
           <li>
-            <strong>Runtime</strong> — <code>@axicharts/charts-runtime</code> live data + embed
+            <strong>Runtime</strong> — <code>@axicharts/charts-runtime</code> live data + embed —{" "}
+            <Link to="/runtime">see runtime SDK</Link>
           </li>
         </ul>
       </section>
