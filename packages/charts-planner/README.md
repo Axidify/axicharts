@@ -110,3 +110,4 @@ presentation). Import restores the same fields — see the
 | C40 | ShareDialog meta export, Spec Phase 3 cross-link |
 | C41 | ImportDialog meta restore hints, track release notes |
 | C42 | Runtime adapters planner feed column, share-import round-trip docs |
+| C43 | RuntimeHubNav share-import link, ShareDialog/ImportDialog Storybook fixtures |

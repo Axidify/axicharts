@@ -9,6 +9,12 @@ export const RUNTIME_HUB_LINKS = [
   { to: "/runtime/links", label: "Deep links" },
 ] as const;
 
+/** In-page anchors on the runtime overview — surfaced in hub nav for quick jumps. */
+export const RUNTIME_HUB_ANCHORS = [
+  { to: "/runtime#share-import", label: "Share ↔ import" },
+  { to: "/runtime#planner-http", label: "Planner HTTP" },
+] as const;
+
 export type RuntimeHubPage = (typeof RUNTIME_HUB_LINKS)[number]["to"];
 
 const PAGE_TITLES: Record<RuntimeHubPage, string> = {
@@ -61,6 +67,20 @@ export function RuntimeHubNav({
               color: isActive ? "#1e3a8a" : "#475569",
               fontWeight: isActive ? 600 : 400,
             })}
+          >
+            {link.label}
+          </NavLink>
+        ))}
+        {RUNTIME_HUB_ANCHORS.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            style={{
+              ...tabStyle,
+              background: "#f8fafc",
+              borderStyle: "dashed",
+              color: "#64748b",
+            }}
           >
             {link.label}
           </NavLink>

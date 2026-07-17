@@ -59,6 +59,7 @@ export const PLANNER_TRACK_RELEASE_NOTES = [
   { slice: "C40", summary: "ShareDialog planner meta export, Spec page Phase 3 planner section" },
   { slice: "C41", summary: "ImportDialog planner meta restore hints, planner track release notes" },
   { slice: "C42", summary: "Runtime adapters planner feed column, share-import round-trip docs" },
+  { slice: "C43", summary: "RuntimeHubNav share-import link, ShareDialog/ImportDialog Storybook fixtures" },
 ] as const;
 
 export const SHARE_EXPORT_META_EXAMPLE = `{
