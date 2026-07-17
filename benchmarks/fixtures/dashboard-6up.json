@@ -1,0 +1,7 @@
+{
+  "id": "dashboard-6up",
+  "panels": 6,
+  "pointsPerPanel": 2000,
+  "updates": 30,
+  "frameBudgetMs": 16
+}

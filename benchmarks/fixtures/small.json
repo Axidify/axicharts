@@ -1,0 +1,7 @@
+{
+  "id": "small",
+  "points": 500,
+  "series": 1,
+  "updateBudgetMs": 8,
+  "firstRenderBudgetMs": 16
+}

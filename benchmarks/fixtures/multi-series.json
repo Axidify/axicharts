@@ -1,0 +1,7 @@
+{
+  "id": "multi-series",
+  "points": 10000,
+  "series": 4,
+  "updateBudgetMs": 16,
+  "firstRenderBudgetMs": 16
+}

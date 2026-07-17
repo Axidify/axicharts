@@ -1,0 +1,68 @@
+[
+  {
+    "name": "@axicharts/charts",
+    "passed": true,
+    "size": 5563,
+    "sizeLimit": 14000
+  },
+  {
+    "name": "@axicharts/charts-canvas",
+    "passed": true,
+    "size": 4335,
+    "sizeLimit": 6000
+  },
+  {
+    "name": "@axicharts/charts-echarts",
+    "passed": true,
+    "size": 5200,
+    "sizeLimit": 8000
+  },
+  {
+    "name": "@axicharts/charts-core",
+    "passed": true,
+    "size": 1551,
+    "sizeLimit": 3000
+  },
+  {
+    "name": "@axicharts/charts-theme",
+    "passed": true,
+    "size": 342,
+    "sizeLimit": 2000
+  },
+  {
+    "name": "@axicharts/charts-spec",
+    "passed": true,
+    "size": 456,
+    "sizeLimit": 8000
+  },
+  {
+    "name": "@axicharts/charts-runtime",
+    "passed": true,
+    "size": 5593,
+    "sizeLimit": 6000
+  },
+  {
+    "name": "@axicharts/charts-tank",
+    "passed": true,
+    "size": 91,
+    "sizeLimit": 3000
+  },
+  {
+    "name": "@axicharts/charts-geo",
+    "passed": true,
+    "size": 116,
+    "sizeLimit": 3000
+  },
+  {
+    "name": "@axicharts/charts-andon",
+    "passed": true,
+    "size": 120,
+    "sizeLimit": 3000
+  },
+  {
+    "name": "@axicharts/charts-gantt",
+    "passed": true,
+    "size": 92,
+    "sizeLimit": 3000
+  }
+]

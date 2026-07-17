@@ -1,0 +1,7 @@
+{
+  "id": "medium",
+  "points": 5000,
+  "series": 1,
+  "updateBudgetMs": 16,
+  "firstRenderBudgetMs": 16
+}

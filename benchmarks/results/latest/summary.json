@@ -1,0 +1,136 @@
+{
+  "collectedAt": "2026-07-17T21:11:51.250Z",
+  "node": "v24.16.0",
+  "platform": "darwin arm64",
+  "hostname": "Axidrains-MacBook-Neo.local",
+  "perf": [
+    {
+      "id": "small",
+      "metric": "update_p95",
+      "points": 500,
+      "panels": 1,
+      "series": 1,
+      "updates": 30,
+      "valueMs": 0.010999999999967258,
+      "budgetMs": 8,
+      "passed": true,
+      "environment": "node-happy-dom"
+    },
+    {
+      "id": "medium",
+      "metric": "update_p95",
+      "points": 5000,
+      "panels": 1,
+      "series": 1,
+      "updates": 30,
+      "valueMs": 0.044499999999970896,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "node-happy-dom"
+    },
+    {
+      "id": "dashboard-6up",
+      "metric": "frame_p95",
+      "points": 2000,
+      "panels": 6,
+      "series": 1,
+      "updates": 30,
+      "valueMs": 0.10829100000000835,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "node-happy-dom"
+    },
+    {
+      "id": "large",
+      "metric": "update_p95",
+      "points": 10000,
+      "panels": 1,
+      "series": 1,
+      "updates": 30,
+      "valueMs": 0.0426670000000513,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "node-happy-dom"
+    },
+    {
+      "id": "multi-series",
+      "metric": "update_p95",
+      "points": 10000,
+      "panels": 1,
+      "series": 4,
+      "updates": 30,
+      "valueMs": 0.238207999999986,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "node-happy-dom"
+    }
+  ],
+  "bundle": [
+    {
+      "name": "@axicharts/charts",
+      "passed": true,
+      "size": 5563,
+      "sizeLimit": 14000
+    },
+    {
+      "name": "@axicharts/charts-canvas",
+      "passed": true,
+      "size": 4335,
+      "sizeLimit": 6000
+    },
+    {
+      "name": "@axicharts/charts-echarts",
+      "passed": true,
+      "size": 5200,
+      "sizeLimit": 8000
+    },
+    {
+      "name": "@axicharts/charts-core",
+      "passed": true,
+      "size": 1551,
+      "sizeLimit": 3000
+    },
+    {
+      "name": "@axicharts/charts-theme",
+      "passed": true,
+      "size": 342,
+      "sizeLimit": 2000
+    },
+    {
+      "name": "@axicharts/charts-spec",
+      "passed": true,
+      "size": 456,
+      "sizeLimit": 8000
+    },
+    {
+      "name": "@axicharts/charts-runtime",
+      "passed": true,
+      "size": 5593,
+      "sizeLimit": 6000
+    },
+    {
+      "name": "@axicharts/charts-tank",
+      "passed": true,
+      "size": 91,
+      "sizeLimit": 3000
+    },
+    {
+      "name": "@axicharts/charts-geo",
+      "passed": true,
+      "size": 116,
+      "sizeLimit": 3000
+    },
+    {
+      "name": "@axicharts/charts-andon",
+      "passed": true,
+      "size": 120,
+      "sizeLimit": 3000
+    },
+    {
+      "name": "@axicharts/charts-gantt",
+      "passed": true,
+      "size": 92,
+      "sizeLimit": 3000
+    }
+  ]
+}

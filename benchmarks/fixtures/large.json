@@ -1,0 +1,7 @@
+{
+  "id": "large",
+  "points": 10000,
+  "series": 1,
+  "updateBudgetMs": 16,
+  "firstRenderBudgetMs": 16
+}

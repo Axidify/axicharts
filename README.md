@@ -59,7 +59,8 @@ export function LatencyPanel() {
 pnpm install
 pnpm build
 pnpm test
-pnpm test:perf   # 6-panel uPlot setData gate
+pnpm test:perf   # uPlot update gates (500 / 5k / 10k + 6-panel)
+pnpm bench       # collect published numbers → benchmarks/BENCHMARKS.md
 pnpm size        # bundle gzip budgets
 pnpm storybook
 pnpm docs

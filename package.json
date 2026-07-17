@@ -11,6 +11,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "test:perf": "pnpm --filter @axicharts/charts-canvas test:perf",
+    "bench": "node scripts/collect-benchmarks.mjs",
     "size": "size-limit",
     "typecheck": "turbo run typecheck",
     "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm size"
