@@ -2,19 +2,19 @@
   {
     "name": "@axicharts/charts",
     "passed": true,
-    "size": 5632,
+    "size": 5669,
     "sizeLimit": 14000
   },
   {
     "name": "@axicharts/charts-canvas",
     "passed": true,
-    "size": 4335,
+    "size": 4340,
     "sizeLimit": 6000
   },
   {
     "name": "@axicharts/charts-echarts",
     "passed": true,
-    "size": 5200,
+    "size": 5210,
     "sizeLimit": 8000
   },
   {

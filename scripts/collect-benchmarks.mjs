@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const withBrowser = process.argv.includes("--browser");
+const withStability = process.argv.includes("--stability");
 const date = new Date().toISOString().slice(0, 10);
 const resultsDir = path.join(root, "benchmarks", "results", date);
 const latestDir = path.join(root, "benchmarks", "results", "latest");
@@ -60,6 +61,38 @@ Profile: Chromium headless, viewport 1280×720, \`flushSync\` state updates, ${b
 `;
 }
 
+function renderStabilitySection(stability) {
+  if (!stability) return "";
+
+  const soakRows = (stability.soak ?? [])
+    .map(
+      (row) =>
+        `| ${row.id} | ${row.points} pts @ ${row.hz} Hz × ${row.durationMs / 1000}s | ${formatMs(row.p95Ms)} | ${row.budgetMs} | ${row.passed ? "✅" : "❌"} |`,
+    )
+    .join("\n");
+
+  const leak = stability.leak;
+  const leakRow = leak
+    ? `| ${leak.id} | ${leak.cycles} cycles | leftover uPlot: ${leak.leftoverUplot}, heap Δ ${leak.heapDeltaMb.toFixed(1)} MB | ${leak.passed ? "✅" : "❌"} |`
+    : "";
+
+  return `
+## Browser stability (Chromium 4× CPU)
+
+### Soak update p95
+
+| Scenario | Profile | p95 | Budget (ms) | Pass |
+|----------|---------|-----|-------------|------|
+${soakRows}
+
+### Leak check
+
+| Scenario | Cycles | Result | Pass |
+|----------|--------|--------|------|
+${leakRow}
+`;
+}
+
 function renderBenchmarksMd(summary) {
   const bundleRows = summary.bundle
     .map((entry) => {
@@ -88,6 +121,9 @@ function renderBenchmarksMd(summary) {
   if (summary.browser?.length) {
     envParts.push("Chromium 4× (browser competitive)");
   }
+  if (summary.stability) {
+    envParts.push("Chromium 4× (soak + leak)");
+  }
 
   return `# Published benchmarks
 
@@ -102,7 +138,8 @@ Re-run locally:
 \`\`\`bash
 pnpm bench              # node proxy gates + bundle
 pnpm bench:browser      # Chromium competitive table
-pnpm bench:all          # both
+pnpm bench:stability    # 60s soak @ 1/5 Hz + leak check
+pnpm bench:all          # node + competitive browser
 \`\`\`
 
 Methodology: Dashboarder [PERFORMANCE.md](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/PERFORMANCE.md).
@@ -119,6 +156,7 @@ ${bundleRows}
 |---------|----------|-----|--------|------|
 ${perfRows}
 ${renderBrowserSection(summary.browser)}
+${renderStabilitySection(summary.stability)}
 ## Fixtures
 
 | File | Points | Series | Purpose |
@@ -165,6 +203,18 @@ if (withBrowser) {
   }
 }
 
+let stability = null;
+if (withStability) {
+  console.log("→ browser stability bench");
+  const { runStabilityBench } = await import("../benchmarks/browser/stability.mjs");
+  stability = await runStabilityBench(resultsDir);
+} else {
+  const stabilityPath = path.join(resultsDir, "browser-stability.json");
+  if (fs.existsSync(stabilityPath)) {
+    stability = readJson(stabilityPath);
+  }
+}
+
 const perfPath = path.join(resultsDir, "perf.json");
 const perf = fs.existsSync(perfPath) ? readJson(perfPath) : [];
 const bundle = JSON.parse(bundleStdout.trim());
@@ -177,6 +227,7 @@ const summary = {
   perf,
   bundle,
   browser,
+  stability,
 };
 
 fs.writeFileSync(

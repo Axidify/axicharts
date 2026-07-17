@@ -1,5 +1,5 @@
 {
-  "collectedAt": "2026-07-17T21:19:08.923Z",
+  "collectedAt": "2026-07-17T21:26:11.238Z",
   "node": "v24.16.0",
   "platform": "darwin arm64",
   "hostname": "Axidrains-MacBook-Neo.local",
@@ -11,20 +11,8 @@
       "panels": 1,
       "series": 1,
       "updates": 30,
-      "valueMs": 0.021541999999953987,
+      "valueMs": 0.009666000000038366,
       "budgetMs": 8,
-      "passed": true,
-      "environment": "node-happy-dom"
-    },
-    {
-      "id": "dashboard-6up",
-      "metric": "frame_p95",
-      "points": 2000,
-      "panels": 6,
-      "series": 1,
-      "updates": 30,
-      "valueMs": 0.10770899999999983,
-      "budgetMs": 16,
       "passed": true,
       "environment": "node-happy-dom"
     },
@@ -35,7 +23,19 @@
       "panels": 1,
       "series": 1,
       "updates": 30,
-      "valueMs": 0.036999999999920874,
+      "valueMs": 0.02575000000001637,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "node-happy-dom"
+    },
+    {
+      "id": "dashboard-6up",
+      "metric": "frame_p95",
+      "points": 2000,
+      "panels": 6,
+      "series": 1,
+      "updates": 30,
+      "valueMs": 0.3797079999999369,
       "budgetMs": 16,
       "passed": true,
       "environment": "node-happy-dom"
@@ -47,7 +47,7 @@
       "panels": 1,
       "series": 1,
       "updates": 30,
-      "valueMs": 0.036958000000026914,
+      "valueMs": 0.03829200000006949,
       "budgetMs": 16,
       "passed": true,
       "environment": "node-happy-dom"
@@ -59,7 +59,7 @@
       "panels": 1,
       "series": 4,
       "updates": 30,
-      "valueMs": 0.37029199999994944,
+      "valueMs": 0.4102090000000089,
       "budgetMs": 16,
       "passed": true,
       "environment": "node-happy-dom"
@@ -69,19 +69,19 @@
     {
       "name": "@axicharts/charts",
       "passed": true,
-      "size": 5632,
+      "size": 5669,
       "sizeLimit": 14000
     },
     {
       "name": "@axicharts/charts-canvas",
       "passed": true,
-      "size": 4335,
+      "size": 4340,
       "sizeLimit": 6000
     },
     {
       "name": "@axicharts/charts-echarts",
       "passed": true,
-      "size": 5200,
+      "size": 5210,
       "sizeLimit": 8000
     },
     {
@@ -290,5 +290,48 @@
       "environment": "chromium-4x",
       "metric": "frame_p95"
     }
-  ]
+  ],
+  "stability": {
+    "soak": [
+      {
+        "id": "soak-large-1hz",
+        "metric": "soak_p95",
+        "lib": "axicharts",
+        "fixture": "large",
+        "points": 10000,
+        "hz": 1,
+        "durationMs": 60000,
+        "updates": 60,
+        "p95Ms": 6.5,
+        "budgetMs": 16,
+        "passed": true,
+        "environment": "chromium-4x"
+      },
+      {
+        "id": "soak-large-5hz",
+        "metric": "soak_p95",
+        "lib": "axicharts",
+        "fixture": "large",
+        "points": 10000,
+        "hz": 5,
+        "durationMs": 60000,
+        "updates": 301,
+        "p95Ms": 4.300000011920929,
+        "budgetMs": 16,
+        "passed": true,
+        "environment": "chromium-4x"
+      }
+    ],
+    "leak": {
+      "id": "leak-mount-100",
+      "metric": "leak_check",
+      "lib": "axicharts",
+      "cycles": 100,
+      "leftoverUplot": 0,
+      "heapDeltaMb": 0,
+      "heapBudgetMb": 30,
+      "passed": true,
+      "environment": "chromium-4x"
+    }
+  }
 }

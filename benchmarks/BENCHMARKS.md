@@ -2,8 +2,8 @@
 
 Reproducible numbers for bundle gzip budgets and live-update latency.
 
-**Collected:** 2026-07-17T21:19:08.923Z  
-**Environment:** Node v24.16.0, darwin arm64, happy-dom (node proxy), Chromium 4× (browser competitive)  
+**Collected:** 2026-07-17T21:26:11.238Z  
+**Environment:** Node v24.16.0, darwin arm64, happy-dom (node proxy), Chromium 4× (browser competitive), Chromium 4× (soak + leak)  
 **Results:** `benchmarks/results/2026-07-17/summary.json`
 
 Re-run locally:
@@ -11,7 +11,8 @@ Re-run locally:
 ```bash
 pnpm bench              # node proxy gates + bundle
 pnpm bench:browser      # Chromium competitive table
-pnpm bench:all          # both
+pnpm bench:stability    # 60s soak @ 1/5 Hz + leak check
+pnpm bench:all          # node + competitive browser
 ```
 
 Methodology: Dashboarder [PERFORMANCE.md](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/PERFORMANCE.md).
@@ -36,11 +37,11 @@ Methodology: Dashboarder [PERFORMANCE.md](https://github.com/Axidify/Dashboarder
 
 | Fixture | Scenario | p95 | Budget | Pass |
 |---------|----------|-----|--------|------|
-| small | 500 pts × 1 series | 0.02 | 8 | ✅ |
-| dashboard-6up | 6 panels × 2000 pts | 0.11 | 16 | ✅ |
-| medium | 5000 pts × 1 series | 0.04 | 16 | ✅ |
+| small | 500 pts × 1 series | 0.01 | 8 | ✅ |
+| medium | 5000 pts × 1 series | 0.03 | 16 | ✅ |
+| dashboard-6up | 6 panels × 2000 pts | 0.38 | 16 | ✅ |
 | large | 10000 pts × 1 series | 0.04 | 16 | ✅ |
-| multi-series | 10000 pts × 4 series | 0.37 | 16 | ✅ |
+| multi-series | 10000 pts × 4 series | 0.41 | 16 | ✅ |
 
 ## Browser competitive update p95 (Chromium 4× CPU)
 
@@ -52,6 +53,22 @@ Methodology: Dashboarder [PERFORMANCE.md](https://github.com/Axidify/Dashboarder
 | dashboard-6up | 6 panels × 2000 pts | 2.90 ms | 54.30 ms | 26.50 ms |
 
 Profile: Chromium headless, viewport 1280×720, `flushSync` state updates, 30 frames per scenario. Harness: `apps/bench-harness`.
+
+
+## Browser stability (Chromium 4× CPU)
+
+### Soak update p95
+
+| Scenario | Profile | p95 | Budget (ms) | Pass |
+|----------|---------|-----|-------------|------|
+| soak-large-1hz | 10000 pts @ 1 Hz × 60s | 6.50 ms | 16 | ✅ |
+| soak-large-5hz | 10000 pts @ 5 Hz × 60s | 4.30 ms | 16 | ✅ |
+
+### Leak check
+
+| Scenario | Cycles | Result | Pass |
+|----------|--------|--------|------|
+| leak-mount-100 | 100 cycles | leftover uPlot: 0, heap Δ 0.0 MB | ✅ |
 
 ## Fixtures
 

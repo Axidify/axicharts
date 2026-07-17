@@ -13,7 +13,14 @@ Or include in the full collector:
 
 ```bash
 pnpm bench:all
+pnpm bench:stability
 ```
+
+## Stability
+
+`benchmarks/browser/stability.mjs` runs 60s soak @ 1 Hz and 5 Hz (10k axicharts line) plus 100 mount/unmount leak check.
+
+Env: `BENCH_SOAK_DURATION_MS`, `BENCH_LEAK_CYCLES`, `BENCH_LEAK_HEAP_MB`.
 
 ## Harness
 

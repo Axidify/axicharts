@@ -1,0 +1,43 @@
+{
+  "soak": [
+    {
+      "id": "soak-large-1hz",
+      "metric": "soak_p95",
+      "lib": "axicharts",
+      "fixture": "large",
+      "points": 10000,
+      "hz": 1,
+      "durationMs": 60000,
+      "updates": 60,
+      "p95Ms": 6.5,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "chromium-4x"
+    },
+    {
+      "id": "soak-large-5hz",
+      "metric": "soak_p95",
+      "lib": "axicharts",
+      "fixture": "large",
+      "points": 10000,
+      "hz": 5,
+      "durationMs": 60000,
+      "updates": 301,
+      "p95Ms": 4.300000011920929,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "chromium-4x"
+    }
+  ],
+  "leak": {
+    "id": "leak-mount-100",
+    "metric": "leak_check",
+    "lib": "axicharts",
+    "cycles": 100,
+    "leftoverUplot": 0,
+    "heapDeltaMb": 0,
+    "heapBudgetMb": 30,
+    "passed": true,
+    "environment": "chromium-4x"
+  }
+}

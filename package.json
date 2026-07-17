@@ -13,6 +13,7 @@
     "test:perf": "pnpm --filter @axicharts/charts-canvas test:perf",
     "bench": "node scripts/collect-benchmarks.mjs",
     "bench:browser": "node benchmarks/browser/run.mjs",
+    "bench:stability": "node benchmarks/browser/stability.mjs",
     "bench:all": "node scripts/collect-benchmarks.mjs --browser",
     "size": "size-limit",
     "typecheck": "turbo run typecheck",
