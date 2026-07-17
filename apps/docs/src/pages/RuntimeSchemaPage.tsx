@@ -85,6 +85,40 @@ export function RuntimeSchemaPage(): ReactElement {
         dual <code>--all</code> gate on every build.
       </p>
 
+      <Section title="Validation stack" subtitle="schema · CLI · presets · Dashboarder">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Runtime portability ships with a complete validation path from editor hints through CI.
+          Every shipped import preset has a matching <code>--preset</code> shortcut, live preview in
+          Dashboarder, and copyable commands across docs.
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 18, color: "#475569", lineHeight: 1.8, fontSize: 13 }}>
+          <li>
+            <strong>Dual gate</strong> — draft-07 JSON Schema shape + semantic checks (templates,
+            adapters, mosaic <code>dataSourceId</code>)
+          </li>
+          <li>
+            <strong>CLI</strong> — <code>charts-runtime validate</code> with <code>--schema</code>,{" "}
+            <code>--all</code>, <code>--share</code>, and <code>--preset</code>
+          </li>
+          <li>
+            <strong>CI</strong> — <code>pnpm validate:runtime</code> loops all gallery presets
+          </li>
+          <li>
+            <strong>Dashboarder</strong> — Import, Share, and Embed dialogs run live validation with
+            copyable CLI hints
+          </li>
+        </ul>
+        <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b" }}>
+          <Link to="/runtime/import">Import gallery</Link>
+          {" · "}
+          <Link to="/runtime/links">Deep link index</Link>
+          {" · "}
+          <a href="https://github.com/Axidify/axicharts" rel="noreferrer" target="_blank">
+            axicharts repo
+          </a>
+        </p>
+      </Section>
+
       <Section title="Hosted schema URLs" subtitle="GitHub Pages · npm subpaths">
         <ul style={{ margin: 0, paddingLeft: 18, color: "#475569", lineHeight: 1.8 }}>
           <li>

@@ -86,6 +86,8 @@ export function RuntimePage(): ReactElement {
         <Link to="/runtime/schema">Runtime JSON schema & validation →</Link>
         {" · "}
         <Link to="/runtime/import">Import gallery →</Link>
+        {" · "}
+        <Link to="/runtime/links">Deep links →</Link>
       </p>
 
       <Section title="Data adapters" subtitle="connectSource + hooks">

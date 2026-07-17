@@ -20,10 +20,12 @@ export function ValidateCommandCopy({
   command,
   label,
   compact = false,
+  buttonLabel = "Copy",
 }: {
   command: string;
   label?: string;
   compact?: boolean;
+  buttonLabel?: string;
 }): ReactElement {
   const [copied, setCopied] = useState(false);
 
@@ -38,7 +40,7 @@ export function ValidateCommandCopy({
       <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
         <code style={{ fontSize: 11, color: "#334155", wordBreak: "break-all" }}>{command}</code>
         <button type="button" onClick={() => void copy()} style={compactCopyButtonStyle}>
-          {copied ? "Copied" : "Copy"}
+          {copied ? "Copied" : buttonLabel}
         </button>
       </div>
     );
@@ -71,7 +73,7 @@ export function ValidateCommandCopy({
         {command}
       </code>
       <button type="button" onClick={() => void copy()} style={copyButtonStyle}>
-        {copied ? "Copied" : "Copy"}
+        {copied ? "Copied" : buttonLabel}
       </button>
     </div>
   );

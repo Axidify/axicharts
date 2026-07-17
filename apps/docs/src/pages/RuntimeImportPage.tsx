@@ -11,6 +11,7 @@ import {
   type HostedImportPreset,
   type ImportPresetSource,
 } from "@axicharts/charts-runtime/validation";
+import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
 
 const base = import.meta.env.BASE_URL;
 
@@ -37,7 +38,6 @@ function PresetCard({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [copiedValidate, setCopiedValidate] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -80,12 +80,6 @@ function PresetCard({
     await navigator.clipboard.writeText(json);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);
-  };
-
-  const copyValidate = async (): Promise<void> => {
-    await navigator.clipboard.writeText(validateCommand);
-    setCopiedValidate(true);
-    window.setTimeout(() => setCopiedValidate(false), 1500);
   };
 
   return (
@@ -167,43 +161,7 @@ function PresetCard({
                 Open in Dashboarder
               </a>
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 8,
-                alignItems: "center",
-                marginBottom: 12,
-                fontSize: 12,
-                color: "#475569",
-              }}
-            >
-              <code
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: 6,
-                  background: "#f1f5f9",
-                  color: "#0f172a",
-                  fontSize: 11,
-                }}
-              >
-                {validateCommand}
-              </code>
-              <button
-                type="button"
-                onClick={() => void copyValidate()}
-                style={{
-                  fontSize: 12,
-                  padding: "6px 12px",
-                  borderRadius: 6,
-                  border: "1px solid #cbd5e1",
-                  background: "#f8fafc",
-                  cursor: "pointer",
-                }}
-              >
-                {copiedValidate ? "Copied" : "Copy validate"}
-              </button>
-            </div>
+            <ValidateCommandCopy command={validateCommand} buttonLabel="Copy validate" />
             <pre
               style={{
                 margin: 0,
@@ -260,17 +218,11 @@ export function RuntimeImportPage(): ReactElement {
           fixtures with <code>pnpm validate:runtime</code>.
         </p>
         {HOSTED_IMPORT_PRESETS.map((preset) => (
-          <div
+          <ValidateCommandCopy
             key={preset.id}
-            style={{
-              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-              fontSize: 11,
-              color: "#334155",
-              lineHeight: 1.8,
-            }}
-          >
-            {formatValidatePresetCommand(preset.id)}
-          </div>
+            label={preset.label}
+            command={formatValidatePresetCommand(preset.id)}
+          />
         ))}
       </section>
 

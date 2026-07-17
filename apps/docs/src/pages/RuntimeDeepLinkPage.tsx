@@ -36,6 +36,9 @@ export function RuntimeDeepLinkPage(): ReactElement {
       <p style={{ color: "#475569", maxWidth: 720, lineHeight: 1.6 }}>
         Canonical URLs for schemas, shipped import presets, docs gallery routes, and Dashboarder
         auto-import query params. Use these in README snippets, issue templates, and CI fixtures.
+        Every preset CLI command is copyable — same shortcuts as{" "}
+        <Link to="/runtime/schema">schema validation</Link> and{" "}
+        <Link to="/runtime/import">import gallery</Link>.
       </p>
 
       <section style={{ marginTop: 28 }}>
