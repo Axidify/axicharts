@@ -81,6 +81,7 @@ function ImportDialogFixture({
 
 const meta = {
   title: "Dashboarder/Share ↔ Import",
+  tags: ["!dev", "!test"],
   parameters: {
     layout: "fullscreen",
     docs: {

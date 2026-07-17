@@ -15,6 +15,7 @@
     "bench": "node scripts/collect-benchmarks.mjs",
     "bench:browser": "node benchmarks/browser/run.mjs",
     "bench:stability": "node benchmarks/browser/stability.mjs",
+    "test:e2e:share-import": "node benchmarks/e2e/share-import.mjs",
     "bench:all": "node scripts/collect-benchmarks.mjs --browser",
     "size": "size-limit",
     "validate:runtime": "pnpm --filter @axicharts/charts-runtime validate:examples",
