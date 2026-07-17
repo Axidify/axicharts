@@ -5,6 +5,7 @@ import {
   HOSTED_IMPORT_PRESETS,
 } from "@axicharts/charts-runtime/validation";
 import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
+import { RuntimeHubNav } from "../components/RuntimeHubNav";
 import runtimeSchema from "../../../../packages/charts-runtime/schema/runtime-spec.schema.json";
 import shareSchema from "../../../../packages/charts-runtime/schema/share-export.schema.json";
 import {
@@ -73,10 +74,8 @@ export function RuntimeSchemaPage(): ReactElement {
 
   return (
     <div>
-      <p style={{ marginTop: 0, fontSize: 13, color: "#64748b" }}>
-        <Link to="/runtime">Runtime SDK</Link> / Schema & validation
-      </p>
-      <h1 style={{ marginTop: 8 }}>Runtime spec schema</h1>
+      <RuntimeHubNav page="/runtime/schema" />
+      <h1 style={{ marginTop: 0 }}>Runtime spec schema</h1>
       <p style={{ color: "#475569", maxWidth: 720, lineHeight: 1.6 }}>
         Portable runtime JSON is validated in two layers: draft-07 JSON Schema for shape and
         enums, plus semantic checks for template IDs, adapter fields, and mosaic{" "}

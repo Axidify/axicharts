@@ -8,6 +8,7 @@ import {
   SHARE_EXPORT_SCHEMA_URL,
 } from "@axicharts/charts-runtime/validation";
 import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
+import { RuntimeHubNav } from "../components/RuntimeHubNav";
 
 const base = import.meta.env.BASE_URL;
 
@@ -29,10 +30,8 @@ export function RuntimeDeepLinkPage(): ReactElement {
 
   return (
     <div>
-      <p style={{ marginTop: 0, fontSize: 13, color: "#64748b" }}>
-        <Link to="/runtime">Runtime SDK</Link> / Deep link index
-      </p>
-      <h1 style={{ marginTop: 8 }}>Deep link index</h1>
+      <RuntimeHubNav page="/runtime/links" />
+      <h1 style={{ marginTop: 0 }}>Deep link index</h1>
       <p style={{ color: "#475569", maxWidth: 720, lineHeight: 1.6 }}>
         Canonical URLs for schemas, shipped import presets, docs gallery routes, and Dashboarder
         auto-import query params. Use these in README snippets, issue templates, and CI fixtures.
@@ -199,16 +198,6 @@ export function RuntimeDeepLinkPage(): ReactElement {
           </li>
         </ul>
       </section>
-
-      <p style={{ marginTop: 24, fontSize: 13, color: "#64748b" }}>
-        <Link to="/runtime/import" style={{ color: "#2563eb" }}>
-          Import gallery
-        </Link>
-        {" · "}
-        <Link to="/runtime/schema" style={{ color: "#2563eb" }}>
-          Runtime schema
-        </Link>
-      </p>
     </div>
   );
 }

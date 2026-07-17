@@ -21,6 +21,7 @@ import {
   type ImportPresetSource,
 } from "@axicharts/charts-runtime/validation";
 import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
+import { RuntimeHubNav } from "../components/RuntimeHubNav";
 
 const base = import.meta.env.BASE_URL;
 
@@ -248,10 +249,8 @@ export function RuntimeImportPage(): ReactElement {
 
   return (
     <div>
-      <p style={{ marginTop: 0, fontSize: 13, color: "#64748b" }}>
-        <Link to="/runtime">Runtime SDK</Link> / Import gallery
-      </p>
-      <h1 style={{ marginTop: 8 }}>Import gallery</h1>
+      <RuntimeHubNav page="/runtime/import" />
+      <h1 style={{ marginTop: 0 }}>Import gallery</h1>
       <p style={{ color: "#475569", maxWidth: 720, lineHeight: 1.6 }}>
         Shipped runtime, dashboard, and workspace export fixtures with <code>$schema</code> hints.
         Deep-link a preset with <code>?preset=ops-embed</code> or filter by adapter with{" "}
@@ -369,20 +368,6 @@ export function RuntimeImportPage(): ReactElement {
           <Link to={importGalleryFilterPath({ type: "all" })}>Show all</Link>.
         </p>
       ) : null}
-
-      <p style={{ marginTop: 24, fontSize: 13, color: "#64748b" }}>
-        <Link to="/runtime/links" style={{ color: "#2563eb" }}>
-          Deep link index
-        </Link>
-        {" · "}
-        <Link to="/runtime/schema" style={{ color: "#2563eb" }}>
-          Runtime schema
-        </Link>
-        {" · "}
-        <Link to="/runtime" style={{ color: "#2563eb" }}>
-          Runtime SDK
-        </Link>
-      </p>
     </div>
   );
 }

@@ -21,6 +21,7 @@ import {
   type AdapterFieldRow,
 } from "../demos/runtimeAdapterDemo";
 import { ADAPTER_FIXTURE_PRESETS, IMPORT_GALLERY_ADAPTER_FILTERS, importGalleryFilterPath } from "@axicharts/charts-runtime/validation";
+import { RuntimeHubNav } from "../components/RuntimeHubNav";
 
 const tableStyle = {
   width: "100%",
@@ -118,10 +119,8 @@ function FieldTable({ rows }: { rows: AdapterFieldRow[] }): ReactElement {
 export function RuntimeAdaptersPage(): ReactElement {
   return (
     <div>
-      <p style={{ marginTop: 0, fontSize: 13, color: "#64748b" }}>
-        <Link to="/runtime">Runtime SDK</Link> / Adapter cookbook
-      </p>
-      <h1 style={{ marginTop: 8 }}>Adapter cookbook</h1>
+      <RuntimeHubNav page="/runtime/adapters" />
+      <h1 style={{ marginTop: 0 }}>Adapter cookbook</h1>
       <p style={{ color: "#475569", maxWidth: 720, lineHeight: 1.6 }}>
         Runtime dashboards bind live data through <code>dataSource</code> (embed) or{" "}
         <code>dataSources</code> + <code>dataSourceId</code> (mosaic). Each adapter exposes a small
@@ -318,20 +317,6 @@ export function RuntimeAdaptersPage(): ReactElement {
           </tbody>
         </table>
       </Section>
-
-      <p style={{ marginTop: 24, fontSize: 13, color: "#64748b" }}>
-        <Link to="/runtime" style={{ color: "#2563eb" }}>
-          Runtime SDK
-        </Link>
-        {" · "}
-        <Link to="/runtime/schema" style={{ color: "#2563eb" }}>
-          Schema & validation
-        </Link>
-        {" · "}
-        <Link to="/runtime/import" style={{ color: "#2563eb" }}>
-          Import gallery
-        </Link>
-      </p>
     </div>
   );
 }

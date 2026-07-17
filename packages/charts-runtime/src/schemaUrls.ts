@@ -184,6 +184,23 @@ export function runtimeEmbedReferencePreset(
   return findImportPreset(RUNTIME_EMBED_REFERENCE_PRESET[layout]);
 }
 
+export type PlannerAdapterPlan = {
+  layout: "embed" | "mosaic";
+  feed: "static" | "historian";
+};
+
+/** Maps planner layout + feed to the shipped adapter fixture preset. */
+export function plannerAdapterReferencePreset(
+  plan: PlannerAdapterPlan,
+): HostedImportPreset | undefined {
+  if (plan.layout === "mosaic") {
+    return findImportPreset(ADAPTER_FIXTURE_PRESETS.mosaic!);
+  }
+  const adapter = plan.feed === "static" ? "static" : "historian";
+  const presetId = ADAPTER_FIXTURE_PRESETS[adapter];
+  return presetId ? findImportPreset(presetId) : undefined;
+}
+
 export function formatValidatePresetCommand(
   presetId: string,
   layer: "semantic" | "schema" | "all" = "all",

@@ -6,6 +6,13 @@ import {
   type DashboardPlan,
   type PlannerHealth,
 } from "@axicharts/charts-planner";
+import {
+  dashboarderImportDeepLink,
+  docsImportGalleryDeepLink,
+  formatValidatePresetCommand,
+  plannerAdapterReferencePreset,
+} from "@axicharts/charts-runtime/validation";
+import { ValidateCommandCopy } from "./validationChrome";
 
 const QUICK_INTENTS = [
   "Line 3 night shift overview",
@@ -230,6 +237,53 @@ export function PlannerPanel({
                 ))}
               </ul>
             ) : null}
+            {(() => {
+              const referencePreset = plannerAdapterReferencePreset({
+                layout: plan.layout,
+                feed: plan.feed,
+              });
+              if (!referencePreset) return null;
+              return (
+                <div
+                  style={{
+                    marginTop: 12,
+                    padding: 12,
+                    borderRadius: 8,
+                    border: "1px solid #334155",
+                    background: "#111827",
+                    fontSize: 12,
+                    color: "#94a3b8",
+                    lineHeight: 1.7,
+                  }}
+                >
+                  Adapter fixture:{" "}
+                  <strong style={{ color: "#e2e8f0" }}>{referencePreset.label}</strong>
+                  {referencePreset.adapter ? (
+                    <>
+                      {" "}
+                      (<code>{referencePreset.adapter}</code>)
+                    </>
+                  ) : null}
+                  {" · "}
+                  <a
+                    href={docsImportGalleryDeepLink(referencePreset.id)}
+                    style={{ color: "#93c5fd" }}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Gallery
+                  </a>
+                  {" · "}
+                  <a
+                    href={dashboarderImportDeepLink(referencePreset.id)}
+                    style={{ color: "#93c5fd" }}
+                  >
+                    Import preset
+                  </a>
+                  <ValidateCommandCopy command={formatValidatePresetCommand(referencePreset.id)} />
+                </div>
+              );
+            })()}
             <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
               <button
                 type="button"

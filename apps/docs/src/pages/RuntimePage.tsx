@@ -2,6 +2,7 @@ import type { ReactElement, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { RuntimeDashboard, buildEmbedBundle, serializeRuntimeSpec } from "@axicharts/charts-runtime";
 import { ADAPTER_FIXTURE_PRESETS } from "@axicharts/charts-runtime/validation";
+import { RuntimeHubNav } from "../components/RuntimeHubNav";
 import {
   ADAPTER_ROWS,
   EMBED_RUNTIME_SPEC,
@@ -80,17 +81,11 @@ export function RuntimePage(): ReactElement {
 
   return (
     <div>
+      <RuntimeHubNav page="/runtime" showBreadcrumb={false} />
       <h1 style={{ marginTop: 0 }}>Dashboard runtime</h1>
       <p style={{ color: "#475569", maxWidth: 640 }}>
         Layer 3 embed SDK — bind REST, WebSocket, MQTT, historian, or static data to charts-spec
-        templates with stale overlays and alarm chrome.{" "}
-        <Link to="/runtime/schema">Runtime JSON schema & validation →</Link>
-        {" · "}
-        <Link to="/runtime/adapters">Adapter cookbook →</Link>
-        {" · "}
-        <Link to="/runtime/import">Import gallery →</Link>
-        {" · "}
-        <Link to="/runtime/links">Deep links →</Link>
+        templates with stale overlays and alarm chrome.
       </p>
 
       <Section title="Adapter overview" subtitle="connectSource · gallery fixtures">

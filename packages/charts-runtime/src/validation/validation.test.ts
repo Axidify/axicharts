@@ -19,6 +19,7 @@ import {
   parseImportPresetQuery,
   shareExportReferencePreset,
   runtimeEmbedReferencePreset,
+  plannerAdapterReferencePreset,
   formatValidatePresetCommand,
   formatValidateFileCommand,
   isShareImportPreset,
@@ -155,6 +156,15 @@ describe("hosted import presets", () => {
     expect(shareExportReferencePreset("workspace")?.id).toBe("ops-workspace");
     expect(runtimeEmbedReferencePreset("embed")?.id).toBe("ops-embed");
     expect(runtimeEmbedReferencePreset("mosaic")?.id).toBe("ops-mosaic");
+    expect(plannerAdapterReferencePreset({ layout: "mosaic", feed: "historian" })?.id).toBe(
+      "ops-mosaic",
+    );
+    expect(plannerAdapterReferencePreset({ layout: "embed", feed: "static" })?.id).toBe(
+      "ops-embed",
+    );
+    expect(plannerAdapterReferencePreset({ layout: "embed", feed: "historian" })?.id).toBe(
+      "ops-historian",
+    );
     expect(isShareImportPreset(findImportPreset("ops-dashboard")!)).toBe(true);
     expect(isShareImportPreset(findImportPreset("ops-embed")!)).toBe(false);
     expect(formatValidatePresetCommand("ops-embed", "all")).toBe(
