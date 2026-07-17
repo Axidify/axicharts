@@ -2,10 +2,7 @@ import { Children, isValidElement, type ReactNode } from "react";
 import type { PlotSeries } from "@axicharts/charts-canvas";
 import type { ChartConfig } from "../container/ChartLayoutContext";
 import type { ComposableMarkKind } from "./marks";
-
-type MarkComponent = {
-  markKind?: ComposableMarkKind;
-};
+import { readMarkKind } from "./readMarkKind";
 
 export type ComposedCartesian = {
   categories: string[];
@@ -18,13 +15,6 @@ const Y_AXIS_SUFFIX: Partial<Record<string, string>> = {
   percent: "%",
   bps: " bps",
 };
-
-function readMarkKind(type: unknown): ComposableMarkKind | null {
-  if (typeof type === "function" || typeof type === "object") {
-    return (type as MarkComponent).markKind ?? null;
-  }
-  return null;
-}
 
 export function composeCartesianMarks(
   children: ReactNode,

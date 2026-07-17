@@ -58,7 +58,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "RFC-002 phase 1 — declarative Line/Bar/XAxis/YAxis marks on LineChart and BarChart via data + children.",
+          "RFC-002 phase 1 — declarative Line/Bar/Area/XAxis/YAxis marks on cartesian shells via data + children. See Charts/Composable ECharts for Pie/Funnel marks.",
       },
     },
   },
