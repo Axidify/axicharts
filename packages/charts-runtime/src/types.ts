@@ -17,6 +17,7 @@ export type RestDataSourceSpec = {
   intervalMs?: number;
   staleAfterMs?: number;
   fetch?: typeof fetch;
+  mapResponse?: (payload: unknown) => Record<string, unknown>;
 };
 
 export type WebSocketDataSourceSpec = {

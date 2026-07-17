@@ -1,8 +1,5 @@
 import type { DataSourceSnapshot, RestDataSourceSpec } from "../types";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+import { defaultRestMapper, mergeAdapterExtras } from "./normalize";
 
 export function connectRestSource(
   spec: RestDataSourceSpec,
@@ -10,24 +7,27 @@ export function connectRestSource(
 ): () => void {
   const fetchImpl = spec.fetch ?? globalThis.fetch;
   const intervalMs = spec.intervalMs ?? 2000;
+  const mapResponse = spec.mapResponse ?? defaultRestMapper;
   let cancelled = false;
+  let hasConnected = false;
   let timer: ReturnType<typeof setInterval> | undefined;
 
   const poll = async () => {
     if (cancelled) return;
-    onUpdate({ data: {}, connection: "connecting" });
+    if (!hasConnected) {
+      onUpdate({ data: {}, connection: "connecting" });
+    }
     try {
       const response = await fetchImpl(spec.url);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
       const payload = (await response.json()) as unknown;
-      if (!isRecord(payload)) {
-        throw new Error("REST adapter expects a JSON object");
-      }
+      const mapped = mapResponse(payload);
       if (cancelled) return;
+      hasConnected = true;
       onUpdate({
-        data: payload,
+        data: mergeAdapterExtras(mapped, payload),
         connection: "ready",
         lastUpdatedAt: Date.now(),
       });

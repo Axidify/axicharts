@@ -1,4 +1,5 @@
 import type { DataSourceSnapshot, HistorianDataSourceSpec } from "../types";
+import { mergeAdapterExtras } from "./normalize";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -79,11 +80,14 @@ export function connectHistorianSource(
   const intervalMs = spec.intervalMs ?? 5000;
   const mapResponse = spec.mapResponse ?? defaultHistorianMapper;
   let cancelled = false;
+  let hasConnected = false;
   let timer: ReturnType<typeof setInterval> | undefined;
 
   const poll = async () => {
     if (cancelled) return;
-    onUpdate({ data: {}, connection: "connecting" });
+    if (!hasConnected) {
+      onUpdate({ data: {}, connection: "connecting" });
+    }
     try {
       const requestUrl = buildHistorianUrl(spec);
       const response = await fetchImpl(requestUrl);
@@ -92,8 +96,9 @@ export function connectHistorianSource(
       }
       const payload = (await response.json()) as unknown;
       if (cancelled) return;
+      hasConnected = true;
       onUpdate({
-        data: mapResponse(payload),
+        data: mergeAdapterExtras(mapResponse(payload), payload),
         connection: "ready",
         lastUpdatedAt: Date.now(),
       });

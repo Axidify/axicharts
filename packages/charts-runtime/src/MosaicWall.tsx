@@ -19,9 +19,15 @@ function resolveStaleAfterMs(spec: MosaicWallSpec): number | undefined {
 
 export type MosaicWallProps = {
   wall: MosaicWallSpec;
+  alarmScopeId?: string;
+  alarmStorage?: Pick<Storage, "getItem" | "setItem">;
 };
 
-export function MosaicWall({ wall }: MosaicWallProps): ReactElement {
+export function MosaicWall({
+  wall,
+  alarmScopeId,
+  alarmStorage,
+}: MosaicWallProps): ReactElement {
   const multiSources = wall.dataSources;
   const snapshots = useDataSources(multiSources);
   const singleSource =
@@ -43,6 +49,11 @@ export function MosaicWall({ wall }: MosaicWallProps): ReactElement {
   const staticData = wall.data ?? {};
   const columns = wall.columns ?? 2;
   const alarms = readAlarms({ ...staticData, ...defaultSnapshot.data });
+  const interactiveAlarms = wall.cells.some(
+    (cell) => cell.template === "ops-2x2" || (cell.theme ?? wall.theme) === "industrial",
+  );
+  const alarmSurface =
+    wall.theme === "industrial" || mode === "live" ? "dark" : "light";
 
   return (
     <RuntimeShell
@@ -52,6 +63,10 @@ export function MosaicWall({ wall }: MosaicWallProps): ReactElement {
       error={defaultSnapshot.error}
       live={mode === "live"}
       alarms={alarms}
+      interactiveAlarms={interactiveAlarms}
+      alarmSurface={alarmSurface}
+      alarmScopeId={alarmScopeId}
+      alarmStorage={alarmStorage}
     >
       <div className="axicharts-mosaic-wall" style={{ width: "100%" }}>
         {wall.title ? (

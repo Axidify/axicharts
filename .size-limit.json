@@ -66,6 +66,12 @@
     "gzip": true
   },
   {
+    "name": "@axicharts/charts-runtime/mosaic-presets",
+    "path": "packages/charts-runtime/dist/mosaic-presets/index.js",
+    "limit": "4 KB",
+    "gzip": true
+  },
+  {
     "name": "@axicharts/charts-planner",
     "path": "packages/charts-planner/dist/index.js",
     "limit": "4 KB",

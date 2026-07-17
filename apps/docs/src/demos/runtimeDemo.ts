@@ -61,6 +61,14 @@ export const EMBED_RUNTIME_SPEC: RuntimeDashboardSpec = {
   },
 };
 
+export const MOSAIC_PRESET_CODE = `import { buildMosaicPreset } from "@axicharts/charts-runtime/mosaic-presets";
+import { listMosaicPresets } from "@axicharts/charts-runtime";
+
+listMosaicPresets(); // ops-finance, ops-overview, trading-program, command-center
+
+const wall = buildMosaicPreset("trading-program");
+// => trading-blotter + program-dashboard cells with static fixtures`;
+
 export const MOSAIC_RUNTIME_SPEC: RuntimeDashboardSpec = {
   layout: "mosaic",
   wall: {

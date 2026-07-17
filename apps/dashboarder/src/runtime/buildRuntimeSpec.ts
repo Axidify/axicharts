@@ -1,7 +1,16 @@
 import type { TemplateId } from "@axicharts/charts-spec";
-import type { RuntimeDashboardSpec } from "@axicharts/charts-runtime";
+import type { MosaicWallSpec, RuntimeDashboardSpec } from "@axicharts/charts-runtime";
+import {
+  buildMosaicPreset,
+  type MosaicPresetId,
+} from "@axicharts/charts-runtime/mosaic-presets";
+
+export type { MosaicPresetId } from "@axicharts/charts-runtime/mosaic-presets";
+export { listMosaicPresets } from "@axicharts/charts-runtime";
 
 export const CATEGORIES = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"];
+
+export const DEFAULT_MOSAIC_PRESET: MosaicPresetId = "ops-finance";
 
 export const FINANCE_DATA = {
   kpis: [
@@ -71,6 +80,7 @@ function mockHistorianPayload(): Record<string, unknown> {
       },
       { name: "p95", timestamps: CATEGORIES, values: [42, 38, 55, 49, 62, 58, 71], suffix: "ms" },
     ],
+    alarms: [{ id: "cpu-high", message: "CPU above warn threshold", severity: "warning" }],
   });
 }
 
@@ -111,51 +121,75 @@ export function createHistorianSource(feed: FeedMode) {
   };
 }
 
+function applyHistorianToMosaicWall(
+  wall: MosaicWallSpec,
+  feed: FeedMode,
+): MosaicWallSpec {
+  const historianSource = createHistorianSource(feed);
+  const opsIndex = wall.dataSources?.findIndex((source) => source.id === "ops") ?? -1;
+
+  if (opsIndex >= 0 && wall.dataSources) {
+    const dataSources = [...wall.dataSources];
+    dataSources[opsIndex] = { id: "ops", ...historianSource };
+    return {
+      ...wall,
+      dataSources,
+      mode: "live",
+      subtitle: "Historian · 2s window",
+    };
+  }
+
+  return {
+    ...wall,
+    dataSource: historianSource,
+    mode: "live",
+    subtitle: "Historian · 2s window",
+  };
+}
+
 export function buildRuntimeSpec(options: {
   template: TemplateId;
   layout: LayoutMode;
   feed: FeedMode;
   presentation?: boolean;
+  mosaicPreset?: MosaicPresetId;
 }): RuntimeDashboardSpec {
-  const { template, layout, feed, presentation = false } = options;
-  const historianSource = createHistorianSource(feed);
-  const theme = presentation ? "presentation" : layout === "mosaic" ? "industrial" : template === "ops-2x2" ? "industrial" : "clean";
+  const {
+    template,
+    layout,
+    feed,
+    presentation = false,
+    mosaicPreset = DEFAULT_MOSAIC_PRESET,
+  } = options;
+  const theme = presentation
+    ? "presentation"
+    : layout === "mosaic"
+      ? "industrial"
+      : template === "ops-2x2"
+        ? "industrial"
+        : "clean";
   const mode = presentation ? "presentation" : feed === "historian" ? "live" : "interactive";
 
   if (layout === "mosaic") {
-    return {
-      layout: "mosaic",
-      wall: {
-        title: "Packaging Line 3",
-        subtitle: feed === "historian" ? "Historian · 2s window" : "Static snapshot",
-        theme,
-        mode,
-        columns: 2,
-        staleAfterMs: 5000,
-        dataSource: feed === "historian" ? historianSource : undefined,
-        data: feed === "static" ? { ops: OPS_DATA, finance: FINANCE_DATA } : undefined,
-        cells:
-          feed === "historian"
-            ? [
-                { id: "ops", template: "ops-2x2", title: "Line 3" },
-                {
-                  id: "finance",
-                  template: "finance-pnl",
-                  title: "Shift P&L",
-                  data: FINANCE_DATA,
-                },
-              ]
-            : [
-                { id: "ops", template: "ops-2x2", title: "Line 3", dataPath: "ops" },
-                {
-                  id: "finance",
-                  template: "finance-pnl",
-                  title: "Shift P&L",
-                  dataPath: "finance",
-                },
-              ],
-      },
-    };
+    let wall = buildMosaicPreset(mosaicPreset, {
+      theme: presentation ? "presentation" : undefined,
+      mode,
+    });
+
+    if (feed === "historian") {
+      wall = applyHistorianToMosaicWall(wall, feed);
+    } else if (feed === "static") {
+      wall = {
+        ...wall,
+        subtitle: "Static snapshot",
+      };
+    }
+
+    if (presentation) {
+      wall = { ...wall, theme: "presentation", mode: "presentation" };
+    }
+
+    return { layout: "mosaic", wall };
   }
 
   const data =
@@ -179,7 +213,7 @@ export function buildRuntimeSpec(options: {
         alarms: [{ id: "cpu-high", message: "CPU above warn threshold", severity: "warning" }],
       },
       dataSource:
-        feed === "historian" && template === "ops-2x2" ? historianSource : undefined,
+        feed === "historian" && template === "ops-2x2" ? createHistorianSource(feed) : undefined,
     },
   };
 }
@@ -197,11 +231,7 @@ export function hydrateRuntimeSpec(
     if (feed !== "historian") return spec;
     return {
       ...spec,
-      wall: {
-        ...spec.wall,
-        dataSource: historianSource,
-        mode: "live" as const,
-      },
+      wall: applyHistorianToMosaicWall(spec.wall, feed),
     };
   }
 

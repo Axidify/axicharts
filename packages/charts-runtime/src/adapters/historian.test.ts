@@ -36,6 +36,7 @@ describe("historian adapter", () => {
           suffix: "%",
         },
       ],
+      alarms: [{ id: "cpu", message: "warn", severity: "warning" }],
     });
 
     expect(mapped.categories).toEqual(["08:00", "09:00"]);
@@ -44,11 +45,12 @@ describe("historian adapter", () => {
     ]);
   });
 
-  it("polls historian REST endpoints", async () => {
+  it("passes alarms through on poll", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         tags: [{ name: "CPU", timestamps: ["Mon"], values: [12] }],
+        alarms: [{ id: "cpu", message: "warn", severity: "warning" }],
       }),
     });
     const snapshots: DataSourceSnapshot[] = [];
@@ -70,6 +72,9 @@ describe("historian adapter", () => {
     expect(fetchMock.mock.calls[0]?.[0]).toContain("/api/tags?from=");
     expect(snapshots.at(-1)?.data.cells).toEqual([
       { title: "CPU", data: [12], suffix: undefined, tone: undefined },
+    ]);
+    expect(snapshots.at(-1)?.data.alarms).toEqual([
+      { id: "cpu", message: "warn", severity: "warning" },
     ]);
 
     disconnect();

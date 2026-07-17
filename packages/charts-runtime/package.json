@@ -25,11 +25,15 @@
     "./workspace": {
       "types": "./dist/workspace/index.d.ts",
       "import": "./dist/workspace/index.js"
+    },
+    "./mosaic-presets": {
+      "types": "./dist/mosaic-presets/index.d.ts",
+      "import": "./dist/mosaic-presets/index.js"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/workspace/index.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-theme --clean",
-    "dev": "tsup src/index.ts src/workspace/index.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-theme --watch",
+    "build": "tsup src/index.ts src/workspace/index.ts src/mosaic-presets/index.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-theme --clean",
+    "dev": "tsup src/index.ts src/workspace/index.ts src/mosaic-presets/index.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-theme --watch",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

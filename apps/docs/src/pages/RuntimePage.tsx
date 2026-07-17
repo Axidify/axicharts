@@ -3,6 +3,7 @@ import { RuntimeDashboard, buildEmbedBundle, serializeRuntimeSpec } from "@axich
 import {
   ADAPTER_ROWS,
   EMBED_RUNTIME_SPEC,
+  MOSAIC_PRESET_CODE,
   MOSAIC_RUNTIME_SPEC,
 } from "../demos/runtimeDemo";
 
@@ -141,6 +142,25 @@ export function RuntimePage(): ReactElement {
           }}
         >
           {MOSAIC_CODE}
+        </pre>
+      </Section>
+
+      <Section title="Mosaic presets" subtitle="buildMosaicPreset · listMosaicPresets">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
+          Named multi-cell walls for Dashboarder and agent planners — ops+finance, trading+program,
+          and more.
+        </p>
+        <pre
+          style={{
+            margin: 0,
+            padding: 14,
+            background: "#f8fafc",
+            fontSize: 11,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {MOSAIC_PRESET_CODE}
         </pre>
       </Section>
 

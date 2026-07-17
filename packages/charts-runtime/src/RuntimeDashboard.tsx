@@ -30,7 +30,11 @@ export function RuntimeDashboard({
       : spec.wall;
     return (
       <div className={className} style={{ width: "100%", height: "100%" }}>
-        <MosaicWall wall={wall} />
+        <MosaicWall
+          wall={wall}
+          alarmScopeId={alarmScopeId}
+          alarmStorage={alarmStorage}
+        />
       </div>
     );
   }

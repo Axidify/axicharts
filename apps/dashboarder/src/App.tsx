@@ -30,8 +30,10 @@ import {
   buildRuntimeSpec,
   defaultSeedSpec,
   hydrateRuntimeSpec,
+  listMosaicPresets,
   type FeedMode,
   type LayoutMode,
+  type MosaicPresetId,
 } from "./runtime/buildRuntimeSpec";
 
 const buttonStyle = {
@@ -65,6 +67,7 @@ function applyDashboardMeta(
   setFeed: (feed: FeedMode) => void,
   setTemplate: (template: TemplateId) => void,
   setPresentation: (presentation: boolean) => void,
+  setMosaicPreset: (preset: MosaicPresetId) => void,
 ): void {
   if (!dashboard.meta) return;
   setLayout(dashboard.meta.layout);
@@ -72,6 +75,9 @@ function applyDashboardMeta(
   setPresentation(dashboard.meta.presentation ?? false);
   if (dashboard.meta.template) {
     setTemplate(dashboard.meta.template as TemplateId);
+  }
+  if (dashboard.meta.mosaicPreset) {
+    setMosaicPreset(dashboard.meta.mosaicPreset as MosaicPresetId);
   }
 }
 
@@ -87,6 +93,7 @@ export function App(): ReactElement {
   const [store, setStore] = useState<WorkspaceStore | null>(null);
   const [template, setTemplate] = useState<TemplateId>("ops-2x2");
   const [layout, setLayout] = useState<LayoutMode>("embed");
+  const [mosaicPreset, setMosaicPreset] = useState<MosaicPresetId>("ops-finance");
   const [feed, setFeed] = useState<FeedMode>("historian");
   const [presentation, setPresentation] = useState(false);
   const [presenting, setPresenting] = useState(false);
@@ -106,12 +113,13 @@ export function App(): ReactElement {
       setFeed,
       setTemplate,
       setPresentation,
+      setMosaicPreset,
     );
   }, []);
 
   const builtSpec = useMemo(
-    () => buildRuntimeSpec({ template, layout, feed, presentation }),
-    [template, layout, feed, presentation],
+    () => buildRuntimeSpec({ template, layout, feed, presentation, mosaicPreset }),
+    [template, layout, feed, presentation, mosaicPreset],
   );
 
   const activeSpec = useMemo((): RuntimeDashboardSpec | null => {
@@ -127,8 +135,8 @@ export function App(): ReactElement {
   };
 
   const builderMeta = useMemo(
-    () => ({ layout, feed, template, presentation }),
-    [layout, feed, template, presentation],
+    () => ({ layout, feed, template, presentation, mosaicPreset }),
+    [layout, feed, template, presentation, mosaicPreset],
   );
 
   const handleSave = (): void => {
@@ -151,6 +159,7 @@ export function App(): ReactElement {
       setFeed,
       setTemplate,
       setPresentation,
+      setMosaicPreset,
     );
     setDirty(false);
   };
@@ -159,7 +168,7 @@ export function App(): ReactElement {
     if (!store) return;
     const name = window.prompt("Dashboard name", "New dashboard");
     if (!name?.trim()) return;
-    const spec = buildRuntimeSpec({ template, layout, feed, presentation });
+    const spec = buildRuntimeSpec({ template, layout, feed, presentation, mosaicPreset });
     persist(addDashboard(store, store.activeWorkspaceId, name.trim(), spec));
     setDirty(false);
   };
@@ -180,6 +189,7 @@ export function App(): ReactElement {
       setFeed,
       setTemplate,
       setPresentation,
+      setMosaicPreset,
     );
     setDirty(false);
   };
@@ -200,6 +210,7 @@ export function App(): ReactElement {
       setFeed,
       setTemplate,
       setPresentation,
+      setMosaicPreset,
     );
     setDirty(false);
   };
@@ -235,6 +246,7 @@ export function App(): ReactElement {
           setFeed,
           setTemplate,
           setPresentation,
+          setMosaicPreset,
         );
         setDirty(false);
         return;
@@ -258,6 +270,7 @@ export function App(): ReactElement {
           setFeed,
           setTemplate,
           setPresentation,
+          setMosaicPreset,
         );
       }
       setDirty(false);
@@ -380,7 +393,25 @@ export function App(): ReactElement {
               }}
               label="Template"
             />
-          ) : null}
+          ) : (
+            <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
+              Preset
+              <select
+                value={mosaicPreset}
+                onChange={(event) => {
+                  setMosaicPreset(event.target.value as MosaicPresetId);
+                  setDirty(true);
+                }}
+                style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
+              >
+                {listMosaicPresets().map((preset) => (
+                  <option key={preset.id} value={preset.id}>
+                    {preset.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <button type="button" onClick={() => setPlannerOpen(true)} style={buttonStyle}>
             Plan
           </button>
@@ -426,6 +457,7 @@ export function App(): ReactElement {
               setFeed,
               setTemplate,
               setPresentation,
+              setMosaicPreset,
             );
             setDirty(false);
           }}

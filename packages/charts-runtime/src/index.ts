@@ -56,6 +56,11 @@ export { useDataSources, resolveBoundSnapshot } from "./useDataSources";
 export { aggregateSnapshots, EMPTY_SNAPSHOT } from "./aggregateSnapshots";
 export { connectSource } from "./connectSource";
 export { mergeMosaicData, pluckMosaicData } from "./mosaicData";
+export {
+  listMosaicPresets,
+  type MosaicPresetId,
+  type MosaicPresetMeta,
+} from "./mosaicPresetMeta";
 export { readAlarms } from "./readAlarms";
 export {
   addDashboard,
@@ -96,5 +101,6 @@ export {
 export { connectMockLiveSource } from "./adapters/mockLive";
 export { connectMqttSource } from "./adapters/mqtt";
 export { connectRestSource } from "./adapters/rest";
+export { defaultRestMapper, mergeAdapterExtras } from "./adapters/normalize";
 export { connectStaticSource } from "./adapters/static";
 export { connectWebSocketSource } from "./adapters/websocket";
