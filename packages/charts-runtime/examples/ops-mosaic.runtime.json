@@ -1,0 +1,64 @@
+{
+  "layout": "mosaic",
+  "wall": {
+    "version": "0.1",
+    "title": "Packaging Line 3",
+    "subtitle": "Multi-source bind",
+    "theme": "industrial",
+    "mode": "interactive",
+    "columns": 2,
+    "dataSourceId": "ops",
+    "dataSources": [
+      {
+        "id": "ops",
+        "type": "static",
+        "data": {
+          "categories": ["Mon", "Tue", "Wed", "Thu"],
+          "cells": [
+            { "title": "CPU", "data": [22, 28, 31, 34], "suffix": "%" },
+            { "title": "Memory", "data": [55, 58, 60, 59], "suffix": "%" }
+          ]
+        }
+      },
+      {
+        "id": "finance",
+        "type": "static",
+        "data": {
+          "kpis": [
+            { "value": "$1.33M", "label": "Net revenue" },
+            { "value": "62.4%", "label": "Gross margin", "tone": "success" }
+          ],
+          "categories": ["Jan", "Feb", "Mar", "Apr"],
+          "revenue": [820, 932, 901, 1034],
+          "waterfall": [
+            { "name": "Q1", "value": 1100000, "isTotal": true },
+            { "name": "Q2", "value": 1330000, "isTotal": true }
+          ]
+        }
+      }
+    ],
+    "data": {
+      "alarms": [
+        {
+          "id": "cpu-high",
+          "message": "CPU above warn threshold",
+          "severity": "warning"
+        }
+      ]
+    },
+    "cells": [
+      {
+        "id": "ops",
+        "template": "ops-2x2",
+        "title": "Line 3",
+        "dataSourceId": "ops"
+      },
+      {
+        "id": "finance",
+        "template": "finance-pnl",
+        "title": "Shift P&L",
+        "dataSourceId": "finance"
+      }
+    ]
+  }
+}

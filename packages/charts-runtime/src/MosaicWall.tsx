@@ -2,10 +2,13 @@
 
 import type { ReactElement } from "react";
 import { Dashboard } from "@axicharts/charts-spec";
+import { aggregateSnapshots } from "./aggregateSnapshots";
 import { mergeMosaicData, pluckMosaicData } from "./mosaicData";
+import { readAlarms } from "./readAlarms";
 import { RuntimeShell } from "./RuntimeShell";
 import type { MosaicWallSpec } from "./types";
 import { useDataSource } from "./useDataSource";
+import { useDataSources, resolveBoundSnapshot } from "./useDataSources";
 
 function resolveStaleAfterMs(spec: MosaicWallSpec): number | undefined {
   if (spec.staleAfterMs != null) return spec.staleAfterMs;
@@ -19,22 +22,36 @@ export type MosaicWallProps = {
 };
 
 export function MosaicWall({ wall }: MosaicWallProps): ReactElement {
-  const source =
+  const multiSources = wall.dataSources;
+  const snapshots = useDataSources(multiSources);
+  const singleSource =
     wall.dataSource ??
-    (wall.data ? { type: "static" as const, data: wall.data } : undefined);
-  const snapshot = useDataSource(source);
+    (wall.data && !multiSources?.length
+      ? { type: "static" as const, data: wall.data }
+      : undefined);
+  const singleSnapshot = useDataSource(multiSources?.length ? undefined : singleSource);
+  const defaultSnapshot = multiSources?.length
+    ? aggregateSnapshots(snapshots, wall.dataSourceId)
+    : singleSnapshot;
   const staleAfterMs = resolveStaleAfterMs(wall);
-  const mode = wall.mode ?? (source?.type === "mock-live" ? "live" : "interactive");
-  const merged = mergeMosaicData(wall.data ?? {}, snapshot.data);
+  const liveSource = multiSources?.[0] ?? singleSource;
+  const mode =
+    wall.mode ??
+    (liveSource?.type === "mock-live" || liveSource?.type === "historian"
+      ? "live"
+      : "interactive");
+  const staticData = wall.data ?? {};
   const columns = wall.columns ?? 2;
+  const alarms = readAlarms({ ...staticData, ...defaultSnapshot.data });
 
   return (
     <RuntimeShell
-      connection={snapshot.connection}
-      lastUpdatedAt={snapshot.lastUpdatedAt}
+      connection={defaultSnapshot.connection}
+      lastUpdatedAt={defaultSnapshot.lastUpdatedAt}
       staleAfterMs={staleAfterMs}
-      error={snapshot.error}
+      error={defaultSnapshot.error}
       live={mode === "live"}
+      alarms={alarms}
     >
       <div className="axicharts-mosaic-wall" style={{ width: "100%" }}>
         {wall.title ? (
@@ -60,6 +77,10 @@ export function MosaicWall({ wall }: MosaicWallProps): ReactElement {
           }}
         >
           {wall.cells.map((cell) => {
+            const cellSnapshot = multiSources?.length
+              ? resolveBoundSnapshot(snapshots, cell.dataSourceId ?? wall.dataSourceId)
+              : defaultSnapshot;
+            const merged = mergeMosaicData(staticData, cellSnapshot.data);
             const cellData = mergeMosaicData(
               merged,
               pluckMosaicData(merged, cell.dataPath),

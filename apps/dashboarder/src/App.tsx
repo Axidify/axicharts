@@ -1,10 +1,14 @@
-import { useMemo, useState, type ReactElement } from "react";
+import { useEffect, useMemo, useState, type ReactElement } from "react";
 import type { TemplateId } from "@axicharts/charts-spec";
 import {
   RuntimeDashboard,
   TemplatePicker,
+  parseRuntimeSpec,
+  serializeRuntimeSpec,
   type RuntimeDashboardSpec,
 } from "@axicharts/charts-runtime";
+
+const STORAGE_KEY = "dashboarder.runtime.spec";
 
 const CATEGORIES = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"];
 
@@ -62,12 +66,33 @@ const OPS_DATA = {
 type LayoutMode = "embed" | "mosaic";
 type FeedMode = "static" | "historian";
 
+const buttonStyle = {
+  fontSize: 12,
+  padding: "4px 10px",
+  borderRadius: 6,
+  border: "1px solid #475569",
+  background: "#1e293b",
+  color: "#e2e8f0",
+  cursor: "pointer",
+} as const;
+
 export function App(): ReactElement {
   const [template, setTemplate] = useState<TemplateId>("ops-2x2");
   const [layout, setLayout] = useState<LayoutMode>("embed");
   const [feed, setFeed] = useState<FeedMode>("historian");
+  const [importedSpec, setImportedSpec] = useState<RuntimeDashboardSpec | null>(null);
 
-  const spec = useMemo((): RuntimeDashboardSpec => {
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    try {
+      setImportedSpec(parseRuntimeSpec(saved));
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, []);
+
+  const builtSpec = useMemo((): RuntimeDashboardSpec => {
     const historianSource = {
       type: "historian" as const,
       url: "/api/historian/tags",
@@ -171,12 +196,42 @@ export function App(): ReactElement {
         mode: feed === "historian" ? "live" : "interactive",
         template,
         staleAfterMs: 5000,
-        data,
+        data: {
+          ...(data ?? {}),
+          alarms: [{ id: "cpu-high", message: "CPU above warn threshold", severity: "warning" }],
+        },
         dataSource:
           feed === "historian" && template === "ops-2x2" ? historianSource : undefined,
       },
     };
   }, [feed, layout, template]);
+
+  const activeSpec = importedSpec ?? builtSpec;
+
+  const handleExport = (): void => {
+    const portable = serializeRuntimeSpec(activeSpec);
+    localStorage.setItem(STORAGE_KEY, portable);
+    const blob = new Blob([portable], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "dashboard.runtime.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (): void => {
+    const next = window.prompt("Paste runtime JSON");
+    if (!next) return;
+    const parsed = parseRuntimeSpec(next);
+    setImportedSpec(parsed);
+    localStorage.setItem(STORAGE_KEY, serializeRuntimeSpec(parsed));
+  };
+
+  const handleReset = (): void => {
+    setImportedSpec(null);
+    localStorage.removeItem(STORAGE_KEY);
+  };
 
   return (
     <div style={{ minHeight: "100vh", background: "#0f172a", color: "#e2e8f0" }}>
@@ -219,10 +274,21 @@ export function App(): ReactElement {
           {layout === "embed" ? (
             <TemplatePicker value={template} onChange={setTemplate} label="Template" />
           ) : null}
+          <button type="button" onClick={handleExport} style={buttonStyle}>
+            Export
+          </button>
+          <button type="button" onClick={handleImport} style={buttonStyle}>
+            Import
+          </button>
+          {importedSpec ? (
+            <button type="button" onClick={handleReset} style={buttonStyle}>
+              Reset
+            </button>
+          ) : null}
         </div>
       </header>
       <main style={{ padding: 24, maxWidth: 1080, margin: "0 auto" }}>
-        <RuntimeDashboard spec={spec} />
+        <RuntimeDashboard spec={activeSpec} />
       </main>
     </div>
   );

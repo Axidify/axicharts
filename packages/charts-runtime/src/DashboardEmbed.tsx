@@ -2,9 +2,12 @@
 
 import type { ReactElement } from "react";
 import { Dashboard } from "@axicharts/charts-spec";
+import { aggregateSnapshots } from "./aggregateSnapshots";
+import { readAlarms } from "./readAlarms";
 import { RuntimeShell } from "./RuntimeShell";
 import type { DashboardEmbedSpec } from "./types";
 import { useDataSource } from "./useDataSource";
+import { useDataSources } from "./useDataSources";
 
 function resolveStaleAfterMs(dashboard: DashboardEmbedSpec): number | undefined {
   if (dashboard.staleAfterMs != null) return dashboard.staleAfterMs;
@@ -18,12 +21,24 @@ export type DashboardEmbedProps = {
 };
 
 export function DashboardEmbed({ dashboard }: DashboardEmbedProps): ReactElement {
-  const source =
+  const multiSources = dashboard.dataSources;
+  const snapshots = useDataSources(multiSources);
+  const singleSource =
     dashboard.dataSource ??
-    (dashboard.data ? { type: "static" as const, data: dashboard.data } : undefined);
-  const snapshot = useDataSource(source);
+    (dashboard.data && !multiSources?.length
+      ? { type: "static" as const, data: dashboard.data }
+      : undefined);
+  const singleSnapshot = useDataSource(multiSources?.length ? undefined : singleSource);
+  const snapshot = multiSources?.length
+    ? aggregateSnapshots(snapshots, dashboard.dataSourceId)
+    : singleSnapshot;
   const staleAfterMs = resolveStaleAfterMs(dashboard);
-  const mode = dashboard.mode ?? (source?.type === "mock-live" ? "live" : "interactive");
+  const liveSource = multiSources?.[0] ?? singleSource;
+  const mode =
+    dashboard.mode ??
+    (liveSource?.type === "mock-live" || liveSource?.type === "historian"
+      ? "live"
+      : "interactive");
   const data = {
     ...(dashboard.data ?? {}),
     ...snapshot.data,
@@ -36,6 +51,7 @@ export function DashboardEmbed({ dashboard }: DashboardEmbedProps): ReactElement
       staleAfterMs={staleAfterMs}
       error={snapshot.error}
       live={mode === "live"}
+      alarms={readAlarms(data)}
     >
       <Dashboard
         template={dashboard.template}

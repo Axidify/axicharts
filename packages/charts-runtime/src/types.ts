@@ -69,6 +69,18 @@ export type HistorianDataSourceSpec = {
   mapResponse?: (payload: unknown) => Record<string, unknown>;
 };
 
+export type BoundDataSourceSpec = DataSourceSpec & { id: string };
+
+export type AlarmSeverity = "normal" | "warning" | "alarm" | "critical";
+
+export type AlarmItem = {
+  id: string;
+  message: string;
+  severity?: AlarmSeverity;
+  acknowledged?: boolean;
+  timestamp?: number;
+};
+
 export type DataSourceSpec =
   | StaticDataSourceSpec
   | RestDataSourceSpec
@@ -93,6 +105,8 @@ export type DashboardEmbedSpec = {
   template: TemplateId;
   data?: Record<string, unknown>;
   dataSource?: DataSourceSpec;
+  dataSources?: BoundDataSourceSpec[];
+  dataSourceId?: string;
   staleAfterMs?: number;
 };
 
@@ -105,6 +119,7 @@ export type MosaicCellSpec = {
   mode?: ChartMode;
   data?: Record<string, unknown>;
   dataPath?: string;
+  dataSourceId?: string;
   colSpan?: number;
   rowSpan?: number;
 };
@@ -120,6 +135,8 @@ export type MosaicWallSpec = {
   cells: MosaicCellSpec[];
   data?: Record<string, unknown>;
   dataSource?: DataSourceSpec;
+  dataSources?: BoundDataSourceSpec[];
+  dataSourceId?: string;
   staleAfterMs?: number;
 };
 

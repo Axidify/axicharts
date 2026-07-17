@@ -2,7 +2,8 @@
 
 import type { ReactElement, ReactNode } from "react";
 import { StaleBadge, useIsStale } from "@axicharts/charts";
-import type { ConnectionState } from "./types";
+import { AlarmBanner } from "./AlarmBanner";
+import type { AlarmItem, ConnectionState } from "./types";
 
 export type RuntimeShellProps = {
   children: ReactNode;
@@ -11,6 +12,7 @@ export type RuntimeShellProps = {
   staleAfterMs?: number;
   error?: string;
   live?: boolean;
+  alarms?: AlarmItem[];
 };
 
 export function RuntimeShell({
@@ -20,6 +22,7 @@ export function RuntimeShell({
   staleAfterMs,
   error,
   live = false,
+  alarms = [],
 }: RuntimeShellProps): ReactElement {
   const isStale = useIsStale(
     lastUpdatedAt,
@@ -54,6 +57,7 @@ export function RuntimeShell({
           <StaleBadge />
         </div>
       ) : null}
+      <AlarmBanner alarms={alarms} />
     </div>
   );
 }

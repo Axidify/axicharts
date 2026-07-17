@@ -1,45 +1,14 @@
 import { useEffect, useState } from "react";
-import { connectHistorianSource } from "./adapters/historian";
-import { connectMockLiveSource } from "./adapters/mockLive";
-import { connectMqttSource } from "./adapters/mqtt";
-import { connectRestSource } from "./adapters/rest";
-import { connectStaticSource } from "./adapters/static";
-import { connectWebSocketSource } from "./adapters/websocket";
+import { connectSource } from "./connectSource";
 import type { DataSourceSnapshot, DataSourceSpec } from "./types";
-
-const EMPTY: DataSourceSnapshot = {
-  data: {},
-  connection: "idle",
-};
-
-function connectSource(
-  spec: DataSourceSpec,
-  onUpdate: (snapshot: DataSourceSnapshot) => void,
-): () => void {
-  switch (spec.type) {
-    case "static":
-      return connectStaticSource(spec, onUpdate);
-    case "rest":
-      return connectRestSource(spec, onUpdate);
-    case "websocket":
-      return connectWebSocketSource(spec, onUpdate);
-    case "mock-live":
-      return connectMockLiveSource(spec, onUpdate);
-    case "mqtt":
-      return connectMqttSource(spec, onUpdate);
-    case "historian":
-      return connectHistorianSource(spec, onUpdate);
-    default:
-      return () => {};
-  }
-}
+import { EMPTY_SNAPSHOT } from "./aggregateSnapshots";
 
 export function useDataSource(spec: DataSourceSpec | undefined): DataSourceSnapshot {
-  const [snapshot, setSnapshot] = useState<DataSourceSnapshot>(EMPTY);
+  const [snapshot, setSnapshot] = useState<DataSourceSnapshot>(EMPTY_SNAPSHOT);
 
   useEffect(() => {
     if (!spec) {
-      setSnapshot(EMPTY);
+      setSnapshot(EMPTY_SNAPSHOT);
       return;
     }
     return connectSource(spec, setSnapshot);
