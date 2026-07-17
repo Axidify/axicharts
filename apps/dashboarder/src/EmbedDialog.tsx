@@ -8,6 +8,7 @@ import {
   plannerAdapterFixtures,
   plannerFeedGalleryDeepLink,
   runtimeShareImportDeepLink,
+  startShareImportDeepLink,
   runtimeEmbedReferencePreset,
   feedAdapterGalleryDeepLink,
   validateRuntimeSpecDualJson,
@@ -306,6 +307,15 @@ export function EmbedDialog({
             rel="noreferrer"
           >
             share ↔ import docs
+          </a>
+          {" · "}
+          <a
+            href={startShareImportDeepLink()}
+            style={{ color: "#93c5fd" }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            getting started
           </a>
           {" · "}
           <a

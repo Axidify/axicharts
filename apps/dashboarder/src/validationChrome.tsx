@@ -1,8 +1,10 @@
 import { useState, type ReactElement } from "react";
 import {
   runtimeDeepLinkShareImportDeepLink,
+  runtimeImportGalleryShareImportTrackDeepLink,
   runtimeSchemaShareMetaDeepLink,
   runtimeShareImportDeepLink,
+  startShareImportDeepLink,
   type ImportShape,
   type ShareExport,
 } from "@axicharts/charts-runtime/validation";
@@ -13,12 +15,25 @@ export function ShareImportDocsLinks(): ReactElement {
   return (
     <div style={{ marginTop: 8 }}>
       Docs:{" "}
+      <a href={startShareImportDeepLink()} style={docsLinkStyle} target="_blank" rel="noreferrer">
+        Start
+      </a>
+      {" · "}
       <a href={runtimeSchemaShareMetaDeepLink()} style={docsLinkStyle} target="_blank" rel="noreferrer">
         Schema § meta
       </a>
       {" · "}
       <a href={runtimeShareImportDeepLink()} style={docsLinkStyle} target="_blank" rel="noreferrer">
         Share ↔ import
+      </a>
+      {" · "}
+      <a
+        href={runtimeImportGalleryShareImportTrackDeepLink()}
+        style={docsLinkStyle}
+        target="_blank"
+        rel="noreferrer"
+      >
+        Gallery track
       </a>
       {" · "}
       <a

@@ -193,7 +193,11 @@ export function SpecPage(): ReactElement {
           {" · "}
           <Link to="/runtime#planner-http">HTTP API</Link>
           {" · "}
-          <Link to="/start">CLI on Getting started</Link>
+          <Link to="/start#planner-cli">CLI on Getting started</Link>
+          {" · "}
+          <Link to="/start#share-import">Share ↔ import</Link>
+          {" · "}
+          <Link to="/runtime/schema#share-meta">Schema § meta</Link>
         </p>
         <pre
           style={{

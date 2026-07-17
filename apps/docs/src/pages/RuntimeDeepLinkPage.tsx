@@ -218,7 +218,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
           maxWidth: 720,
         }}
       >
-        <h2 style={{ fontSize: 16, margin: "0 0 8px" }}>Share/import track release notes (C44–C48)</h2>
+        <h2 style={{ fontSize: 16, margin: "0 0 8px" }}>Share/import track release notes (C44–C49)</h2>
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
           The C44–C46 hardening track closes the planner meta round-trip: Share exports{" "}
           <code>meta</code>, Import restores it, schema documents fields, and Dashboarder dialogs

@@ -217,9 +217,11 @@ export function RuntimePage(): ReactElement {
           {" · "}
           <Link to="/runtime/import?preset=ops-workspace">ops-workspace</Link>
           {" · "}
-          <Link to="/runtime/import#planner-track">planner track notes</Link>
+          <Link to="/start#share-import">Getting started</Link>
           {" · "}
-          <Link to="/runtime/schema">share-export schema</Link>
+          <Link to="/runtime/import#share-import-track">share/import track notes</Link>
+          {" · "}
+          <Link to="/runtime/schema#share-meta">schema § meta</Link>
         </p>
       </Section>
 

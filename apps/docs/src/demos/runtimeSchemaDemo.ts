@@ -121,6 +121,10 @@ export const SHARE_IMPORT_TRACK_RELEASE_NOTES = [
     slice: "C48",
     summary: "Start page share-import cross-link, RuntimeHubNav import gallery anchor",
   },
+  {
+    slice: "C49",
+    summary: "ShareImportDocsLinks Start + gallery anchors, Runtime/Spec page cross-links",
+  },
 ] as const;
 
 export const GITOPS_CODE = `name: Validate dashboards
