@@ -1,7 +1,13 @@
 "use client";
 
 import type { ReactElement } from "react";
-import { UPlotLine, type PlotSeries } from "@axicharts/charts-canvas";
+import { useMemo } from "react";
+import {
+  UPlotLine,
+  preparePlotData,
+  type PlotSeries,
+} from "@axicharts/charts-canvas";
+import type { RendererPreference } from "@axicharts/charts-core";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import {
   CartesianChartShell,
@@ -9,6 +15,7 @@ import {
 import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
 import { usePlotSync } from "../sync/usePlotSync";
+import { usePlotSampling } from "../plot/usePlotSampling";
 
 export type LineChartProps = {
   categories: string[];
@@ -18,6 +25,8 @@ export type LineChartProps = {
   valueSuffix?: string;
   dualAxis?: boolean | "auto";
   stacked?: boolean;
+  renderer?: RendererPreference;
+  refreshHz?: number;
 };
 
 function LinePlot({
@@ -69,8 +78,19 @@ export function LineChart({
   valueSuffix,
   dualAxis = "auto",
   stacked = false,
+  renderer = "auto",
+  refreshHz,
 }: LineChartProps): ReactElement | null {
   const { size, ready, theme, mode } = useChartLayout();
+  const maxPoints = usePlotSampling({
+    pointCount: categories.length,
+    renderer,
+    refreshHz,
+  });
+  const prepared = useMemo(
+    () => preparePlotData(categories, series, maxPoints),
+    [categories, series, maxPoints],
+  );
 
   if (!ready || size.width < 1 || size.height < 1) {
     return null;
@@ -79,6 +99,8 @@ export function LineChart({
   const compact = size.height < 72;
   const axes =
     showAxes ?? (theme.axis.show && !compact);
+  const plotCategories = prepared.categories;
+  const plotSeries = prepared.series;
 
   return (
     <div
@@ -91,14 +113,14 @@ export function LineChart({
       }}
     >
       <CartesianChartShell
-        categories={categories}
-        series={series}
+        categories={plotCategories}
+        series={plotSeries}
         valueSuffix={valueSuffix}
         compact={compact}
         plot={
           <LinePlot
-            categories={categories}
-            series={series}
+            categories={plotCategories}
+            series={plotSeries}
             fill={fill}
             showAxes={axes}
             valueSuffix={valueSuffix}

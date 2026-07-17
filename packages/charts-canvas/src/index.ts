@@ -1,3 +1,4 @@
+export { preparePlotData, type PreparedPlotData } from "./preparePlotData";
 export { UPlotLine } from "./UPlotLine";
 export { UPlotBar } from "./UPlotBar";
 export type {

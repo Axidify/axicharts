@@ -81,5 +81,8 @@ export {
   formatTick,
   registerTickFormat,
   unregisterTickFormat,
+  resolveRenderer,
   type BuiltinTickFormat,
+  type RendererPreference,
+  type ResolvedRenderer,
 } from "@axicharts/charts-core";

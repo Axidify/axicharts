@@ -1,11 +1,14 @@
 "use client";
 
 import type { ReactElement } from "react";
+import { useMemo } from "react";
 import {
   UPlotBar,
+  preparePlotData,
   type PlotSeries,
   type ReferenceLine,
 } from "@axicharts/charts-canvas";
+import type { RendererPreference } from "@axicharts/charts-core";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import {
   CartesianChartShell,
@@ -13,6 +16,7 @@ import {
 import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
 import { usePlotSync } from "../sync/usePlotSync";
+import { usePlotSampling } from "../plot/usePlotSampling";
 
 export type BarChartProps = {
   categories: string[];
@@ -22,6 +26,8 @@ export type BarChartProps = {
   valueSuffix?: string;
   referenceLines?: ReferenceLine[];
   stacked?: boolean;
+  renderer?: RendererPreference;
+  refreshHz?: number;
 };
 
 function BarPlot({
@@ -71,14 +77,27 @@ export function BarChart({
   valueSuffix,
   referenceLines,
   stacked = false,
+  renderer = "auto",
+  refreshHz,
 }: BarChartProps): ReactElement | null {
   const { size, ready, theme } = useChartLayout();
+  const maxPoints = usePlotSampling({
+    pointCount: categories.length,
+    renderer,
+    refreshHz,
+  });
+  const prepared = useMemo(
+    () => preparePlotData(categories, series, maxPoints),
+    [categories, series, maxPoints],
+  );
 
   if (!ready || size.width < 1 || size.height < 1) {
     return null;
   }
 
   const axes = showAxes ?? theme.axis.show;
+  const plotCategories = prepared.categories;
+  const plotSeries = prepared.series;
 
   return (
     <div
@@ -91,13 +110,13 @@ export function BarChart({
       }}
     >
       <CartesianChartShell
-        categories={categories}
-        series={series}
+        categories={plotCategories}
+        series={plotSeries}
         valueSuffix={valueSuffix}
         plot={
           <BarPlot
-            categories={categories}
-            series={series}
+            categories={plotCategories}
+            series={plotSeries}
             showAxes={axes}
             showValues={showValues}
             valueSuffix={valueSuffix}
