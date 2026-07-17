@@ -5,6 +5,7 @@ import { HomePage } from "./pages/HomePage";
 import { PackagesPage } from "./pages/PackagesPage";
 import { PluginsPage } from "./pages/PluginsPage";
 import { RuntimePage } from "./pages/RuntimePage";
+import { RuntimeAdaptersPage } from "./pages/RuntimeAdaptersPage";
 import { RuntimeDeepLinkPage } from "./pages/RuntimeDeepLinkPage";
 import { RuntimeImportPage } from "./pages/RuntimeImportPage";
 import { RuntimeSchemaPage } from "./pages/RuntimeSchemaPage";
@@ -22,6 +23,7 @@ export function App(): ReactElement {
           <Route path="verticals" element={<VerticalsPage />} />
           <Route path="spec" element={<SpecPage />} />
           <Route path="runtime" element={<RuntimePage />} />
+          <Route path="runtime/adapters" element={<RuntimeAdaptersPage />} />
           <Route path="runtime/schema" element={<RuntimeSchemaPage />} />
           <Route path="runtime/import" element={<RuntimeImportPage />} />
           <Route path="runtime/links" element={<RuntimeDeepLinkPage />} />

@@ -85,12 +85,19 @@ export function RuntimePage(): ReactElement {
         templates with stale overlays and alarm chrome.{" "}
         <Link to="/runtime/schema">Runtime JSON schema & validation →</Link>
         {" · "}
+        <Link to="/runtime/adapters">Adapter cookbook →</Link>
+        {" · "}
         <Link to="/runtime/import">Import gallery →</Link>
         {" · "}
         <Link to="/runtime/links">Deep links →</Link>
       </p>
 
       <Section title="Data adapters" subtitle="connectSource + hooks">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
+          Field reference, payload shapes, and mosaic wiring — see the{" "}
+          <Link to="/runtime/adapters">adapter cookbook</Link> for REST, WebSocket, historian, and
+          MQTT details.
+        </p>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>

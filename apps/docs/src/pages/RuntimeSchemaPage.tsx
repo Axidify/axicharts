@@ -140,6 +140,10 @@ export function RuntimeSchemaPage(): ReactElement {
             <Link to="/runtime/import">Import gallery</Link> — dual-gate preview for all examples
           </li>
           <li>
+            <Link to="/runtime/adapters">Adapter cookbook</Link> — REST, WebSocket, historian field
+            reference
+          </li>
+          <li>
             <Link to="/runtime/links">Deep link index</Link> — canonical preset and schema URLs
           </li>
         </ul>

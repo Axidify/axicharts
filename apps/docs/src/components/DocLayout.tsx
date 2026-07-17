@@ -7,6 +7,7 @@ const links = [
   { to: "/verticals", label: "Verticals" },
   { to: "/spec", label: "Spec layer" },
   { to: "/runtime", label: "Runtime" },
+  { to: "/runtime/adapters", label: "Adapter cookbook" },
   { to: "/runtime/schema", label: "Runtime schema" },
   { to: "/runtime/import", label: "Import gallery" },
   { to: "/runtime/links", label: "Deep links" },
