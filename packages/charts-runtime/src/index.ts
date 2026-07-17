@@ -4,6 +4,7 @@ export type {
   DashboardEmbedSpec,
   DataSourceSnapshot,
   DataSourceSpec,
+  HistorianDataSourceSpec,
   MockLiveDataSourceSpec,
   MosaicCellSpec,
   MosaicWallSpec,
@@ -11,17 +12,24 @@ export type {
   MqttConnectFn,
   MqttDataSourceSpec,
   RestDataSourceSpec,
+  RuntimeDashboardSpec,
   StaticDataSourceSpec,
   WebSocketDataSourceSpec,
 } from "./types";
 
 export { DashboardEmbed, type DashboardEmbedProps } from "./DashboardEmbed";
 export { MosaicWall, type MosaicWallProps } from "./MosaicWall";
+export { RuntimeDashboard, type RuntimeDashboardProps } from "./RuntimeDashboard";
 export { RuntimeShell, type RuntimeShellProps } from "./RuntimeShell";
 export { TemplatePicker, type TemplatePickerProps } from "./TemplatePicker";
 export { useDataSource } from "./useDataSource";
 export { mergeMosaicData, pluckMosaicData } from "./mosaicData";
 
+export {
+  buildHistorianUrl,
+  connectHistorianSource,
+  defaultHistorianMapper,
+} from "./adapters/historian";
 export { connectMockLiveSource } from "./adapters/mockLive";
 export { connectMqttSource } from "./adapters/mqtt";
 export { connectRestSource } from "./adapters/rest";

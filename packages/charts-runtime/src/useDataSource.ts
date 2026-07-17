@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { connectHistorianSource } from "./adapters/historian";
 import { connectMockLiveSource } from "./adapters/mockLive";
 import { connectMqttSource } from "./adapters/mqtt";
 import { connectRestSource } from "./adapters/rest";
@@ -26,6 +27,8 @@ function connectSource(
       return connectMockLiveSource(spec, onUpdate);
     case "mqtt":
       return connectMqttSource(spec, onUpdate);
+    case "historian":
+      return connectHistorianSource(spec, onUpdate);
     default:
       return () => {};
   }

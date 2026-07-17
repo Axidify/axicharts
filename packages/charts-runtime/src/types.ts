@@ -57,12 +57,25 @@ export type MqttDataSourceSpec = {
   parsePayload?: (raw: unknown) => Record<string, unknown>;
 };
 
+export type HistorianDataSourceSpec = {
+  id?: string;
+  type: "historian";
+  url: string;
+  tags?: string[];
+  windowMs?: number;
+  intervalMs?: number;
+  staleAfterMs?: number;
+  fetch?: typeof fetch;
+  mapResponse?: (payload: unknown) => Record<string, unknown>;
+};
+
 export type DataSourceSpec =
   | StaticDataSourceSpec
   | RestDataSourceSpec
   | WebSocketDataSourceSpec
   | MockLiveDataSourceSpec
-  | MqttDataSourceSpec;
+  | MqttDataSourceSpec
+  | HistorianDataSourceSpec;
 
 export type DataSourceSnapshot = {
   data: Record<string, unknown>;
@@ -109,3 +122,13 @@ export type MosaicWallSpec = {
   dataSource?: DataSourceSpec;
   staleAfterMs?: number;
 };
+
+export type RuntimeDashboardSpec =
+  | {
+      layout?: "embed";
+      dashboard: DashboardEmbedSpec;
+    }
+  | {
+      layout: "mosaic";
+      wall: MosaicWallSpec;
+    };
