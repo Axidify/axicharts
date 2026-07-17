@@ -6,6 +6,8 @@ Line/bar/area via uPlot; pie, candlestick, waterfall, and heatmap via ECharts; i
 
 - **GitHub:** https://github.com/Axidify/axicharts
 - **Storybook:** `pnpm storybook` → http://localhost:6006
+- **Docs:** `pnpm docs` → http://localhost:3001
+- **Dashboarder:** `pnpm dashboarder` → http://localhost:3000
 - **License:** MIT
 
 ## Install
@@ -44,6 +46,8 @@ export function LatencyPanel() {
 | `@axicharts/charts-canvas` | uPlot — line, bar, area (live path) |
 | `@axicharts/charts-echarts` | ECharts — pie, candlestick, waterfall, heatmap |
 | `@axicharts/charts-core` | Layout math + `formatTick` / `registerTickFormat` |
+| `@axicharts/charts-spec` | Vertical templates, planner, eject CLI |
+| `@axicharts/charts-runtime` | Data adapters, embed SDK, spec portability |
 
 ## Develop
 
@@ -54,6 +58,7 @@ pnpm test
 pnpm test:perf   # 6-panel uPlot setData gate
 pnpm size        # bundle gzip budgets
 pnpm storybook
+pnpm docs
 ```
 
 ## Storybook gates
