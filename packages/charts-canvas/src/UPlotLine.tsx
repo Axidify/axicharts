@@ -13,6 +13,27 @@ import {
 } from "./colors";
 import type { UPlotLineProps } from "./types";
 
+function seriesSpan(data: number[]): number {
+  if (data.length === 0) return 1;
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  return max - min || max || 1;
+}
+
+function shouldUseDualAxis(
+  series: UPlotLineProps["series"],
+  dualAxis: UPlotLineProps["dualAxis"],
+): boolean {
+  if (series.length < 2) return false;
+  if (dualAxis === true) return true;
+  if (dualAxis === false) return false;
+
+  const spans = series.map((item) => seriesSpan(item.data));
+  const hi = Math.max(...spans);
+  const lo = Math.min(...spans);
+  return hi / lo > 3;
+}
+
 function buildOptions({
   width,
   height,
@@ -21,6 +42,7 @@ function buildOptions({
   theme,
   fill,
   showAxes = true,
+  dualAxis = "auto",
 }: UPlotLineProps): uPlot.Options {
   const compact = height < 72;
   const gridOpacity = compact
@@ -46,15 +68,21 @@ function buildOptions({
     ? Math.min(theme.area.fillOpacity + 0.12, 0.35)
     : theme.area.fillOpacity;
 
+  const useDualAxis = shouldUseDualAxis(series, dualAxis);
+  const showLegend = series.length > 1;
+  const topPad = showLegend && !compact ? 28 : compact ? 4 : 8;
+
   return {
     width,
     height,
     class: "axicharts-uplot",
-    padding: compact ? [4, 6, 4, 6] : [8, 10, 8, 10],
+    padding: compact ? [4, 6, 4, 6] : [topPad, 10, 8, useDualAxis ? 48 : 10],
     cursor: { show: false },
-    legend: { show: series.length > 1 },
+    legend: { show: showLegend },
     scales: {
       x: { time: false },
+      y: { auto: true },
+      ...(useDualAxis ? { y2: { auto: true } } : {}),
     },
     axes: showAxes
       ? [
@@ -70,6 +98,8 @@ function buildOptions({
             font: "11px ui-sans-serif, system-ui, sans-serif",
           },
           {
+            scale: "y",
+            side: 3,
             stroke: AXIS_COLOR,
             grid: theme.grid.horizontal ? compactYGrid : { show: false },
             splits: compactSplits,
@@ -79,6 +109,21 @@ function buildOptions({
               ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
               : "11px ui-sans-serif, system-ui, sans-serif",
           },
+          ...(useDualAxis
+            ? [
+                {
+                  scale: "y2",
+                  side: 1,
+                  stroke: AXIS_COLOR,
+                  grid: { show: false },
+                  ticks: { show: false },
+                  size: 32,
+                  font: theme.values.monospace
+                    ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
+                    : "11px ui-sans-serif, system-ui, sans-serif",
+                },
+              ]
+            : []),
         ]
       : [
           {
@@ -94,10 +139,11 @@ function buildOptions({
         ],
     series: [
       {},
-      ...series.map((item) => {
+      ...series.map((item, index) => {
         const color = SERIES_COLORS[item.tone ?? "default"];
         return {
           label: item.name,
+          scale: useDualAxis && index > 0 ? "y2" : "y",
           stroke: color,
           width: theme.line.strokeWidth,
           fill: fill && theme.area.show ? withAlpha(color, fillOpacity) : undefined,
@@ -114,13 +160,14 @@ function buildData(categories: string[], series: UPlotLineProps["series"]) {
 }
 
 export function UPlotLine(props: UPlotLineProps): ReactElement {
-  const { width, height, categories, series, theme, fill, showAxes } = props;
+  const { width, height, categories, series, theme, fill, showAxes, dualAxis } =
+    props;
   const rootRef = useRef<HTMLDivElement>(null);
   const plotRef = useRef<uPlot | null>(null);
 
   const options = useMemo(
     () => buildOptions(props),
-    [width, height, categories, series, theme, fill, showAxes],
+    [width, height, categories, series, theme, fill, showAxes, dualAxis],
   );
 
   const data = useMemo(

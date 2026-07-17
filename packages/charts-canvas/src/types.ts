@@ -19,6 +19,8 @@ export type ReferenceLine = {
   tone?: SeriesTone;
 };
 
+export type DualAxisMode = boolean | "auto";
+
 export type UPlotLineProps = {
   width: number;
   height: number;
@@ -28,6 +30,7 @@ export type UPlotLineProps = {
   fill?: boolean;
   showAxes?: boolean;
   valueSuffix?: string;
+  dualAxis?: DualAxisMode;
 };
 
 export type UPlotBarProps = {

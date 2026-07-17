@@ -15,6 +15,7 @@ export {
 } from "./status/StatusLamp";
 export { Stat, type StatProps, type StatSurface, type StatTone } from "./stat/Stat";
 export type {
+  DualAxisMode,
   PlotSeries,
   ReferenceLine,
   SeriesTone,

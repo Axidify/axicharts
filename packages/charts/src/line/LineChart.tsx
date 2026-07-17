@@ -10,6 +10,7 @@ export type LineChartProps = {
   fill?: boolean;
   showAxes?: boolean;
   valueSuffix?: string;
+  dualAxis?: boolean | "auto";
 };
 
 export function LineChart({
@@ -18,6 +19,7 @@ export function LineChart({
   fill = false,
   showAxes,
   valueSuffix,
+  dualAxis = "auto",
 }: LineChartProps): ReactElement | null {
   const { size, ready, theme, mode } = useChartLayout();
 
@@ -48,6 +50,7 @@ export function LineChart({
         fill={fill}
         showAxes={axes}
         valueSuffix={valueSuffix}
+        dualAxis={dualAxis}
       />
       {valueSuffix && theme.caption.show && !compact ? (
         <span

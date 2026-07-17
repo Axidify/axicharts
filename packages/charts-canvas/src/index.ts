@@ -1,6 +1,7 @@
 export { UPlotLine } from "./UPlotLine";
 export { UPlotBar } from "./UPlotBar";
 export type {
+  DualAxisMode,
   PlotSeries,
   ReferenceLine,
   SeriesTone,
