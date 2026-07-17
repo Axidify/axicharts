@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { RuntimeDashboard, buildEmbedBundle, serializeRuntimeSpec } from "@axicharts/charts-runtime";
-import { ADAPTER_FIXTURE_PRESETS } from "@axicharts/charts-runtime/validation";
+import { ADAPTER_FIXTURE_PRESETS, PLANNER_FEED_ROWS } from "@axicharts/charts-runtime/validation";
 import { RuntimeHubNav } from "../components/RuntimeHubNav";
 import {
   ADAPTER_ROWS,
@@ -126,6 +126,39 @@ export function RuntimePage(): ReactElement {
                 </tr>
               );
             })}
+          </tbody>
+        </table>
+      </Section>
+
+      <Section title="Planner feeds" subtitle="intent → feed → gallery fixture">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Phase 3 <code>@axicharts/charts-planner</code> infers a live feed from intent and applies it
+          in Dashboarder via <strong>Plan</strong>. Each feed maps to a shipped import preset — see
+          the full index on the{" "}
+          <Link to="/runtime/import#planner-feeds">import gallery planner feed table</Link>.
+        </p>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+          <thead>
+            <tr style={{ textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>
+              <th style={{ padding: "8px 6px" }}>Feed</th>
+              <th style={{ padding: "8px 6px" }}>Sample intent</th>
+              <th style={{ padding: "8px 6px" }}>Fixture</th>
+            </tr>
+          </thead>
+          <tbody>
+            {PLANNER_FEED_ROWS.map((row) => (
+              <tr key={row.feed} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                <td style={{ padding: "8px 6px" }}>
+                  <code>{row.feed}</code>
+                </td>
+                <td style={{ padding: "8px 6px", color: "#475569", fontSize: 12 }}>
+                  {row.intentSample}
+                </td>
+                <td style={{ padding: "8px 6px", fontSize: 12 }}>
+                  <Link to={`/runtime/import?preset=${row.presetId}`}>{row.presetId}</Link>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </Section>

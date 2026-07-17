@@ -20,7 +20,11 @@ import {
   shareExportReferencePreset,
   runtimeEmbedReferencePreset,
   plannerAdapterReferencePreset,
+  PLANNER_FEED_ROWS,
+  PLANNER_MOSAIC_INTENT_SAMPLE,
   plannerAdapterFixtures,
+  plannerFeedGalleryDeepLink,
+  plannerFeedGalleryIndexDeepLink,
   feedAdapterGalleryDeepLink,
   adapterFixtureGalleryDeepLink,
   formatValidatePresetCommand,
@@ -182,6 +186,28 @@ describe("hosted import presets", () => {
     const embedFixtures = plannerAdapterFixtures({ layout: "embed", feed: "mock-live" });
     expect(embedFixtures).toHaveLength(1);
     expect(embedFixtures[0]?.preset.id).toBe("ops-mock-live");
+    expect(PLANNER_FEED_ROWS.map((row) => row.feed)).toEqual([
+      "static",
+      "historian",
+      "rest",
+      "websocket",
+      "mqtt",
+      "mock-live",
+    ]);
+    expect(plannerFeedGalleryDeepLink("rest")).toBe(
+      "https://axidify.github.io/axicharts/runtime/import?preset=ops-rest",
+    );
+    expect(plannerFeedGalleryIndexDeepLink()).toBe(
+      "https://axidify.github.io/axicharts/runtime/import#planner-feeds",
+    );
+    const mosaicFixturesFromSample = plannerAdapterFixtures({
+      layout: "mosaic",
+      feed: "historian",
+    });
+    expect(mosaicFixturesFromSample.map((item) => item.preset.id)).toEqual([
+      "ops-mosaic",
+      "ops-historian",
+    ]);
     expect(feedAdapterGalleryDeepLink("mqtt", "embed")).toBe(
       "https://axidify.github.io/axicharts/runtime/import?preset=ops-mqtt",
     );

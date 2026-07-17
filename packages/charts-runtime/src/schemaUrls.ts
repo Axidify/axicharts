@@ -236,6 +236,71 @@ export function plannerAdapterFixtures(plan: PlannerAdapterPlan): PlannerAdapter
 
 export type PlannerFeedLike = PlannerAdapterPlan["feed"];
 
+export type PlannerFeedRow = {
+  feed: PlannerFeedLike;
+  intentSample: string;
+  adapter: ImportPresetAdapter;
+  presetId: string;
+};
+
+/** Shipped planner feed → adapter fixture index for docs and Dashboarder cross-links. */
+export const PLANNER_FEED_ROWS: PlannerFeedRow[] = [
+  {
+    feed: "static",
+    intentSample: "Static CSV snapshot batch report",
+    adapter: "static",
+    presetId: "ops-embed",
+  },
+  {
+    feed: "historian",
+    intentSample: "Line 3 night shift live telemetry",
+    adapter: "historian",
+    presetId: "ops-historian",
+  },
+  {
+    feed: "rest",
+    intentSample: "REST API polling /api/metrics endpoint",
+    adapter: "rest",
+    presetId: "ops-rest",
+  },
+  {
+    feed: "websocket",
+    intentSample: "WebSocket push feed trading desk",
+    adapter: "websocket",
+    presetId: "ops-websocket",
+  },
+  {
+    feed: "mqtt",
+    intentSample: "MQTT plant floor sparkplug telemetry",
+    adapter: "mqtt",
+    presetId: "ops-mqtt",
+  },
+  {
+    feed: "mock-live",
+    intentSample: "Mock-live synthetic demo drift sandbox",
+    adapter: "mock-live",
+    presetId: "ops-mock-live",
+  },
+];
+
+export const PLANNER_MOSAIC_INTENT_SAMPLE = "Trading desk program mosaic wall";
+
+/** Docs gallery URL for the planner feed track index. */
+export function plannerFeedGalleryIndexDeepLink(origin = DOCS_SITE_ORIGIN): string {
+  const base = origin.endsWith("/") ? origin.slice(0, -1) : origin;
+  return `${base}/runtime/import#planner-feeds`;
+}
+
+/** Docs gallery URL for a planner feed row. */
+export function plannerFeedGalleryDeepLink(
+  feed: PlannerFeedLike,
+  origin = DOCS_SITE_ORIGIN,
+): string {
+  const row = PLANNER_FEED_ROWS.find((item) => item.feed === feed);
+  if (row) return docsImportGalleryDeepLink(row.presetId, origin);
+  return feedAdapterGalleryDeepLink(feed, "embed", origin);
+}
+
 /** Docs gallery URL for a planner/builder feed + layout pair. */
 export function feedAdapterGalleryDeepLink(
   feed: PlannerFeedLike,

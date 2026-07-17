@@ -14,6 +14,9 @@ import {
   isImportGalleryFilterActive,
   localImportPresetUrl,
   parseImportGalleryFilter,
+  plannerAdapterFixtures,
+  PLANNER_FEED_ROWS,
+  PLANNER_MOSAIC_INTENT_SAMPLE,
   validatePortableImportJson,
   type HostedImportPreset,
   type ImportGalleryFilter,
@@ -259,6 +262,74 @@ export function RuntimeImportPage(): ReactElement {
         {" "}
         <Link to="/runtime/adapters">Adapter cookbook →</Link>
       </p>
+
+      <section
+        id="planner-feeds"
+        style={{
+          marginTop: 16,
+          padding: 14,
+          borderRadius: 10,
+          border: "1px solid #e2e8f0",
+          background: "#ffffff",
+          maxWidth: 720,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+          Planner feed index
+        </div>
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          <code>@axicharts/charts-planner</code> maps natural-language intent to{" "}
+          <code>DashboardPlan.feed</code> — each feed binds to a gallery fixture validated in CI.
+          Dashboarder <strong>Plan</strong> surfaces the same presets with gallery and import links.
+        </p>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: 13,
+          }}
+        >
+          <thead>
+            <tr>
+              <th style={{ borderBottom: "1px solid #e2e8f0", padding: "8px 6px", textAlign: "left" }}>
+                Feed
+              </th>
+              <th style={{ borderBottom: "1px solid #e2e8f0", padding: "8px 6px", textAlign: "left" }}>
+                Sample intent
+              </th>
+              <th style={{ borderBottom: "1px solid #e2e8f0", padding: "8px 6px", textAlign: "left" }}>
+                Gallery preset
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {PLANNER_FEED_ROWS.map((row) => (
+              <tr key={row.feed}>
+                <td style={{ borderBottom: "1px solid #f1f5f9", padding: "8px 6px" }}>
+                  <code>{row.feed}</code>
+                </td>
+                <td style={{ borderBottom: "1px solid #f1f5f9", padding: "8px 6px", color: "#475569" }}>
+                  {row.intentSample}
+                </td>
+                <td style={{ borderBottom: "1px solid #f1f5f9", padding: "8px 6px" }}>
+                  <Link to={`/runtime/import?preset=${row.presetId}`}>{row.presetId}</Link>
+                  {" · "}
+                  <Link to={importGalleryFilterPath({ type: "adapter", value: row.adapter })}>
+                    ?adapter={row.adapter}
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p style={{ margin: "12px 0 0", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Mosaic intents (e.g. <em>{PLANNER_MOSAIC_INTENT_SAMPLE}</em>) surface multiple fixtures:{" "}
+          {plannerAdapterFixtures({ layout: "mosaic", feed: "historian" })
+            .map((item) => item.preset.id)
+            .join(" + ")}
+          . See the <Link to="/runtime/adapters">adapter cookbook</Link> for field tables.
+        </p>
+      </section>
 
       <section
         style={{

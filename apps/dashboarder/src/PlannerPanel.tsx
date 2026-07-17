@@ -11,6 +11,7 @@ import {
   docsImportGalleryDeepLink,
   formatValidatePresetCommand,
   plannerAdapterFixtures,
+  plannerFeedGalleryDeepLink,
 } from "@axicharts/charts-runtime/validation";
 import { ValidateCommandCopy } from "./validationChrome";
 
@@ -294,6 +295,17 @@ export function PlannerPanel({
                       </li>
                     ))}
                   </ul>
+                  <p style={{ margin: "10px 0 0", fontSize: 11, color: "#64748b" }}>
+                    Planner feed index:{" "}
+                    <a
+                      href={plannerFeedGalleryDeepLink(plan.feed)}
+                      style={{ color: "#93c5fd" }}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Gallery table
+                    </a>
+                  </p>
                 </div>
               );
             })()}

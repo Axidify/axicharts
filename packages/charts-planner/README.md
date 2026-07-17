@@ -17,6 +17,24 @@ const plan = planFromIntent(DEFAULT_OPS_PROFILE, "Line 3 night shift overview");
 // → { template: "ops-2x2", layout: "embed", feed: "historian", panels: [...] }
 ```
 
+## Planner feeds
+
+`inferFeed()` maps intent keywords to `DashboardPlan.feed`. Each feed binds to a shipped import
+gallery fixture — same presets surfaced in Dashboarder **Plan** and the
+[runtime import gallery](https://axidify.github.io/axicharts/runtime/import#planner-feeds).
+
+| Feed | Sample intent | Gallery preset |
+|------|---------------|----------------|
+| `static` | Static CSV snapshot batch report | `ops-embed` |
+| `historian` | Line 3 night shift live telemetry | `ops-historian` |
+| `rest` | REST API polling /api/metrics endpoint | `ops-rest` |
+| `websocket` | WebSocket push feed trading desk | `ops-websocket` |
+| `mqtt` | MQTT plant floor sparkplug telemetry | `ops-mqtt` |
+| `mock-live` | Mock-live synthetic demo drift sandbox | `ops-mock-live` |
+
+Mosaic intents surface multiple fixtures (wall + feed bind) via `plannerAdapterFixtures()` in
+`@axicharts/charts-runtime/validation`.
+
 ## OpenAI-compatible provider
 
 Set `OPENAI_API_KEY` (or `AXICHARTS_PLANNER_API_KEY`) and start the server:

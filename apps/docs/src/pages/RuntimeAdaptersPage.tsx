@@ -20,7 +20,7 @@ import {
   WEBSOCKET_TELEMETRY_FRAME,
   type AdapterFieldRow,
 } from "../demos/runtimeAdapterDemo";
-import { ADAPTER_FIXTURE_PRESETS, IMPORT_GALLERY_ADAPTER_FILTERS, importGalleryFilterPath } from "@axicharts/charts-runtime/validation";
+import { ADAPTER_FIXTURE_PRESETS, IMPORT_GALLERY_ADAPTER_FILTERS, importGalleryFilterPath, PLANNER_FEED_ROWS, plannerFeedGalleryIndexDeepLink } from "@axicharts/charts-runtime/validation";
 import { RuntimeHubNav } from "../components/RuntimeHubNav";
 
 const tableStyle = {
@@ -277,23 +277,27 @@ export function RuntimeAdaptersPage(): ReactElement {
         </p>
       </Section>
 
-      <Section title="Adapter fixture index" subtitle="import gallery · C28–C32">
+      <Section title="Adapter fixture index" subtitle="import gallery · planner feeds">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
           Each adapter type maps to a shipped preset validated in CI via{" "}
           <code>pnpm validate:runtime</code>. Filter the{" "}
-          <Link to="/runtime/import">import gallery</Link> by adapter or open a fixture directly.
+          <Link to="/runtime/import">import gallery</Link> by adapter or open the{" "}
+          <Link to="/runtime/import#planner-feeds">planner feed index</Link> for intent → fixture
+          cross-links.
         </p>
         <table style={tableStyle}>
           <thead>
             <tr>
               <th style={cellStyle}>Adapter</th>
               <th style={cellStyle}>Preset</th>
+              <th style={cellStyle}>Planner sample</th>
               <th style={cellStyle}>Gallery filter</th>
             </tr>
           </thead>
           <tbody>
             {IMPORT_GALLERY_ADAPTER_FILTERS.map((adapter) => {
               const presetId = ADAPTER_FIXTURE_PRESETS[adapter];
+              const plannerRow = PLANNER_FEED_ROWS.find((row) => row.adapter === adapter);
               return (
                 <tr key={adapter}>
                   <td style={cellStyle}>
@@ -302,6 +306,19 @@ export function RuntimeAdaptersPage(): ReactElement {
                   <td style={cellStyle}>
                     {presetId ? (
                       <Link to={`/runtime/import?preset=${presetId}`}>{presetId}</Link>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td style={{ ...cellStyle, color: "#475569", fontSize: 12 }}>
+                    {plannerRow ? (
+                      <>
+                        <code>{plannerRow.feed}</code>
+                        {" · "}
+                        {plannerRow.intentSample}
+                      </>
+                    ) : adapter === "mosaic" ? (
+                      <Link to="/runtime/import#planner-feeds">mosaic wall + bind</Link>
                     ) : (
                       "—"
                     )}
@@ -316,6 +333,10 @@ export function RuntimeAdaptersPage(): ReactElement {
             })}
           </tbody>
         </table>
+        <p style={{ margin: "12px 0 0", fontSize: 12, color: "#64748b" }}>
+          Full planner feed table:{" "}
+          <a href={plannerFeedGalleryIndexDeepLink()}>{plannerFeedGalleryIndexDeepLink()}</a>
+        </p>
       </Section>
     </div>
   );
