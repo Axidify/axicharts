@@ -5,7 +5,9 @@ import {
   Dashboard,
   ejectPanel,
   planPanelsFromProfile,
+  registerSpecCompiler,
   suggestTemplate,
+  clearSpecCompilers,
 } from "@axicharts/charts-spec";
 import "@axicharts/charts-andon/register";
 import "@axicharts/charts-geo/register";
@@ -191,6 +193,33 @@ export const ProfilePlanner: Story = {
           {ejected}
         </pre>
       </div>
+    );
+  },
+};
+
+export const ThirdPartyCompiler: Story = {
+  render: () => {
+    clearSpecCompilers();
+    registerSpecCompiler({
+      id: "storybook-fill-lines",
+      compile(panel) {
+        if (panel.type !== "line") return panel;
+        return { ...panel, fill: true, title: panel.title ?? "Compiler default" };
+      },
+    });
+
+    return (
+      <Chart
+        panel={{
+          type: "line",
+          encoding: {
+            x: { field: "day", type: "nominal" },
+            y: { field: "value", type: "quantitative" },
+          },
+          height: 200,
+        }}
+        data={REVENUE_ROWS}
+      />
     );
   },
 };

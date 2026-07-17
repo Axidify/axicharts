@@ -9,6 +9,7 @@ import {
   parsePanelSpecFile,
 } from "./parseSpec";
 import { planPanelsFromProfile, suggestTemplate } from "./plan";
+import { listTemplates } from "./templates";
 
 function readArgFlag(args: string[], flag: string): string | undefined {
   const index = args.indexOf(flag);
@@ -39,11 +40,7 @@ export function runCli(argv: string[]): number {
   }
 
   if (command === "templates") {
-    process.stdout.write(
-      ["finance-pnl", "trading-blotter", "capacity-grid", "ops-2x2", "line-overview"].join(
-        "\n",
-      ) + "\n",
-    );
+    process.stdout.write(`${listTemplates().join("\n")}\n`);
     return 0;
   }
 

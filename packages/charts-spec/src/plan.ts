@@ -1,4 +1,5 @@
 import type { DataProfile, MetricProfile, PanelSpec } from "./types";
+import { applySpecCompilers } from "./specCompiler";
 
 function inferChartType(metric: MetricProfile): PanelSpec["type"] {
   const name = metric.name.toLowerCase();
@@ -76,7 +77,9 @@ export function planPanelFromMetric(metric: MetricProfile): PanelSpec {
 }
 
 export function planPanelsFromProfile(profile: DataProfile): PanelSpec[] {
-  return profile.metrics.map(planPanelFromMetric);
+  return profile.metrics.map((metric) =>
+    applySpecCompilers(planPanelFromMetric(metric), [], profile),
+  );
 }
 
 export function suggestTemplate(profile: DataProfile): string {

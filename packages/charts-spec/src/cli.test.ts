@@ -61,4 +61,9 @@ describe("runCli", () => {
     expect(output.suggestedTemplate).toBe("finance-pnl");
     expect(output.panels).toHaveLength(1);
   });
+
+  it("lists all templates including plugins-wall", () => {
+    const code = runCli(["templates"]);
+    expect(code).toBe(0);
+  });
 });

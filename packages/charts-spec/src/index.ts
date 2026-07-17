@@ -35,6 +35,14 @@ export {
   planPanelsFromProfile,
   suggestTemplate,
 } from "./plan";
+export {
+  applySpecCompilers,
+  clearSpecCompilers,
+  listSpecCompilers,
+  registerSpecCompiler,
+  type SpecCompiler,
+  type SpecCompilerContext,
+} from "./specCompiler";
 export { normalizePanelSpec, parseDashboardSpecFile, parseDataProfileFile, parsePanelSpecFile } from "./parseSpec";
 export { resolveTheme } from "./themes";
 export { asRows, pluckField, readArray, readNumber } from "./data";

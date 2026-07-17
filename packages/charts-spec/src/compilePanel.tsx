@@ -16,6 +16,7 @@ import {
 import { getChartType } from "@axicharts/charts/registry";
 import type { FieldEncoding, PanelSpec, SpecData, ThemeName, ChartMode } from "./types";
 import { asRows, pluckField } from "./data";
+import { applySpecCompilers } from "./specCompiler";
 import { resolveTheme } from "./themes";
 
 export type CompileOptions = {
@@ -94,49 +95,50 @@ export function compilePanel(
   data: SpecData,
   options: CompileOptions = {},
 ): ReactElement {
+  const resolved = applySpecCompilers(spec, data);
   const rows = asRows(data);
-  const props = spec.props ?? {};
+  const props = resolved.props ?? {};
 
-  switch (spec.type) {
+  switch (resolved.type) {
     case "line":
     case "area":
     case "bar": {
-      const categories = spec.encoding?.x
-        ? (pluckField(rows, spec.encoding.x) as string[])
+      const categories = resolved.encoding?.x
+        ? (pluckField(rows, resolved.encoding.x) as string[])
         : (props.categories as string[] | undefined) ?? [];
       const series =
-        seriesFromEncoding(rows, spec.encoding?.y).length > 0
-          ? seriesFromEncoding(rows, spec.encoding?.y)
+        seriesFromEncoding(rows, resolved.encoding?.y).length > 0
+          ? seriesFromEncoding(rows, resolved.encoding?.y)
           : ((props.series as PlotSeries[] | undefined) ?? []);
 
       const chartProps = {
         categories,
         series,
-        fill: spec.fill,
-        stacked: spec.stacked,
-        valueSuffix: spec.valueSuffix,
+        fill: resolved.fill,
+        stacked: resolved.stacked,
+        valueSuffix: resolved.valueSuffix,
         ...props,
       };
 
       const Chart =
-        spec.type === "area"
+        resolved.type === "area"
           ? AreaChart
-          : spec.type === "bar"
+          : resolved.type === "bar"
             ? BarChart
             : LineChart;
 
-      return wrapChart(spec, createElement(Chart, chartProps), options);
+      return wrapChart(resolved, createElement(Chart, chartProps), options);
     }
 
     case "pie": {
-      const nameField = spec.encoding?.name?.field ?? "name";
-      const valueField = spec.encoding?.value?.field ?? "value";
+      const nameField = resolved.encoding?.name?.field ?? "name";
+      const valueField = resolved.encoding?.value?.field ?? "value";
       const slices = rows.map((row) => ({
         name: String(row[nameField]),
         value: Number(row[valueField]),
       }));
       return wrapChart(
-        spec,
+        resolved,
         createElement(PieChart, {
           slices,
           ...props,
@@ -155,7 +157,7 @@ export function compilePanel(
           tone: row.tone as "critical" | "success" | "warning" | "default" | undefined,
         }));
       return wrapChart(
-        spec,
+        resolved,
         createElement(WaterfallChart, {
           items,
           valueFormat: props.valueFormat as "currency" | "number" | "compact" | undefined,
@@ -165,20 +167,20 @@ export function compilePanel(
     }
 
     case "candlestick": {
-      const categories = spec.encoding?.x
-        ? (pluckField(rows, spec.encoding.x) as string[])
+      const categories = resolved.encoding?.x
+        ? (pluckField(rows, resolved.encoding.x) as string[])
         : ((props.categories as string[]) ?? []);
-      const data = rows.map((row) => ({
-        open: Number(row[spec.encoding?.open?.field ?? "open"]),
-        high: Number(row[spec.encoding?.high?.field ?? "high"]),
-        low: Number(row[spec.encoding?.low?.field ?? "low"]),
-        close: Number(row[spec.encoding?.close?.field ?? "close"]),
+      const candleData = rows.map((row) => ({
+        open: Number(row[resolved.encoding?.open?.field ?? "open"]),
+        high: Number(row[resolved.encoding?.high?.field ?? "high"]),
+        low: Number(row[resolved.encoding?.low?.field ?? "low"]),
+        close: Number(row[resolved.encoding?.close?.field ?? "close"]),
       }));
       return wrapChart(
-        spec,
+        resolved,
         createElement(CandlestickChart, {
           categories,
-          data,
+          data: candleData,
           volume: props.volume as number[] | undefined,
         }),
         options,
@@ -188,7 +190,7 @@ export function compilePanel(
     case "heatmap": {
       const matrix = props.matrix as Parameters<typeof HeatmapChart>[0]["matrix"];
       return wrapChart(
-        spec,
+        resolved,
         createElement(HeatmapChart, {
           matrix,
           min: props.min as number | undefined,
@@ -200,11 +202,11 @@ export function compilePanel(
 
     case "stat": {
       const value = String(
-        props.value ?? rows[0]?.[spec.encoding?.value?.field ?? "value"] ?? "",
+        props.value ?? rows[0]?.[resolved.encoding?.value?.field ?? "value"] ?? "",
       );
       return createElement(Stat, {
         value,
-        label: String(props.label ?? spec.title ?? ""),
+        label: String(props.label ?? resolved.title ?? ""),
         tone: props.tone as StatTone | undefined,
         surface: props.surface as "light" | "dark" | undefined,
         monospace: props.monospace as boolean | undefined,
@@ -213,11 +215,11 @@ export function compilePanel(
 
     case "gauge": {
       const value = Number(
-        props.value ?? rows[0]?.[spec.encoding?.value?.field ?? "value"] ?? 0,
+        props.value ?? rows[0]?.[resolved.encoding?.value?.field ?? "value"] ?? 0,
       );
       return createElement(Gauge, {
         value,
-        label: String(props.label ?? spec.title ?? ""),
+        label: String(props.label ?? resolved.title ?? ""),
         unit: props.unit as string | undefined,
         warningAt: props.warningAt as number | undefined,
         criticalAt: props.criticalAt as number | undefined,
@@ -225,6 +227,6 @@ export function compilePanel(
     }
 
     default:
-      return compileRegisteredPanel(spec, data, rows, options);
+      return compileRegisteredPanel(resolved, data, rows, options);
   }
 }

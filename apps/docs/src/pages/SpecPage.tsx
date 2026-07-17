@@ -40,6 +40,16 @@ const profile = {
 suggestTemplate(profile);       // → "ops-2x2"
 planPanelsFromProfile(profile); // → PanelSpec[]`;
 
+const COMPILER_CODE = `import { registerSpecCompiler } from "@axicharts/charts-spec";
+
+registerSpecCompiler({
+  id: "acme-defaults",
+  compile(panel, { data, profile }) {
+    if (panel.type === "line") return { ...panel, fill: true, height: 200 };
+    return panel;
+  },
+});`;
+
 function Section({
   title,
   subtitle,
@@ -148,6 +158,25 @@ export function SpecPage(): ReactElement {
           }}
         >
           {ejected}
+        </pre>
+      </Section>
+
+      <Section title="Third-party compilers" subtitle="registerSpecCompiler">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", maxWidth: 640 }}>
+          Extend panel planning and compilation without forking core — compilers run before{" "}
+          <code>compilePanel</code> and during <code>planPanelsFromProfile</code>.
+        </p>
+        <pre
+          style={{
+            margin: 0,
+            padding: 14,
+            background: "#f8fafc",
+            fontSize: 11,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {COMPILER_CODE}
         </pre>
       </Section>
 
