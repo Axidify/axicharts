@@ -13,6 +13,7 @@ import {
   type PlotSeries,
   type StatTone,
 } from "@axicharts/charts";
+import { getChartType } from "@axicharts/charts/registry";
 import type { FieldEncoding, PanelSpec, SpecData, ThemeName, ChartMode } from "./types";
 import { asRows, pluckField } from "./data";
 import { resolveTheme } from "./themes";
@@ -53,6 +54,38 @@ function wrapChart(
     ChartContainer,
     { theme, mode, height, width },
     chart,
+  );
+}
+
+function objectDataFromSpec(data: SpecData): Record<string, unknown> {
+  if (Array.isArray(data)) return {};
+  if (data !== null && typeof data === "object") {
+    return data as Record<string, unknown>;
+  }
+  return {};
+}
+
+function compileRegisteredPanel(
+  spec: PanelSpec,
+  data: SpecData,
+  rows: Record<string, unknown>[],
+  options: CompileOptions,
+): ReactElement {
+  const registration = getChartType(spec.type);
+  if (!registration) {
+    throw new Error(`Unsupported panel type: ${spec.type}`);
+  }
+
+  const chartProps = {
+    ...objectDataFromSpec(data),
+    ...(rows[0] ?? {}),
+    ...spec.props,
+  };
+
+  return wrapChart(
+    spec,
+    createElement(registration.Chart, chartProps),
+    options,
   );
 }
 
@@ -191,9 +224,7 @@ export function compilePanel(
       });
     }
 
-    default: {
-      const _exhaustive: never = spec.type;
-      throw new Error(`Unsupported panel type: ${String(_exhaustive)}`);
-    }
+    default:
+      return compileRegisteredPanel(spec, data, rows, options);
   }
 }

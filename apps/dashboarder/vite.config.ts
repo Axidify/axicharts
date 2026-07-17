@@ -15,6 +15,11 @@ export default defineConfig({
       "@axicharts/charts-theme": path.resolve(root, "packages/charts-theme/src"),
       "@axicharts/charts-canvas": path.resolve(root, "packages/charts-canvas/src"),
       "@axicharts/charts-echarts": path.resolve(root, "packages/charts-echarts/src"),
+      "@axicharts/charts-core": path.resolve(root, "packages/charts-core/src"),
+      "@axicharts/charts-tank": path.resolve(root, "packages/charts-tank/src"),
+      "@axicharts/charts-geo": path.resolve(root, "packages/charts-geo/src"),
+      "@axicharts/charts-andon": path.resolve(root, "packages/charts-andon/src"),
+      "@axicharts/charts-sankey": path.resolve(root, "packages/charts-sankey/src"),
     },
   },
   server: {

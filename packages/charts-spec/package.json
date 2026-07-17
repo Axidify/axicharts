@@ -43,6 +43,7 @@
     "@axicharts/charts-theme": "workspace:*"
   },
   "devDependencies": {
+    "@axicharts/charts-tank": "workspace:*",
     "@testing-library/react": "^16.2.0",
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",

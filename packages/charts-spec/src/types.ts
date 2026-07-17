@@ -24,7 +24,8 @@ export type PanelChartType =
   | "candlestick"
   | "heatmap"
   | "stat"
-  | "gauge";
+  | "gauge"
+  | string;
 
 export type PanelSpec = {
   specVersion?: number;

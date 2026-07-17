@@ -7,6 +7,7 @@ import {
   serializeRuntimeSpec,
   type RuntimeDashboardSpec,
 } from "@axicharts/charts-runtime";
+import { PluginStrip } from "./PluginStrip";
 
 const STORAGE_KEY = "dashboarder.runtime.spec";
 
@@ -246,7 +247,9 @@ export function App(): ReactElement {
       >
         <div>
           <div style={{ fontSize: 18, fontWeight: 700 }}>Dashboarder</div>
-          <div style={{ fontSize: 12, color: "#94a3b8" }}>C4 runtime shell · @axicharts/charts-runtime</div>
+          <div style={{ fontSize: 12, color: "#94a3b8" }}>
+            C4 runtime shell · community plugins registered
+          </div>
         </div>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
           <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
@@ -289,6 +292,7 @@ export function App(): ReactElement {
       </header>
       <main style={{ padding: 24, maxWidth: 1080, margin: "0 auto" }}>
         <RuntimeDashboard spec={activeSpec} />
+        <PluginStrip />
       </main>
     </div>
   );
