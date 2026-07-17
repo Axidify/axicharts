@@ -92,7 +92,7 @@ charts-planner plan examples/ops.profile.json --intent "Line 3 night shift overv
 charts-planner serve --port 3921
 ```
 
-## Planner track (C33–C41)
+## Planner track (C33–C43)
 
 Dashboarder share exports include planner `meta` (layout, feed, template, mosaic preset,
 presentation). Import restores the same fields — see the

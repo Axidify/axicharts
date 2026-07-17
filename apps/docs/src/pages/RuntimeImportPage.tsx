@@ -345,7 +345,7 @@ export function RuntimeImportPage(): ReactElement {
         }}
       >
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
-          Planner track release notes (C33–C41)
+          Planner track release notes (C33–C43)
         </div>
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
           The planner ↔ gallery ↔ Dashboarder track ships share/import meta round-trip: exports
