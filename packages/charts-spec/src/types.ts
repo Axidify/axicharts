@@ -71,7 +71,8 @@ export type TemplateId =
   | "trading-blotter"
   | "capacity-grid"
   | "ops-2x2"
-  | "line-overview";
+  | "line-overview"
+  | "plugins-wall";
 
 export type DashboardSpec = {
   specVersion?: number;

@@ -24,8 +24,10 @@ export {
   financePnlTemplate,
   lineOverviewTemplate,
   ops2x2Template,
+  pluginsWallTemplate,
   tradingBlotterTemplate,
 } from "./templates";
+export { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 export { Chart, Dashboard, type ChartProps, type DashboardProps } from "./Chart";
 export { ejectPanel } from "./eject";
 export {

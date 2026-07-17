@@ -7,6 +7,10 @@ import {
   planPanelsFromProfile,
   suggestTemplate,
 } from "@axicharts/charts-spec";
+import "@axicharts/charts-andon/register";
+import "@axicharts/charts-geo/register";
+import "@axicharts/charts-sankey/register";
+import "@axicharts/charts-tank/register";
 
 const REVENUE_ROWS = [
   { day: "Mon", value: 120 },
@@ -97,6 +101,18 @@ export const Ops2x2Template: Story = {
           { title: "p95", data: [42, 38, 55, 49, 62, 58, 71], suffix: "ms" },
         ],
       }}
+    />
+  ),
+};
+
+export const PluginsWallTemplate: Story = {
+  render: () => (
+    <Dashboard
+      template="plugins-wall"
+      title="Community plugins"
+      subtitle="compilePanel + registerChartType"
+      theme="industrial"
+      data={{}}
     />
   ),
 };

@@ -84,6 +84,7 @@ export function suggestTemplate(profile: DataProfile): string {
     Object.entries(metric.tags ?? {}).map(([key, value]) => `${key}:${value}`),
   );
 
+  if (tags.some((tag) => tag.includes("vertical:plugins"))) return "plugins-wall";
   if (tags.some((tag) => tag.includes("vertical:finance"))) return "finance-pnl";
   if (tags.some((tag) => tag.includes("vertical:trading"))) return "trading-blotter";
   if (tags.some((tag) => tag.includes("vertical:resources"))) return "capacity-grid";

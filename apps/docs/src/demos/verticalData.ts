@@ -196,4 +196,12 @@ export const VERTICAL_GATES: VerticalGate[] = [
       },
     },
   },
+  {
+    id: "P",
+    title: "P · Plugins wall",
+    subtitle: "registerChartType mosaic",
+    template: "plugins-wall",
+    theme: "industrial",
+    data: {},
+  },
 ];

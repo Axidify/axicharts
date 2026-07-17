@@ -37,6 +37,14 @@ describe("plan", () => {
     expect(template).toBe("finance-pnl");
   });
 
+  it("suggests plugins-wall for plugin vertical tags", () => {
+    const template = suggestTemplate({
+      metrics: [{ name: "tank_level", tags: { vertical: "plugins" } }],
+    });
+
+    expect(template).toBe("plugins-wall");
+  });
+
   it("plans one panel per metric", () => {
     const panels = planPanelsFromProfile({
       metrics: [{ name: "cpu" }, { name: "errors" }],

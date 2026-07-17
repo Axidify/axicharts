@@ -10,6 +10,7 @@ const TEMPLATE_LABELS: Record<TemplateId, string> = {
   "capacity-grid": "Capacity grid",
   "ops-2x2": "Ops 2×2",
   "line-overview": "Line overview",
+  "plugins-wall": "Plugins wall",
 };
 
 export type TemplatePickerProps = {

@@ -14,7 +14,9 @@ import {
   type PlotSeries,
   type StatTone,
 } from "@axicharts/charts";
-import type { DashboardSpec, TemplateId, ThemeName, ChartMode } from "./types";
+import type { DashboardSpec, TemplateId, ThemeName, ChartMode, PanelSpec } from "./types";
+import { compilePanel } from "./compilePanel";
+import { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 import { resolveTheme } from "./themes";
 
 type KpiSpec = {
@@ -405,6 +407,44 @@ export function tradingBlotterTemplate(
   );
 }
 
+export function pluginsWallTemplate(
+  data: Record<string, unknown>,
+  theme: ThemeName = "industrial",
+  mode?: ChartMode,
+): ReactElement {
+  const panels = (data.panels as PanelSpec[] | undefined) ?? DEFAULT_PLUGINS_WALL_PANELS;
+  const panelData = (data.panelData as Record<string, Record<string, unknown>> | undefined) ?? {};
+
+  return createElement(
+    "div",
+    {
+      style: {
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+        gap: 12,
+        alignItems: "end",
+        maxWidth: 960,
+        padding: 12,
+        background: "#0f172a",
+        borderRadius: 8,
+        border: "1px solid #334155",
+      },
+    },
+    ...panels.map((panel, index) => {
+      const key = panel.title ?? `${panel.type}-${index}`;
+      const dataForPanel = panelData[key] ?? panelData[panel.type] ?? {};
+      return createElement(
+        "div",
+        { key, style: { minWidth: 0 } },
+        compilePanel(panel, dataForPanel, {
+          theme: panel.theme ?? theme,
+          mode: panel.mode ?? mode,
+        }),
+      );
+    }),
+  );
+}
+
 const TEMPLATE_RENDERERS: Record<
   TemplateId,
   (data: Record<string, unknown>, theme: ThemeName, mode?: ChartMode) => ReactElement
@@ -414,6 +454,7 @@ const TEMPLATE_RENDERERS: Record<
   "line-overview": (data, theme) => lineOverviewTemplate(data, theme),
   "capacity-grid": (data, theme) => capacityGridTemplate(data, theme),
   "trading-blotter": (data, theme) => tradingBlotterTemplate(data, theme),
+  "plugins-wall": (data, theme, mode) => pluginsWallTemplate(data, theme, mode),
 };
 
 export function compileTemplate(
