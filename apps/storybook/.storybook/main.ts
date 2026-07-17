@@ -30,6 +30,10 @@ const config: StorybookConfig = {
             root,
             "packages/charts-core/src",
           ),
+          "@axicharts/charts-echarts": path.resolve(
+            root,
+            "packages/charts-echarts/src",
+          ),
         },
       },
     });

@@ -9,3 +9,6 @@ dist
 storybook-static
 storybook-static
 coverage
+audit-*.png
+.audit-*.png
+grid-cells-audit.png

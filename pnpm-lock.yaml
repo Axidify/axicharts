@@ -29,6 +29,9 @@ importers:
       '@axicharts/charts-theme':
         specifier: workspace:*
         version: link:../../packages/charts-theme
+      echarts:
+        specifier: ^5.6.0
+        version: 5.6.0
       react:
         specifier: ^19.0.0
         version: 19.2.7
@@ -72,6 +75,9 @@ importers:
       '@axicharts/charts-core':
         specifier: workspace:*
         version: link:../charts-core
+      '@axicharts/charts-echarts':
+        specifier: workspace:*
+        version: link:../charts-echarts
       '@axicharts/charts-theme':
         specifier: workspace:*
         version: link:../charts-theme
@@ -88,6 +94,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.4
         version: 19.2.3(@types/react@19.2.17)
+      echarts:
+        specifier: ^5.6.0
+        version: 5.6.0
       jsdom:
         specifier: ^26.0.0
         version: 26.1.0(canvas@3.2.3)
@@ -161,6 +170,31 @@ importers:
       vitest:
         specifier: ^3.0.8
         version: 3.2.7(@types/node@22.20.1)(happy-dom@20.10.6)(jiti@2.7.0)(jsdom@26.1.0(canvas@3.2.3))
+
+  packages/charts-echarts:
+    dependencies:
+      '@axicharts/charts-theme':
+        specifier: workspace:*
+        version: link:../charts-theme
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.17
+      echarts:
+        specifier: ^5.6.0
+        version: 5.6.0
+      react:
+        specifier: ^19.0.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.7(react@19.2.7)
+      tsup:
+        specifier: ^8.4.0
+        version: 8.5.1(jiti@2.7.0)(postcss@8.5.19)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
 
   packages/charts-theme:
     devDependencies:
@@ -1346,6 +1380,9 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
+  echarts@5.6.0:
+    resolution: {integrity: sha512-oTbVTsXfKuEhxftHqL5xprgLoc0k7uScAwtryCgWF6hPYFLRwOUHiFmHGCBKP5NPFNkDVopOieyUqYGH8Fa3kA==}
+
   electron-to-chromium@1.5.393:
     resolution: {integrity: sha512-kiDJdIUawuEIcp9XoICKp1iTYDEbgguIPq526N1Q7jIQDeQ3CqoMx71025PI/7E48Ddtw2HuWsVjY7afEgNxmg==}
 
@@ -2074,6 +2111,9 @@ packages:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
     engines: {node: '>=6'}
 
+  tslib@2.3.0:
+    resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==}
+
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
@@ -2289,6 +2329,9 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  zrender@5.6.1:
+    resolution: {integrity: sha512-OFXkDJKcrlx5su2XbzJvj/34Q3m6PvyCZkVPHGYpcCJ52ek4U/ymZyfuV1nKE23AyBJ51E/6Yr0mhZ7xGTO4ag==}
 
 snapshots:
 
@@ -3290,6 +3333,11 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
+  echarts@5.6.0:
+    dependencies:
+      tslib: 2.3.0
+      zrender: 5.6.1
+
   electron-to-chromium@1.5.393: {}
 
   emoji-regex@8.0.0: {}
@@ -4095,6 +4143,8 @@ snapshots:
       minimist: 1.2.8
       strip-bom: 3.0.0
 
+  tslib@2.3.0: {}
+
   tslib@2.8.1: {}
 
   tsup@8.5.1(jiti@2.7.0)(postcss@8.5.19)(typescript@5.9.3):
@@ -4312,3 +4362,7 @@ snapshots:
   yallist@3.1.1: {}
 
   yocto-queue@0.1.0: {}
+
+  zrender@5.6.1:
+    dependencies:
+      tslib: 2.3.0

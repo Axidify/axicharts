@@ -1,17 +1,20 @@
 # AxiCharts
 
-**Operational dashboard charts for React** — live-native line/bar charts, industrial SVG primitives (gauge, digital, status lamp), and a `ChartContainer` that actually sizes correctly in flex/grid layouts.
+**The best free, open-source chart platform for React dashboards** — layout DX, live performance, and vertical breadth (finance, trading, resources, SaaS, ops) on one MIT-licensed stack.
+
+Line/bar/area via uPlot; pie, candlestick, waterfall, and heatmap via ECharts; industrial SVG primitives; `ChartContainer` that sizes correctly in flex/grid layouts.
 
 - **GitHub:** https://github.com/Axidify/axicharts
 - **Storybook:** `pnpm storybook` → http://localhost:6006
+- **License:** MIT
 
 ## Install
 
 ```bash
-pnpm add @axicharts/charts @axicharts/charts-theme uplot
+pnpm add @axicharts/charts @axicharts/charts-theme echarts uplot
 ```
 
-Peer dependencies: `react`, `react-dom`, `uplot`.
+Peer dependencies: `react`, `react-dom`, `uplot`, `echarts`.
 
 ## Quick start
 
@@ -36,10 +39,11 @@ export function LatencyPanel() {
 
 | Package | Description |
 |---------|-------------|
-| `@axicharts/charts` | React API — `ChartContainer`, `LineChart`, `BarChart`, `Gauge`, `Digital`, `StatusLamp`, `Stat`, registry |
+| `@axicharts/charts` | React API — all chart types, primitives, registry, formatters |
 | `@axicharts/charts-theme` | `cleanTheme`, `liveTheme`, `industrialTheme`, CSS tokens |
-| `@axicharts/charts-canvas` | uPlot adapters (pulled in by `@axicharts/charts`) |
-| `@axicharts/charts-core` | Pure layout/math (no React) |
+| `@axicharts/charts-canvas` | uPlot — line, bar, area (live path) |
+| `@axicharts/charts-echarts` | ECharts — pie, candlestick, waterfall, heatmap |
+| `@axicharts/charts-core` | Layout math + `formatTick` / `registerTickFormat` |
 
 ## Develop
 
@@ -52,9 +56,10 @@ pnpm size        # bundle gzip budgets
 pnpm storybook
 ```
 
-## C1 Storybook gate (round 2 mockups)
+## Storybook gates
 
-All six acceptance stories live under **Mockups/** in Storybook: G, H, I, J, K, L + Industrial Primitives.
+**Round 2 (universal + ops):** G, H, I, J, K, L + Industrial Primitives  
+**Round 3 (vertical breadth):** M · Finance, N · Trading, O · Resources
 
 ## License
 
