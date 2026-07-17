@@ -46,5 +46,11 @@
     "path": "packages/charts-tank/dist/index.js",
     "limit": "3 KB",
     "gzip": true
+  },
+  {
+    "name": "@axicharts/charts-geo",
+    "path": "packages/charts-geo/dist/index.js",
+    "limit": "3 KB",
+    "gzip": true
   }
 ]

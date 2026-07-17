@@ -49,6 +49,7 @@ export function LatencyPanel() {
 | `@axicharts/charts-spec` | Vertical templates, planner, eject CLI |
 | `@axicharts/charts-runtime` | Data adapters, embed SDK, spec portability |
 | `@axicharts/charts-tank` | Community plugin — tank level chart (`registerChartType`) |
+| `@axicharts/charts-geo` | Community plugin — regional cartogram map (`registerChartType`) |
 
 ## Develop
 

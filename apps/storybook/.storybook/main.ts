@@ -40,6 +40,7 @@ const config: StorybookConfig = {
             "packages/charts-runtime/src",
           ),
           "@axicharts/charts-tank": path.resolve(root, "packages/charts-tank/src"),
+          "@axicharts/charts-geo": path.resolve(root, "packages/charts-geo/src"),
         },
       },
     });
