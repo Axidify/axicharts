@@ -53,7 +53,9 @@
   },
   "dependencies": {
     "@axicharts/charts": "workspace:*",
-    "@axicharts/charts-spec": "workspace:*"
+    "@axicharts/charts-spec": "workspace:*",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
   },
   "devDependencies": {
     "@axicharts/charts": "workspace:*",
@@ -62,8 +64,6 @@
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
-    "ajv": "^8.17.1",
-    "ajv-formats": "^3.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tsup": "^8.4.0",

@@ -508,6 +508,12 @@ importers:
       '@axicharts/charts-spec':
         specifier: workspace:*
         version: link:../charts-spec
+      ajv:
+        specifier: ^8.17.1
+        version: 8.20.0
+      ajv-formats:
+        specifier: ^3.0.1
+        version: 3.0.1(ajv@8.20.0)
     devDependencies:
       '@axicharts/charts-theme':
         specifier: workspace:*
@@ -524,12 +530,6 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.4
         version: 19.2.3(@types/react@19.2.17)
-      ajv:
-        specifier: ^8.17.1
-        version: 8.20.0
-      ajv-formats:
-        specifier: ^3.0.1
-        version: 3.0.1(ajv@8.20.0)
       jsdom:
         specifier: ^26.0.0
         version: 26.1.0(canvas@3.2.3)

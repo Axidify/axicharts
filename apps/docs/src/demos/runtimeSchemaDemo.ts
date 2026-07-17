@@ -1,8 +1,15 @@
 export const VALIDATE_RUNTIME_CODE = `# Semantic validation (templates, adapter refs, dataSourceId)
 charts-runtime validate packages/charts-runtime/examples/ops-mosaic.runtime.json
 
+# JSON Schema shape gate (draft-07)
+charts-runtime validate --schema packages/charts-runtime/examples/ops-mosaic.runtime.json
+
+# Dual gate — schema + semantic (CI default)
+charts-runtime validate --all packages/charts-runtime/examples/ops-mosaic.runtime.json
+
 # Share export envelope
 charts-runtime validate --share packages/charts-runtime/examples/ops-dashboard.share.json
+charts-runtime validate --share --all packages/charts-runtime/examples/ops-dashboard.share.json
 
 # CI gate (all examples)
 pnpm validate:runtime`;
@@ -13,6 +20,40 @@ import shareSchema from "@axicharts/charts-runtime/schema/share-export.json";
 
 // Hosted on GitHub Pages (after docs deploy)
 // https://axidify.github.io/axicharts/schema/runtime-spec.schema.json`;
+
+export const EDITOR_VSCODE_SETTINGS = `{
+  "json.schemas": [
+    {
+      "fileMatch": ["*.runtime.json"],
+      "url": "https://axidify.github.io/axicharts/schema/runtime-spec.schema.json"
+    },
+    {
+      "fileMatch": ["*.share.json", "*.workspace.json"],
+      "url": "https://axidify.github.io/axicharts/schema/share-export.schema.json"
+    }
+  ]
+}`;
+
+export const EDITOR_RUNTIME_HEADER = `{
+  "$schema": "https://axidify.github.io/axicharts/schema/runtime-spec.schema.json",
+  "layout": "embed",
+  "dashboard": {
+    "template": "ops-2x2",
+    "title": "Line 3"
+  }
+}`;
+
+export const EDITOR_SHARE_HEADER = `{
+  "$schema": "https://axidify.github.io/axicharts/schema/share-export.schema.json",
+  "version": 1,
+  "kind": "dashboard",
+  "exportedAt": "2026-01-01T00:00:00.000Z",
+  "name": "Line 3",
+  "spec": {
+    "layout": "embed",
+    "dashboard": { "template": "ops-2x2", "title": "Line 3" }
+  }
+}`;
 
 export const GITOPS_CODE = `name: Validate dashboards
 on: [pull_request]
@@ -29,4 +70,4 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm validate:runtime
-      - run: charts-runtime validate path/to/dashboard.runtime.json`;
+      - run: charts-runtime validate --all path/to/dashboard.runtime.json`;

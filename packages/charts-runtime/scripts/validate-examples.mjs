@@ -15,15 +15,15 @@ function listFixtures(suffix) {
 let failed = false;
 
 for (const file of listFixtures(".runtime.json")) {
-  const code = runCli(["validate", file]);
+  const code = runCli(["validate", "--all", file]);
   if (code !== 0) {
     failed = true;
-    process.stderr.write(`semantic validation failed: ${file}\n`);
+    process.stderr.write(`validation failed: ${file}\n`);
   }
 }
 
 for (const file of listFixtures(".share.json")) {
-  const code = runCli(["validate", "--share", file]);
+  const code = runCli(["validate", "--share", "--all", file]);
   if (code !== 0) {
     failed = true;
     process.stderr.write(`share validation failed: ${file}\n`);

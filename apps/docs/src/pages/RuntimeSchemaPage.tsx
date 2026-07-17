@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import runtimeSchema from "../../../../packages/charts-runtime/schema/runtime-spec.schema.json";
 import shareSchema from "../../../../packages/charts-runtime/schema/share-export.schema.json";
 import {
+  EDITOR_RUNTIME_HEADER,
+  EDITOR_SHARE_HEADER,
+  EDITOR_VSCODE_SETTINGS,
   GITOPS_CODE,
   SCHEMA_IMPORT_CODE,
   VALIDATE_RUNTIME_CODE,
@@ -101,10 +104,31 @@ export function RuntimeSchemaPage(): ReactElement {
 
       <Section title="CLI validation" subtitle="charts-runtime validate">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
-          Semantic validation returns structured <code>path: message</code> errors. Exit code{" "}
-          <code>0</code> prints <code>ok</code> for GitOps pipelines.
+          Semantic validation returns structured <code>path: message</code> errors. Add{" "}
+          <code>--schema</code> for draft-07 shape checks or <code>--all</code> to run both gates.
+          Exit code <code>0</code> prints <code>ok</code> for GitOps pipelines.
         </p>
         <CodeBlock>{VALIDATE_RUNTIME_CODE}</CodeBlock>
+      </Section>
+
+      <Section title="Editor integration" subtitle="VS Code · $schema headers">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
+          Map <code>*.runtime.json</code> and share exports to hosted schemas in workspace settings,
+          or add a top-level <code>$schema</code> URL for per-file completion. Dashboarder exports
+          include the hint automatically.
+        </p>
+        <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>settings.json</strong>
+        </p>
+        <CodeBlock>{EDITOR_VSCODE_SETTINGS}</CodeBlock>
+        <p style={{ margin: "16px 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Runtime spec file</strong>
+        </p>
+        <CodeBlock>{EDITOR_RUNTIME_HEADER}</CodeBlock>
+        <p style={{ margin: "16px 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Share export file</strong>
+        </p>
+        <CodeBlock>{EDITOR_SHARE_HEADER}</CodeBlock>
       </Section>
 
       <Section title="GitOps workflow" subtitle="pull request gate">
