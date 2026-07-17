@@ -1,9 +1,7 @@
 import { useMemo, useState, type ReactElement } from "react";
-import {
-  buildEmbedBundle,
-  validateRuntimeSpecJson,
-  type RuntimeDashboardSpec,
-} from "@axicharts/charts-runtime";
+import { buildEmbedBundle, RUNTIME_SPEC_SCHEMA_URL, type RuntimeDashboardSpec } from "@axicharts/charts-runtime";
+import { validateRuntimeSpecDualJson } from "@axicharts/charts-runtime/validation";
+import { ErrorList, LayerStatus } from "./validationChrome";
 
 const overlayStyle = {
   position: "fixed" as const,
@@ -47,6 +45,11 @@ export type EmbedDialogProps = {
   onClose: () => void;
 };
 
+function runtimeTitle(spec: RuntimeDashboardSpec | undefined): string | undefined {
+  if (!spec) return undefined;
+  return spec.layout === "embed" ? spec.dashboard?.title : spec.wall?.title;
+}
+
 export function EmbedDialog({
   open,
   spec,
@@ -66,7 +69,10 @@ export function EmbedDialog({
     [spec, presentation, alarmScopeId],
   );
 
-  const validation = useMemo(() => validateRuntimeSpecJson(bundle.specJson), [bundle.specJson]);
+  const validation = useMemo(
+    () => validateRuntimeSpecDualJson(bundle.specJson),
+    [bundle.specJson],
+  );
 
   if (!open) return null;
 
@@ -83,6 +89,8 @@ export function EmbedDialog({
     window.setTimeout(() => setCopied(false), 1500);
   };
 
+  const title = runtimeTitle(validation.spec ?? spec);
+
   return (
     <div style={overlayStyle} role="presentation" onClick={onClose}>
       <div
@@ -97,9 +105,22 @@ export function EmbedDialog({
               Embed SDK
             </div>
             <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
-              {validation.error
-                ? `Spec validation failed: ${validation.error}`
-                : "Portable runtime spec validated"}
+              Portable runtime JSON with{" "}
+              <a href={RUNTIME_SPEC_SCHEMA_URL} style={{ color: "#93c5fd" }}>
+                $schema
+              </a>
+              {" · "}
+              <LayerStatus
+                label="JSON Schema"
+                ok={validation.schemaOk}
+                schemaUrl={validation.schemaUrl}
+              />
+              <LayerStatus label="Semantic" ok={validation.semanticOk} />
+              {validation.ok ? (
+                <span style={{ color: "#4ade80" }}>
+                  Runtime spec · {title ?? "dashboard"}
+                </span>
+              ) : null}
             </div>
           </div>
           <button type="button" onClick={onClose} style={buttonStyle}>
@@ -127,7 +148,12 @@ export function EmbedDialog({
               {label}
             </button>
           ))}
-          <button type="button" onClick={() => void copy()} style={{ ...buttonStyle, marginLeft: "auto" }}>
+          <button
+            type="button"
+            onClick={() => void copy()}
+            disabled={!validation.ok}
+            style={{ ...buttonStyle, marginLeft: "auto" }}
+          >
             {copied ? "Copied" : "Copy"}
           </button>
         </div>
@@ -138,7 +164,7 @@ export function EmbedDialog({
             padding: 14,
             borderRadius: 8,
             background: "#020617",
-            border: "1px solid #334155",
+            border: `1px solid ${validation.ok ? "#334155" : "#7f1d1d"}`,
             fontSize: 11,
             lineHeight: 1.5,
             overflow: "auto",
@@ -147,6 +173,13 @@ export function EmbedDialog({
         >
           {activeText}
         </pre>
+
+        {!validation.ok ? (
+          <>
+            <ErrorList title="JSON Schema" errors={validation.schemaErrors} />
+            <ErrorList title="Semantic" errors={validation.semanticErrors} />
+          </>
+        ) : null}
       </div>
     </div>
   );

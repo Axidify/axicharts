@@ -2,10 +2,12 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { hostedImportPresetUrl, HOSTED_IMPORT_PRESETS } from "../schemaUrls";
 import { serializeDashboardExport } from "../workspace/share";
 import {
   detectImportShape,
   validatePortableImportJson,
+  validateRuntimeSpecDualJson,
   validateShareExportDualJson,
 } from "./index";
 
@@ -81,5 +83,25 @@ describe("validateShareExportDualJson", () => {
     const result = validateShareExportDualJson(json);
     expect(result.ok).toBe(true);
     expect(result.shape).toBe("share");
+  });
+});
+
+describe("validateRuntimeSpecDualJson", () => {
+  it("passes dual gate for shipped runtime examples", () => {
+    const json = readExample("ops-embed.runtime.json");
+    const result = validateRuntimeSpecDualJson(json);
+    expect(result.ok).toBe(true);
+    expect(result.schemaOk).toBe(true);
+    expect(result.semanticOk).toBe(true);
+    expect(result.spec?.dashboard?.template).toBe("ops-2x2");
+  });
+});
+
+describe("hosted import presets", () => {
+  it("maps presets to GitHub Pages example URLs", () => {
+    const preset = HOSTED_IMPORT_PRESETS[0]!;
+    expect(hostedImportPresetUrl(preset)).toBe(
+      "https://axidify.github.io/axicharts/examples/ops-embed.runtime.json",
+    );
   });
 });

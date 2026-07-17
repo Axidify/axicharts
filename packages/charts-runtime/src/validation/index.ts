@@ -1,6 +1,10 @@
 import {
   RUNTIME_SPEC_SCHEMA_URL,
   SHARE_EXPORT_SCHEMA_URL,
+  HOSTED_EXAMPLES_BASE_URL,
+  HOSTED_IMPORT_PRESETS,
+  hostedImportPresetUrl,
+  type HostedImportPreset,
 } from "../schemaUrls";
 import {
   formatSchemaValidationErrors,
@@ -12,11 +16,13 @@ import {
   type SchemaValidationResult,
 } from "../schemaValidation";
 import type { RuntimeValidationIssue } from "../runtimeValidation";
+import { validateRuntimeSpecJson } from "../runtimeValidation";
 import {
   validateShareExportJson,
   type ShareExport,
   type ShareValidationResult,
 } from "../workspace/share";
+import type { RuntimeDashboardSpec } from "../types";
 
 export {
   formatSchemaValidationErrors,
@@ -25,6 +31,12 @@ export {
   validateShareExportSchemaJson,
   validateShareExportSchemaRaw,
   validateShareExportJson,
+  HOSTED_EXAMPLES_BASE_URL,
+  HOSTED_IMPORT_PRESETS,
+  hostedImportPresetUrl,
+  RUNTIME_SPEC_SCHEMA_URL,
+  SHARE_EXPORT_SCHEMA_URL,
+  type HostedImportPreset,
   type RuntimeValidationIssue,
   type SchemaValidationIssue,
   type SchemaValidationResult,
@@ -118,6 +130,31 @@ export function validatePortableImportJson(json: string): PortableImportValidati
     schemaErrors: schema.ok ? [] : schema.errors,
     semanticErrors: semantic.ok ? [] : semantic.errors,
     export: semantic.ok ? semantic.export : undefined,
+  };
+}
+
+export type RuntimeSpecDualValidationResult = {
+  schemaUrl: string;
+  schemaOk: boolean;
+  semanticOk: boolean;
+  ok: boolean;
+  schemaErrors: SchemaValidationIssue[];
+  semanticErrors: RuntimeValidationIssue[];
+  spec?: RuntimeDashboardSpec;
+};
+
+export function validateRuntimeSpecDualJson(json: string): RuntimeSpecDualValidationResult {
+  const schema = validateRuntimeSpecSchemaJson(json);
+  const semantic = validateRuntimeSpecJson(json);
+
+  return {
+    schemaUrl: RUNTIME_SPEC_SCHEMA_URL,
+    schemaOk: schema.ok,
+    semanticOk: semantic.ok,
+    ok: schema.ok && semantic.ok,
+    schemaErrors: schema.ok ? [] : schema.errors,
+    semanticErrors: semantic.ok ? [] : semantic.errors,
+    spec: semantic.ok ? semantic.spec : undefined,
   };
 }
 

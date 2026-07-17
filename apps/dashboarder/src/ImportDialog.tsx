@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
-import { RUNTIME_SPEC_SCHEMA_URL, SHARE_EXPORT_SCHEMA_URL } from "@axicharts/charts-runtime";
 import {
+  hostedImportPresetUrl,
+  HOSTED_IMPORT_PRESETS,
+  RUNTIME_SPEC_SCHEMA_URL,
+  SHARE_EXPORT_SCHEMA_URL,
   validatePortableImportJson,
   type ShareExport,
 } from "@axicharts/charts-runtime/validation";
@@ -54,13 +57,19 @@ export function ImportDialog({
   onApply,
 }: ImportDialogProps): ReactElement | null {
   const [jsonText, setJsonText] = useState(initialJson);
+  const [filename, setFilename] = useState(initialFilename);
+  const [loadingPresetId, setLoadingPresetId] = useState<string | null>(null);
+  const [presetError, setPresetError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
       setJsonText(initialJson);
+      setFilename(initialFilename);
+      setPresetError(null);
+      setLoadingPresetId(null);
     }
-  }, [open, initialJson]);
+  }, [open, initialJson, initialFilename]);
 
   const validation = useMemo(() => validatePortableImportJson(jsonText), [jsonText]);
   const hasInput = jsonText.trim().length > 0;
@@ -68,7 +77,31 @@ export function ImportDialog({
   if (!open) return null;
 
   const loadFile = async (file: File): Promise<void> => {
+    setPresetError(null);
+    setFilename(file.name);
     setJsonText(await file.text());
+  };
+
+  const loadPreset = async (presetId: string): Promise<void> => {
+    const preset = HOSTED_IMPORT_PRESETS.find((item) => item.id === presetId);
+    if (!preset) return;
+
+    setLoadingPresetId(preset.id);
+    setPresetError(null);
+
+    try {
+      const response = await fetch(hostedImportPresetUrl(preset));
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      setJsonText(await response.text());
+      setFilename(preset.filename);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setPresetError(`Failed to load ${preset.label}: ${message}`);
+    } finally {
+      setLoadingPresetId(null);
+    }
   };
 
   return (
@@ -85,7 +118,7 @@ export function ImportDialog({
               Import JSON
             </div>
             <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
-              {initialFilename ? `${initialFilename} · ` : null}
+              {filename ? `${filename} · ` : null}
               {hasInput ? (
                 <>
                   <LayerStatus
@@ -120,7 +153,21 @@ export function ImportDialog({
           </button>
         </div>
 
-        <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 }}>
+          {HOSTED_IMPORT_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              disabled={loadingPresetId !== null}
+              onClick={() => void loadPreset(preset.id)}
+              style={{
+                ...buttonStyle,
+                opacity: loadingPresetId === preset.id ? 0.7 : 1,
+              }}
+            >
+              {loadingPresetId === preset.id ? `Loading ${preset.label}…` : preset.label}
+            </button>
+          ))}
           <button type="button" onClick={() => fileInputRef.current?.click()} style={buttonStyle}>
             Choose file
           </button>
@@ -149,9 +196,16 @@ export function ImportDialog({
           />
         </div>
 
+        {presetError ? (
+          <div style={{ marginTop: 12, fontSize: 12, color: "#f87171" }}>{presetError}</div>
+        ) : null}
+
         <textarea
           value={jsonText}
-          onChange={(event) => setJsonText(event.target.value)}
+          onChange={(event) => {
+            setPresetError(null);
+            setJsonText(event.target.value);
+          }}
           spellCheck={false}
           placeholder='{ "$schema": "...", "layout": "embed", ... } or share export envelope'
           style={{
