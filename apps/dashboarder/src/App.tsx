@@ -19,6 +19,11 @@ import {
   type RuntimeDashboardSpec,
   type WorkspaceStore,
 } from "@axicharts/charts-runtime";
+import {
+  DEFAULT_OPS_PROFILE,
+  planFromIntent,
+  type DashboardPlan,
+} from "@axicharts/charts-planner";
 import { PluginStrip } from "./PluginStrip";
 import { WorkspaceSidebar } from "./WorkspaceSidebar";
 import {
@@ -38,6 +43,21 @@ const buttonStyle = {
   color: "#e2e8f0",
   cursor: "pointer",
 } as const;
+
+const PLANNER_URL = import.meta.env.VITE_PLANNER_URL as string | undefined;
+
+function applyPlan(
+  plan: DashboardPlan,
+  setTemplate: (template: TemplateId) => void,
+  setLayout: (layout: LayoutMode) => void,
+  setFeed: (feed: FeedMode) => void,
+  setPresentation: (presentation: boolean) => void,
+): void {
+  setTemplate(plan.template as TemplateId);
+  setLayout(plan.layout);
+  setFeed(plan.feed);
+  setPresentation(plan.presentation);
+}
 
 function applyDashboardMeta(
   dashboard: ReturnType<typeof getActiveDashboard>,
@@ -192,6 +212,37 @@ export function App(): ReactElement {
     URL.revokeObjectURL(url);
   };
 
+  const handlePlan = async (): Promise<void> => {
+    const intent = window.prompt(
+      "Describe the dashboard",
+      "Line 3 night shift overview",
+    );
+    if (!intent?.trim()) return;
+
+    let plan: DashboardPlan;
+    if (PLANNER_URL) {
+      const response = await fetch(`${PLANNER_URL.replace(/\/$/, "")}/plan`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ profile: DEFAULT_OPS_PROFILE, intent: intent.trim() }),
+      });
+      if (!response.ok) {
+        window.alert("Planner server failed — using local rules planner.");
+        plan = planFromIntent(DEFAULT_OPS_PROFILE, intent.trim());
+      } else {
+        plan = (await response.json()) as DashboardPlan;
+      }
+    } else {
+      plan = planFromIntent(DEFAULT_OPS_PROFILE, intent.trim());
+    }
+
+    applyPlan(plan, setTemplate, setLayout, setFeed, setPresentation);
+    setDirty(true);
+    if (plan.warnings?.length) {
+      window.alert(plan.warnings.join("\n"));
+    }
+  };
+
   const handleImportFile = async (file: File): Promise<void> => {
     if (!store) return;
     const text = await file.text();
@@ -294,6 +345,9 @@ export function App(): ReactElement {
               label="Template"
             />
           ) : null}
+          <button type="button" onClick={() => void handlePlan()} style={buttonStyle}>
+            Plan
+          </button>
           <button type="button" onClick={handleSave} style={buttonStyle}>
             Save
           </button>

@@ -1,0 +1,8 @@
+{
+  "metrics": [
+    { "name": "cpu", "unit": "%", "tags": { "vertical": "ops", "refresh": "live" } },
+    { "name": "memory", "unit": "%", "tags": { "vertical": "ops", "refresh": "live" } },
+    { "name": "errors", "unit": "/min", "tags": { "vertical": "ops", "refresh": "live" } },
+    { "name": "p95", "unit": "ms", "tags": { "vertical": "ops", "refresh": "live" } }
+  ]
+}

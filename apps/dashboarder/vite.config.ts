@@ -11,6 +11,7 @@ export default defineConfig({
     alias: {
       "@axicharts/charts-runtime": path.resolve(root, "packages/charts-runtime/src"),
       "@axicharts/charts-spec": path.resolve(root, "packages/charts-spec/src"),
+      "@axicharts/charts-planner": path.resolve(root, "packages/charts-planner/src"),
       "@axicharts/charts": path.resolve(root, "packages/charts/src"),
       "@axicharts/charts-theme": path.resolve(root, "packages/charts-theme/src"),
       "@axicharts/charts-canvas": path.resolve(root, "packages/charts-canvas/src"),

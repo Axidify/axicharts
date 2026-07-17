@@ -1,0 +1,49 @@
+{
+  "name": "@axicharts/charts-planner",
+  "version": "0.1.0",
+  "description": "Phase 3 server-side dashboard planner — intent parsing, LLM provider hooks, validation with rules fallback.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Axidify/axicharts.git",
+    "directory": "packages/charts-planner"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "examples",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "bin": {
+    "charts-planner": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server-entry.d.ts",
+      "import": "./dist/server-entry.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/cli.ts src/server-entry.ts --format esm --dts --external @axicharts/charts-spec --clean",
+    "dev": "tsup src/index.ts src/cli.ts src/server-entry.ts --format esm --dts --external @axicharts/charts-spec --watch",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@axicharts/charts-spec": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.8"
+  }
+}

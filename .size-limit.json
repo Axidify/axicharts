@@ -66,6 +66,12 @@
     "gzip": true
   },
   {
+    "name": "@axicharts/charts-planner",
+    "path": "packages/charts-planner/dist/index.js",
+    "limit": "4 KB",
+    "gzip": true
+  },
+  {
     "name": "@axicharts/charts-tank",
     "path": "packages/charts-tank/dist/index.js",
     "limit": "3 KB",

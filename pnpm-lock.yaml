@@ -75,6 +75,9 @@ importers:
       '@axicharts/charts-geo':
         specifier: workspace:*
         version: link:../../packages/charts-geo
+      '@axicharts/charts-planner':
+        specifier: workspace:*
+        version: link:../../packages/charts-planner
       '@axicharts/charts-runtime':
         specifier: workspace:*
         version: link:../../packages/charts-runtime
@@ -468,6 +471,25 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.7(react@19.2.7)
+      tsup:
+        specifier: ^8.4.0
+        version: 8.5.1(jiti@2.7.0)(postcss@8.5.19)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.8
+        version: 3.2.7(@types/node@22.20.1)(happy-dom@20.10.6)(jiti@2.7.0)(jsdom@26.1.0(canvas@3.2.3))
+
+  packages/charts-planner:
+    dependencies:
+      '@axicharts/charts-spec':
+        specifier: workspace:*
+        version: link:../charts-spec
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.20.1
       tsup:
         specifier: ^8.4.0
         version: 8.5.1(jiti@2.7.0)(postcss@8.5.19)(typescript@5.9.3)

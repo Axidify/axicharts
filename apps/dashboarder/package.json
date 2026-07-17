@@ -16,6 +16,7 @@
     "@axicharts/charts-runtime": "workspace:*",
     "@axicharts/charts-sankey": "workspace:*",
     "@axicharts/charts-spec": "workspace:*",
+    "@axicharts/charts-planner": "workspace:*",
     "@axicharts/charts-tank": "workspace:*",
     "@axicharts/charts-theme": "workspace:*",
     "echarts": "^5.6.0",

@@ -46,7 +46,8 @@ export function LatencyPanel() {
 | `@axicharts/charts-canvas` | uPlot — line, bar, area (live path) |
 | `@axicharts/charts-echarts` | ECharts — pie, candlestick, waterfall, heatmap |
 | `@axicharts/charts-core` | Layout math + `formatTick` / `registerTickFormat` |
-| `@axicharts/charts-spec` | Vertical templates, planner, eject CLI |
+| `@axicharts/charts-spec` | Vertical templates, rules planner, eject CLI |
+| `@axicharts/charts-planner` | Phase 3 server planner — intent, LLM provider hooks, HTTP `/plan` |
 | `@axicharts/charts-runtime` | Data adapters, embed SDK, spec portability |
 | `@axicharts/charts-tank` | Community plugin — tank level chart (`registerChartType`) |
 | `@axicharts/charts-geo` | Community plugin — regional cartogram map (`registerChartType`) |
