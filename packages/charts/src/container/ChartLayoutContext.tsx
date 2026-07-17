@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 import type { ChartSize } from "@axicharts/charts-core";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartDataState } from "../state/types";
 
 export type ChartConfig = Record<
   string,
@@ -17,6 +18,10 @@ export type ChartLayoutContextValue = {
   config?: ChartConfig;
   mode: "static" | "interactive" | "live" | "presentation";
   syncId?: string;
+  dataState: ChartDataState;
+  isStale: boolean;
+  lastUpdatedAt?: number;
+  staleAfterMs?: number;
 };
 
 export const ChartLayoutContext = createContext<ChartLayoutContextValue | null>(

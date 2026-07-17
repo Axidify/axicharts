@@ -25,6 +25,7 @@ export type StatProps = {
   tone?: StatTone;
   surface?: StatSurface;
   monospace?: boolean;
+  stale?: boolean;
   style?: CSSProperties;
 };
 
@@ -34,10 +35,12 @@ export function Stat({
   tone = "neutral",
   surface = "dark",
   monospace = false,
+  stale = false,
   style,
 }: StatProps): ReactElement {
   const colors = TONE_COLORS[surface];
   const labelColor = surface === "light" ? "#64748b" : "#94a3b8";
+  const staleColor = surface === "light" ? "#94a3b8" : "#64748b";
 
   return (
     <div style={style}>
@@ -46,7 +49,8 @@ export function Stat({
           fontSize: 20,
           fontWeight: 600,
           lineHeight: 1.2,
-          color: colors[tone],
+          color: stale ? staleColor : colors[tone],
+          textDecoration: stale ? "line-through" : undefined,
           fontFamily: monospace
             ? "ui-monospace, SFMono-Regular, Menlo, monospace"
             : undefined,

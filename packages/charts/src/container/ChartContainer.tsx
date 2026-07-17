@@ -12,6 +12,14 @@ import {
   type ChartConfig,
 } from "./ChartLayoutContext";
 import { useResizeObserver } from "./useResizeObserver";
+import {
+  ChartStateOverlay,
+  StaleBadge,
+  useIsStale,
+  type ChartDataState,
+} from "../state";
+
+export type { ChartDataState };
 
 export type ChartContainerProps = {
   children?: ReactNode;
@@ -27,8 +35,18 @@ export type ChartContainerProps = {
   config?: ChartConfig;
   mode?: "static" | "interactive" | "live" | "presentation";
   syncId?: string;
+  dataState?: ChartDataState;
+  staleAfterMs?: number;
+  lastUpdatedAt?: number;
+  loadingMessage?: string;
+  emptyMessage?: string;
+  errorMessage?: string;
   onResize?: (size: { width: number; height: number }) => void;
 };
+
+function isDarkTheme(theme: ChartTheme): boolean {
+  return theme.name === "live" || theme.name === "industrial";
+}
 
 export function ChartContainer({
   children,
@@ -44,9 +62,20 @@ export function ChartContainer({
   config,
   mode = "interactive",
   syncId,
+  dataState = "ready",
+  staleAfterMs,
+  lastUpdatedAt,
+  loadingMessage,
+  emptyMessage,
+  errorMessage,
   onResize,
 }: ChartContainerProps): ReactElement {
   const [ref, measured] = useResizeObserver(debounceMs);
+  const isStale = useIsStale(
+    lastUpdatedAt,
+    staleAfterMs,
+    mode === "live" && dataState === "ready",
+  );
 
   const size = resolveSize({
     width,
@@ -59,6 +88,9 @@ export function ChartContainer({
   });
 
   const ready = size.width >= 1 && size.height >= 1;
+  const dark = isDarkTheme(theme);
+  const showStale = isStale && dataState === "ready";
+  const contentHeight = height ?? minHeight;
 
   useEffect(() => {
     if (onResize && ready) {
@@ -80,7 +112,18 @@ export function ChartContainer({
 
   return (
     <ChartLayoutContext.Provider
-      value={{ size, ready, theme, config, mode, syncId }}
+      value={{
+        size,
+        ready,
+        theme,
+        config,
+        mode,
+        syncId,
+        dataState,
+        isStale: showStale,
+        lastUpdatedAt,
+        staleAfterMs,
+      }}
     >
       <div
         ref={ref}
@@ -96,7 +139,48 @@ export function ChartContainer({
         }}
       >
         {ready ? (
-          children
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              height: height ?? "100%",
+              minHeight: height === undefined ? contentHeight : undefined,
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                opacity: showStale ? 0.55 : dataState === "ready" ? 1 : 0.35,
+                filter: showStale ? "saturate(0.65)" : undefined,
+                transition: "opacity 180ms ease",
+              }}
+            >
+              {children}
+            </div>
+            {dataState === "loading" ? (
+              <ChartStateOverlay
+                state="loading"
+                message={loadingMessage}
+                dark={dark}
+              />
+            ) : null}
+            {dataState === "empty" ? (
+              <ChartStateOverlay
+                state="empty"
+                message={emptyMessage}
+                dark={dark}
+              />
+            ) : null}
+            {dataState === "error" ? (
+              <ChartStateOverlay
+                state="error"
+                message={errorMessage}
+                dark={dark}
+              />
+            ) : null}
+            {showStale ? <StaleBadge /> : null}
+          </div>
         ) : (
           <div
             aria-hidden

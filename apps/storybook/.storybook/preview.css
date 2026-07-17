@@ -11,3 +11,9 @@ body {
 .axicharts-uplot .u-legend {
   font-size: 11px;
 }
+
+@keyframes axicharts-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

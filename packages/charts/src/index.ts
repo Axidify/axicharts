@@ -32,6 +32,13 @@ export {
 } from "./status/StatusLamp";
 export { Stat, type StatProps, type StatSurface, type StatTone } from "./stat/Stat";
 export {
+  ChartStateOverlay,
+  StaleBadge,
+  useIsStale,
+  type ChartDataState,
+  type ChartStateOverlayProps,
+} from "./state";
+export {
   Crosshair,
   Legend,
   Tooltip,
