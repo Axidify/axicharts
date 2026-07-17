@@ -8,7 +8,7 @@ import {
 } from "../chrome/CartesianChartShell";
 import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
-import { useChartInteraction } from "../interaction/ChartInteractionContext";
+import { usePlotSync } from "../sync/usePlotSync";
 
 export type LineChartProps = {
   categories: string[];
@@ -29,7 +29,7 @@ function LinePlot({
   compact,
 }: LineChartProps & { compact: boolean }): ReactElement {
   const { size, theme, mode } = useChartLayout();
-  const { setCursor } = useChartInteraction();
+  const plotSync = usePlotSync();
   const chrome = getInteractionChrome(mode);
   const showLegend =
     chrome.showLegend && series.length > 1 && !compact;
@@ -49,7 +49,11 @@ function LinePlot({
       dualAxis={dualAxis}
       showCursor={chrome.showCrosshair}
       useNativeLegend={false}
-      onCursor={setCursor}
+      onCursor={plotSync.onCursor}
+      onSyncIndex={plotSync.onSyncIndex}
+      syncIndex={plotSync.syncIndex}
+      syncSourceId={plotSync.syncSourceId}
+      chartId={plotSync.chartId}
     />
   );
 }

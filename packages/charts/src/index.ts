@@ -44,6 +44,11 @@ export {
   useChartInteraction,
 } from "./interaction/ChartInteractionContext";
 export {
+  ChartSyncGroup,
+  useChartSync,
+  useOptionalChartSync,
+} from "./sync/ChartSyncContext";
+export {
   clearChartTypes,
   getChartType,
   listChartTypes,

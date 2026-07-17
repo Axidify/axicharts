@@ -6,6 +6,7 @@ import {
   type OhlcPoint,
 } from "@axicharts/charts-echarts";
 import { useChartLayout } from "../container/ChartLayoutContext";
+import { useEChartsSync } from "../sync/useEChartsSync";
 
 export type CandlestickChartProps = {
   categories: string[];
@@ -19,6 +20,7 @@ export function CandlestickChart({
   volume,
 }: CandlestickChartProps): ReactElement | null {
   const { size, ready, theme } = useChartLayout();
+  const sync = useEChartsSync();
 
   if (!ready || size.width < 1 || size.height < 1) {
     return null;
@@ -32,6 +34,10 @@ export function CandlestickChart({
       data={data}
       volume={volume}
       theme={theme}
+      chartId={sync.chartId}
+      onSyncIndex={sync.onSyncIndex}
+      syncIndex={sync.syncIndex}
+      syncSourceId={sync.syncSourceId}
     />
   );
 }

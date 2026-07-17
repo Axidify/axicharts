@@ -26,6 +26,7 @@ export type ChartContainerProps = {
   theme?: ChartTheme;
   config?: ChartConfig;
   mode?: "static" | "interactive" | "live" | "presentation";
+  syncId?: string;
   onResize?: (size: { width: number; height: number }) => void;
 };
 
@@ -42,6 +43,7 @@ export function ChartContainer({
   theme = cleanTheme,
   config,
   mode = "interactive",
+  syncId,
   onResize,
 }: ChartContainerProps): ReactElement {
   const [ref, measured] = useResizeObserver(debounceMs);
@@ -78,7 +80,7 @@ export function ChartContainer({
 
   return (
     <ChartLayoutContext.Provider
-      value={{ size, ready, theme, config, mode }}
+      value={{ size, ready, theme, config, mode, syncId }}
     >
       <div
         ref={ref}

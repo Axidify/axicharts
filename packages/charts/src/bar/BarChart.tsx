@@ -12,7 +12,7 @@ import {
 } from "../chrome/CartesianChartShell";
 import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
-import { useChartInteraction } from "../interaction/ChartInteractionContext";
+import { usePlotSync } from "../sync/usePlotSync";
 
 export type BarChartProps = {
   categories: string[];
@@ -32,7 +32,7 @@ function BarPlot({
   referenceLines,
 }: BarChartProps): ReactElement {
   const { size, theme, mode } = useChartLayout();
-  const { setCursor } = useChartInteraction();
+  const plotSync = usePlotSync();
   const chrome = getInteractionChrome(mode);
   const showLegend = chrome.showLegend && series.length > 1;
   const legendHeight = getLegendHeight(showLegend);
@@ -51,7 +51,11 @@ function BarPlot({
       referenceLines={referenceLines}
       showCursor={chrome.showCrosshair}
       useNativeLegend={false}
-      onCursor={setCursor}
+      onCursor={plotSync.onCursor}
+      onSyncIndex={plotSync.onSyncIndex}
+      syncIndex={plotSync.syncIndex}
+      syncSourceId={plotSync.syncSourceId}
+      chartId={plotSync.chartId}
     />
   );
 }

@@ -12,6 +12,7 @@ import {
   withAlpha,
 } from "./colors";
 import type { ReferenceLine, UPlotBarProps } from "./types";
+import { applySyncedCursor } from "./plotCursor";
 
 type BarLayout = {
   left: number;
@@ -40,7 +41,6 @@ function buildOptions({
   barLayoutsRef,
   showCursor = false,
   useNativeLegend = true,
-  onCursor,
 }: UPlotBarProps & {
   barLayoutsRef: React.MutableRefObject<BarLayout[]>;
 }): uPlot.Options {
@@ -127,24 +127,6 @@ function buildOptions({
       })),
     ],
     hooks: {
-      ...(onCursor
-        ? {
-            setCursor: [
-              (u) => {
-                const idx = u.cursor.idx;
-                if (idx == null || idx < 0) {
-                  onCursor(null);
-                  return;
-                }
-                onCursor({
-                  index: idx,
-                  left: u.cursor.left ?? 0,
-                  top: u.cursor.top ?? 0,
-                });
-              },
-            ],
-          }
-        : {}),
       draw: [
         (u) => {
           const ctx = u.ctx;
@@ -216,37 +198,67 @@ export function UPlotBar(props: UPlotBarProps): ReactElement {
     showCursor,
     useNativeLegend,
     onCursor,
+    onSyncIndex,
+    syncIndex,
+    syncSourceId,
+    chartId,
   } = props;
   const rootRef = useRef<HTMLDivElement>(null);
   const plotRef = useRef<uPlot | null>(null);
   const barLayoutsRef = useRef<BarLayout[]>([]);
   const onCursorRef = useRef(onCursor);
+  const onSyncIndexRef = useRef(onSyncIndex);
+  const applyingSyncRef = useRef(false);
   onCursorRef.current = onCursor;
+  onSyncIndexRef.current = onSyncIndex;
 
-  const options = useMemo(
-    () =>
-      buildOptions({
-        ...props,
-        barLayoutsRef,
-        onCursor: onCursorRef.current
-          ? (event) => onCursorRef.current?.(event)
-          : undefined,
-      }),
-    [
-      width,
-      height,
-      categories,
-      series,
-      theme,
-      props.showValues,
-      props.valueSuffix,
-      props.referenceLines,
-      showAxes,
-      showCursor,
-      useNativeLegend,
-      onCursor,
-    ],
-  );
+  const options = useMemo(() => {
+    const base = buildOptions({ ...props, barLayoutsRef });
+    if (!showCursor && !onSyncIndexRef.current) {
+      return base;
+    }
+
+    return {
+      ...base,
+      hooks: {
+        ...base.hooks,
+        setCursor: [
+          (u: uPlot) => {
+            const idx = u.cursor.idx;
+            const event =
+              idx == null || idx < 0
+                ? null
+                : {
+                    index: idx,
+                    left: u.cursor.left ?? 0,
+                    top: u.cursor.top ?? 0,
+                  };
+
+            if (!applyingSyncRef.current) {
+              onSyncIndexRef.current?.(
+                idx == null || idx < 0 ? null : idx,
+              );
+            }
+            onCursorRef.current?.(event);
+          },
+        ],
+      },
+    };
+  }, [
+    width,
+    height,
+    categories,
+    series,
+    theme,
+    props.showValues,
+    props.valueSuffix,
+    props.referenceLines,
+    showAxes,
+    showCursor,
+    useNativeLegend,
+    onCursor,
+    onSyncIndex,
+  ]);
 
   const data = useMemo(
     () => buildData(categories, series),
@@ -275,6 +287,16 @@ export function UPlotBar(props: UPlotBarProps): ReactElement {
     if (!plotRef.current) return;
     plotRef.current.setSize({ width, height });
   }, [width, height]);
+
+  useEffect(() => {
+    const plot = plotRef.current;
+    if (!plot || !chartId) return;
+    if (syncSourceId === chartId) return;
+
+    applyingSyncRef.current = true;
+    applySyncedCursor(plot, syncIndex);
+    applyingSyncRef.current = false;
+  }, [syncIndex, syncSourceId, chartId]);
 
   return (
     <div

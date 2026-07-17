@@ -20,6 +20,10 @@ export type EChartsCandlestickProps = {
   data: OhlcPoint[];
   volume?: number[];
   theme: ChartTheme;
+  chartId?: string;
+  onSyncIndex?: (index: number | null) => void;
+  syncIndex?: number | null;
+  syncSourceId?: string | null;
 };
 
 export function EChartsCandlestick({
@@ -29,6 +33,10 @@ export function EChartsCandlestick({
   data,
   volume,
   theme,
+  chartId,
+  onSyncIndex,
+  syncIndex,
+  syncSourceId,
 }: EChartsCandlestickProps): ReactElement {
   const { up, down } = upDownColors();
   const ohlc = data.map((point) => [point.open, point.close, point.low, point.high]);
@@ -115,7 +123,16 @@ export function EChartsCandlestick({
     ],
   };
 
-  const rootRef = useEChart({ option, width, height });
+  const rootRef = useEChart({
+    option,
+    width,
+    height,
+    categories,
+    chartId,
+    onSyncIndex,
+    syncIndex,
+    syncSourceId,
+  });
 
   return (
     <div

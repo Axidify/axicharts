@@ -40,6 +40,10 @@ export type UPlotLineProps = {
   showCursor?: boolean;
   useNativeLegend?: boolean;
   onCursor?: (event: PlotCursorEvent) => void;
+  onSyncIndex?: (index: number | null) => void;
+  syncIndex?: number | null;
+  syncSourceId?: string | null;
+  chartId?: string;
 };
 
 export type UPlotBarProps = {
@@ -55,4 +59,8 @@ export type UPlotBarProps = {
   showCursor?: boolean;
   useNativeLegend?: boolean;
   onCursor?: (event: PlotCursorEvent) => void;
+  onSyncIndex?: (index: number | null) => void;
+  syncIndex?: number | null;
+  syncSourceId?: string | null;
+  chartId?: string;
 };

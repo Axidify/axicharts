@@ -16,6 +16,7 @@ export type ChartLayoutContextValue = {
   theme: ChartTheme;
   config?: ChartConfig;
   mode: "static" | "interactive" | "live" | "presentation";
+  syncId?: string;
 };
 
 export const ChartLayoutContext = createContext<ChartLayoutContextValue | null>(

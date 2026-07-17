@@ -12,6 +12,7 @@ import {
   withAlpha,
 } from "./colors";
 import type { UPlotLineProps } from "./types";
+import { applySyncedCursor } from "./plotCursor";
 
 function seriesSpan(data: number[]): number {
   if (data.length === 0) return 1;
@@ -45,7 +46,6 @@ function buildOptions({
   dualAxis = "auto",
   showCursor = false,
   useNativeLegend = true,
-  onCursor,
 }: UPlotLineProps): uPlot.Options {
   const compact = height < 72;
   const gridOpacity = compact
@@ -87,24 +87,6 @@ function buildOptions({
       points: { show: false },
     },
     legend: { show: showLegend },
-    hooks: onCursor
-      ? {
-          setCursor: [
-            (u) => {
-              const idx = u.cursor.idx;
-              if (idx == null || idx < 0) {
-                onCursor(null);
-                return;
-              }
-              onCursor({
-                index: idx,
-                left: u.cursor.left ?? 0,
-                top: u.cursor.top ?? 0,
-              });
-            },
-          ],
-        }
-      : undefined,
     scales: {
       x: { time: false },
       y: { auto: true },
@@ -198,34 +180,65 @@ export function UPlotLine(props: UPlotLineProps): ReactElement {
     showCursor,
     useNativeLegend,
     onCursor,
+    onSyncIndex,
+    syncIndex,
+    syncSourceId,
+    chartId,
   } = props;
   const rootRef = useRef<HTMLDivElement>(null);
   const plotRef = useRef<uPlot | null>(null);
   const onCursorRef = useRef(onCursor);
+  const onSyncIndexRef = useRef(onSyncIndex);
+  const applyingSyncRef = useRef(false);
   onCursorRef.current = onCursor;
+  onSyncIndexRef.current = onSyncIndex;
 
-  const options = useMemo(
-    () =>
-      buildOptions({
-        ...props,
-        onCursor: onCursorRef.current
-          ? (event) => onCursorRef.current?.(event)
-          : undefined,
-      }),
-    [
-      width,
-      height,
-      categories,
-      series,
-      theme,
-      fill,
-      showAxes,
-      dualAxis,
-      showCursor,
-      useNativeLegend,
-      onCursor,
-    ],
-  );
+  const options = useMemo(() => {
+    const base = buildOptions(props);
+    if (!showCursor && !onSyncIndexRef.current) {
+      return base;
+    }
+
+    return {
+      ...base,
+      hooks: {
+        ...base.hooks,
+        setCursor: [
+          (u: uPlot) => {
+            const idx = u.cursor.idx;
+            const event =
+              idx == null || idx < 0
+                ? null
+                : {
+                    index: idx,
+                    left: u.cursor.left ?? 0,
+                    top: u.cursor.top ?? 0,
+                  };
+
+            if (!applyingSyncRef.current) {
+              onSyncIndexRef.current?.(
+                idx == null || idx < 0 ? null : idx,
+              );
+            }
+            onCursorRef.current?.(event);
+          },
+        ],
+      },
+    };
+  }, [
+    width,
+    height,
+    categories,
+    series,
+    theme,
+    fill,
+    showAxes,
+    dualAxis,
+    showCursor,
+    useNativeLegend,
+    onCursor,
+    onSyncIndex,
+  ]);
 
   const data = useMemo(
     () => buildData(categories, series),
@@ -253,6 +266,16 @@ export function UPlotLine(props: UPlotLineProps): ReactElement {
     if (!plotRef.current) return;
     plotRef.current.setSize({ width, height });
   }, [width, height]);
+
+  useEffect(() => {
+    const plot = plotRef.current;
+    if (!plot || !chartId) return;
+    if (syncSourceId === chartId) return;
+
+    applyingSyncRef.current = true;
+    applySyncedCursor(plot, syncIndex);
+    applyingSyncRef.current = false;
+  }, [syncIndex, syncSourceId, chartId]);
 
   return (
     <div

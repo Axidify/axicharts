@@ -3,7 +3,9 @@ import type { Meta, StoryObj } from "@storybook/react";
 import {
   CandlestickChart,
   ChartContainer,
+  ChartSyncGroup,
   HeatmapChart,
+  LineChart,
   Stat,
 } from "@axicharts/charts";
 import { liveTheme } from "@axicharts/charts-theme";
@@ -18,6 +20,7 @@ const OHLC = [
   { open: 184.2, high: 184.8, low: 183.5, close: 184.0 },
 ];
 const VOLUME = [1.2, 1.8, 1.1, 2.4, 1.6, 1.3].map((v) => v * 1_000_000);
+const RSI = [38, 42, 35, 58, 52, 48];
 
 const HEATMAP = {
   xCategories: ["Tech", "Energy", "Finance", "Health"],
@@ -69,15 +72,42 @@ function TradingDeskMockup(): ReactElement {
           <Stat value="42" label="RSI" tone="warning" surface="dark" monospace />
         </div>
 
-        <div style={{ marginTop: 16 }}>
-          <ChartContainer theme={liveTheme} mode="live" height={280} width="100%">
-            <CandlestickChart
-              categories={SESSIONS}
-              data={OHLC}
-              volume={VOLUME}
-            />
-          </ChartContainer>
-        </div>
+        <ChartSyncGroup>
+          <div style={{ marginTop: 16 }}>
+            <ChartContainer
+              theme={liveTheme}
+              mode="live"
+              syncId="ohlc"
+              height={280}
+              width="100%"
+            >
+              <CandlestickChart
+                categories={SESSIONS}
+                data={OHLC}
+                volume={VOLUME}
+              />
+            </ChartContainer>
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <ChartContainer
+              theme={liveTheme}
+              mode="live"
+              syncId="rsi"
+              height={120}
+              width="100%"
+            >
+              <LineChart
+                categories={SESSIONS}
+                series={[{ name: "RSI", data: RSI, tone: "warning" }]}
+                fill
+              />
+            </ChartContainer>
+            <p style={{ marginTop: 6, fontSize: 11, color: "#94a3b8" }}>
+              RSI (14) · synced crosshair with OHLC panel
+            </p>
+          </div>
+        </ChartSyncGroup>
 
         <div style={{ marginTop: 16 }}>
           <ChartContainer theme={liveTheme} height={200} width="100%">
@@ -100,7 +130,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Trading vertical — OHLC + volume, live stat strip, correlation heatmap.",
+          "Trading vertical — OHLC + volume, synced RSI panel, live stat strip, correlation heatmap.",
       },
     },
   },
