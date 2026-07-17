@@ -25,6 +25,7 @@ import {
 } from "@axicharts/charts-runtime/validation";
 import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
 import { RuntimeHubNav } from "../components/RuntimeHubNav";
+import { PLANNER_TRACK_RELEASE_NOTES } from "../demos/runtimePlannerDemo";
 
 const base = import.meta.env.BASE_URL;
 
@@ -330,6 +331,35 @@ export function RuntimeImportPage(): ReactElement {
           . See the <Link to="/runtime/adapters">adapter cookbook</Link> or{" "}
           <Link to="/runtime#planner-http">planner HTTP examples</Link>.
         </p>
+      </section>
+
+      <section
+        id="planner-track"
+        style={{
+          marginTop: 16,
+          padding: 14,
+          borderRadius: 10,
+          border: "1px solid #e2e8f0",
+          background: "#ffffff",
+          maxWidth: 720,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+          Planner track release notes (C33–C41)
+        </div>
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          The planner ↔ gallery ↔ Dashboarder track ships share/import meta round-trip: exports
+          include <code>meta</code> and Dashboarder import restores layout, feed, template, and
+          mosaic preset. See <Link to="/spec#phase-3-planner">Spec Phase 3 planner</Link> and{" "}
+          <Link to="/start#planner-cli">Start CLI</Link>.
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
+          {PLANNER_TRACK_RELEASE_NOTES.map((item) => (
+            <li key={item.slice}>
+              <strong>{item.slice}</strong> — {item.summary}
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section

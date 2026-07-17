@@ -1,9 +1,15 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import type { SavedDashboard } from "@axicharts/charts-runtime";
 import {
+  feedAdapterGalleryDeepLink,
   fetchImportPreset,
   formatValidateFileCommand,
   formatValidatePresetCommand,
   HOSTED_IMPORT_PRESETS,
+  PLANNER_FEED_ROWS,
+  plannerAdapterFixtures,
+  plannerFeedGalleryDeepLink,
+  plannerFeedGalleryIndexDeepLink,
   RUNTIME_SPEC_SCHEMA_URL,
   SHARE_EXPORT_SCHEMA_URL,
   validatePortableImportJson,
@@ -35,7 +41,7 @@ const panelStyle = {
   padding: 20,
 };
 
-const validateHintBoxStyle = {
+const hintBoxStyle = {
   marginTop: 12,
   padding: 12,
   borderRadius: 8,
@@ -45,6 +51,105 @@ const validateHintBoxStyle = {
   color: "#94a3b8",
   lineHeight: 1.7,
 } as const;
+
+function plannerMetaFeedRow(feed: NonNullable<SavedDashboard["meta"]>["feed"] | undefined) {
+  return feed ? PLANNER_FEED_ROWS.find((row) => row.feed === feed) : undefined;
+}
+
+function PlannerMetaRestoreHint({
+  meta,
+  dashboardName,
+}: {
+  meta: NonNullable<SavedDashboard["meta"]>;
+  dashboardName?: string;
+}): ReactElement {
+  const feedRow = plannerMetaFeedRow(meta.feed);
+  const plannerFixtures =
+    meta.feed != null
+      ? plannerAdapterFixtures({
+          layout: meta.layout ?? "embed",
+          feed: meta.feed,
+        })
+      : [];
+
+  return (
+    <div style={hintBoxStyle}>
+      <div style={{ fontWeight: 600, color: "#e2e8f0", marginBottom: 8 }}>
+        Planner meta restore
+        {dashboardName ? (
+          <span style={{ fontWeight: 400, color: "#94a3b8" }}> · {dashboardName}</span>
+        ) : null}
+      </div>
+      <p style={{ margin: "0 0 10px" }}>
+        Apply import restores builder layout, feed, template, mosaic preset, and presentation mode
+        from exported <code>meta</code>.
+      </p>
+      <dl
+        style={{
+          display: "grid",
+          gridTemplateColumns: "88px 1fr",
+          gap: "4px 12px",
+          margin: "0 0 10px",
+        }}
+      >
+        <dt>Layout</dt>
+        <dd style={{ margin: 0 }}>{meta.layout}</dd>
+        <dt>Feed</dt>
+        <dd style={{ margin: 0 }}>
+          <code>{meta.feed}</code>
+        </dd>
+        {meta.template ? (
+          <>
+            <dt>Template</dt>
+            <dd style={{ margin: 0 }}>{meta.template}</dd>
+          </>
+        ) : null}
+        {meta.layout === "mosaic" && meta.mosaicPreset ? (
+          <>
+            <dt>Mosaic</dt>
+            <dd style={{ margin: 0 }}>{meta.mosaicPreset}</dd>
+          </>
+        ) : null}
+        <dt>Presentation</dt>
+        <dd style={{ margin: 0 }}>{meta.presentation ? "Yes" : "No"}</dd>
+      </dl>
+      {feedRow ? (
+        <div style={{ marginBottom: 8 }}>
+          Planner intent: <em>{feedRow.intentSample}</em>
+        </div>
+      ) : null}
+      {meta.feed ? (
+        <>
+          <a
+            href={feedAdapterGalleryDeepLink(meta.feed, meta.layout)}
+            style={{ color: "#93c5fd" }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Feed fixture
+          </a>
+          {" · "}
+          <a
+            href={plannerFeedGalleryDeepLink(meta.feed)}
+            style={{ color: "#93c5fd" }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Planner index
+          </a>
+        </>
+      ) : null}
+      {plannerFixtures.length > 1 ? (
+        <div style={{ marginTop: 8 }}>
+          Adapter fixtures:{" "}
+          <strong style={{ color: "#e2e8f0" }}>
+            {plannerFixtures.map((item) => item.preset.id).join(" + ")}
+          </strong>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 const buttonStyle = {
   fontSize: 12,
@@ -99,6 +204,24 @@ export function ImportDialog({
   }, [open, initialJson, initialFilename]);
 
   const validation = useMemo(() => validatePortableImportJson(jsonText), [jsonText]);
+  const importPlannerMeta = useMemo(() => {
+    if (!validation.ok || !validation.export) return null;
+    if (validation.export.kind === "dashboard") {
+      if (!validation.export.meta?.feed) return null;
+      return {
+        kind: "dashboard" as const,
+        name: validation.export.name,
+        meta: validation.export.meta,
+      };
+    }
+    const dashboards = validation.export.dashboards.filter((item) => item.meta?.feed);
+    if (dashboards.length === 0) return null;
+    return {
+      kind: "workspace" as const,
+      total: validation.export.dashboards.length,
+      dashboards,
+    };
+  }, [validation]);
   const hasInput = jsonText.trim().length > 0;
   const validateHint = loadedPresetId
     ? formatValidatePresetCommand(loadedPresetId)
@@ -281,8 +404,91 @@ export function ImportDialog({
           </>
         ) : null}
 
+        {importPlannerMeta?.kind === "dashboard" ? (
+          <PlannerMetaRestoreHint meta={importPlannerMeta.meta} dashboardName={importPlannerMeta.name} />
+        ) : null}
+
+        {importPlannerMeta?.kind === "workspace" ? (
+          <div style={hintBoxStyle}>
+            <div style={{ fontWeight: 600, color: "#e2e8f0", marginBottom: 8 }}>
+              Planner meta restore
+            </div>
+            <p style={{ margin: "0 0 10px" }}>
+              Workspace import restores planner <code>meta</code> per dashboard (
+              {importPlannerMeta.dashboards.length}/{importPlannerMeta.total} with feed). Active
+              dashboard picks up layout, feed, template, and mosaic preset after apply.
+            </p>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: 11,
+                marginBottom: 10,
+              }}
+            >
+              <thead>
+                <tr>
+                  <th
+                    style={{
+                      borderBottom: "1px solid #334155",
+                      padding: "6px 4px",
+                      textAlign: "left",
+                      color: "#cbd5e1",
+                    }}
+                  >
+                    Dashboard
+                  </th>
+                  <th
+                    style={{
+                      borderBottom: "1px solid #334155",
+                      padding: "6px 4px",
+                      textAlign: "left",
+                      color: "#cbd5e1",
+                    }}
+                  >
+                    Feed
+                  </th>
+                  <th
+                    style={{
+                      borderBottom: "1px solid #334155",
+                      padding: "6px 4px",
+                      textAlign: "left",
+                      color: "#cbd5e1",
+                    }}
+                  >
+                    Layout
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {importPlannerMeta.dashboards.map((item) => (
+                  <tr key={item.name}>
+                    <td style={{ borderBottom: "1px solid #1e293b", padding: "6px 4px" }}>
+                      {item.name}
+                    </td>
+                    <td style={{ borderBottom: "1px solid #1e293b", padding: "6px 4px" }}>
+                      <code>{item.meta?.feed}</code>
+                    </td>
+                    <td style={{ borderBottom: "1px solid #1e293b", padding: "6px 4px" }}>
+                      {item.meta?.layout}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <a
+              href={plannerFeedGalleryIndexDeepLink()}
+              style={{ color: "#93c5fd" }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Planner feed index
+            </a>
+          </div>
+        ) : null}
+
         {!hasInput ? (
-          <div style={validateHintBoxStyle}>
+          <div style={hintBoxStyle}>
             <div>Validate shipped presets in CI:</div>
             {HOSTED_IMPORT_PRESETS.map((preset) => (
               <ValidateCommandCopy
@@ -292,7 +498,7 @@ export function ImportDialog({
             ))}
           </div>
         ) : validateHint ? (
-          <div style={validateHintBoxStyle}>
+          <div style={hintBoxStyle}>
             Validate this import:
             <ValidateCommandCopy command={validateHint} />
           </div>

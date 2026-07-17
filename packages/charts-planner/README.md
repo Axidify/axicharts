@@ -91,3 +91,21 @@ curl -s http://127.0.0.1:3921/plan \
 charts-planner plan examples/ops.profile.json --intent "Line 3 night shift overview"
 charts-planner serve --port 3921
 ```
+
+## Planner track (C33–C41)
+
+Dashboarder share exports include planner `meta` (layout, feed, template, mosaic preset,
+presentation). Import restores the same fields — see the
+[import gallery planner track notes](https://axidify.github.io/axicharts/runtime/import#planner-track).
+
+| Slice | Shipped |
+|-------|---------|
+| C33 | PlannerPanel adapter hints, docs RuntimeHubNav |
+| C34 | WS/MQTT feed intents, feed gallery deep links |
+| C35 | REST feed intent, adapter health strip fixture links |
+| C36 | Mock-live feed, mosaic multi-adapter hints |
+| C37 | `PLANNER_FEED_ROWS`, import gallery planner index |
+| C38 | Runtime planner HTTP docs, FeedIntentGlossary |
+| C39 | Start page CLI, EmbedDialog feed hints |
+| C40 | ShareDialog meta export, Spec Phase 3 cross-link |
+| C41 | ImportDialog meta restore hints, track release notes |
