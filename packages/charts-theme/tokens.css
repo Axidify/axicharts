@@ -1,0 +1,20 @@
+:root {
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
+  --chart-grid: hsl(var(--border, 214 32% 91%) / 0.6);
+  --chart-axis: hsl(var(--muted-foreground, 215 16% 47%));
+  --chart-area-fill: hsl(var(--chart-1) / 0.12);
+  --chart-alarm-warning: 38 92% 50%;
+  --chart-alarm-critical: 0 84% 60%;
+  --chart-stale: 215 16% 47%;
+}
+
+[data-theme="industrial"] {
+  color-scheme: dark;
+  --chart-grid: hsl(215 20% 22% / 0.8);
+  --chart-axis: hsl(215 20% 65%);
+  --chart-area-fill: hsl(var(--chart-1) / 0.15);
+}
