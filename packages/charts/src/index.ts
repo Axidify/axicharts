@@ -6,7 +6,7 @@ export {
 } from "./container/ChartLayoutContext";
 export { LineChart, type LineChartProps } from "./line/LineChart";
 export { BarChart, type BarChartProps } from "./bar/BarChart";
-export { Stat, type StatProps, type StatTone } from "./stat/Stat";
+export { Stat, type StatProps, type StatSurface, type StatTone } from "./stat/Stat";
 export type {
   PlotSeries,
   ReferenceLine,

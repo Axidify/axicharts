@@ -2,17 +2,28 @@ import type { CSSProperties, ReactElement } from "react";
 
 export type StatTone = "neutral" | "success" | "warning" | "critical";
 
-const TONE_COLORS: Record<StatTone, string> = {
-  neutral: "#e2e8f0",
-  success: "#4ade80",
-  warning: "#fbbf24",
-  critical: "#f87171",
+export type StatSurface = "dark" | "light";
+
+const TONE_COLORS: Record<StatSurface, Record<StatTone, string>> = {
+  dark: {
+    neutral: "#e2e8f0",
+    success: "#4ade80",
+    warning: "#fbbf24",
+    critical: "#f87171",
+  },
+  light: {
+    neutral: "#0f172a",
+    success: "#16a34a",
+    warning: "#d97706",
+    critical: "#dc2626",
+  },
 };
 
 export type StatProps = {
   value: string;
   label: string;
   tone?: StatTone;
+  surface?: StatSurface;
   monospace?: boolean;
   style?: CSSProperties;
 };
@@ -21,9 +32,13 @@ export function Stat({
   value,
   label,
   tone = "neutral",
+  surface = "dark",
   monospace = false,
   style,
 }: StatProps): ReactElement {
+  const colors = TONE_COLORS[surface];
+  const labelColor = surface === "light" ? "#64748b" : "#94a3b8";
+
   return (
     <div style={style}>
       <div
@@ -31,7 +46,7 @@ export function Stat({
           fontSize: 20,
           fontWeight: 600,
           lineHeight: 1.2,
-          color: TONE_COLORS[tone],
+          color: colors[tone],
           fontFamily: monospace
             ? "ui-monospace, SFMono-Regular, Menlo, monospace"
             : undefined,
@@ -43,7 +58,7 @@ export function Stat({
         style={{
           marginTop: 4,
           fontSize: 12,
-          color: "#94a3b8",
+          color: labelColor,
         }}
       >
         {label}
