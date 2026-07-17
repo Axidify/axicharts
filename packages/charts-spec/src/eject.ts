@@ -38,7 +38,9 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
                 ? "CandlestickChart"
                 : spec.type === "heatmap"
                   ? "HeatmapChart"
-                  : spec.type === "stat"
+                  : spec.type === "scatter"
+                    ? "ScatterChart"
+                    : spec.type === "stat"
                     ? "Stat"
                     : "Gauge";
 
@@ -75,6 +77,19 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
         low: Number(row.low),
         close: Number(row.close),
       }))}`;
+  } else if (spec.type === "scatter") {
+    const xField = encoding?.x?.field ?? "x";
+    const yField = Array.isArray(encoding?.y)
+      ? encoding.y[0]?.field
+      : encoding?.y?.field ?? "y";
+    chartBody = `series={[{
+        name: "Series",
+        points: ${dataVar}.map((row) => ({
+          x: Number(row.${xField}),
+          y: Number(row.${yField}),
+          label: row.label != null ? String(row.label) : undefined,
+        })),
+      }]}`;
   } else if (spec.type === "heatmap") {
     chartBody = `matrix={${dataVar}.matrix}
       min={${dataVar}.min}

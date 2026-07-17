@@ -8,6 +8,7 @@ import {
   HeatmapChart,
   LineChart,
   PieChart,
+  ScatterChart,
   Stat,
   WaterfallChart,
   type PlotSeries,
@@ -128,6 +129,38 @@ export function compilePanel(
             : LineChart;
 
       return wrapChart(resolved, createElement(Chart, chartProps), options);
+    }
+
+    case "scatter": {
+      const xField = resolved.encoding?.x?.field ?? "x";
+      const yEnc = resolved.encoding?.y;
+      const yField = Array.isArray(yEnc)
+        ? yEnc[0]?.field
+        : yEnc?.field ?? "y";
+      const labelField = (props.labelField as string | undefined) ?? "label";
+      const scatterSeries =
+        (props.series as Parameters<typeof ScatterChart>[0]["series"]) ??
+        [
+          {
+            name: (props.seriesName as string | undefined) ?? "Series",
+            points: rows.map((row) => ({
+              x: Number(row[xField]),
+              y: Number(row[yField]),
+              label:
+                row[labelField] != null
+                  ? String(row[labelField])
+                  : undefined,
+            })),
+          },
+        ];
+      return wrapChart(
+        resolved,
+        createElement(ScatterChart, {
+          series: scatterSeries,
+          ...props,
+        }),
+        options,
+      );
     }
 
     case "pie": {

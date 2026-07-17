@@ -23,6 +23,7 @@ export type PanelChartType =
   | "waterfall"
   | "candlestick"
   | "heatmap"
+  | "scatter"
   | "stat"
   | "gauge"
   | string;

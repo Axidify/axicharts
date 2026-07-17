@@ -5,6 +5,7 @@ import { CandlestickChart } from "../candlestick/CandlestickChart";
 import { HeatmapChart } from "../heatmap/HeatmapChart";
 import { LineChart } from "../line/LineChart";
 import { PieChart } from "../pie/PieChart";
+import { ScatterChart } from "../scatter/ScatterChart";
 import { WaterfallChart } from "../waterfall/WaterfallChart";
 import { registerChartType } from "./registry";
 
@@ -15,6 +16,11 @@ const builtins: ChartTypeRegistration[] = [
   { type: "bar", Chart: BarChart as ChartTypeRegistration["Chart"], defaultRenderer: "canvas" },
   { type: "area", Chart: AreaChart as ChartTypeRegistration["Chart"], defaultRenderer: "canvas" },
   { type: "pie", Chart: PieChart as ChartTypeRegistration["Chart"], defaultRenderer: "canvas" },
+  {
+    type: "scatter",
+    Chart: ScatterChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
   {
     type: "candlestick",
     Chart: CandlestickChart as ChartTypeRegistration["Chart"],

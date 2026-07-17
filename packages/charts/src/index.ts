@@ -9,6 +9,12 @@ export { AreaChart, type AreaChartProps } from "./area/AreaChart";
 export { BarChart, type BarChartProps } from "./bar/BarChart";
 export { PieChart, type PieChartProps, type PieSlice } from "./pie/PieChart";
 export {
+  ScatterChart,
+  type ScatterChartProps,
+  type ScatterPoint,
+  type ScatterSeries,
+} from "./scatter/ScatterChart";
+export {
   CandlestickChart,
   type CandlestickChartProps,
   type OhlcPoint,
