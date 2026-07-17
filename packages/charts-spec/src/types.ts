@@ -28,6 +28,7 @@ export type PanelChartType =
   | "treemap"
   | "stat"
   | "gauge"
+  | "table"
   | string;
 
 export type PanelSpec = {

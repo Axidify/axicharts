@@ -4,6 +4,7 @@ import {
   CandlestickChart,
   ChartContainer,
   ChartSyncGroup,
+  DataTable,
   HeatmapChart,
   LineChart,
   Stat,
@@ -50,6 +51,25 @@ const HEATMAP = {
     [0.38, 0.29, 0.47, 1.0],
   ],
 };
+
+const POSITIONS = [
+  {
+    symbol: "AAPL",
+    side: "LONG",
+    qty: 400,
+    avg: "182.10",
+    pnl: "+$360",
+    pnlTone: "success" as const,
+  },
+  {
+    symbol: "NVDA",
+    side: "LONG",
+    qty: 120,
+    avg: "118.40",
+    pnl: "-$84",
+    pnlTone: "critical" as const,
+  },
+];
 
 function TradingDeskMockup(): ReactElement {
   return (
@@ -140,6 +160,28 @@ function TradingDeskMockup(): ReactElement {
             Sector correlation matrix
           </p>
         </div>
+
+        <div style={{ marginTop: 16 }}>
+          <DataTable
+            columns={[
+              { key: "symbol", label: "Symbol", monospace: true },
+              { key: "side", label: "Side" },
+              { key: "qty", label: "Qty", align: "right", monospace: true },
+              { key: "avg", label: "Avg", align: "right", monospace: true },
+              {
+                key: "pnl",
+                label: "P&L",
+                align: "right",
+                monospace: true,
+                toneKey: "pnlTone",
+              },
+            ]}
+            rows={POSITIONS}
+            surface="dark"
+            compact
+            caption="Open positions"
+          />
+        </div>
       </div>
     </div>
   );
@@ -153,7 +195,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Trading vertical — OHLC + volume with brush/zoom, synced RSI panel, live stat strip, correlation heatmap.",
+          "Trading vertical — OHLC + volume with brush/zoom, synced RSI panel, live stat strip, correlation heatmap, positions table.",
       },
     },
   },

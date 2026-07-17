@@ -48,6 +48,12 @@ export {
 } from "./status/StatusLamp";
 export { Stat, type StatProps, type StatSurface, type StatTone } from "./stat/Stat";
 export {
+  DataTable,
+  type DataTableProps,
+  type TableColumn,
+  type TableRow,
+} from "./table/DataTable";
+export {
   ChartStateOverlay,
   StaleBadge,
   useIsStale,

@@ -5,6 +5,7 @@ import {
   CandlestickChart,
   ChartContainer,
   ChartSyncGroup,
+  DataTable,
   Gauge,
   HeatmapChart,
   LineChart,
@@ -28,6 +29,41 @@ type KpiSpec = {
   label: string;
   tone?: StatTone;
 };
+
+const DEFAULT_TRADING_POSITIONS = [
+  {
+    symbol: "AAPL",
+    side: "LONG",
+    qty: 400,
+    avg: "182.10",
+    pnl: "+$360",
+    pnlTone: "success" as const,
+  },
+  {
+    symbol: "NVDA",
+    side: "LONG",
+    qty: 120,
+    avg: "118.40",
+    pnl: "-$84",
+    pnlTone: "critical" as const,
+  },
+  {
+    symbol: "MSFT",
+    side: "SHORT",
+    qty: 200,
+    avg: "428.20",
+    pnl: "+$120",
+    pnlTone: "success" as const,
+  },
+];
+
+const TRADING_POSITION_COLUMNS = [
+  { key: "symbol", label: "Symbol", monospace: true },
+  { key: "side", label: "Side" },
+  { key: "qty", label: "Qty", align: "right" as const, monospace: true },
+  { key: "avg", label: "Avg", align: "right" as const, monospace: true },
+  { key: "pnl", label: "P&L", align: "right" as const, monospace: true, toneKey: "pnlTone" },
+];
 
 type OpsCell = {
   title: string;
@@ -342,6 +378,9 @@ export function tradingBlotterTemplate(
   const volume = data.volume as number[] | undefined;
   const rsi = data.rsi as number[] | undefined;
   const heatmap = data.heatmap as Parameters<typeof HeatmapChart>[0]["matrix"];
+  const positions =
+    (data.positions as typeof DEFAULT_TRADING_POSITIONS | undefined) ??
+    DEFAULT_TRADING_POSITIONS;
 
   return createElement(
     "div",
@@ -413,6 +452,17 @@ export function tradingBlotterTemplate(
         200,
         createElement(HeatmapChart, { matrix: heatmap, min: 0, max: 1 }),
       ),
+    ),
+    createElement(
+      "div",
+      { style: { marginTop: 16 } },
+      createElement(DataTable, {
+        columns: TRADING_POSITION_COLUMNS,
+        rows: positions,
+        surface: "dark",
+        compact: true,
+        caption: "Open positions",
+      }),
     ),
   );
 }

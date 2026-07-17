@@ -45,6 +45,16 @@ describe("plan", () => {
     expect(template).toBe("plugins-wall");
   });
 
+  it("maps position metrics to table panels", () => {
+    const panel = planPanelFromMetric({
+      name: "open_positions",
+      tags: { vertical: "trading" },
+    });
+
+    expect(panel.type).toBe("table");
+    expect(panel.props?.compact).toBe(true);
+  });
+
   it("plans one panel per metric", () => {
     const panels = planPanelsFromProfile({
       metrics: [{ name: "cpu" }, { name: "errors" }],

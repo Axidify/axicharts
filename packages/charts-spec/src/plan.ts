@@ -9,6 +9,9 @@ function inferChartType(metric: MetricProfile): PanelSpec["type"] {
   if (kind === "distribution") return "pie";
   if (kind === "gauge") return "gauge";
 
+  if (name.includes("position") || name.includes("blotter") || name.includes("order")) {
+    return "table";
+  }
   if (name.includes("waterfall") || name.includes("bridge") || name.includes("pnl")) {
     return "waterfall";
   }
@@ -77,6 +80,19 @@ export function planPanelFromMetric(metric: MetricProfile): PanelSpec {
   if (type === "gauge") {
     panel.encoding = { value: { field: metric.name, type: "quantitative" } };
     panel.props = { label: metric.name, unit: metric.unit ?? "%" };
+  }
+
+  if (type === "table") {
+    panel.encoding = undefined;
+    panel.props = {
+      columns: [
+        { key: "name", label: metric.name },
+        { key: "value", label: "Value", align: "right", monospace: true },
+      ],
+      rows: [],
+      compact: true,
+      surface: inferTheme(metric) === "live" ? "dark" : "light",
+    };
   }
 
   return panel;

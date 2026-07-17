@@ -25,3 +25,25 @@ describe("compilePanel registered types", () => {
     expect(container.textContent).toContain("72%");
   });
 });
+
+describe("compilePanel table", () => {
+  it("renders tabular rows from spec data", () => {
+    const panel = compilePanel(
+      {
+        type: "table",
+        props: {
+          columns: [
+            { key: "symbol", label: "Symbol" },
+            { key: "qty", label: "Qty", align: "right" },
+          ],
+        },
+      },
+      [{ symbol: "AAPL", qty: 100 }],
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Symbol");
+    expect(container.textContent).toContain("AAPL");
+    expect(container.textContent).toContain("100");
+  });
+});

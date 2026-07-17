@@ -46,11 +46,17 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
                       ? "TreemapChart"
                       : spec.type === "stat"
                     ? "Stat"
+                    : spec.type === "table"
+                      ? "DataTable"
                     : "Gauge";
 
-  if (spec.type === "stat" || spec.type === "gauge") {
+  if (spec.type === "stat" || spec.type === "gauge" || spec.type === "table") {
     const props = spec.props ?? {};
-    return `<${chartName}\n  ${serializeProps({ ...props, label: props.label ?? spec.title }, "  ")}\n/>`;
+    const merged =
+      spec.type === "stat" || spec.type === "gauge"
+        ? { ...props, label: props.label ?? spec.title }
+        : props;
+    return `<${chartName}\n  ${serializeProps(merged, "  ")}\n/>`;
   }
 
   const encoding = spec.encoding;

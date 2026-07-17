@@ -35,4 +35,19 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("<Stat");
     expect(jsx).not.toContain("ChartContainer");
   });
+
+  it("emits table without ChartContainer", () => {
+    const jsx = ejectPanel({
+      type: "table",
+      props: {
+        columns: [{ key: "symbol", label: "Symbol" }],
+        rows: [{ symbol: "AAPL" }],
+        compact: true,
+      },
+    });
+
+    expect(jsx).toContain("<DataTable");
+    expect(jsx).toContain("compact={true}");
+    expect(jsx).not.toContain("ChartContainer");
+  });
 });

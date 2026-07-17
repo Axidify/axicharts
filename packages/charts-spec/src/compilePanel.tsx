@@ -13,6 +13,7 @@ import {
   Stat,
   TreemapChart,
   WaterfallChart,
+  DataTable,
   type PlotSeries,
   type StatTone,
 } from "@axicharts/charts";
@@ -298,6 +299,22 @@ export function compilePanel(
         unit: props.unit as string | undefined,
         warningAt: props.warningAt as number | undefined,
         criticalAt: props.criticalAt as number | undefined,
+      });
+    }
+
+    case "table": {
+      const columns =
+        (props.columns as Parameters<typeof DataTable>[0]["columns"]) ?? [];
+      const tableRows =
+        rows.length > 0
+          ? (rows as Parameters<typeof DataTable>[0]["rows"])
+          : ((props.rows as Parameters<typeof DataTable>[0]["rows"]) ?? []);
+      return createElement(DataTable, {
+        columns,
+        rows: tableRows,
+        surface: props.surface as "light" | "dark" | undefined,
+        compact: props.compact as boolean | undefined,
+        caption: String(props.caption ?? resolved.title ?? ""),
       });
     }
 
