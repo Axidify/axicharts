@@ -7,6 +7,12 @@ import {
   type ReferenceLine,
 } from "@axicharts/charts-canvas";
 import { useChartLayout } from "../container/ChartLayoutContext";
+import {
+  CartesianChartShell,
+} from "../chrome/CartesianChartShell";
+import { getLegendHeight } from "../chrome/Legend";
+import { getInteractionChrome } from "../interaction/mode";
+import { useChartInteraction } from "../interaction/ChartInteractionContext";
 
 export type BarChartProps = {
   categories: string[];
@@ -16,6 +22,39 @@ export type BarChartProps = {
   valueSuffix?: string;
   referenceLines?: ReferenceLine[];
 };
+
+function BarPlot({
+  categories,
+  series,
+  showAxes,
+  showValues,
+  valueSuffix,
+  referenceLines,
+}: BarChartProps): ReactElement {
+  const { size, theme, mode } = useChartLayout();
+  const { setCursor } = useChartInteraction();
+  const chrome = getInteractionChrome(mode);
+  const showLegend = chrome.showLegend && series.length > 1;
+  const legendHeight = getLegendHeight(showLegend);
+  const plotHeight = Math.floor(size.height) - legendHeight;
+
+  return (
+    <UPlotBar
+      width={Math.floor(size.width)}
+      height={plotHeight}
+      categories={categories}
+      series={series}
+      theme={theme}
+      showAxes={showAxes}
+      showValues={showValues}
+      valueSuffix={valueSuffix}
+      referenceLines={referenceLines}
+      showCursor={chrome.showCrosshair}
+      useNativeLegend={false}
+      onCursor={setCursor}
+    />
+  );
+}
 
 export function BarChart({
   categories,
@@ -43,16 +82,20 @@ export function BarChart({
         overflow: "hidden",
       }}
     >
-      <UPlotBar
-        width={Math.floor(size.width)}
-        height={Math.floor(size.height)}
+      <CartesianChartShell
         categories={categories}
         series={series}
-        theme={theme}
-        showAxes={axes}
-        showValues={showValues}
         valueSuffix={valueSuffix}
-        referenceLines={referenceLines}
+        plot={
+          <BarPlot
+            categories={categories}
+            series={series}
+            showAxes={axes}
+            showValues={showValues}
+            valueSuffix={valueSuffix}
+            referenceLines={referenceLines}
+          />
+        }
       />
       {valueSuffix && theme.caption.show ? (
         <span

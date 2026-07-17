@@ -21,6 +21,12 @@ export type ReferenceLine = {
 
 export type DualAxisMode = boolean | "auto";
 
+export type PlotCursorEvent = {
+  index: number;
+  left: number;
+  top: number;
+} | null;
+
 export type UPlotLineProps = {
   width: number;
   height: number;
@@ -31,6 +37,9 @@ export type UPlotLineProps = {
   showAxes?: boolean;
   valueSuffix?: string;
   dualAxis?: DualAxisMode;
+  showCursor?: boolean;
+  useNativeLegend?: boolean;
+  onCursor?: (event: PlotCursorEvent) => void;
 };
 
 export type UPlotBarProps = {
@@ -43,4 +52,7 @@ export type UPlotBarProps = {
   showValues?: boolean;
   valueSuffix?: string;
   referenceLines?: ReferenceLine[];
+  showCursor?: boolean;
+  useNativeLegend?: boolean;
+  onCursor?: (event: PlotCursorEvent) => void;
 };

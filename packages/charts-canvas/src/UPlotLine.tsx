@@ -43,6 +43,9 @@ function buildOptions({
   fill,
   showAxes = true,
   dualAxis = "auto",
+  showCursor = false,
+  useNativeLegend = true,
+  onCursor,
 }: UPlotLineProps): uPlot.Options {
   const compact = height < 72;
   const gridOpacity = compact
@@ -69,7 +72,7 @@ function buildOptions({
     : theme.area.fillOpacity;
 
   const useDualAxis = shouldUseDualAxis(series, dualAxis);
-  const showLegend = series.length > 1;
+  const showLegend = useNativeLegend && series.length > 1;
   const topPad = showLegend && !compact ? 28 : compact ? 4 : 8;
 
   return {
@@ -77,8 +80,31 @@ function buildOptions({
     height,
     class: "axicharts-uplot",
     padding: compact ? [4, 6, 4, 6] : [topPad, 10, 8, useDualAxis ? 48 : 10],
-    cursor: { show: false },
+    cursor: {
+      show: showCursor,
+      x: true,
+      y: false,
+      points: { show: false },
+    },
     legend: { show: showLegend },
+    hooks: onCursor
+      ? {
+          setCursor: [
+            (u) => {
+              const idx = u.cursor.idx;
+              if (idx == null || idx < 0) {
+                onCursor(null);
+                return;
+              }
+              onCursor({
+                index: idx,
+                left: u.cursor.left ?? 0,
+                top: u.cursor.top ?? 0,
+              });
+            },
+          ],
+        }
+      : undefined,
     scales: {
       x: { time: false },
       y: { auto: true },
@@ -160,14 +186,45 @@ function buildData(categories: string[], series: UPlotLineProps["series"]) {
 }
 
 export function UPlotLine(props: UPlotLineProps): ReactElement {
-  const { width, height, categories, series, theme, fill, showAxes, dualAxis } =
-    props;
+  const {
+    width,
+    height,
+    categories,
+    series,
+    theme,
+    fill,
+    showAxes,
+    dualAxis,
+    showCursor,
+    useNativeLegend,
+    onCursor,
+  } = props;
   const rootRef = useRef<HTMLDivElement>(null);
   const plotRef = useRef<uPlot | null>(null);
+  const onCursorRef = useRef(onCursor);
+  onCursorRef.current = onCursor;
 
   const options = useMemo(
-    () => buildOptions(props),
-    [width, height, categories, series, theme, fill, showAxes, dualAxis],
+    () =>
+      buildOptions({
+        ...props,
+        onCursor: onCursorRef.current
+          ? (event) => onCursorRef.current?.(event)
+          : undefined,
+      }),
+    [
+      width,
+      height,
+      categories,
+      series,
+      theme,
+      fill,
+      showAxes,
+      dualAxis,
+      showCursor,
+      useNativeLegend,
+      onCursor,
+    ],
   );
 
   const data = useMemo(

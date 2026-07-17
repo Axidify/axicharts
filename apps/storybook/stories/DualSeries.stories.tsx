@@ -63,8 +63,7 @@ function DualSeriesMockup(): ReactElement {
             />
           </ChartContainer>
           <p style={{ marginTop: 6, fontSize: 11, color: "#64748b" }}>
-            Source: APM + logs · Mon–Sun · legend: p95 latency (ms), errors/min
-            · dual Y-scale auto
+            Source: APM + logs · Mon–Sun · hover for tooltip · dual Y-scale auto
           </p>
         </div>
       </div>

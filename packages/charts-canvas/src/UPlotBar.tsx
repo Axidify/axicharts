@@ -38,6 +38,9 @@ function buildOptions({
   valueSuffix = "",
   referenceLines = [],
   barLayoutsRef,
+  showCursor = false,
+  useNativeLegend = true,
+  onCursor,
 }: UPlotBarProps & {
   barLayoutsRef: React.MutableRefObject<BarLayout[]>;
 }): uPlot.Options {
@@ -50,8 +53,13 @@ function buildOptions({
     height,
     class: "axicharts-uplot",
     padding: [8, 10, 8, 10],
-    cursor: { show: false },
-    legend: { show: series.length > 1 },
+    cursor: {
+      show: showCursor,
+      x: true,
+      y: false,
+      points: { show: false },
+    },
+    legend: { show: useNativeLegend && series.length > 1 },
     scales: {
       x: { time: false },
       y: {
@@ -119,6 +127,24 @@ function buildOptions({
       })),
     ],
     hooks: {
+      ...(onCursor
+        ? {
+            setCursor: [
+              (u) => {
+                const idx = u.cursor.idx;
+                if (idx == null || idx < 0) {
+                  onCursor(null);
+                  return;
+                }
+                onCursor({
+                  index: idx,
+                  left: u.cursor.left ?? 0,
+                  top: u.cursor.top ?? 0,
+                });
+              },
+            ],
+          }
+        : {}),
       draw: [
         (u) => {
           const ctx = u.ctx;
@@ -180,24 +206,47 @@ function buildData(categories: string[], series: UPlotBarProps["series"]) {
 }
 
 export function UPlotBar(props: UPlotBarProps): ReactElement {
-  const { width, height, categories, series, theme, showAxes } = props;
-  const rootRef = useRef<HTMLDivElement>(null);
-  const plotRef = useRef<uPlot | null>(null);
-  const barLayoutsRef = useRef<BarLayout[]>([]);
-
-  const options = useMemo(
-    () => buildOptions({ ...props, barLayoutsRef }),
-    [
+  const {
     width,
     height,
     categories,
     series,
     theme,
-    props.showValues,
-    props.valueSuffix,
-    props.referenceLines,
     showAxes,
-  ]);
+    showCursor,
+    useNativeLegend,
+    onCursor,
+  } = props;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const plotRef = useRef<uPlot | null>(null);
+  const barLayoutsRef = useRef<BarLayout[]>([]);
+  const onCursorRef = useRef(onCursor);
+  onCursorRef.current = onCursor;
+
+  const options = useMemo(
+    () =>
+      buildOptions({
+        ...props,
+        barLayoutsRef,
+        onCursor: onCursorRef.current
+          ? (event) => onCursorRef.current?.(event)
+          : undefined,
+      }),
+    [
+      width,
+      height,
+      categories,
+      series,
+      theme,
+      props.showValues,
+      props.valueSuffix,
+      props.referenceLines,
+      showAxes,
+      showCursor,
+      useNativeLegend,
+      onCursor,
+    ],
+  );
 
   const data = useMemo(
     () => buildData(categories, series),

@@ -3,6 +3,12 @@
 import type { ReactElement } from "react";
 import { UPlotLine, type PlotSeries } from "@axicharts/charts-canvas";
 import { useChartLayout } from "../container/ChartLayoutContext";
+import {
+  CartesianChartShell,
+} from "../chrome/CartesianChartShell";
+import { getLegendHeight } from "../chrome/Legend";
+import { getInteractionChrome } from "../interaction/mode";
+import { useChartInteraction } from "../interaction/ChartInteractionContext";
 
 export type LineChartProps = {
   categories: string[];
@@ -12,6 +18,41 @@ export type LineChartProps = {
   valueSuffix?: string;
   dualAxis?: boolean | "auto";
 };
+
+function LinePlot({
+  categories,
+  series,
+  fill,
+  showAxes,
+  valueSuffix,
+  dualAxis,
+  compact,
+}: LineChartProps & { compact: boolean }): ReactElement {
+  const { size, theme, mode } = useChartLayout();
+  const { setCursor } = useChartInteraction();
+  const chrome = getInteractionChrome(mode);
+  const showLegend =
+    chrome.showLegend && series.length > 1 && !compact;
+  const legendHeight = getLegendHeight(showLegend);
+  const plotHeight = Math.floor(size.height) - legendHeight;
+
+  return (
+    <UPlotLine
+      width={Math.floor(size.width)}
+      height={plotHeight}
+      categories={categories}
+      series={series}
+      theme={theme}
+      fill={fill}
+      showAxes={showAxes}
+      valueSuffix={valueSuffix}
+      dualAxis={dualAxis}
+      showCursor={chrome.showCrosshair}
+      useNativeLegend={false}
+      onCursor={setCursor}
+    />
+  );
+}
 
 export function LineChart({
   categories,
@@ -41,16 +82,22 @@ export function LineChart({
         overflow: "hidden",
       }}
     >
-      <UPlotLine
-        width={Math.floor(size.width)}
-        height={Math.floor(size.height)}
+      <CartesianChartShell
         categories={categories}
         series={series}
-        theme={theme}
-        fill={fill}
-        showAxes={axes}
         valueSuffix={valueSuffix}
-        dualAxis={dualAxis}
+        compact={compact}
+        plot={
+          <LinePlot
+            categories={categories}
+            series={series}
+            fill={fill}
+            showAxes={axes}
+            valueSuffix={valueSuffix}
+            dualAxis={dualAxis}
+            compact={compact}
+          />
+        }
       />
       {valueSuffix && theme.caption.show && !compact ? (
         <span

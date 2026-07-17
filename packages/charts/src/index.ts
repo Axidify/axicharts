@@ -32,6 +32,18 @@ export {
 } from "./status/StatusLamp";
 export { Stat, type StatProps, type StatSurface, type StatTone } from "./stat/Stat";
 export {
+  Crosshair,
+  Legend,
+  Tooltip,
+  getInteractionChrome,
+  type LegendProps,
+  type TooltipProps,
+} from "./chrome";
+export {
+  ChartInteractionProvider,
+  useChartInteraction,
+} from "./interaction/ChartInteractionContext";
+export {
   clearChartTypes,
   getChartType,
   listChartTypes,
@@ -44,6 +56,7 @@ export type {
 } from "./registry";
 export type {
   DualAxisMode,
+  PlotCursorEvent,
   PlotSeries,
   ReferenceLine,
   SeriesTone,
