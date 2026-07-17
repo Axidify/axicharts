@@ -549,6 +549,8 @@ export function App(): ReactElement {
         spec={activeSpec}
         presentation={presentation}
         alarmScopeId={activeDashboard.id}
+        feed={feed}
+        layout={layout}
         onClose={() => setEmbedOpen(false)}
       />
       <ShareDialog

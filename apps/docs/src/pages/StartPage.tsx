@@ -1,6 +1,8 @@
 import type { ReactElement } from "react";
+import { Link } from "react-router-dom";
 import { ChartContainer, LineChart } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
+import { PLANNER_CLI_CODE } from "../demos/runtimePlannerDemo";
 
 const CODE = `import { ChartContainer, LineChart } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
@@ -17,6 +19,14 @@ export function LatencyPanel() {
   );
 }`;
 
+const codeBlockStyle = {
+  padding: 14,
+  borderRadius: 8,
+  fontSize: 11,
+  lineHeight: 1.5,
+  overflow: "auto" as const,
+};
+
 export function StartPage(): ReactElement {
   return (
     <div>
@@ -24,12 +34,10 @@ export function StartPage(): ReactElement {
       <h2 style={{ fontSize: 16 }}>Install</h2>
       <pre
         style={{
-          padding: 14,
-          borderRadius: 8,
+          ...codeBlockStyle,
           background: "#0f172a",
           color: "#e2e8f0",
           fontSize: 12,
-          overflow: "auto",
         }}
       >
         {`npm install @axicharts/charts @axicharts/charts-theme echarts uplot`}
@@ -55,15 +63,36 @@ export function StartPage(): ReactElement {
       <h2 style={{ fontSize: 16, marginTop: 28 }}>Source</h2>
       <pre
         style={{
-          padding: 14,
-          borderRadius: 8,
+          ...codeBlockStyle,
           background: "#f1f5f9",
-          fontSize: 11,
-          overflow: "auto",
         }}
       >
         {CODE}
       </pre>
+
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>Dashboarder + planner CLI</h2>
+      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 14 }}>
+        Layer 3 runtime dashboards use <code>@axicharts/charts-runtime</code> with live adapter
+        feeds. Phase 3 <code>@axicharts/charts-planner</code> maps natural-language intent to a{" "}
+        <code>DashboardPlan.feed</code> — use the CLI locally, HTTP server, or Dashboarder{" "}
+        <strong>Plan</strong>.
+      </p>
+      <pre
+        style={{
+          ...codeBlockStyle,
+          background: "#0f172a",
+          color: "#e2e8f0",
+        }}
+      >
+        {PLANNER_CLI_CODE}
+      </pre>
+      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 13 }}>
+        <Link to="/runtime">Runtime SDK</Link>
+        {" · "}
+        <Link to="/runtime#planner-http">Planner HTTP API</Link>
+        {" · "}
+        <Link to="/runtime/import#planner-feeds">Planner feed gallery index</Link>
+      </p>
     </div>
   );
 }

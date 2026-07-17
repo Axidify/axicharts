@@ -4,10 +4,15 @@ import {
   dashboarderImportDeepLink,
   docsImportGalleryDeepLink,
   formatValidatePresetCommand,
+  PLANNER_FEED_ROWS,
+  plannerAdapterFixtures,
+  plannerFeedGalleryDeepLink,
   runtimeEmbedReferencePreset,
+  feedAdapterGalleryDeepLink,
   validateRuntimeSpecDualJson,
 } from "@axicharts/charts-runtime/validation";
-import { ErrorList, importSummary, LayerStatus, ValidateCommandCopy } from "./validationChrome";
+import type { FeedMode, LayoutMode } from "./runtime/buildRuntimeSpec";
+import { ErrorList, LayerStatus, ValidateCommandCopy } from "./validationChrome";
 
 const overlayStyle = {
   position: "fixed" as const,
@@ -48,6 +53,8 @@ export type EmbedDialogProps = {
   spec: RuntimeDashboardSpec;
   presentation?: boolean;
   alarmScopeId?: string;
+  feed?: FeedMode;
+  layout?: LayoutMode;
   onClose: () => void;
 };
 
@@ -61,6 +68,8 @@ export function EmbedDialog({
   spec,
   presentation = false,
   alarmScopeId,
+  feed,
+  layout = "embed",
   onClose,
 }: EmbedDialogProps): ReactElement | null {
   const [tab, setTab] = useState<EmbedTab>("react");
@@ -81,6 +90,14 @@ export function EmbedDialog({
   );
 
   const referencePreset = runtimeEmbedReferencePreset(spec.layout);
+  const feedRow = feed ? PLANNER_FEED_ROWS.find((row) => row.feed === feed) : undefined;
+  const plannerFixtures =
+    feed != null
+      ? plannerAdapterFixtures({
+          layout: layout ?? spec.layout,
+          feed,
+        })
+      : [];
 
   if (!open) return null;
 
@@ -187,6 +204,52 @@ export function EmbedDialog({
             <ErrorList title="JSON Schema" errors={validation.schemaErrors} />
             <ErrorList title="Semantic" errors={validation.semanticErrors} />
           </>
+        ) : null}
+
+        {feed && feedRow ? (
+          <div
+            style={{
+              marginTop: 12,
+              padding: 12,
+              borderRadius: 8,
+              border: "1px solid #334155",
+              background: "#111827",
+              fontSize: 12,
+              color: "#94a3b8",
+              lineHeight: 1.7,
+            }}
+          >
+            Builder feed: <strong style={{ color: "#e2e8f0" }}>{feed}</strong>
+            {" · "}
+            Planner intent: <em>{feedRow.intentSample}</em>
+            {" · "}
+            <a
+              href={feedAdapterGalleryDeepLink(feed, layout ?? spec.layout)}
+              style={{ color: "#93c5fd" }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Gallery
+            </a>
+            {" · "}
+            <a
+              href={plannerFeedGalleryDeepLink(feed)}
+              style={{ color: "#93c5fd" }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Planner index
+            </a>
+            {plannerFixtures.length > 1 ? (
+              <>
+                {" · "}
+                Fixtures:{" "}
+                <strong style={{ color: "#e2e8f0" }}>
+                  {plannerFixtures.map((item) => item.preset.id).join(" + ")}
+                </strong>
+              </>
+            ) : null}
+          </div>
         ) : null}
 
         {referencePreset ? (

@@ -1,4 +1,17 @@
-export const PLANNER_SERVE_CODE = `# Rules planner (local fallback)
+export const PLANNER_CLI_CODE = `# Rules intent planner (stdout JSON plan)
+charts-planner plan packages/charts-planner/examples/ops.profile.json \\
+  --intent "REST API polling /api/metrics endpoint"
+
+# Write plan to disk
+charts-planner plan packages/charts-planner/examples/ops.profile.json \\
+  --intent "Line 3 night shift overview" \\
+  --out /tmp/plan.json
+
+# LLM provider (needs OPENAI_API_KEY)
+charts-planner plan packages/charts-planner/examples/ops.profile.json \\
+  --intent "Finance board deck" --llm`;
+
+export const PLANNER_SERVE_CODE = `# Rules planner HTTP server (local fallback)
 pnpm planner
 
 # OpenAI-compatible provider (optional)
@@ -22,15 +35,6 @@ export const PLANNER_PLAN_CURL_INLINE = `curl -s http://127.0.0.1:3921/plan \\
     },
     "intent": "WebSocket push feed trading desk"
   }'`;
-
-export const PLANNER_PLAN_CURL_FILE = `curl -s http://127.0.0.1:3921/plan \\
-  -H 'content-type: application/json' \\
-  --data-binary @- <<'EOF'
-{
-  "profile": $(cat packages/charts-planner/examples/ops.profile.json),
-  "intent": "REST API polling /api/metrics endpoint"
-}
-EOF`;
 
 export const PLANNER_PLAN_RESPONSE = `{
   "source": "intent",
