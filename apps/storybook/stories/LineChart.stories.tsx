@@ -14,8 +14,18 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const InContainer: Story = {
+  parameters: {
+    layout: "padded",
+  },
   render: () => (
-    <div style={{ width: 480 }}>
+    <div
+      style={{
+        width: 480,
+        padding: 24,
+        background: "#f8fafc",
+        borderRadius: 8,
+      }}
+    >
       <ChartContainer theme={cleanTheme} height={180}>
         <LineChart
           categories={DAYS}

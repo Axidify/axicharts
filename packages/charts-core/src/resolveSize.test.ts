@@ -22,6 +22,17 @@ describe("resolveSize", () => {
     ).toEqual({ width: 320, height: 180 });
   });
 
+  it("does not let minHeight override explicit height", () => {
+    expect(
+      resolveSize({
+        measuredWidth: 138,
+        measuredHeight: 200,
+        height: 56,
+        minHeight: 200,
+      }),
+    ).toEqual({ width: 138, height: 56 });
+  });
+
   it("clamps to min and max height", () => {
     expect(
       resolveSize({

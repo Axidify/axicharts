@@ -22,8 +22,29 @@ function buildOptions({
   fill,
   showAxes = true,
 }: UPlotLineProps): uPlot.Options {
-  const gridStroke = withAlpha(GRID_COLOR, theme.grid.opacity);
   const compact = height < 72;
+  const gridOpacity = compact
+    ? Math.min(theme.grid.opacity + 0.35, 0.95)
+    : theme.grid.opacity;
+  const gridStroke = withAlpha(GRID_COLOR, gridOpacity);
+  const gridWidth = compact ? 1 : theme.grid.strokeWidth;
+
+  const compactYGrid = {
+    stroke: gridStroke,
+    width: gridWidth,
+  };
+
+  const compactSplits = compact
+    ? (_u: uPlot, axisIdx: number, min: number, max: number) => {
+        if (axisIdx !== 1) return [];
+        const span = max - min || 1;
+        return [min + span * 0.25, min + span * 0.5, min + span * 0.75];
+      }
+    : undefined;
+
+  const fillOpacity = compact
+    ? Math.min(theme.area.fillOpacity + 0.12, 0.35)
+    : theme.area.fillOpacity;
 
   return {
     width,
@@ -40,7 +61,7 @@ function buildOptions({
           {
             stroke: AXIS_COLOR,
             grid: theme.grid.vertical
-              ? { stroke: gridStroke, width: theme.grid.strokeWidth }
+              ? { stroke: gridStroke, width: gridWidth }
               : { show: false },
             ticks: { show: false },
             values: (_u, ticks) =>
@@ -50,9 +71,8 @@ function buildOptions({
           },
           {
             stroke: AXIS_COLOR,
-            grid: theme.grid.horizontal
-              ? { stroke: gridStroke, width: theme.grid.strokeWidth }
-              : { show: false },
+            grid: theme.grid.horizontal ? compactYGrid : { show: false },
+            splits: compactSplits,
             ticks: { show: false },
             size: compact ? 0 : 32,
             font: theme.values.monospace
@@ -63,15 +83,13 @@ function buildOptions({
       : [
           {
             show: false,
-            grid: theme.grid.horizontal
-              ? { stroke: gridStroke, width: theme.grid.strokeWidth }
-              : { show: false },
+            splits: compactSplits,
+            grid: theme.grid.horizontal ? compactYGrid : { show: false },
           },
           {
             show: false,
-            grid: theme.grid.horizontal
-              ? { stroke: gridStroke, width: theme.grid.strokeWidth }
-              : { show: false },
+            splits: compactSplits,
+            grid: theme.grid.horizontal ? compactYGrid : { show: false },
           },
         ],
     series: [
@@ -82,7 +100,7 @@ function buildOptions({
           label: item.name,
           stroke: color,
           width: theme.line.strokeWidth,
-          fill: fill && theme.area.show ? withAlpha(color, theme.area.fillOpacity) : undefined,
+          fill: fill && theme.area.show ? withAlpha(color, fillOpacity) : undefined,
           points: { show: false },
         };
       }),

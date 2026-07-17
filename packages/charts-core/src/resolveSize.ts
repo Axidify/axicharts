@@ -38,7 +38,11 @@ export function resolveSize(constraints: SizeConstraints): ChartSize {
     height = width / constraints.aspectRatio;
   }
 
-  if (typeof constraints.minHeight === "number") {
+  // Explicit height wins over minHeight (mini grid cells, sparklines).
+  if (
+    typeof constraints.minHeight === "number" &&
+    typeof constraints.height !== "number"
+  ) {
     height = Math.max(height, constraints.minHeight);
   }
 

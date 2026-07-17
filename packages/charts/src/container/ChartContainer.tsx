@@ -89,6 +89,7 @@ export function ChartContainer({
           minHeight: height === undefined ? minHeight : undefined,
           maxHeight,
           position: "relative",
+          overflow: height !== undefined ? "hidden" : undefined,
           ...style,
         }}
       >

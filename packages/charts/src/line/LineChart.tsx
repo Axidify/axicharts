@@ -32,7 +32,12 @@ export function LineChart({
   return (
     <div
       aria-label={series.map((item) => item.name).join(", ")}
-      style={{ width: size.width, height: size.height }}
+      style={{
+        width: size.width,
+        height: size.height,
+        position: "relative",
+        overflow: "hidden",
+      }}
     >
       <UPlotLine
         width={Math.floor(size.width)}

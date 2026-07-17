@@ -49,13 +49,14 @@ function Panel({
       <ChartContainer
         theme={industrialTheme}
         mode="live"
-        height={52}
+        height={56}
         width="100%"
         debounceMs={16}
       >
         <LineChart
           categories={DAYS}
           series={[{ name: label, data, tone }]}
+          fill
           showAxes={false}
         />
       </ChartContainer>
@@ -130,8 +131,8 @@ function RichOpsMockup(): ReactElement {
         />
       </div>
 
-      <div style={{ marginBottom: 8 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
           <Stat
             value={`${latency[latency.length - 1]?.toFixed(0)} ms`}
             label="p95 peak"
@@ -162,6 +163,7 @@ function RichOpsMockup(): ReactElement {
             series={[
               { name: "errors/min", data: errors, tone: "warning" },
             ]}
+            fill
             valueSuffix="/min"
           />
         </ChartContainer>
