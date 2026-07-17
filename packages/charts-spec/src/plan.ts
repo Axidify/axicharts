@@ -15,6 +15,12 @@ function inferChartType(metric: MetricProfile): PanelSpec["type"] {
   if (name.includes("correlation") || name.includes("heatmap")) {
     return "heatmap";
   }
+  if (name.includes("funnel") || name.includes("pipeline") || name.includes("stage")) {
+    return "funnel";
+  }
+  if (name.includes("burndown") || name.includes("burn")) {
+    return "line";
+  }
   if (name.includes("share") || name.includes("mix") || name.includes("split")) {
     return "pie";
   }
@@ -88,6 +94,7 @@ export function suggestTemplate(profile: DataProfile): string {
   );
 
   if (tags.some((tag) => tag.includes("vertical:plugins"))) return "plugins-wall";
+  if (tags.some((tag) => tag.includes("vertical:program"))) return "program-dashboard";
   if (tags.some((tag) => tag.includes("vertical:finance"))) return "finance-pnl";
   if (tags.some((tag) => tag.includes("vertical:trading"))) return "trading-blotter";
   if (tags.some((tag) => tag.includes("vertical:resources"))) return "capacity-grid";

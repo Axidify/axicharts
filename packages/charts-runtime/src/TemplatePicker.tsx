@@ -11,6 +11,7 @@ const TEMPLATE_LABELS: Record<TemplateId, string> = {
   "ops-2x2": "Ops 2×2",
   "line-overview": "Line overview",
   "plugins-wall": "Plugins wall",
+  "program-dashboard": "Program dashboard",
 };
 
 export type TemplatePickerProps = {

@@ -2,6 +2,7 @@ import type { ChartTypeRegistration } from "./types";
 import { AreaChart } from "../area/AreaChart";
 import { BarChart } from "../bar/BarChart";
 import { CandlestickChart } from "../candlestick/CandlestickChart";
+import { FunnelChart } from "../funnel/FunnelChart";
 import { HeatmapChart } from "../heatmap/HeatmapChart";
 import { LineChart } from "../line/LineChart";
 import { PieChart } from "../pie/PieChart";
@@ -17,6 +18,11 @@ const builtins: ChartTypeRegistration[] = [
   { type: "bar", Chart: BarChart as ChartTypeRegistration["Chart"], defaultRenderer: "canvas" },
   { type: "area", Chart: AreaChart as ChartTypeRegistration["Chart"], defaultRenderer: "canvas" },
   { type: "pie", Chart: PieChart as ChartTypeRegistration["Chart"], defaultRenderer: "canvas" },
+  {
+    type: "funnel",
+    Chart: FunnelChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
   {
     type: "scatter",
     Chart: ScatterChart as ChartTypeRegistration["Chart"],

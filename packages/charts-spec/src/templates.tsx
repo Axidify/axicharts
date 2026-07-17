@@ -17,6 +17,10 @@ import {
 import type { DashboardSpec, TemplateId, ThemeName, ChartMode, PanelSpec } from "./types";
 import { compilePanel } from "./compilePanel";
 import { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
+import {
+  DEFAULT_PROGRAM_DASHBOARD_DATA,
+  PROGRAM_DASHBOARD_PANELS,
+} from "./programDashboardData";
 import { resolveTheme } from "./themes";
 
 type KpiSpec = {
@@ -451,6 +455,93 @@ export function pluginsWallTemplate(
   );
 }
 
+export function programDashboardTemplate(
+  data: Record<string, unknown>,
+  theme: ThemeName = "clean",
+  mode: ChartMode = "interactive",
+): ReactElement {
+  const kpis =
+    (data.kpis as KpiSpec[]) ?? DEFAULT_PROGRAM_DASHBOARD_DATA.kpis;
+  const panels =
+    (data.panels as PanelSpec[] | undefined) ??
+    PROGRAM_DASHBOARD_PANELS.filter((panel) => panel.type !== "stat");
+
+  return createElement(
+    "div",
+    {
+      style: {
+        maxWidth: 900,
+        border: "1px solid #e2e8f0",
+        borderRadius: 8,
+        background: "#ffffff",
+        overflow: "hidden",
+      },
+    },
+    createElement(
+      "div",
+      {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          gap: 12,
+          padding: 16,
+        },
+      },
+      ...kpis.map((kpi) =>
+        createElement(Stat, {
+          key: kpi.label,
+          value: kpi.value,
+          label: kpi.label,
+          tone: kpi.tone,
+        }),
+      ),
+    ),
+    createElement(
+      "div",
+      {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1.4fr 1fr",
+          gap: 12,
+          padding: "0 16px 16px",
+        },
+      },
+      ...panels.slice(0, 2).map((panel, index) =>
+        createElement(
+          "div",
+          { key: panel.title ?? `panel-${index}` },
+          compilePanel(panel, data, { theme, mode }),
+        ),
+      ),
+    ),
+    createElement(
+      "div",
+      {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 12,
+          padding: "0 16px 16px",
+        },
+      },
+      ...panels.slice(2, 4).map((panel, index) =>
+        createElement(
+          "div",
+          { key: panel.title ?? `dist-${index}` },
+          compilePanel(panel, data, { theme, mode }),
+        ),
+      ),
+    ),
+    createElement(
+      "div",
+      { style: { padding: "0 16px 16px" } },
+      panels[4]
+        ? compilePanel(panels[4], data, { theme, mode })
+        : null,
+    ),
+  );
+}
+
 const TEMPLATE_RENDERERS: Record<
   TemplateId,
   (data: Record<string, unknown>, theme: ThemeName, mode?: ChartMode) => ReactElement
@@ -461,6 +552,8 @@ const TEMPLATE_RENDERERS: Record<
   "capacity-grid": (data, theme) => capacityGridTemplate(data, theme),
   "trading-blotter": (data, theme) => tradingBlotterTemplate(data, theme),
   "plugins-wall": (data, theme, mode) => pluginsWallTemplate(data, theme, mode),
+  "program-dashboard": (data, theme, mode) =>
+    programDashboardTemplate(data, theme, mode),
 };
 
 export function compileTemplate(

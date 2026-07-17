@@ -6,9 +6,22 @@ import { GeoMapChart, SAMPLE_GEO_REGIONS } from "@axicharts/charts-geo";
 import "@axicharts/charts-geo/register";
 import { SankeyChart, SAMPLE_SANKEY_FLOW } from "@axicharts/charts-sankey";
 import "@axicharts/charts-sankey/register";
-import { TankChart } from "@axicharts/charts-tank";
-import "@axicharts/charts-tank/register";
+import { GanttChart } from "@axicharts/charts-gantt";
+import "@axicharts/charts-gantt/register";
 import { cleanTheme, industrialTheme } from "@axicharts/charts-theme";
+
+const GANTT_CODE = `import "@axicharts/charts-gantt/register";
+import { GanttChart } from "@axicharts/charts-gantt";
+
+<ChartContainer theme={cleanTheme} height={220} width="100%">
+  <GanttChart
+    tasks={[
+      { name: "Design", start: 0, end: 5, progress: 1 },
+      { name: "Build", start: 4, end: 14, progress: 0.6 },
+    ]}
+    milestones={[{ label: "Beta", at: 10 }]}
+  />
+</ChartContainer>`;
 
 const TANK_CODE = `import "@axicharts/charts-tank/register";
 import { TankChart } from "@axicharts/charts-tank";
@@ -134,6 +147,23 @@ export function PluginsPage(): ReactElement {
           </ChartContainer>
         }
         code={SANKEY_CODE}
+      />
+      <PluginSection
+        title="@axicharts/charts-gantt"
+        subtitle="Program timeline (Gantt)"
+        preview={
+          <ChartContainer theme={cleanTheme} width={520} height={220}>
+            <GanttChart
+              tasks={[
+                { name: "Design", start: 0, end: 5, progress: 1, tone: "success" },
+                { name: "Build", start: 4, end: 14, progress: 0.55, tone: "info" },
+                { name: "QA", start: 12, end: 16, progress: 0.15, tone: "warning" },
+              ]}
+              milestones={[{ label: "Beta", at: 10, tone: "warning" }]}
+            />
+          </ChartContainer>
+        }
+        code={GANTT_CODE}
       />
     </div>
   );

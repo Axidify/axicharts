@@ -2,7 +2,27 @@ import { describe, expect, it } from "vitest";
 import { render } from "@testing-library/react";
 import { registerBuiltinChartTypes } from "@axicharts/charts/registry";
 import { registerTankChart } from "@axicharts/charts-tank";
-import { compileTemplate } from "./templates";
+import { registerGanttChart } from "@axicharts/charts-gantt";
+import { compileTemplate, listTemplates } from "./templates";
+
+describe("listTemplates", () => {
+  it("includes program-dashboard", () => {
+    expect(listTemplates()).toContain("program-dashboard");
+  });
+});
+
+describe("programDashboardTemplate", () => {
+  it("compiles burndown and gantt panels", () => {
+    registerBuiltinChartTypes();
+    registerGanttChart();
+
+    const view = compileTemplate("program-dashboard", {});
+    const { container } = render(view);
+    expect(container.textContent).toContain("Points left");
+    expect(container.textContent).toContain("Velocity");
+    expect(container.textContent).toContain("On-time");
+  });
+});
 
 describe("pluginsWallTemplate", () => {
   it("compiles registered plugin panels from template data", () => {

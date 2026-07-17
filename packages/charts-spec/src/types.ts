@@ -20,6 +20,7 @@ export type PanelChartType =
   | "area"
   | "bar"
   | "pie"
+  | "funnel"
   | "waterfall"
   | "candlestick"
   | "heatmap"
@@ -74,7 +75,8 @@ export type TemplateId =
   | "capacity-grid"
   | "ops-2x2"
   | "line-overview"
-  | "plugins-wall";
+  | "plugins-wall"
+  | "program-dashboard";
 
 export type DashboardSpec = {
   specVersion?: number;

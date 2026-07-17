@@ -32,7 +32,9 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
           ? "BarChart"
           : spec.type === "pie"
             ? "PieChart"
-            : spec.type === "waterfall"
+            : spec.type === "funnel"
+              ? "FunnelChart"
+              : spec.type === "waterfall"
               ? "WaterfallChart"
               : spec.type === "candlestick"
                 ? "CandlestickChart"
@@ -65,6 +67,13 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     const nameField = encoding?.name?.field ?? "name";
     const valueField = encoding?.value?.field ?? "value";
     chartBody = `slices={${dataVar}.map((row) => ({
+        name: String(row.${nameField}),
+        value: Number(row.${valueField}),
+      }))}`;
+  } else if (spec.type === "funnel") {
+    const nameField = encoding?.name?.field ?? "name";
+    const valueField = encoding?.value?.field ?? "value";
+    chartBody = `stages={${dataVar}.map((row) => ({
         name: String(row.${nameField}),
         value: Number(row.${valueField}),
       }))}`;

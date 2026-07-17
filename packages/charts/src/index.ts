@@ -9,6 +9,11 @@ export { AreaChart, type AreaChartProps } from "./area/AreaChart";
 export { BarChart, type BarChartProps } from "./bar/BarChart";
 export { PieChart, type PieChartProps, type PieSlice } from "./pie/PieChart";
 export {
+  FunnelChart,
+  type FunnelChartProps,
+  type FunnelStage,
+} from "./funnel/FunnelChart";
+export {
   ScatterChart,
   type ScatterChartProps,
   type ScatterPoint,

@@ -8,6 +8,7 @@ import {
   HeatmapChart,
   LineChart,
   PieChart,
+  FunnelChart,
   ScatterChart,
   Stat,
   TreemapChart,
@@ -158,6 +159,25 @@ export function compilePanel(
         resolved,
         createElement(ScatterChart, {
           series: scatterSeries,
+          ...props,
+        }),
+        options,
+      );
+    }
+
+    case "funnel": {
+      const nameField = resolved.encoding?.name?.field ?? "name";
+      const valueField = resolved.encoding?.value?.field ?? "value";
+      const stages =
+        (props.stages as Parameters<typeof FunnelChart>[0]["stages"]) ??
+        rows.map((row) => ({
+          name: String(row[nameField]),
+          value: Number(row[valueField]),
+        }));
+      return wrapChart(
+        resolved,
+        createElement(FunnelChart, {
+          stages,
           ...props,
         }),
         options,

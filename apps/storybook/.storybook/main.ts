@@ -43,6 +43,7 @@ const config: StorybookConfig = {
           "@axicharts/charts-geo": path.resolve(root, "packages/charts-geo/src"),
           "@axicharts/charts-andon": path.resolve(root, "packages/charts-andon/src"),
           "@axicharts/charts-sankey": path.resolve(root, "packages/charts-sankey/src"),
+          "@axicharts/charts-gantt": path.resolve(root, "packages/charts-gantt/src"),
         },
       },
     });

@@ -1,6 +1,7 @@
 import {
   BarChart,
   CandlestickChart,
+  FunnelChart,
   HeatmapChart,
   LineChart,
   PieChart,
@@ -20,6 +21,7 @@ import { CanvasRenderer } from "echarts/renderers";
 echarts.use([
   BarChart,
   CandlestickChart,
+  FunnelChart,
   HeatmapChart,
   LineChart,
   PieChart,
@@ -35,7 +37,9 @@ echarts.use([
 
 export { buildDataZoom, type BuildDataZoomInput } from "./dataZoom";
 export { EChartsCandlestick, type EChartsCandlestickProps } from "./EChartsCandlestick";
+export { EChartsFunnel, type EChartsFunnelProps } from "./EChartsFunnel";
 export { EChartsTreemap, type EChartsTreemapProps } from "./EChartsTreemap";
+export type { FunnelStage } from "./funnelTypes";
 export { EChartsScatter, type EChartsScatterProps } from "./EChartsScatter";
 export { EChartsHeatmap, type EChartsHeatmapProps } from "./EChartsHeatmap";
 export { EChartsPie, type EChartsPieProps } from "./EChartsPie";
