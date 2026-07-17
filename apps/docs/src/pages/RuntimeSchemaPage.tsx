@@ -97,6 +97,9 @@ export function RuntimeSchemaPage(): ReactElement {
           <li>
             <a href={`${base}examples/ops-dashboard.share.json`}>ops-dashboard.share.json</a>
           </li>
+          <li>
+            <Link to="/runtime/import">Import gallery</Link> — dual-gate preview for all examples
+          </li>
         </ul>
         <div style={{ marginTop: 12 }}>
           <CodeBlock>{SCHEMA_IMPORT_CODE}</CodeBlock>

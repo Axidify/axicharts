@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { hostedImportPresetUrl, HOSTED_IMPORT_PRESETS } from "../schemaUrls";
+import { hostedImportPresetUrl, HOSTED_IMPORT_PRESETS, localImportPresetUrl } from "../schemaUrls";
 import { serializeDashboardExport } from "../workspace/share";
 import {
   detectImportShape,
@@ -102,6 +102,13 @@ describe("hosted import presets", () => {
     const preset = HOSTED_IMPORT_PRESETS[0]!;
     expect(hostedImportPresetUrl(preset)).toBe(
       "https://axidify.github.io/axicharts/examples/ops-embed.runtime.json",
+    );
+  });
+
+  it("builds local mirror URLs", () => {
+    const preset = HOSTED_IMPORT_PRESETS[0]!;
+    expect(localImportPresetUrl(preset, "/axicharts/examples/")).toBe(
+      "/axicharts/examples/ops-embed.runtime.json",
     );
   });
 });

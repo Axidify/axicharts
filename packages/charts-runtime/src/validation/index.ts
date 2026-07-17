@@ -4,6 +4,7 @@ import {
   HOSTED_EXAMPLES_BASE_URL,
   HOSTED_IMPORT_PRESETS,
   hostedImportPresetUrl,
+  localImportPresetUrl,
   type HostedImportPreset,
 } from "../schemaUrls";
 import {
@@ -34,6 +35,7 @@ export {
   HOSTED_EXAMPLES_BASE_URL,
   HOSTED_IMPORT_PRESETS,
   hostedImportPresetUrl,
+  localImportPresetUrl,
   RUNTIME_SPEC_SCHEMA_URL,
   SHARE_EXPORT_SCHEMA_URL,
   type HostedImportPreset,
@@ -177,3 +179,10 @@ export function validateShareExportDualJson(json: string): PortableImportValidat
 
 /** @deprecated Use validatePortableImportJson */
 export const validateShareImportJson = validatePortableImportJson;
+
+export {
+  fetchImportPreset,
+  type FetchImportPresetOptions,
+  type FetchImportPresetResult,
+  type ImportPresetSource,
+} from "./importPresets";

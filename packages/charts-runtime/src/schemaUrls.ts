@@ -23,6 +23,11 @@ export function hostedImportPresetUrl(preset: HostedImportPreset): string {
   return `${HOSTED_EXAMPLES_BASE_URL}${preset.filename}`;
 }
 
+export function localImportPresetUrl(preset: HostedImportPreset, baseUrl: string): string {
+  const normalized = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  return `${normalized}${preset.filename}`;
+}
+
 export type WithSchemaHint<T extends Record<string, unknown>> = T & {
   $schema: string;
 };

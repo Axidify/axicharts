@@ -84,6 +84,8 @@ export function RuntimePage(): ReactElement {
         Layer 3 embed SDK — bind REST, WebSocket, MQTT, historian, or static data to charts-spec
         templates with stale overlays and alarm chrome.{" "}
         <Link to="/runtime/schema">Runtime JSON schema & validation →</Link>
+        {" · "}
+        <Link to="/runtime/import">Import gallery →</Link>
       </p>
 
       <Section title="Data adapters" subtitle="connectSource + hooks">

@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import {
-  hostedImportPresetUrl,
+  fetchImportPreset,
   HOSTED_IMPORT_PRESETS,
   RUNTIME_SPEC_SCHEMA_URL,
   SHARE_EXPORT_SCHEMA_URL,
   validatePortableImportJson,
+  type ImportPresetSource,
   type ShareExport,
 } from "@axicharts/charts-runtime/validation";
+import { LOCAL_IMPORT_FIXTURES } from "./importPresetFixtures";
 import { ErrorList, importSummary, LayerStatus } from "./validationChrome";
 
 const overlayStyle = {
@@ -49,6 +51,12 @@ export type ImportDialogProps = {
   onApply: (exported: ShareExport) => void;
 };
 
+function presetSourceLabel(source: ImportPresetSource): string {
+  if (source === "hosted") return "GitHub Pages";
+  if (source === "local") return "local mirror";
+  return "bundled fixture";
+}
+
 export function ImportDialog({
   open,
   initialJson = "",
@@ -60,6 +68,7 @@ export function ImportDialog({
   const [filename, setFilename] = useState(initialFilename);
   const [loadingPresetId, setLoadingPresetId] = useState<string | null>(null);
   const [presetError, setPresetError] = useState<string | null>(null);
+  const [presetSource, setPresetSource] = useState<ImportPresetSource | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -68,6 +77,7 @@ export function ImportDialog({
       setFilename(initialFilename);
       setPresetError(null);
       setLoadingPresetId(null);
+      setPresetSource(null);
     }
   }, [open, initialJson, initialFilename]);
 
@@ -78,6 +88,7 @@ export function ImportDialog({
 
   const loadFile = async (file: File): Promise<void> => {
     setPresetError(null);
+    setPresetSource(null);
     setFilename(file.name);
     setJsonText(await file.text());
   };
@@ -88,14 +99,15 @@ export function ImportDialog({
 
     setLoadingPresetId(preset.id);
     setPresetError(null);
+    setPresetSource(null);
 
     try {
-      const response = await fetch(hostedImportPresetUrl(preset));
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      setJsonText(await response.text());
+      const result = await fetchImportPreset(preset, {
+        localFixtures: LOCAL_IMPORT_FIXTURES,
+      });
+      setJsonText(result.json);
       setFilename(preset.filename);
+      setPresetSource(result.source);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setPresetError(`Failed to load ${preset.label}: ${message}`);
@@ -119,6 +131,11 @@ export function ImportDialog({
             </div>
             <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
               {filename ? `${filename} · ` : null}
+              {presetSource ? (
+                <span style={{ color: "#cbd5e1" }}>
+                  source: {presetSourceLabel(presetSource)} ·{" "}
+                </span>
+              ) : null}
               {hasInput ? (
                 <>
                   <LayerStatus
@@ -204,6 +221,7 @@ export function ImportDialog({
           value={jsonText}
           onChange={(event) => {
             setPresetError(null);
+            setPresetSource(null);
             setJsonText(event.target.value);
           }}
           spellCheck={false}

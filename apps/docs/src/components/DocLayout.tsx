@@ -8,6 +8,7 @@ const links = [
   { to: "/spec", label: "Spec layer" },
   { to: "/runtime", label: "Runtime" },
   { to: "/runtime/schema", label: "Runtime schema" },
+  { to: "/runtime/import", label: "Import gallery" },
   { to: "/plugins", label: "Plugins" },
   { to: "/packages", label: "Packages" },
 ] as const;
