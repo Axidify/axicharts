@@ -33,6 +33,29 @@ export { connectSource } from "./connectSource";
 export { mergeMosaicData, pluckMosaicData } from "./mosaicData";
 export { readAlarms } from "./readAlarms";
 export {
+  addDashboard,
+  addWorkspace,
+  createDefaultDashboard,
+  createDefaultWorkspaceStore,
+  deleteDashboard,
+  getActiveDashboard,
+  getActiveWorkspace,
+  loadWorkspaceStore,
+  parseDashboardSpec,
+  persistWorkspaceStore,
+  renameDashboard,
+  saveDashboardSpec,
+  selectDashboard,
+  selectWorkspace,
+} from "./workspace/store";
+export {
+  DEFAULT_WORKSPACE_STORE_KEY,
+  LEGACY_RUNTIME_SPEC_KEY,
+  type SavedDashboard,
+  type Workspace,
+  type WorkspaceStore,
+} from "./workspace/types";
+export {
   parseRuntimeSpec,
   serializeRuntimeSpec,
   toPortableRuntimeSpec,

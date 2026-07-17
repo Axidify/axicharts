@@ -3,69 +3,30 @@ import type { TemplateId } from "@axicharts/charts-spec";
 import {
   RuntimeDashboard,
   TemplatePicker,
+  addDashboard,
+  addWorkspace,
+  getActiveDashboard,
+  loadWorkspaceStore,
+  parseDashboardSpec,
   parseRuntimeSpec,
+  persistWorkspaceStore,
+  renameDashboard,
+  saveDashboardSpec,
+  selectDashboard,
+  selectWorkspace,
   serializeRuntimeSpec,
   type RuntimeDashboardSpec,
+  type WorkspaceStore,
 } from "@axicharts/charts-runtime";
 import { PluginStrip } from "./PluginStrip";
-
-const STORAGE_KEY = "dashboarder.runtime.spec";
-
-const CATEGORIES = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"];
-
-function mutateHistorianTags(data: Record<string, unknown>): Record<string, unknown> {
-  const tags =
-    (data.tags as Array<{
-      name: string;
-      timestamps: string[];
-      values: number[];
-      suffix?: string;
-      tone?: string;
-    }>) ?? [];
-
-  return {
-    tags: tags.map((tag) => {
-      const values = [...tag.values];
-      const last = values[values.length - 1] ?? 0;
-      values.push(Math.max(0, last + (Math.random() - 0.5) * 8));
-      if (values.length > CATEGORIES.length) values.shift();
-      return {
-        ...tag,
-        timestamps: CATEGORIES,
-        values,
-      };
-    }),
-  };
-}
-
-const FINANCE_DATA = {
-  kpis: [
-    { value: "$1.33M", label: "Net revenue" },
-    { value: "62.4%", label: "Gross margin", tone: "success" },
-    { value: "+18%", label: "QoQ growth" },
-  ],
-  waterfall: [
-    { name: "Q1", value: 1100000, isTotal: true },
-    { name: "New ARR", value: 240000 },
-    { name: "Churn", value: -80000, tone: "critical" },
-    { name: "Q2", value: 1330000, isTotal: true },
-  ],
-  categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  revenue: [820, 932, 901, 1034, 1290, 1330],
-};
-
-const OPS_DATA = {
-  categories: CATEGORIES,
-  cells: [
-    { title: "CPU", data: [22, 28, 31, 34, 30, 34, 32], suffix: "%" },
-    { title: "Memory", data: [55, 58, 60, 59, 61, 62, 61], suffix: "%" },
-    { title: "Errors", data: [1, 2, 5, 3, 2, 4, 3], suffix: "/min", tone: "warning" },
-    { title: "p95", data: [42, 38, 55, 49, 62, 58, 71], suffix: "ms" },
-  ],
-};
-
-type LayoutMode = "embed" | "mosaic";
-type FeedMode = "static" | "historian";
+import { WorkspaceSidebar } from "./WorkspaceSidebar";
+import {
+  buildRuntimeSpec,
+  defaultSeedSpec,
+  hydrateRuntimeSpec,
+  type FeedMode,
+  type LayoutMode,
+} from "./runtime/buildRuntimeSpec";
 
 const buttonStyle = {
   fontSize: 12,
@@ -77,141 +38,93 @@ const buttonStyle = {
   cursor: "pointer",
 } as const;
 
+function applyDashboardMeta(
+  dashboard: ReturnType<typeof getActiveDashboard>,
+  setLayout: (layout: LayoutMode) => void,
+  setFeed: (feed: FeedMode) => void,
+  setTemplate: (template: TemplateId) => void,
+): void {
+  if (!dashboard.meta) return;
+  setLayout(dashboard.meta.layout);
+  setFeed(dashboard.meta.feed);
+  if (dashboard.meta.template) {
+    setTemplate(dashboard.meta.template as TemplateId);
+  }
+}
+
 export function App(): ReactElement {
+  const [store, setStore] = useState<WorkspaceStore | null>(null);
   const [template, setTemplate] = useState<TemplateId>("ops-2x2");
   const [layout, setLayout] = useState<LayoutMode>("embed");
   const [feed, setFeed] = useState<FeedMode>("historian");
-  const [importedSpec, setImportedSpec] = useState<RuntimeDashboardSpec | null>(null);
+  const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return;
-    try {
-      setImportedSpec(parseRuntimeSpec(saved));
-    } catch {
-      localStorage.removeItem(STORAGE_KEY);
-    }
+    const loaded = loadWorkspaceStore(localStorage, undefined, defaultSeedSpec());
+    setStore(loaded);
+    applyDashboardMeta(getActiveDashboard(loaded), setLayout, setFeed, setTemplate);
   }, []);
 
-  const builtSpec = useMemo((): RuntimeDashboardSpec => {
-    const historianSource = {
-      type: "historian" as const,
-      url: "/api/historian/tags",
-      tags: ["cpu", "memory", "errors", "p95"],
-      windowMs: 3_600_000,
-      intervalMs: 2000,
-      mapResponse: (payload: unknown) => {
-        if (feed === "static") {
-          return OPS_DATA;
-        }
-        const record = payload as Record<string, unknown>;
-        const tags = record.tags as Array<{
-          name: string;
-          timestamps: string[];
-          values: number[];
-          suffix?: string;
-          tone?: string;
-        }>;
-        return {
-          categories: tags[0]?.timestamps ?? CATEGORIES,
-          cells: tags.map((tag) => ({
-            title: tag.name,
-            data: tag.values,
-            suffix: tag.suffix,
-            tone: tag.tone,
-          })),
-        };
-      },
-      fetch: async () =>
-        ({
-          ok: true,
-          json: async () =>
-            feed === "static"
-              ? { tags: [] }
-              : mutateHistorianTags({
-                  tags: [
-                    { name: "CPU", timestamps: CATEGORIES, values: [22, 28, 31, 34, 30, 34, 32], suffix: "%" },
-                    { name: "Memory", timestamps: CATEGORIES, values: [55, 58, 60, 59, 61, 62, 61], suffix: "%" },
-                    {
-                      name: "Errors",
-                      timestamps: CATEGORIES,
-                      values: [1, 2, 5, 3, 2, 4, 3],
-                      suffix: "/min",
-                      tone: "warning",
-                    },
-                    { name: "p95", timestamps: CATEGORIES, values: [42, 38, 55, 49, 62, 58, 71], suffix: "ms" },
-                  ],
-                }),
-        }) as Response,
-    };
+  const builtSpec = useMemo(
+    () => buildRuntimeSpec({ template, layout, feed }),
+    [template, layout, feed],
+  );
 
-    if (layout === "mosaic") {
-      return {
-        layout: "mosaic",
-        wall: {
-          title: "Packaging Line 3",
-          subtitle: feed === "historian" ? "Historian · 2s window" : "Static snapshot",
-          theme: "industrial",
-          mode: feed === "historian" ? "live" : "interactive",
-          columns: 2,
-          staleAfterMs: 5000,
-          dataSource: feed === "historian" ? historianSource : undefined,
-          data: feed === "static" ? { ops: OPS_DATA, finance: FINANCE_DATA } : undefined,
-          cells:
-            feed === "historian"
-              ? [
-                  { id: "ops", template: "ops-2x2", title: "Line 3" },
-                  {
-                    id: "finance",
-                    template: "finance-pnl",
-                    title: "Shift P&L",
-                    data: FINANCE_DATA,
-                  },
-                ]
-              : [
-                  { id: "ops", template: "ops-2x2", title: "Line 3", dataPath: "ops" },
-                  {
-                    id: "finance",
-                    template: "finance-pnl",
-                    title: "Shift P&L",
-                    dataPath: "finance",
-                  },
-                ],
-        },
-      };
-    }
+  const activeSpec = useMemo((): RuntimeDashboardSpec | null => {
+    if (!store) return null;
+    if (dirty) return builtSpec;
+    const dashboard = getActiveDashboard(store);
+    return hydrateRuntimeSpec(parseDashboardSpec(dashboard), feed);
+  }, [store, dirty, builtSpec, feed]);
 
-    const data =
-      template === "finance-pnl"
-        ? FINANCE_DATA
-        : template === "ops-2x2" && feed === "static"
-          ? OPS_DATA
-          : undefined;
+  const persist = (next: WorkspaceStore): void => {
+    setStore(next);
+    persistWorkspaceStore(localStorage, next);
+  };
 
-    return {
-      layout: "embed",
-      dashboard: {
-        title: "Dashboarder runtime",
-        subtitle: feed === "historian" ? "Historian feed" : "Static feed",
-        theme: template === "ops-2x2" ? "industrial" : "clean",
-        mode: feed === "historian" ? "live" : "interactive",
-        template,
-        staleAfterMs: 5000,
-        data: {
-          ...(data ?? {}),
-          alarms: [{ id: "cpu-high", message: "CPU above warn threshold", severity: "warning" }],
-        },
-        dataSource:
-          feed === "historian" && template === "ops-2x2" ? historianSource : undefined,
-      },
-    };
-  }, [feed, layout, template]);
+  const handleSave = (): void => {
+    if (!store || !activeSpec) return;
+    persist(
+      saveDashboardSpec(store, store.activeWorkspaceId, store.activeDashboardId, activeSpec, {
+        meta: { layout, feed, template },
+      }),
+    );
+    setDirty(false);
+  };
 
-  const activeSpec = importedSpec ?? builtSpec;
+  const handleSelectDashboard = (workspaceId: string, dashboardId: string): void => {
+    if (!store) return;
+    const next = selectDashboard(store, workspaceId, dashboardId);
+    persist(next);
+    applyDashboardMeta(getActiveDashboard(next), setLayout, setFeed, setTemplate);
+    setDirty(false);
+  };
+
+  const handleNewDashboard = (): void => {
+    if (!store) return;
+    const name = window.prompt("Dashboard name", "New dashboard");
+    if (!name?.trim()) return;
+    const spec = buildRuntimeSpec({ template, layout, feed });
+    persist(addDashboard(store, store.activeWorkspaceId, name.trim(), spec));
+    setDirty(false);
+  };
+
+  const handleNewWorkspace = (): void => {
+    if (!store) return;
+    const name = window.prompt("Workspace name", "New workspace");
+    if (!name?.trim()) return;
+    const next = addWorkspace(store, name.trim(), defaultSeedSpec());
+    persist(next);
+    setLayout("embed");
+    setFeed("historian");
+    setTemplate("ops-2x2");
+    applyDashboardMeta(getActiveDashboard(next), setLayout, setFeed, setTemplate);
+    setDirty(false);
+  };
 
   const handleExport = (): void => {
+    if (!activeSpec) return;
     const portable = serializeRuntimeSpec(activeSpec);
-    localStorage.setItem(STORAGE_KEY, portable);
     const blob = new Blob([portable], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -222,17 +135,21 @@ export function App(): ReactElement {
   };
 
   const handleImport = (): void => {
+    if (!store) return;
     const next = window.prompt("Paste runtime JSON");
     if (!next) return;
     const parsed = parseRuntimeSpec(next);
-    setImportedSpec(parsed);
-    localStorage.setItem(STORAGE_KEY, serializeRuntimeSpec(parsed));
+    persist(
+      saveDashboardSpec(store, store.activeWorkspaceId, store.activeDashboardId, parsed),
+    );
+    setDirty(false);
   };
 
-  const handleReset = (): void => {
-    setImportedSpec(null);
-    localStorage.removeItem(STORAGE_KEY);
-  };
+  if (!store || !activeSpec) {
+    return <div style={{ padding: 24, color: "#e2e8f0" }}>Loading workspace…</div>;
+  }
+
+  const activeDashboard = getActiveDashboard(store);
 
   return (
     <div style={{ minHeight: "100vh", background: "#0f172a", color: "#e2e8f0" }}>
@@ -248,7 +165,7 @@ export function App(): ReactElement {
         <div>
           <div style={{ fontSize: 18, fontWeight: 700 }}>Dashboarder</div>
           <div style={{ fontSize: 12, color: "#94a3b8" }}>
-            C4 runtime shell · community plugins registered
+            Workspaces · saved dashboards · {dirty ? "unsaved changes" : activeDashboard.name}
           </div>
         </div>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
@@ -256,7 +173,10 @@ export function App(): ReactElement {
             Layout
             <select
               value={layout}
-              onChange={(event) => setLayout(event.target.value as LayoutMode)}
+              onChange={(event) => {
+                setLayout(event.target.value as LayoutMode);
+                setDirty(true);
+              }}
               style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
             >
               <option value="embed">Single embed</option>
@@ -267,7 +187,10 @@ export function App(): ReactElement {
             Feed
             <select
               value={feed}
-              onChange={(event) => setFeed(event.target.value as FeedMode)}
+              onChange={(event) => {
+                setFeed(event.target.value as FeedMode);
+                setDirty(true);
+              }}
               style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
             >
               <option value="historian">Historian (mock)</option>
@@ -275,25 +198,50 @@ export function App(): ReactElement {
             </select>
           </label>
           {layout === "embed" ? (
-            <TemplatePicker value={template} onChange={setTemplate} label="Template" />
+            <TemplatePicker
+              value={template}
+              onChange={(value) => {
+                setTemplate(value);
+                setDirty(true);
+              }}
+              label="Template"
+            />
           ) : null}
+          <button type="button" onClick={handleSave} style={buttonStyle}>
+            Save
+          </button>
           <button type="button" onClick={handleExport} style={buttonStyle}>
             Export
           </button>
           <button type="button" onClick={handleImport} style={buttonStyle}>
-            Import
+            Import JSON
           </button>
-          {importedSpec ? (
-            <button type="button" onClick={handleReset} style={buttonStyle}>
-              Reset
-            </button>
-          ) : null}
         </div>
       </header>
-      <main style={{ padding: 24, maxWidth: 1080, margin: "0 auto" }}>
-        <RuntimeDashboard spec={activeSpec} />
-        <PluginStrip />
-      </main>
+
+      <div style={{ display: "flex" }}>
+        <WorkspaceSidebar
+          store={store}
+          onSelectWorkspace={(workspaceId) => {
+            const next = selectWorkspace(store, workspaceId);
+            persist(next);
+            applyDashboardMeta(getActiveDashboard(next), setLayout, setFeed, setTemplate);
+            setDirty(false);
+          }}
+          onSelectDashboard={handleSelectDashboard}
+          onNewWorkspace={handleNewWorkspace}
+          onNewDashboard={handleNewDashboard}
+          onRenameDashboard={(name) => {
+            persist(
+              renameDashboard(store, store.activeWorkspaceId, store.activeDashboardId, name),
+            );
+          }}
+        />
+        <main style={{ flex: 1, padding: 24, maxWidth: 900 }}>
+          <RuntimeDashboard spec={activeSpec} />
+          <PluginStrip />
+        </main>
+      </div>
     </div>
   );
 }
