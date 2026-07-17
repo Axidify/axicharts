@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import type { ImportShape, ShareExport } from "@axicharts/charts-runtime/validation";
 
 export function LayerStatus({
@@ -68,4 +68,50 @@ export function importSummary(exported: ShareExport, shape: ImportShape | null =
   }
 
   return `Dashboard · ${exported.name}`;
+}
+
+const validateCopyButtonStyle = {
+  fontSize: 11,
+  padding: "4px 10px",
+  borderRadius: 6,
+  border: "1px solid #475569",
+  background: "#1e293b",
+  color: "#e2e8f0",
+  cursor: "pointer",
+  flexShrink: 0,
+} as const;
+
+export function ValidateCommandCopy({
+  command,
+  label = "Copy validate",
+}: {
+  command: string;
+  label?: string;
+}): ReactElement {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async (): Promise<void> => {
+    await navigator.clipboard.writeText(command);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1500);
+  };
+
+  return (
+    <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 6 }}>
+      <code
+        style={{
+          flex: 1,
+          fontFamily: "ui-monospace, monospace",
+          fontSize: 11,
+          color: "#cbd5e1",
+          wordBreak: "break-all",
+        }}
+      >
+        {command}
+      </code>
+      <button type="button" onClick={() => void copy()} style={validateCopyButtonStyle}>
+        {copied ? "Copied" : label}
+      </button>
+    </div>
+  );
 }

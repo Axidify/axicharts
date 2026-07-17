@@ -15,7 +15,7 @@ import {
   shareExportReferencePreset,
   validateShareExportDualJson,
 } from "@axicharts/charts-runtime/validation";
-import { ErrorList, importSummary, LayerStatus } from "./validationChrome";
+import { ErrorList, importSummary, LayerStatus, ValidateCommandCopy } from "./validationChrome";
 
 const overlayStyle = {
   position: "fixed" as const,
@@ -248,9 +248,7 @@ export function ShareDialog({
             <a href={dashboarderImportDeepLink(referencePreset.id)} style={{ color: "#93c5fd" }}>
               Import in app
             </a>
-            <div style={{ marginTop: 6, fontFamily: "ui-monospace, monospace", fontSize: 11 }}>
-              {formatValidatePresetCommand(referencePreset.id)}
-            </div>
+            <ValidateCommandCopy command={formatValidatePresetCommand(referencePreset.id)} />
           </div>
         ) : null}
       </div>

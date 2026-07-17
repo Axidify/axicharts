@@ -11,7 +11,7 @@ import {
   type ShareExport,
 } from "@axicharts/charts-runtime/validation";
 import { LOCAL_IMPORT_FIXTURES } from "./importPresetFixtures";
-import { ErrorList, importSummary, LayerStatus } from "./validationChrome";
+import { ErrorList, importSummary, LayerStatus, ValidateCommandCopy } from "./validationChrome";
 
 const overlayStyle = {
   position: "fixed" as const,
@@ -44,12 +44,6 @@ const validateHintBoxStyle = {
   fontSize: 12,
   color: "#94a3b8",
   lineHeight: 1.7,
-} as const;
-
-const validateHintMonoStyle = {
-  marginTop: 6,
-  fontFamily: "ui-monospace, monospace",
-  fontSize: 11,
 } as const;
 
 const buttonStyle = {
@@ -291,15 +285,16 @@ export function ImportDialog({
           <div style={validateHintBoxStyle}>
             <div>Validate shipped presets in CI:</div>
             {HOSTED_IMPORT_PRESETS.map((preset) => (
-              <div key={preset.id} style={validateHintMonoStyle}>
-                {formatValidatePresetCommand(preset.id)}
-              </div>
+              <ValidateCommandCopy
+                key={preset.id}
+                command={formatValidatePresetCommand(preset.id)}
+              />
             ))}
           </div>
         ) : validateHint ? (
           <div style={validateHintBoxStyle}>
             Validate this import:
-            <div style={validateHintMonoStyle}>{validateHint}</div>
+            <ValidateCommandCopy command={validateHint} />
           </div>
         ) : null}
       </div>
