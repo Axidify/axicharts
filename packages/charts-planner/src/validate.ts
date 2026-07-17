@@ -38,7 +38,7 @@ const PANEL_TYPES = new Set([
 
 const THEMES = new Set(["clean", "live", "industrial", "presentation"]);
 const MODES = new Set(["static", "interactive", "live", "presentation"]);
-const FEEDS = new Set(["static", "historian", "websocket", "mqtt"]);
+const FEEDS = new Set(["static", "historian", "websocket", "mqtt", "rest"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);

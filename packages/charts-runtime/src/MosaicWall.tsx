@@ -8,7 +8,7 @@ import { readAlarms } from "./readAlarms";
 import { AdapterHealthStrip } from "./AdapterHealthStrip";
 import { RuntimeShell } from "./RuntimeShell";
 import { isLiveDataSource } from "./isLiveDataSource";
-import type { MosaicWallSpec } from "./types";
+import type { MosaicWallSpec, AdapterFixtureHrefResolver } from "./types";
 import { useDataSource } from "./useDataSource";
 import { useDataSources, resolveBoundSnapshot } from "./useDataSources";
 
@@ -23,12 +23,14 @@ export type MosaicWallProps = {
   wall: MosaicWallSpec;
   alarmScopeId?: string;
   alarmStorage?: Pick<Storage, "getItem" | "setItem">;
+  adapterFixtureHref?: AdapterFixtureHrefResolver;
 };
 
 export function MosaicWall({
   wall,
   alarmScopeId,
   alarmStorage,
+  adapterFixtureHref,
 }: MosaicWallProps): ReactElement {
   const multiSources = wall.dataSources;
   const snapshots = useDataSources(multiSources);
@@ -91,6 +93,7 @@ export function MosaicWall({
                 id: source.id,
                 label: cell?.title ?? source.id,
                 connection: snapshots[source.id]?.connection ?? "idle",
+                fixtureHref: adapterFixtureHref?.(source.type),
               };
             })}
           />

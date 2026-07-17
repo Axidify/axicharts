@@ -44,7 +44,7 @@ export const OPS_DATA = {
 };
 
 export type LayoutMode = "embed" | "mosaic";
-export type FeedMode = "static" | "historian" | "websocket" | "mqtt";
+export type FeedMode = "static" | "historian" | "websocket" | "mqtt" | "rest";
 export type LiveFeedMode = Exclude<FeedMode, "static">;
 
 const OPS_ALARMS = [
@@ -59,6 +59,8 @@ export function feedSubtitle(feed: LiveFeedMode): string {
   switch (feed) {
     case "historian":
       return "Historian · 2s window";
+    case "rest":
+      return "REST · 2s poll";
     case "websocket":
       return "WebSocket · push";
     case "mqtt":
@@ -156,6 +158,28 @@ export function createHistorianSource() {
   };
 }
 
+export function createRestSource() {
+  let tick = 0;
+
+  return {
+    type: "rest" as const,
+    url: "/api/metrics",
+    intervalMs: 2000,
+    staleAfterMs: 5000,
+    mapResponse: (payload: unknown) => {
+      const record = payload as Record<string, unknown>;
+      return record.cells ? record : mockOpsPayload(tick);
+    },
+    fetch: async () => {
+      tick += 1;
+      return {
+        ok: true,
+        json: async () => mockOpsPayload(tick),
+      } as Response;
+    },
+  };
+}
+
 export function createWebSocketSource() {
   let tick = 0;
 
@@ -245,6 +269,8 @@ export function createLiveSource(feed: LiveFeedMode): DataSourceSpec {
   switch (feed) {
     case "historian":
       return createHistorianSource();
+    case "rest":
+      return createRestSource();
     case "websocket":
       return createWebSocketSource();
     case "mqtt":
@@ -346,7 +372,7 @@ export function buildRuntimeSpec(options: {
   };
 }
 
-const LIVE_SOURCE_TYPES = new Set(["historian", "websocket", "mqtt"]);
+const LIVE_SOURCE_TYPES = new Set(["historian", "rest", "websocket", "mqtt"]);
 
 export function hydrateRuntimeSpec(
   spec: RuntimeDashboardSpec,

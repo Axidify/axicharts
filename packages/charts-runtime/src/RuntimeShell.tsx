@@ -4,6 +4,7 @@ import type { ReactElement, ReactNode } from "react";
 import { StaleBadge, useIsStale } from "@axicharts/charts";
 import { AlarmBanner } from "./AlarmBanner";
 import { ConnectionBadge } from "./ConnectionBadge";
+import { FixtureLink } from "./FixtureLink";
 import { useAlarmState } from "./useAlarmState";
 import type { AlarmItem, ConnectionState } from "./types";
 
@@ -19,6 +20,7 @@ export type RuntimeShellProps = {
   alarmSurface?: "dark" | "light";
   alarmScopeId?: string;
   alarmStorage?: Pick<Storage, "getItem" | "setItem">;
+  fixtureHref?: string;
 };
 
 export function RuntimeShell({
@@ -33,6 +35,7 @@ export function RuntimeShell({
   alarmSurface = "light",
   alarmScopeId,
   alarmStorage,
+  fixtureHref,
 }: RuntimeShellProps): ReactElement {
   const isStale = useIsStale(
     lastUpdatedAt,
@@ -54,8 +57,19 @@ export function RuntimeShell({
     >
       {children}
       {showConnectionBadge ? (
-        <div style={{ position: "absolute", top: 8, left: 8, zIndex: 4 }}>
+        <div
+          style={{
+            position: "absolute",
+            top: 8,
+            left: 8,
+            zIndex: 4,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
           <ConnectionBadge connection={badgeConnection} />
+          {fixtureHref ? <FixtureLink href={fixtureHref} /> : null}
         </div>
       ) : null}
       {error && connection === "error" ? (

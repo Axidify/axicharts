@@ -21,6 +21,7 @@ import {
   runtimeEmbedReferencePreset,
   plannerAdapterReferencePreset,
   feedAdapterGalleryDeepLink,
+  adapterFixtureGalleryDeepLink,
   formatValidatePresetCommand,
   formatValidateFileCommand,
   isShareImportPreset,
@@ -170,8 +171,15 @@ describe("hosted import presets", () => {
       "ops-websocket",
     );
     expect(plannerAdapterReferencePreset({ layout: "embed", feed: "mqtt" })?.id).toBe("ops-mqtt");
+    expect(plannerAdapterReferencePreset({ layout: "embed", feed: "rest" })?.id).toBe("ops-rest");
     expect(feedAdapterGalleryDeepLink("mqtt", "embed")).toBe(
       "https://axidify.github.io/axicharts/runtime/import?preset=ops-mqtt",
+    );
+    expect(feedAdapterGalleryDeepLink("rest", "embed")).toBe(
+      "https://axidify.github.io/axicharts/runtime/import?preset=ops-rest",
+    );
+    expect(adapterFixtureGalleryDeepLink("websocket")).toBe(
+      "https://axidify.github.io/axicharts/runtime/import?preset=ops-websocket",
     );
     expect(feedAdapterGalleryDeepLink("historian", "mosaic")).toBe(
       "https://axidify.github.io/axicharts/runtime/import?preset=ops-mosaic",

@@ -186,7 +186,7 @@ export function runtimeEmbedReferencePreset(
 
 export type PlannerAdapterPlan = {
   layout: "embed" | "mosaic";
-  feed: "static" | "historian" | "websocket" | "mqtt";
+  feed: "static" | "historian" | "websocket" | "mqtt" | "rest";
 };
 
 /** Maps planner layout + feed to the shipped adapter fixture preset. */
@@ -212,6 +212,17 @@ export function feedAdapterGalleryDeepLink(
   if (preset) return docsImportGalleryDeepLink(preset.id, origin);
   const base = origin.endsWith("/") ? origin.slice(0, -1) : origin;
   return `${base}${importGalleryFilterPath({ type: "adapter", value: feed })}`;
+}
+
+/** Docs gallery URL for a runtime adapter type. */
+export function adapterFixtureGalleryDeepLink(
+  adapter: ImportPresetAdapter,
+  origin = DOCS_SITE_ORIGIN,
+): string {
+  const presetId = ADAPTER_FIXTURE_PRESETS[adapter];
+  if (presetId) return docsImportGalleryDeepLink(presetId, origin);
+  const base = origin.endsWith("/") ? origin.slice(0, -1) : origin;
+  return `${base}${importGalleryFilterPath({ type: "adapter", value: adapter })}`;
 }
 
 export function formatValidatePresetCommand(

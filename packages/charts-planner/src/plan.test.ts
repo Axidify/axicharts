@@ -55,6 +55,12 @@ describe("planFromIntent", () => {
     const plan = planFromIntent(profile, "Static CSV snapshot batch report");
     expect(plan.feed).toBe("static");
   });
+
+  it("maps rest polling intent to rest feed", () => {
+    const plan = planFromIntent(profile, "REST API polling /api/metrics endpoint");
+    expect(plan.feed).toBe("rest");
+    expect(plan.template).toBe("ops-2x2");
+  });
 });
 
 describe("planFromProfile", () => {
@@ -100,7 +106,7 @@ describe("planWithProvider", () => {
   });
 
   it("accepts websocket and mqtt feeds from provider JSON", async () => {
-    for (const feed of ["websocket", "mqtt"] as const) {
+    for (const feed of ["websocket", "mqtt", "rest"] as const) {
       const provider = createMockPlannerProvider(
         JSON.stringify({
           template: "ops-2x2",

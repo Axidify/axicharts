@@ -2,12 +2,14 @@
 
 import type { ReactElement } from "react";
 import { ConnectionBadge } from "./ConnectionBadge";
+import { FixtureLink } from "./FixtureLink";
 import type { ConnectionState } from "./types";
 
 export type AdapterHealthItem = {
   id: string;
   label: string;
   connection: ConnectionState;
+  fixtureHref?: string;
 };
 
 export type AdapterHealthStripProps = {
@@ -38,6 +40,7 @@ export function AdapterHealthStrip({ items }: AdapterHealthStripProps): ReactEle
         >
           <ConnectionBadge connection={item.connection} compact />
           {item.label}
+          {item.fixtureHref ? <FixtureLink href={item.fixtureHref} /> : null}
         </span>
       ))}
     </div>

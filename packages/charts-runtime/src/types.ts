@@ -97,6 +97,12 @@ export type DataSourceSpec =
   | MqttDataSourceSpec
   | HistorianDataSourceSpec;
 
+export type DataSourceAdapterType = DataSourceSpec["type"];
+
+export type AdapterFixtureHrefResolver = (
+  adapterType: DataSourceAdapterType,
+) => string | undefined;
+
 export type DataSourceSnapshot = {
   data: Record<string, unknown>;
   connection: ConnectionState;

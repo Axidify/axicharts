@@ -23,9 +23,11 @@ export { RUNTIME_VERSION } from "./types";
 export type {
   AlarmItem,
   AlarmSeverity,
+  AdapterFixtureHrefResolver,
   BoundDataSourceSpec,
   ConnectionState,
   DashboardEmbedSpec,
+  DataSourceAdapterType,
   DataSourceSnapshot,
   DataSourceSpec,
   HistorianDataSourceSpec,

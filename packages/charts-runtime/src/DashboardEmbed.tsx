@@ -6,7 +6,7 @@ import { aggregateSnapshots } from "./aggregateSnapshots";
 import { readAlarms } from "./readAlarms";
 import { RuntimeShell } from "./RuntimeShell";
 import { isLiveDataSource } from "./isLiveDataSource";
-import type { DashboardEmbedSpec } from "./types";
+import type { DashboardEmbedSpec, AdapterFixtureHrefResolver } from "./types";
 import { useDataSource } from "./useDataSource";
 import { useDataSources } from "./useDataSources";
 
@@ -21,12 +21,14 @@ export type DashboardEmbedProps = {
   dashboard: DashboardEmbedSpec;
   alarmScopeId?: string;
   alarmStorage?: Pick<Storage, "getItem" | "setItem">;
+  adapterFixtureHref?: AdapterFixtureHrefResolver;
 };
 
 export function DashboardEmbed({
   dashboard,
   alarmScopeId,
   alarmStorage,
+  adapterFixtureHref,
 }: DashboardEmbedProps): ReactElement {
   const multiSources = dashboard.dataSources;
   const snapshots = useDataSources(multiSources);
@@ -49,6 +51,11 @@ export function DashboardEmbed({
     ...snapshot.data,
   };
 
+  const fixtureHref =
+    singleSource && !multiSources?.length
+      ? adapterFixtureHref?.(singleSource.type)
+      : undefined;
+
   return (
     <RuntimeShell
       connection={snapshot.connection}
@@ -65,6 +72,7 @@ export function DashboardEmbed({
       }
       alarmScopeId={alarmScopeId}
       alarmStorage={alarmStorage}
+      fixtureHref={fixtureHref}
     >
       <Dashboard
         template={dashboard.template}

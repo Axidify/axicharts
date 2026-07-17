@@ -3,7 +3,7 @@
 import type { ReactElement } from "react";
 import { DashboardEmbed } from "./DashboardEmbed";
 import { MosaicWall } from "./MosaicWall";
-import type { RuntimeDashboardSpec } from "./types";
+import type { RuntimeDashboardSpec, AdapterFixtureHrefResolver } from "./types";
 
 export type RuntimeDashboardProps = {
   spec: RuntimeDashboardSpec;
@@ -11,6 +11,7 @@ export type RuntimeDashboardProps = {
   presentation?: boolean;
   alarmScopeId?: string;
   alarmStorage?: Pick<Storage, "getItem" | "setItem">;
+  adapterFixtureHref?: AdapterFixtureHrefResolver;
 };
 
 export function RuntimeDashboard({
@@ -19,6 +20,7 @@ export function RuntimeDashboard({
   presentation = false,
   alarmScopeId,
   alarmStorage,
+  adapterFixtureHref,
 }: RuntimeDashboardProps): ReactElement {
   if (spec.layout === "mosaic") {
     const wall = presentation
@@ -34,6 +36,7 @@ export function RuntimeDashboard({
           wall={wall}
           alarmScopeId={alarmScopeId}
           alarmStorage={alarmStorage}
+          adapterFixtureHref={adapterFixtureHref}
         />
       </div>
     );
@@ -53,6 +56,7 @@ export function RuntimeDashboard({
         dashboard={dashboard}
         alarmScopeId={alarmScopeId}
         alarmStorage={alarmStorage}
+        adapterFixtureHref={adapterFixtureHref}
       />
     </div>
   );

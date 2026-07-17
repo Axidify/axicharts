@@ -23,7 +23,8 @@ import {
 import type { DashboardPlan } from "@axicharts/charts-planner";
 import { EmbedDialog } from "./EmbedDialog";
 import { ImportDialog } from "./ImportDialog";
-import { findImportPreset, feedAdapterGalleryDeepLink, parseImportPresetQuery } from "@axicharts/charts-runtime/validation";
+import { findImportPreset, adapterFixtureGalleryDeepLink, feedAdapterGalleryDeepLink, parseImportPresetQuery } from "@axicharts/charts-runtime/validation";
+import type { DataSourceAdapterType } from "@axicharts/charts-runtime";
 import { PlannerPanel } from "./PlannerPanel";
 import { ShareDialog } from "./ShareDialog";
 import { PluginStrip } from "./PluginStrip";
@@ -49,6 +50,20 @@ const buttonStyle = {
 } as const;
 
 const PLANNER_URL = import.meta.env.VITE_PLANNER_URL as string | undefined;
+
+function resolveAdapterFixtureHref(type: DataSourceAdapterType): string | undefined {
+  switch (type) {
+    case "static":
+    case "rest":
+    case "historian":
+    case "websocket":
+    case "mqtt":
+    case "mock-live":
+      return adapterFixtureGalleryDeepLink(type);
+    default:
+      return undefined;
+  }
+}
 
 function applyPlan(
   plan: DashboardPlan,
@@ -338,6 +353,7 @@ export function App(): ReactElement {
             presentation
             alarmScopeId={activeDashboard.id}
             alarmStorage={localStorage}
+            adapterFixtureHref={resolveAdapterFixtureHref}
           />
         </main>
       </div>
@@ -387,6 +403,7 @@ export function App(): ReactElement {
               style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
             >
               <option value="historian">Historian (mock)</option>
+              <option value="rest">REST (mock)</option>
               <option value="websocket">WebSocket (mock)</option>
               <option value="mqtt">MQTT (mock)</option>
               <option value="static">Static</option>
@@ -498,6 +515,7 @@ export function App(): ReactElement {
             presentation={presentation}
             alarmScopeId={activeDashboard.id}
             alarmStorage={localStorage}
+            adapterFixtureHref={resolveAdapterFixtureHref}
           />
           <PluginStrip />
         </main>
