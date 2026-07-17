@@ -291,6 +291,12 @@ export function plannerFeedGalleryIndexDeepLink(origin = DOCS_SITE_ORIGIN): stri
   return `${base}/runtime/import#planner-feeds`;
 }
 
+/** Docs runtime overview anchor for Dashboarder share → import meta round-trip. */
+export function runtimeShareImportDeepLink(origin = DOCS_SITE_ORIGIN): string {
+  const base = origin.endsWith("/") ? origin.slice(0, -1) : origin;
+  return `${base}/runtime#share-import`;
+}
+
 /** Docs gallery URL for a planner feed row. */
 export function plannerFeedGalleryDeepLink(
   feed: PlannerFeedLike,

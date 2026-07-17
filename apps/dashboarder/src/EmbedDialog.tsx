@@ -7,6 +7,7 @@ import {
   PLANNER_FEED_ROWS,
   plannerAdapterFixtures,
   plannerFeedGalleryDeepLink,
+  runtimeShareImportDeepLink,
   runtimeEmbedReferencePreset,
   feedAdapterGalleryDeepLink,
   validateRuntimeSpecDualJson,
@@ -283,6 +284,39 @@ export function EmbedDialog({
             <ValidateCommandCopy command={formatValidatePresetCommand(referencePreset.id)} />
           </div>
         ) : null}
+
+        <div
+          style={{
+            marginTop: 12,
+            padding: 12,
+            borderRadius: 8,
+            border: "1px solid #334155",
+            background: "#111827",
+            fontSize: 12,
+            color: "#94a3b8",
+            lineHeight: 1.7,
+          }}
+        >
+          Portable runtime JSON omits planner <code>meta</code>. For layout/feed round-trip across
+          workspaces, use <strong>Share</strong> export and re-import —{" "}
+          <a
+            href={runtimeShareImportDeepLink()}
+            style={{ color: "#93c5fd" }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            share ↔ import docs
+          </a>
+          {" · "}
+          <a
+            href={plannerFeedGalleryDeepLink(feed ?? "static")}
+            style={{ color: "#93c5fd" }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            gallery preset
+          </a>
+        </div>
       </div>
     </div>
   );

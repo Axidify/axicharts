@@ -1,10 +1,13 @@
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import {
+  dashboarderImportDeepLink,
   formatValidatePresetCommand,
   HOSTED_IMPORT_PRESETS,
   listImportDeepLinks,
+  runtimeShareImportDeepLink,
   RUNTIME_SPEC_SCHEMA_URL,
+  SHARE_EXPORT_REFERENCE_PRESET,
   SHARE_EXPORT_SCHEMA_URL,
 } from "@axicharts/charts-runtime/validation";
 import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
@@ -133,6 +136,69 @@ export function RuntimeDeepLinkPage(): ReactElement {
             ))}
           </tbody>
         </table>
+      </section>
+
+      <section style={{ marginTop: 28 }} id="share-import">
+        <h2 style={{ fontSize: 16, marginBottom: 12 }}>Share ↔ import round-trip</h2>
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Dashboarder <strong>Share</strong> exports portable JSON with planner <code>meta</code>;{" "}
+          <strong>Import</strong> validates and restores layout, feed, template, and mosaic preset.
+          Embed SDK JSON omits <code>meta</code> — use share exports for builder round-trip. Full
+          flow:{" "}
+          <Link to="/runtime#share-import">runtime overview § share-import</Link>
+          {" · "}
+          <a href={runtimeShareImportDeepLink()}>hosted anchor</a>
+          {" · "}
+          <Link to="/runtime/import#planner-track">planner track notes</Link>.
+        </p>
+        <table style={tableStyle}>
+          <thead>
+            <tr>
+              <th style={cellStyle}>Step</th>
+              <th style={cellStyle}>Preset</th>
+              <th style={cellStyle}>Gallery</th>
+              <th style={cellStyle}>Dashboarder</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={cellStyle}>Share dashboard + meta</td>
+              <td style={cellStyle}>
+                <code>{SHARE_EXPORT_REFERENCE_PRESET.dashboard}</code>
+              </td>
+              <td style={cellStyle}>
+                <Link to={`/runtime/import?preset=${SHARE_EXPORT_REFERENCE_PRESET.dashboard}`}>
+                  import gallery
+                </Link>
+              </td>
+              <td style={cellStyle}>
+                <a href={dashboarderImportDeepLink(SHARE_EXPORT_REFERENCE_PRESET.dashboard)}>
+                  auto-import
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td style={cellStyle}>Share workspace bundle</td>
+              <td style={cellStyle}>
+                <code>{SHARE_EXPORT_REFERENCE_PRESET.workspace}</code>
+              </td>
+              <td style={cellStyle}>
+                <Link to={`/runtime/import?preset=${SHARE_EXPORT_REFERENCE_PRESET.workspace}`}>
+                  import gallery
+                </Link>
+              </td>
+              <td style={cellStyle}>
+                <a href={dashboarderImportDeepLink(SHARE_EXPORT_REFERENCE_PRESET.workspace)}>
+                  auto-import
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p style={{ margin: "12px 0 0", fontSize: 12, color: "#64748b" }}>
+          Storybook: <code>Dashboarder/Share ↔ Import</code> — ShareDialog meta export and
+          ImportDialog restore previews.
+        </p>
       </section>
 
       <section style={{ marginTop: 28 }}>
