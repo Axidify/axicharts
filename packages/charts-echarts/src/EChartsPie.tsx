@@ -3,13 +3,8 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
-import {
-  axisLabelStyle,
-  gridOptions,
-  splitLineStyle,
-  toneColor,
-} from "./themeBridge";
-import { useEChart } from "./useEChart";
+import { gridOptions, hiddenTooltip, toneColor } from "./themeBridge";
+import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { SERIES_PALETTE, type PieSlice } from "./types";
 
 export type EChartsPieProps = {
@@ -19,6 +14,7 @@ export type EChartsPieProps = {
   theme: ChartTheme;
   innerRadius?: number;
   showLabels?: boolean;
+  onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
 export function EChartsPie({
@@ -28,7 +24,10 @@ export function EChartsPie({
   theme,
   innerRadius = 0,
   showLabels = true,
+  onItemHover,
 }: EChartsPieProps): ReactElement {
+  const total = slices.reduce((sum, slice) => sum + slice.value, 0);
+
   const data = slices.map((slice, index) => ({
     name: slice.name,
     value: slice.value,
@@ -39,7 +38,7 @@ export function EChartsPie({
 
   const option: EChartsOption = {
     grid: gridOptions(theme),
-    tooltip: { trigger: "item" },
+    tooltip: hiddenTooltip(),
     series: [
       {
         type: "pie",
@@ -56,7 +55,34 @@ export function EChartsPie({
     ],
   };
 
-  const rootRef = useEChart({ option, width, height });
+  const rootRef = useEChart({
+    option,
+    width,
+    height,
+    onItemHover,
+    formatItemHover: (params) => {
+      const mouse = params.event?.event;
+      if (!mouse || params.name == null) return null;
+      const value = typeof params.value === "number" ? params.value : 0;
+      const share = total > 0 ? ((value / total) * 100).toFixed(1) : "0";
+      return {
+        title: params.name,
+        rows: [
+          {
+            label: "Value",
+            value: String(value),
+            color: params.color,
+          },
+          {
+            label: "Share",
+            value: `${share}%`,
+          },
+        ],
+        left: mouse.offsetX,
+        top: mouse.offsetY,
+      };
+    },
+  });
 
   return (
     <div

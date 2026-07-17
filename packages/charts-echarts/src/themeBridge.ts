@@ -39,12 +39,40 @@ export function splitLineStyle(theme: ChartTheme) {
   };
 }
 
+/** Matches React `Tooltip` chrome — use for item-trigger native tooltips (pie). */
+export function unifiedTooltipStyle() {
+  return {
+    backgroundColor: "rgba(255, 255, 255, 0.96)",
+    borderColor: "#e2e8f0",
+    borderWidth: 1,
+    padding: [8, 10],
+    textStyle: { color: "#0f172a", fontSize: 11 },
+    extraCssText:
+      "border-radius: 6px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);",
+  };
+}
+
+/** Disable ECharts tooltip when React overlay handles hover. */
+export function hiddenTooltip() {
+  return { show: false };
+}
+
+/** @deprecated Use hiddenTooltip + React Tooltip for axis charts. */
 export function tooltipStyle() {
   return {
     trigger: "axis" as const,
-    backgroundColor: "#ffffff",
-    borderColor: "#e2e8f0",
-    textStyle: { color: "#0f172a", fontSize: 12 },
+    ...unifiedTooltipStyle(),
+  };
+}
+
+/** Axis pointer config when React crosshair + tooltip own hover. */
+export function reactAxisPointer() {
+  return {
+    type: "line" as const,
+    trigger: "axis" as const,
+    lineStyle: { opacity: 0 },
+    label: { show: false },
+    triggerTooltip: false,
   };
 }
 

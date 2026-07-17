@@ -32,6 +32,11 @@ export { EChartsHeatmap, type EChartsHeatmapProps } from "./EChartsHeatmap";
 export { EChartsPie, type EChartsPieProps } from "./EChartsPie";
 export { EChartsWaterfall, type EChartsWaterfallProps } from "./EChartsWaterfall";
 export {
+  useEChart,
+  type EChartCursorEvent,
+  type EChartItemHoverEvent,
+} from "./useEChart";
+export {
   SERIES_COLORS,
   SERIES_PALETTE,
   type HeatmapMatrix,

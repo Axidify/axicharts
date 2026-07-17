@@ -42,9 +42,11 @@ export {
   Crosshair,
   Legend,
   Tooltip,
+  EChartsInteractionShell,
   getInteractionChrome,
   type LegendProps,
   type TooltipProps,
+  type TooltipRow,
 } from "./chrome";
 export {
   ChartInteractionProvider,
@@ -55,6 +57,7 @@ export {
   useChartSync,
   useOptionalChartSync,
 } from "./sync/ChartSyncContext";
+export { useEChartsInteraction } from "./sync/useEChartsInteraction";
 export {
   clearChartTypes,
   getChartType,

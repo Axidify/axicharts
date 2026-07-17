@@ -3,8 +3,8 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
-import { axisLabelStyle, gridOptions, splitLineStyle } from "./themeBridge";
-import { useEChart } from "./useEChart";
+import { axisLabelStyle, gridOptions, hiddenTooltip, splitLineStyle } from "./themeBridge";
+import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { HeatmapMatrix } from "./types";
 
 export type EChartsHeatmapProps = {
@@ -14,6 +14,7 @@ export type EChartsHeatmapProps = {
   theme: ChartTheme;
   min?: number;
   max?: number;
+  onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
 export function EChartsHeatmap({
@@ -23,6 +24,7 @@ export function EChartsHeatmap({
   theme,
   min,
   max,
+  onItemHover,
 }: EChartsHeatmapProps): ReactElement {
   const flat = matrix.values.flat();
   const computedMin = min ?? Math.min(...flat);
@@ -37,15 +39,7 @@ export function EChartsHeatmap({
 
   const option: EChartsOption = {
     grid: gridOptions(theme),
-    tooltip: {
-      position: "top",
-      formatter: (params) => {
-        const row = Array.isArray(params) ? params[0] : params;
-        if (!row || !Array.isArray(row.data)) return "";
-        const [x, y, value] = row.data as [number, number, number];
-        return `${matrix.xCategories[x]} / ${matrix.yCategories[y]}: ${value}`;
-      },
-    },
+    tooltip: hiddenTooltip(),
     xAxis: {
       type: "category",
       data: matrix.xCategories,
@@ -82,7 +76,23 @@ export function EChartsHeatmap({
     ],
   };
 
-  const rootRef = useEChart({ option, width, height });
+  const rootRef = useEChart({
+    option,
+    width,
+    height,
+    onItemHover,
+    formatItemHover: (params) => {
+      const mouse = params.event?.event;
+      if (!mouse || !Array.isArray(params.data)) return null;
+      const [x, y, value] = params.data as [number, number, number];
+      return {
+        title: `${matrix.xCategories[x]} · ${matrix.yCategories[y]}`,
+        rows: [{ label: "Value", value: String(value), color: params.color }],
+        left: mouse.offsetX,
+        top: mouse.offsetY,
+      };
+    },
+  });
 
   return (
     <div

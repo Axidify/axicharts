@@ -6,6 +6,8 @@ import {
   type HeatmapMatrix,
 } from "@axicharts/charts-echarts";
 import { useChartLayout } from "../container/ChartLayoutContext";
+import { EChartsInteractionShell } from "../chrome/EChartsInteractionShell";
+import { useEChartsInteraction } from "../sync/useEChartsInteraction";
 
 export type HeatmapChartProps = {
   matrix: HeatmapMatrix;
@@ -13,16 +15,9 @@ export type HeatmapChartProps = {
   max?: number;
 };
 
-export function HeatmapChart({
-  matrix,
-  min,
-  max,
-}: HeatmapChartProps): ReactElement | null {
-  const { size, ready, theme } = useChartLayout();
-
-  if (!ready || size.width < 1 || size.height < 1) {
-    return null;
-  }
+function HeatmapPlot({ matrix, min, max }: HeatmapChartProps): ReactElement {
+  const { size, theme } = useChartLayout();
+  const interaction = useEChartsInteraction();
 
   return (
     <EChartsHeatmap
@@ -32,6 +27,25 @@ export function HeatmapChart({
       theme={theme}
       min={min}
       max={max}
+      onItemHover={interaction.onItemHover}
+    />
+  );
+}
+
+export function HeatmapChart({
+  matrix,
+  min,
+  max,
+}: HeatmapChartProps): ReactElement | null {
+  const { size, ready } = useChartLayout();
+
+  if (!ready || size.width < 1 || size.height < 1) {
+    return null;
+  }
+
+  return (
+    <EChartsInteractionShell
+      plot={<HeatmapPlot matrix={matrix} min={min} max={max} />}
     />
   );
 }

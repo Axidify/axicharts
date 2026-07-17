@@ -6,11 +6,12 @@ import type { ChartTheme } from "@axicharts/charts-theme";
 import {
   axisLabelStyle,
   gridOptions,
+  hiddenTooltip,
+  reactAxisPointer,
   splitLineStyle,
   toneColor,
-  tooltipStyle,
 } from "./themeBridge";
-import { useEChart } from "./useEChart";
+import { useEChart, type EChartCursorEvent } from "./useEChart";
 import type { WaterfallItem } from "./types";
 
 export type EChartsWaterfallProps = {
@@ -19,6 +20,7 @@ export type EChartsWaterfallProps = {
   items: WaterfallItem[];
   theme: ChartTheme;
   valueFormat?: (value: number) => string;
+  onCursor?: (event: EChartCursorEvent) => void;
 };
 
 function buildWaterfallSeries(items: WaterfallItem[]) {
@@ -62,19 +64,14 @@ export function EChartsWaterfall({
   items,
   theme,
   valueFormat = (value) => `${value}`,
+  onCursor,
 }: EChartsWaterfallProps): ReactElement {
   const { placeholders, values, colors, labels } = buildWaterfallSeries(items);
 
   const option: EChartsOption = {
     grid: gridOptions(theme),
-    tooltip: {
-      ...tooltipStyle(),
-      formatter: (params) => {
-        const row = Array.isArray(params) ? params[1] : params;
-        if (!row || typeof row.value !== "number") return "";
-        return `${row.name}: ${valueFormat(row.value)}`;
-      },
-    },
+    tooltip: hiddenTooltip(),
+    axisPointer: reactAxisPointer(),
     xAxis: {
       type: "category",
       data: labels,
@@ -111,7 +108,13 @@ export function EChartsWaterfall({
     ],
   };
 
-  const rootRef = useEChart({ option, width, height });
+  const rootRef = useEChart({
+    option,
+    width,
+    height,
+    categories: labels,
+    onCursor,
+  });
 
   return (
     <div

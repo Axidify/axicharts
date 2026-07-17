@@ -12,19 +12,23 @@ import {
 import { ChartInteractionProvider } from "../interaction/ChartInteractionContext";
 import { getInteractionChrome } from "../interaction/mode";
 
+import type { TooltipRow } from "./Tooltip";
+
 export type CartesianChromeProps = {
   categories: string[];
-  series: PlotSeries[];
+  series?: PlotSeries[];
   valueSuffix?: string;
   compact?: boolean;
+  getRows?: (index: number) => TooltipRow[] | null;
   plot: ReactNode;
 };
 
 function CartesianChromeInner({
   categories,
-  series,
+  series = [],
   valueSuffix,
   compact = false,
+  getRows,
   plot,
 }: CartesianChromeProps): ReactElement {
   const { mode } = useChartLayout();
@@ -52,6 +56,7 @@ function CartesianChromeInner({
             categories={categories}
             series={series}
             valueSuffix={valueSuffix}
+            getRows={getRows}
           />
         ) : null}
       </div>

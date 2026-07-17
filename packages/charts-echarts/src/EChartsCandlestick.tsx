@@ -6,11 +6,12 @@ import type { ChartTheme } from "@axicharts/charts-theme";
 import {
   axisLabelStyle,
   gridOptions,
+  hiddenTooltip,
+  reactAxisPointer,
   splitLineStyle,
-  tooltipStyle,
   upDownColors,
 } from "./themeBridge";
-import { useEChart } from "./useEChart";
+import { useEChart, type EChartCursorEvent } from "./useEChart";
 import type { OhlcPoint } from "./types";
 
 export type EChartsCandlestickProps = {
@@ -24,6 +25,7 @@ export type EChartsCandlestickProps = {
   onSyncIndex?: (index: number | null) => void;
   syncIndex?: number | null;
   syncSourceId?: string | null;
+  onCursor?: (event: EChartCursorEvent) => void;
 };
 
 export function EChartsCandlestick({
@@ -37,6 +39,7 @@ export function EChartsCandlestick({
   onSyncIndex,
   syncIndex,
   syncSourceId,
+  onCursor,
 }: EChartsCandlestickProps): ReactElement {
   const { up, down } = upDownColors();
   const ohlc = data.map((point) => [point.open, point.close, point.low, point.high]);
@@ -48,8 +51,11 @@ export function EChartsCandlestick({
           { ...gridOptions(theme), top: "72%", height: "18%" },
         ]
       : [gridOptions(theme)],
-    tooltip: tooltipStyle(),
-    axisPointer: { link: [{ xAxisIndex: volume ? [0, 1] : [0] }] },
+    tooltip: hiddenTooltip(),
+    axisPointer: {
+      link: [{ xAxisIndex: volume ? [0, 1] : [0] }],
+      ...reactAxisPointer(),
+    },
     xAxis: volume
       ? [
           {
@@ -132,6 +138,7 @@ export function EChartsCandlestick({
     onSyncIndex,
     syncIndex,
     syncSourceId,
+    onCursor,
   });
 
   return (
