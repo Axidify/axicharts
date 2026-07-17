@@ -3,6 +3,7 @@ import type {
   MqttClientLike,
   MqttDataSourceSpec,
 } from "../types";
+import { mergeAdapterExtras } from "./normalize";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -34,9 +35,76 @@ export function connectMqttSource(
   const parsePayload = spec.parsePayload ?? defaultParsePayload;
   let data: Record<string, unknown> = {};
   let activeClient: MqttClientLike;
+  let cancelled = false;
+  let hasConnected = false;
+  let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
+
+  const bindClient = (client: MqttClientLike) => {
+    activeClient = client;
+
+    if (!hasConnected) {
+      onUpdate({ data, connection: "connecting" });
+    }
+
+    client.on("connect", () => {
+      hasConnected = true;
+      client.subscribe(spec.topic);
+      onUpdate({
+        data,
+        connection: "ready",
+        lastUpdatedAt: Date.now(),
+      });
+    });
+
+    client.on("message", (_topic, payload) => {
+      try {
+        const raw = payload;
+        const chunk = parsePayload(raw);
+        data = { ...data, ...mergeAdapterExtras(chunk, raw) };
+        onUpdate({
+          data,
+          connection: "ready",
+          lastUpdatedAt: Date.now(),
+        });
+      } catch {
+        // Ignore malformed frames
+      }
+    });
+
+    client.on("error", () => {
+      onUpdate({
+        data,
+        connection: "error",
+        error: "MQTT error",
+      });
+    });
+
+    client.on("close", () => {
+      if (cancelled) return;
+      onUpdate({
+        data,
+        connection: "error",
+        error: "MQTT disconnected",
+      });
+      if (spec.reconnectDelayMs != null && spec.connect) {
+        reconnectTimer = setTimeout(() => {
+          if (cancelled) return;
+          try {
+            bindClient(spec.connect!(spec.url, { clientId: spec.clientId }));
+          } catch (error) {
+            onUpdate({
+              data,
+              connection: "error",
+              error: error instanceof Error ? error.message : String(error),
+            });
+          }
+        }, spec.reconnectDelayMs);
+      }
+    });
+  };
 
   try {
-    activeClient = connect(spec.url, { clientId: spec.clientId });
+    bindClient(connect(spec.url, { clientId: spec.clientId }));
   } catch (error) {
     onUpdate({
       data: {},
@@ -46,48 +114,9 @@ export function connectMqttSource(
     return () => {};
   }
 
-  onUpdate({ data, connection: "connecting" });
-
-  activeClient.on("connect", () => {
-    activeClient.subscribe(spec.topic);
-    onUpdate({
-      data,
-      connection: "ready",
-      lastUpdatedAt: Date.now(),
-    });
-  });
-
-  activeClient.on("message", (_topic, payload) => {
-    try {
-      const chunk = parsePayload(payload);
-      data = { ...data, ...chunk };
-      onUpdate({
-        data,
-        connection: "ready",
-        lastUpdatedAt: Date.now(),
-      });
-    } catch {
-      // Ignore malformed frames
-    }
-  });
-
-  activeClient.on("error", () => {
-    onUpdate({
-      data,
-      connection: "error",
-      error: "MQTT error",
-    });
-  });
-
-  activeClient.on("close", () => {
-    onUpdate({
-      data,
-      connection: "error",
-      error: "MQTT disconnected",
-    });
-  });
-
   return () => {
+    cancelled = true;
+    if (reconnectTimer) clearTimeout(reconnectTimer);
     activeClient.end(true);
   };
 }

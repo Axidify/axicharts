@@ -4,6 +4,12 @@ export type PlannerLayout = "embed" | "mosaic";
 
 export type PlannerFeed = "static" | "historian";
 
+export type MosaicPresetId =
+  | "ops-finance"
+  | "ops-overview"
+  | "trading-program"
+  | "command-center";
+
 export type DashboardPlan = {
   source: PlannerSource;
   template: string;
@@ -14,6 +20,7 @@ export type DashboardPlan = {
   layout: PlannerLayout;
   feed: PlannerFeed;
   presentation: boolean;
+  mosaicPreset?: MosaicPresetId;
   panels: import("@axicharts/charts-spec").PanelSpec[];
   warnings?: string[];
 };

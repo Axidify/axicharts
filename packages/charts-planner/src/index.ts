@@ -1,6 +1,7 @@
 export type {
   DashboardPlan,
   LlmPlannerProvider,
+  MosaicPresetId,
   PlannerFeed,
   PlannerLayout,
   PlannerRequest,
@@ -15,7 +16,7 @@ export {
   validatePanelSpecs,
 } from "./validate";
 export { enrichProfileFromIntent } from "./intent";
-export { inferTemplateFromIntent } from "./plan";
+export { inferTemplateFromIntent, inferMosaicPresetFromIntent } from "./plan";
 export {
   buildPlannerPrompt,
   planFromIntent,

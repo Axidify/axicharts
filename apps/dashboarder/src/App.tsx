@@ -54,11 +54,15 @@ function applyPlan(
   setLayout: (layout: LayoutMode) => void,
   setFeed: (feed: FeedMode) => void,
   setPresentation: (presentation: boolean) => void,
+  setMosaicPreset: (preset: MosaicPresetId) => void,
 ): void {
   setTemplate(plan.template as TemplateId);
   setLayout(plan.layout);
   setFeed(plan.feed);
   setPresentation(plan.presentation);
+  if (plan.layout === "mosaic") {
+    setMosaicPreset(plan.mosaicPreset ?? "ops-overview");
+  }
 }
 
 function applyDashboardMeta(
@@ -226,7 +230,7 @@ export function App(): ReactElement {
   };
 
   const handleApplyPlan = (plan: DashboardPlan): void => {
-    applyPlan(plan, setTemplate, setLayout, setFeed, setPresentation);
+    applyPlan(plan, setTemplate, setLayout, setFeed, setPresentation, setMosaicPreset);
     setDirty(true);
   };
 

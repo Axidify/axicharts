@@ -16,7 +16,7 @@ export const ADAPTER_ROWS = [
   {
     type: "websocket",
     useCase: "Push JSON telemetry streams",
-    fields: "url, staleAfterMs",
+    fields: "url, staleAfterMs, reconnectDelayMs, parseMessage",
   },
   {
     type: "mock-live",
@@ -26,7 +26,7 @@ export const ADAPTER_ROWS = [
   {
     type: "mqtt",
     useCase: "Sparkplug / plain MQTT (inject connect)",
-    fields: "url, topic, connect, parsePayload",
+    fields: "url, topic, staleAfterMs, reconnectDelayMs, connect, parsePayload",
   },
   {
     type: "historian",

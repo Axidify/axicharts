@@ -2,6 +2,13 @@ import type { PanelSpec, TemplateId } from "@axicharts/charts-spec";
 import { SPEC_VERSION } from "@axicharts/charts-spec";
 import type { DashboardPlan } from "./types";
 
+const MOSAIC_PRESET_IDS = new Set<string>([
+  "ops-finance",
+  "ops-overview",
+  "trading-program",
+  "command-center",
+]);
+
 const TEMPLATE_IDS = new Set<string>([
   "finance-pnl",
   "trading-blotter",
@@ -76,6 +83,10 @@ export function validateDashboardPlan(raw: unknown): DashboardPlan | null {
   const feed = raw.feed === "static" ? "static" : "historian";
   const theme = typeof raw.theme === "string" && THEMES.has(raw.theme) ? raw.theme : undefined;
   const mode = typeof raw.mode === "string" && MODES.has(raw.mode) ? raw.mode : undefined;
+  const mosaicPreset =
+    typeof raw.mosaicPreset === "string" && MOSAIC_PRESET_IDS.has(raw.mosaicPreset)
+      ? (raw.mosaicPreset as DashboardPlan["mosaicPreset"])
+      : undefined;
 
   return {
     source: "llm",
@@ -87,6 +98,7 @@ export function validateDashboardPlan(raw: unknown): DashboardPlan | null {
     layout,
     feed,
     presentation: raw.presentation === true || mode === "presentation",
+    mosaicPreset,
     panels,
     warnings: Array.isArray(raw.warnings)
       ? raw.warnings.filter((item): item is string => typeof item === "string")

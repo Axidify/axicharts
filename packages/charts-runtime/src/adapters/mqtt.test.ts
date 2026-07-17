@@ -65,6 +65,36 @@ describe("connectMqttSource", () => {
     disconnect();
   });
 
+  it("passes alarms through merged MQTT payloads", async () => {
+    const { connect } = createMockMqttClient([
+      {
+        cells: [{ title: "CPU", data: [12] }],
+        alarms: [{ id: "mqtt-alarm", message: "high", severity: "alarm" }],
+      },
+    ]);
+    const snapshots: DataSourceSnapshot[] = [];
+
+    const disconnect = connectMqttSource(
+      {
+        type: "mqtt",
+        url: "wss://broker.test/mqtt",
+        topic: "plant/line3/#",
+        connect,
+      },
+      (snapshot) => snapshots.push(snapshot),
+    );
+
+    await vi.waitFor(() => {
+      expect(snapshots.some((item) => item.connection === "ready")).toBe(true);
+    });
+
+    expect(snapshots.at(-1)?.data.alarms).toEqual([
+      { id: "mqtt-alarm", message: "high", severity: "alarm" },
+    ]);
+
+    disconnect();
+  });
+
   it("reports error when connect factory is missing", () => {
     const snapshots: DataSourceSnapshot[] = [];
     connectMqttSource(

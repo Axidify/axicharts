@@ -4,7 +4,7 @@ import {
   suggestTemplate,
 } from "@axicharts/charts-spec";
 import { enrichProfileFromIntent } from "./intent";
-import type { DashboardPlan, PlannerFeed, PlannerLayout } from "./types";
+import type { DashboardPlan, MosaicPresetId, PlannerFeed, PlannerLayout } from "./types";
 import { isTemplateId } from "./validate";
 
 function inferLayout(intent: string | undefined): PlannerLayout {
@@ -40,6 +40,37 @@ export function inferTemplateFromIntent(intent: string): TemplateId | undefined 
   return undefined;
 }
 
+export function inferMosaicPresetFromIntent(intent: string): MosaicPresetId {
+  const lower = intent.toLowerCase();
+  if (
+    (/trading|blotter|positions/.test(lower) && /program|sprint|burndown/.test(lower)) ||
+    (/trading|blotter/.test(lower) && /mosaic|wall|grid|multi|split/.test(lower))
+  ) {
+    return "trading-program";
+  }
+  if (/command|capacity|resource|utilization/.test(lower)) {
+    return "command-center";
+  }
+  if (/finance|p&l|pnl|revenue|margin/.test(lower)) {
+    return "ops-finance";
+  }
+  if (/overview|throughput|kpi/.test(lower)) {
+    return "ops-overview";
+  }
+  if (/program|sprint|burndown/.test(lower)) {
+    return "trading-program";
+  }
+  if (/trading|blotter/.test(lower)) {
+    return "trading-program";
+  }
+  return "ops-overview";
+}
+
+function resolveMosaicPreset(intent: string | undefined, layout: PlannerLayout): MosaicPresetId | undefined {
+  if (layout !== "mosaic" || !intent) return undefined;
+  return inferMosaicPresetFromIntent(intent);
+}
+
 function inferTitle(intent: string | undefined): string | undefined {
   if (!intent) return undefined;
   const lineMatch = intent.match(/line\s*(\d+)/i);
@@ -63,6 +94,7 @@ export function planFromProfile(
   const enriched = intent ? enrichProfileFromIntent(profile, intent) : profile;
   const template = suggestTemplate(enriched);
   const presentation = inferPresentation(intent);
+  const layout = inferLayout(intent);
 
   return {
     source: intent ? "intent" : "rules",
@@ -71,9 +103,10 @@ export function planFromProfile(
     subtitle: inferSubtitle(intent),
     theme: presentation ? "presentation" : undefined,
     mode: presentation ? "presentation" : undefined,
-    layout: inferLayout(intent),
+    layout,
     feed: inferFeed(intent),
     presentation,
+    mosaicPreset: resolveMosaicPreset(intent, layout),
     panels: planPanelsFromProfile(enriched),
   };
 }
@@ -83,6 +116,7 @@ export function planFromIntent(profile: DataProfile, intent: string): DashboardP
   const template = inferTemplateFromIntent(intent) ?? suggestTemplate(enriched);
   const resolvedTemplate = isTemplateId(template) ? template : suggestTemplate(enriched);
   const presentation = inferPresentation(intent);
+  const layout = inferLayout(intent);
 
   return {
     source: "intent",
@@ -91,9 +125,10 @@ export function planFromIntent(profile: DataProfile, intent: string): DashboardP
     subtitle: inferSubtitle(intent),
     theme: presentation ? "presentation" : undefined,
     mode: presentation ? "presentation" : undefined,
-    layout: inferLayout(intent),
+    layout,
     feed: inferFeed(intent),
     presentation,
+    mosaicPreset: resolveMosaicPreset(intent, layout),
     panels: planPanelsFromProfile(enriched),
   };
 }
@@ -109,6 +144,7 @@ export function buildPlannerPrompt(profile: DataProfile, intent: string): string
     '  "mode": "static|interactive|live|presentation",',
     '  "layout": "embed|mosaic",',
     '  "feed": "static|historian",',
+    '  "mosaicPreset": "ops-finance|ops-overview|trading-program|command-center",',
     '  "presentation": boolean,',
     '  "panels": [ { "specVersion": 1, "type": "line|bar|gauge|table|...", "title": "...", "encoding": {...} } ]',
     "}",

@@ -25,7 +25,9 @@ export type WebSocketDataSourceSpec = {
   type: "websocket";
   url: string;
   staleAfterMs?: number;
+  reconnectDelayMs?: number;
   WebSocketImpl?: typeof WebSocket;
+  parseMessage?: (payload: unknown) => Record<string, unknown>;
 };
 
 export type MockLiveDataSourceSpec = {
@@ -53,6 +55,7 @@ export type MqttDataSourceSpec = {
   url: string;
   topic: string;
   staleAfterMs?: number;
+  reconnectDelayMs?: number;
   clientId?: string;
   connect?: MqttConnectFn;
   parsePayload?: (raw: unknown) => Record<string, unknown>;

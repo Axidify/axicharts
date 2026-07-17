@@ -12,7 +12,7 @@ const QUICK_INTENTS = [
   "Finance P&L board",
   "Trading desk with positions",
   "Program sprint burndown",
-  "Plugin wall mosaic",
+  "Trading desk program mosaic",
 ] as const;
 
 const overlayStyle = {
@@ -210,6 +210,12 @@ export function PlannerPanel({
               <dd style={{ margin: 0 }}>{plan.template}</dd>
               <dt style={{ color: "#94a3b8" }}>Layout</dt>
               <dd style={{ margin: 0 }}>{plan.layout}</dd>
+              {plan.layout === "mosaic" && plan.mosaicPreset ? (
+                <>
+                  <dt style={{ color: "#94a3b8" }}>Mosaic preset</dt>
+                  <dd style={{ margin: 0 }}>{plan.mosaicPreset}</dd>
+                </>
+              ) : null}
               <dt style={{ color: "#94a3b8" }}>Feed</dt>
               <dd style={{ margin: 0 }}>{plan.feed}</dd>
               <dt style={{ color: "#94a3b8" }}>Presentation</dt>

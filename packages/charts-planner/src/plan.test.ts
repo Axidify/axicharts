@@ -26,6 +26,18 @@ describe("planFromIntent", () => {
     expect(plan.template).toBe("finance-pnl");
     expect(plan.presentation).toBe(true);
   });
+
+  it("maps mosaic wall intent to preset", () => {
+    const plan = planFromIntent(profile, "Trading desk program mosaic wall");
+    expect(plan.layout).toBe("mosaic");
+    expect(plan.mosaicPreset).toBe("trading-program");
+  });
+
+  it("maps command center mosaic to capacity preset", () => {
+    const plan = planFromIntent(profile, "Plant command center mosaic wall");
+    expect(plan.layout).toBe("mosaic");
+    expect(plan.mosaicPreset).toBe("command-center");
+  });
 });
 
 describe("planFromProfile", () => {

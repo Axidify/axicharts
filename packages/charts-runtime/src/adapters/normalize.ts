@@ -9,6 +9,11 @@ export function defaultRestMapper(payload: unknown): Record<string, unknown> {
   return payload;
 }
 
+export function defaultWebSocketMapper(payload: unknown): Record<string, unknown> {
+  if (!isRecord(payload)) return {};
+  return payload;
+}
+
 export function mergeAdapterExtras(
   mapped: Record<string, unknown>,
   payload: unknown,
