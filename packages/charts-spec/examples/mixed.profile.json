@@ -1,0 +1,15 @@
+{
+  "metrics": [
+    {
+      "name": "revenue",
+      "unit": "USD",
+      "tags": { "vertical": "finance" }
+    },
+    {
+      "name": "p95_latency",
+      "unit": "ms",
+      "kind": "histogram",
+      "tags": { "vertical": "ops", "refresh": "live" }
+    }
+  ]
+}

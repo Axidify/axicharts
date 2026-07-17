@@ -101,6 +101,43 @@ export const Ops2x2Template: Story = {
   ),
 };
 
+export const EjectCli: Story = {
+  render: () => {
+    const jsx = ejectPanel({
+      type: "line",
+      encoding: {
+        x: { field: "day", type: "nominal" },
+        y: { field: "value", type: "quantitative" },
+      },
+      fill: true,
+      height: 200,
+    });
+
+    return (
+      <div style={{ maxWidth: 560, fontSize: 12 }}>
+        <p>
+          CLI:{" "}
+          <code>
+            npx @axicharts/charts-spec eject examples/revenue-line.panel.json
+          </code>
+        </p>
+        <pre
+          style={{
+            marginTop: 12,
+            padding: 12,
+            background: "#f8fafc",
+            borderRadius: 6,
+            overflow: "auto",
+            fontSize: 11,
+          }}
+        >
+          {jsx}
+        </pre>
+      </div>
+    );
+  },
+};
+
 export const ProfilePlanner: Story = {
   render: () => {
     const profile = {

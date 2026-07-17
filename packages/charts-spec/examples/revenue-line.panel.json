@@ -1,0 +1,12 @@
+{
+  "specVersion": 1,
+  "type": "line",
+  "theme": "clean",
+  "height": 200,
+  "fill": true,
+  "encoding": {
+    "x": { "field": "day", "type": "nominal" },
+    "y": { "field": "revenue", "type": "quantitative", "format": "currency" }
+  },
+  "valueSuffix": " USD"
+}
