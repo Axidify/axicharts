@@ -26,6 +26,9 @@ importers:
       '@axicharts/charts':
         specifier: workspace:*
         version: link:../../packages/charts
+      '@axicharts/charts-runtime':
+        specifier: workspace:*
+        version: link:../../packages/charts-runtime
       '@axicharts/charts-spec':
         specifier: workspace:*
         version: link:../../packages/charts-spec
@@ -198,6 +201,49 @@ importers:
       typescript:
         specifier: ^5.8.2
         version: 5.9.3
+
+  packages/charts-runtime:
+    dependencies:
+      '@axicharts/charts':
+        specifier: workspace:*
+        version: link:../charts
+      '@axicharts/charts-spec':
+        specifier: workspace:*
+        version: link:../charts-spec
+    devDependencies:
+      '@axicharts/charts-theme':
+        specifier: workspace:*
+        version: link:../charts-theme
+      '@testing-library/react':
+        specifier: ^16.2.0
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.20.1
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.2.3(@types/react@19.2.17)
+      jsdom:
+        specifier: ^26.0.0
+        version: 26.1.0(canvas@3.2.3)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.7(react@19.2.7)
+      tsup:
+        specifier: ^8.4.0
+        version: 8.5.1(jiti@2.7.0)(postcss@8.5.19)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.8
+        version: 3.2.7(@types/node@22.20.1)(happy-dom@20.10.6)(jiti@2.7.0)(jsdom@26.1.0(canvas@3.2.3))
 
   packages/charts-spec:
     dependencies:

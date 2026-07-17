@@ -1,0 +1,56 @@
+{
+  "name": "@axicharts/charts-runtime",
+  "version": "0.2.3",
+  "description": "C4 dashboard runtime — data source adapters and embed shell for AxiCharts.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Axidify/axicharts.git",
+    "directory": "packages/charts-runtime"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-theme --clean",
+    "dev": "tsup src/index.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-theme --watch",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "@axicharts/charts": "workspace:*",
+    "@axicharts/charts-spec": "workspace:*",
+    "@axicharts/charts-theme": "workspace:*",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@axicharts/charts": "workspace:*",
+    "@axicharts/charts-spec": "workspace:*"
+  },
+  "devDependencies": {
+    "@axicharts/charts": "workspace:*",
+    "@axicharts/charts-theme": "workspace:*",
+    "@testing-library/react": "^16.2.0",
+    "@types/node": "^22.13.10",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.8",
+    "jsdom": "^26.0.0"
+  }
+}
