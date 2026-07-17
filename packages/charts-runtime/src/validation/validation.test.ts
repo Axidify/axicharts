@@ -4,12 +4,15 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   dashboarderImportDeepLink,
+  docsImportGalleryDeepLink,
   findImportPreset,
   hostedImportPresetUrl,
   HOSTED_IMPORT_PRESETS,
   importGalleryDeepLink,
+  listImportDeepLinks,
   localImportPresetUrl,
   parseImportPresetQuery,
+  shareExportReferencePreset,
 } from "../schemaUrls";
 import { serializeDashboardExport } from "../workspace/share";
 import {
@@ -132,10 +135,21 @@ describe("hosted import presets", () => {
 
   it("builds gallery and dashboarder deep links", () => {
     expect(importGalleryDeepLink("ops-embed")).toBe("/runtime/import?preset=ops-embed");
+    expect(docsImportGalleryDeepLink("ops-workspace")).toBe(
+      "https://axidify.github.io/axicharts/runtime/import?preset=ops-workspace",
+    );
     expect(dashboarderImportDeepLink("ops-workspace")).toBe(
       "http://localhost:3000/?import=ops-workspace",
     );
     expect(parseImportPresetQuery("?import=ops-mosaic")).toBe("ops-mosaic");
-    expect(findImportPreset("ops-workspace")?.filename).toBe("ops-workspace.workspace.json");
+    expect(findImportPreset("ops-workspace")?.kind).toBe("workspace");
+    expect(shareExportReferencePreset("workspace")?.id).toBe("ops-workspace");
+  });
+
+  it("lists import deep links for docs index", () => {
+    const links = listImportDeepLinks("/axicharts/");
+    expect(links).toHaveLength(HOSTED_IMPORT_PRESETS.length);
+    expect(links[3]?.galleryPath).toBe("/runtime/import?preset=ops-workspace");
+    expect(links[3]?.localMirrorPath).toContain("ops-workspace.workspace.json");
   });
 });

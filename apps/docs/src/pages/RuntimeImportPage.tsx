@@ -104,7 +104,7 @@ function PresetCard({
         <div>
           <strong>{preset.label}</strong>
           <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>
-            <code>{preset.filename}</code>
+            <code>{preset.filename}</code> · {preset.kind}
           </div>
         </div>
         <button
@@ -228,11 +228,13 @@ export function RuntimeImportPage(): ReactElement {
       </div>
 
       <p style={{ marginTop: 24, fontSize: 13, color: "#64748b" }}>
-        See also{" "}
+        <Link to="/runtime/links" style={{ color: "#2563eb" }}>
+          Deep link index
+        </Link>
+        {" · "}
         <Link to="/runtime/schema" style={{ color: "#2563eb" }}>
           Runtime schema
-        </Link>{" "}
-        for validation CLI flags and editor <code>$schema</code> snippets.
+        </Link>
       </p>
     </div>
   );

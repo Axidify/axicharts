@@ -9,6 +9,7 @@ const links = [
   { to: "/runtime", label: "Runtime" },
   { to: "/runtime/schema", label: "Runtime schema" },
   { to: "/runtime/import", label: "Import gallery" },
+  { to: "/runtime/links", label: "Deep links" },
   { to: "/plugins", label: "Plugins" },
   { to: "/packages", label: "Packages" },
 ] as const;

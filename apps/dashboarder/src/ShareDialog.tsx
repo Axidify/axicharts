@@ -8,7 +8,12 @@ import {
   type SavedDashboard,
   type WorkspaceStore,
 } from "@axicharts/charts-runtime";
-import { validateShareExportDualJson } from "@axicharts/charts-runtime/validation";
+import {
+  dashboarderImportDeepLink,
+  docsImportGalleryDeepLink,
+  shareExportReferencePreset,
+  validateShareExportDualJson,
+} from "@axicharts/charts-runtime/validation";
 import { ErrorList, importSummary, LayerStatus } from "./validationChrome";
 
 const overlayStyle = {
@@ -101,6 +106,8 @@ export function ShareDialog({
   }, [tab, workspace, dashboard.name, spec, meta]);
 
   const validation = useMemo(() => validateShareExportDualJson(exportJson), [exportJson]);
+  const referencePreset =
+    tab === "workspace" || tab === "dashboard" ? shareExportReferencePreset(tab) : undefined;
 
   if (!open) return null;
 
@@ -211,6 +218,36 @@ export function ShareDialog({
             <ErrorList title="JSON Schema" errors={validation.schemaErrors} />
             <ErrorList title="Semantic" errors={validation.semanticErrors} />
           </>
+        ) : null}
+
+        {referencePreset ? (
+          <div
+            style={{
+              marginTop: 12,
+              padding: 12,
+              borderRadius: 8,
+              border: "1px solid #334155",
+              background: "#111827",
+              fontSize: 12,
+              color: "#94a3b8",
+              lineHeight: 1.7,
+            }}
+          >
+            Shipped {tab} preset: <strong style={{ color: "#e2e8f0" }}>{referencePreset.label}</strong>
+            {" · "}
+            <a
+              href={docsImportGalleryDeepLink(referencePreset.id)}
+              style={{ color: "#93c5fd" }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Gallery
+            </a>
+            {" · "}
+            <a href={dashboarderImportDeepLink(referencePreset.id)} style={{ color: "#93c5fd" }}>
+              Import in app
+            </a>
+          </div>
         ) : null}
       </div>
     </div>

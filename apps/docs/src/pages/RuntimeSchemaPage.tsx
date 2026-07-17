@@ -100,6 +100,9 @@ export function RuntimeSchemaPage(): ReactElement {
           <li>
             <Link to="/runtime/import">Import gallery</Link> — dual-gate preview for all examples
           </li>
+          <li>
+            <Link to="/runtime/links">Deep link index</Link> — canonical preset and schema URLs
+          </li>
         </ul>
         <div style={{ marginTop: 12 }}>
           <CodeBlock>{SCHEMA_IMPORT_CODE}</CodeBlock>
