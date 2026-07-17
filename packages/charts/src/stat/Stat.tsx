@@ -1,4 +1,6 @@
 import type { CSSProperties, ReactElement } from "react";
+import { useOptionalChartLayout } from "../container/useOptionalChartLayout";
+import { resolveTagStatTone } from "../alarm/tagTones";
 
 export type StatTone = "neutral" | "success" | "warning" | "critical";
 
@@ -38,6 +40,9 @@ export function Stat({
   stale = false,
   style,
 }: StatProps): ReactElement {
+  const layout = useOptionalChartLayout();
+  const resolvedTone =
+    resolveTagStatTone(layout?.tagTones, label, tone) ?? tone ?? "neutral";
   const colors = TONE_COLORS[surface];
   const labelColor = surface === "light" ? "#64748b" : "#94a3b8";
   const staleColor = surface === "light" ? "#94a3b8" : "#64748b";
@@ -49,7 +54,7 @@ export function Stat({
           fontSize: 20,
           fontWeight: 600,
           lineHeight: 1.2,
-          color: stale ? staleColor : colors[tone],
+          color: stale ? staleColor : colors[resolvedTone],
           textDecoration: stale ? "line-through" : undefined,
           fontFamily: monospace
             ? "ui-monospace, SFMono-Regular, Menlo, monospace"

@@ -79,6 +79,9 @@ export type AlarmItem = {
   severity?: AlarmSeverity;
   acknowledged?: boolean;
   timestamp?: number;
+  tag?: string;
+  metric?: string;
+  panelId?: string;
 };
 
 export type DataSourceSpec =

@@ -124,3 +124,12 @@ export {
   type XAxisMarkProps,
   type YAxisMarkProps,
 } from "./composable";
+export {
+  alarmSeverityToSeriesTone,
+  applyTagTonesToSeries,
+  mergeSeriesTone,
+  readTagTones,
+  resolveTagStatTone,
+  seriesToneToStatTone,
+  type AlarmSeverity,
+} from "./alarm/tagTones";

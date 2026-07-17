@@ -7,6 +7,7 @@ import {
   cleanTheme,
   type ChartTheme,
 } from "@axicharts/charts-theme";
+import type { SeriesTone } from "@axicharts/charts-canvas";
 import {
   ChartLayoutContext,
   type ChartConfig,
@@ -41,6 +42,7 @@ export type ChartContainerProps = {
   loadingMessage?: string;
   emptyMessage?: string;
   errorMessage?: string;
+  tagTones?: Record<string, SeriesTone>;
   onResize?: (size: { width: number; height: number }) => void;
 };
 
@@ -68,6 +70,7 @@ export function ChartContainer({
   loadingMessage,
   emptyMessage,
   errorMessage,
+  tagTones,
   onResize,
 }: ChartContainerProps): ReactElement {
   const [ref, measured] = useResizeObserver(debounceMs);
@@ -123,6 +126,7 @@ export function ChartContainer({
         isStale: showStale,
         lastUpdatedAt,
         staleAfterMs,
+        tagTones,
       }}
     >
       <div

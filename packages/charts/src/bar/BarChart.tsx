@@ -19,6 +19,7 @@ import { getInteractionChrome } from "../interaction/mode";
 import { usePlotSync } from "../sync/usePlotSync";
 import { usePlotSampling } from "../plot/usePlotSampling";
 import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
+import { applyTagTonesToSeries } from "../alarm/tagTones";
 
 const BAR_SERIES_KINDS = ["bar"] as const;
 
@@ -103,8 +104,8 @@ export function BarChart({
   refreshHz,
   thresholdBands,
 }: BarChartProps): ReactElement | null {
-  const { size, ready, theme, config } = useChartLayout();
-  const { categories, series, valueSuffix } = useResolvedCartesianProps(
+  const { size, ready, theme, config, tagTones } = useChartLayout();
+  const { categories, series: resolvedSeries, valueSuffix } = useResolvedCartesianProps(
     {
       categories: categoriesProp,
       series: seriesProp,
@@ -114,6 +115,10 @@ export function BarChart({
     },
     config,
     [...BAR_SERIES_KINDS],
+  );
+  const series = useMemo(
+    () => applyTagTonesToSeries(resolvedSeries, tagTones ?? {}),
+    [resolvedSeries, tagTones],
   );
   const maxPoints = usePlotSampling({
     pointCount: categories.length,

@@ -16,6 +16,10 @@ import {
   DataTable,
   type PlotSeries,
   type StatTone,
+  type SeriesTone,
+  readTagTones,
+  applyTagTonesToSeries,
+  resolveTagStatTone,
 } from "@axicharts/charts";
 import { getChartType } from "@axicharts/charts/registry";
 import type { FieldEncoding, PanelSpec, SpecData, ThemeName, ChartMode } from "./types";
@@ -28,6 +32,7 @@ export type CompileOptions = {
   mode?: ChartMode;
   height?: number;
   width?: number | string;
+  tagTones?: Record<string, SeriesTone>;
 };
 
 function seriesFromEncoding(
@@ -49,6 +54,7 @@ function wrapChart(
   spec: PanelSpec,
   chart: ReactElement,
   options: CompileOptions,
+  tagTones?: Record<string, SeriesTone>,
 ): ReactElement {
   const theme = resolveTheme(options.theme ?? spec.theme);
   const mode = options.mode ?? spec.mode;
@@ -57,7 +63,7 @@ function wrapChart(
 
   return createElement(
     ChartContainer,
-    { theme, mode, height, width },
+    { theme, mode, height, width, tagTones },
     chart,
   );
 }
@@ -75,6 +81,7 @@ function compileRegisteredPanel(
   data: SpecData,
   rows: Record<string, unknown>[],
   options: CompileOptions,
+  tagTones: Record<string, SeriesTone>,
 ): ReactElement {
   const registration = getChartType(spec.type);
   if (!registration) {
@@ -91,6 +98,7 @@ function compileRegisteredPanel(
     spec,
     createElement(registration.Chart, chartProps),
     options,
+    tagTones,
   );
 }
 
@@ -102,6 +110,10 @@ export function compilePanel(
   const resolved = applySpecCompilers(spec, data);
   const rows = asRows(data);
   const props = resolved.props ?? {};
+  const objectData = objectDataFromSpec(data);
+  const tagTones = options.tagTones ?? readTagTones(objectData);
+  const wrap = (chart: ReactElement) =>
+    wrapChart(resolved, chart, options, tagTones);
 
   switch (resolved.type) {
     case "line":
@@ -110,18 +122,17 @@ export function compilePanel(
       const categories = resolved.encoding?.x
         ? (pluckField(rows, resolved.encoding.x) as string[])
         : (props.categories as string[] | undefined) ?? [];
-      const series =
+      const baseSeries =
         seriesFromEncoding(rows, resolved.encoding?.y).length > 0
           ? seriesFromEncoding(rows, resolved.encoding?.y)
           : ((props.series as PlotSeries[] | undefined) ?? []);
-
       const chartProps = {
+        ...props,
         categories,
-        series,
+        series: applyTagTonesToSeries(baseSeries, tagTones),
         fill: resolved.fill,
         stacked: resolved.stacked,
         valueSuffix: resolved.valueSuffix,
-        ...props,
       };
 
       const Chart =
@@ -131,7 +142,7 @@ export function compilePanel(
             ? BarChart
             : LineChart;
 
-      return wrapChart(resolved, createElement(Chart, chartProps), options);
+      return wrap(createElement(Chart, chartProps));
     }
 
     case "scatter": {
@@ -156,13 +167,11 @@ export function compilePanel(
             })),
           },
         ];
-      return wrapChart(
-        resolved,
+      return wrap(
         createElement(ScatterChart, {
           series: scatterSeries,
           ...props,
         }),
-        options,
       );
     }
 
@@ -175,13 +184,11 @@ export function compilePanel(
           name: String(row[nameField]),
           value: Number(row[valueField]),
         }));
-      return wrapChart(
-        resolved,
+      return wrap(
         createElement(FunnelChart, {
           stages,
           ...props,
         }),
-        options,
       );
     }
 
@@ -194,13 +201,11 @@ export function compilePanel(
           name: String(row[nameField]),
           value: Number(row[valueField]),
         }));
-      return wrapChart(
-        resolved,
+      return wrap(
         createElement(TreemapChart, {
           nodes,
           ...props,
         }),
-        options,
       );
     }
 
@@ -218,14 +223,12 @@ export function compilePanel(
         resolved.innerRadius ??
         (props.innerRadius as number | undefined) ??
         (resolved.type === "donut" ? 42 : undefined);
-      return wrapChart(
-        resolved,
+      return wrap(
         createElement(PieChart, {
           slices,
           innerRadius,
           showLabels: props.showLabels as boolean | undefined,
         }),
-        options,
       );
     }
 
@@ -238,13 +241,11 @@ export function compilePanel(
           isTotal: Boolean(row.isTotal),
           tone: row.tone as "critical" | "success" | "warning" | "default" | undefined,
         }));
-      return wrapChart(
-        resolved,
+      return wrap(
         createElement(WaterfallChart, {
           items,
           valueFormat: props.valueFormat as "currency" | "number" | "compact" | undefined,
         }),
-        options,
       );
     }
 
@@ -258,8 +259,7 @@ export function compilePanel(
         low: Number(row[resolved.encoding?.low?.field ?? "low"]),
         close: Number(row[resolved.encoding?.close?.field ?? "close"]),
       }));
-      return wrapChart(
-        resolved,
+      return wrap(
         createElement(CandlestickChart, {
           categories,
           data: candleData,
@@ -267,20 +267,17 @@ export function compilePanel(
           brush: props.brush as boolean | undefined,
           brushEnd: props.brushEnd as number | undefined,
         }),
-        options,
       );
     }
 
     case "heatmap": {
       const matrix = props.matrix as Parameters<typeof HeatmapChart>[0]["matrix"];
-      return wrapChart(
-        resolved,
+      return wrap(
         createElement(HeatmapChart, {
           matrix,
           min: props.min as number | undefined,
           max: props.max as number | undefined,
         }),
-        options,
       );
     }
 
@@ -288,10 +285,13 @@ export function compilePanel(
       const value = String(
         props.value ?? rows[0]?.[resolved.encoding?.value?.field ?? "value"] ?? "",
       );
+      const label = String(props.label ?? resolved.title ?? "");
       return createElement(Stat, {
         value,
-        label: String(props.label ?? resolved.title ?? ""),
-        tone: props.tone as StatTone | undefined,
+        label,
+        tone:
+          (props.tone as StatTone | undefined) ??
+          resolveTagStatTone(tagTones, label),
         surface: props.surface as "light" | "dark" | undefined,
         monospace: props.monospace as boolean | undefined,
       });
@@ -301,13 +301,19 @@ export function compilePanel(
       const value = Number(
         props.value ?? rows[0]?.[resolved.encoding?.value?.field ?? "value"] ?? 0,
       );
-      return createElement(Gauge, {
-        value,
-        label: String(props.label ?? resolved.title ?? ""),
-        unit: props.unit as string | undefined,
-        warningAt: props.warningAt as number | undefined,
-        criticalAt: props.criticalAt as number | undefined,
-      });
+      const label = String(props.label ?? resolved.title ?? "");
+      return wrap(
+        createElement(Gauge, {
+          value,
+          label,
+          unit: props.unit as string | undefined,
+          warningAt: props.warningAt as number | undefined,
+          criticalAt: props.criticalAt as number | undefined,
+          tone:
+            (props.tone as StatTone | undefined) ??
+            resolveTagStatTone(tagTones, label),
+        }),
+      );
     }
 
     case "table": {
@@ -327,6 +333,6 @@ export function compilePanel(
     }
 
     default:
-      return compileRegisteredPanel(resolved, data, rows, options);
+      return compileRegisteredPanel(resolved, data, rows, options, tagTones);
   }
 }

@@ -19,6 +19,7 @@ import { getInteractionChrome } from "../interaction/mode";
 import { usePlotSync } from "../sync/usePlotSync";
 import { usePlotSampling } from "../plot/usePlotSampling";
 import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
+import { applyTagTonesToSeries } from "../alarm/tagTones";
 
 const LINE_SERIES_KINDS = ["line", "area"] as const;
 
@@ -111,8 +112,8 @@ export function LineChart({
   thresholdBands,
   referenceLines,
 }: LineChartProps): ReactElement | null {
-  const { size, ready, theme, mode, config } = useChartLayout();
-  const { categories, series, valueSuffix } = useResolvedCartesianProps(
+  const { size, ready, theme, mode, config, tagTones } = useChartLayout();
+  const { categories, series: resolvedSeries, valueSuffix } = useResolvedCartesianProps(
     {
       categories: categoriesProp,
       series: seriesProp,
@@ -122,6 +123,10 @@ export function LineChart({
     },
     config,
     [...LINE_SERIES_KINDS],
+  );
+  const series = useMemo(
+    () => applyTagTonesToSeries(resolvedSeries, tagTones ?? {}),
+    [resolvedSeries, tagTones],
   );
   const maxPoints = usePlotSampling({
     pointCount: categories.length,

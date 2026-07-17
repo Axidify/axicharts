@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import type { StatTone } from "../stat/Stat";
 import { useOptionalChartLayout } from "../container/useOptionalChartLayout";
+import { resolveTagStatTone } from "../alarm/tagTones";
 
 const TONE_STROKE: Record<StatTone, string> = {
   neutral: "#3b82f6",
@@ -63,6 +64,10 @@ export function Gauge({
   criticalAt,
 }: GaugeProps): ReactElement {
   const layout = useOptionalChartLayout();
+  const resolvedTone =
+    tone ??
+    resolveTagStatTone(layout?.tagTones, label) ??
+    resolveTone(value, undefined, warningAt, criticalAt);
   const width = layout?.ready ? layout.size.width : 160;
   const height = layout?.ready ? layout.size.height : 120;
 
@@ -75,7 +80,7 @@ export function Gauge({
   const clamped = Math.min(max, Math.max(min, value));
   const fraction = (clamped - min) / span;
   const valueEnd = start - fraction * Math.PI;
-  const stroke = TONE_STROKE[resolveTone(value, tone, warningAt, criticalAt)];
+  const stroke = TONE_STROKE[resolvedTone];
   const track = "#334155";
   const display =
     unit === "%" ? `${clamped.toFixed(0)}%` : `${clamped.toFixed(0)}${unit}`;

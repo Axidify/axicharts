@@ -1,3 +1,6 @@
+import { afterEach } from "vitest";
+import { cleanup } from "@testing-library/react";
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: (query: string) => ({
@@ -34,3 +37,8 @@ globalThis.ResizeObserver = class ResizeObserver {
 
   unobserve() {}
 } as typeof ResizeObserver;
+
+afterEach(async () => {
+  cleanup();
+  await new Promise((resolve) => setTimeout(resolve, 60));
+});

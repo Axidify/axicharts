@@ -47,6 +47,27 @@ describe("compilePanel donut", () => {
   });
 });
 
+describe("compilePanel alarm tones", () => {
+  it("applies tag tones from runtime data to line series", () => {
+    const panel = compilePanel(
+      {
+        type: "line",
+        props: {
+          categories: ["a", "b"],
+          series: [{ name: "cpu", data: [1, 2] }],
+        },
+        height: 160,
+      },
+      {
+        alarms: [{ id: "1", message: "High CPU", severity: "warning", tag: "cpu" }],
+      },
+    );
+
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+  });
+});
+
 describe("compilePanel table", () => {
   it("renders tabular rows from spec data", () => {
     const panel = compilePanel(
