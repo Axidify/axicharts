@@ -182,6 +182,8 @@ export function compilePanel(
           categories,
           data: candleData,
           volume: props.volume as number[] | undefined,
+          brush: props.brush as boolean | undefined,
+          brushEnd: props.brushEnd as number | undefined,
         }),
         options,
       );

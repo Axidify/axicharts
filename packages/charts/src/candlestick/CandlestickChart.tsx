@@ -17,6 +17,8 @@ export type CandlestickChartProps = {
   categories: string[];
   data: OhlcPoint[];
   volume?: number[];
+  brush?: boolean;
+  brushEnd?: number;
 };
 
 function buildOhlcRows(
@@ -39,6 +41,8 @@ function CandlestickPlot({
   categories,
   data,
   volume,
+  brush,
+  brushEnd,
 }: CandlestickChartProps): ReactElement {
   const { size, theme } = useChartLayout();
   const interaction = useEChartsInteraction();
@@ -51,6 +55,8 @@ function CandlestickPlot({
       data={data}
       volume={volume}
       theme={theme}
+      brush={brush}
+      brushEnd={brushEnd}
       chartId={interaction.chartId}
       onSyncIndex={interaction.onSyncIndex}
       syncIndex={interaction.syncIndex}
@@ -64,6 +70,8 @@ export function CandlestickChart({
   categories,
   data,
   volume,
+  brush = false,
+  brushEnd,
 }: CandlestickChartProps): ReactElement | null {
   const { size, ready } = useChartLayout();
 
@@ -88,6 +96,8 @@ export function CandlestickChart({
             categories={categories}
             data={data}
             volume={volume}
+            brush={brush}
+            brushEnd={brushEnd}
           />
         }
       />

@@ -10,17 +10,35 @@ import {
 } from "@axicharts/charts";
 import { liveTheme } from "@axicharts/charts-theme";
 
-const SESSIONS = ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00"];
-const OHLC = [
-  { open: 182.4, high: 183.2, low: 181.9, close: 182.8 },
-  { open: 182.8, high: 184.1, low: 182.5, close: 183.6 },
-  { open: 183.6, high: 183.9, low: 182.1, close: 182.4 },
-  { open: 182.4, high: 185.0, low: 182.2, close: 184.7 },
-  { open: 184.7, high: 185.4, low: 184.0, close: 184.2 },
-  { open: 184.2, high: 184.8, low: 183.5, close: 184.0 },
-];
-const VOLUME = [1.2, 1.8, 1.1, 2.4, 1.6, 1.3].map((v) => v * 1_000_000);
-const RSI = [38, 42, 35, 58, 52, 48];
+const BAR_COUNT = 48;
+const SESSIONS = Array.from({ length: BAR_COUNT }, (_, index) => {
+  const totalMinutes = 9 * 60 + 30 + index;
+  const hour = Math.floor(totalMinutes / 60);
+  const minute = totalMinutes % 60;
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+});
+
+let price = 182.4;
+const OHLC = SESSIONS.map(() => {
+  const open = price;
+  const delta = (Math.random() - 0.48) * 1.2;
+  const close = open + delta;
+  const high = Math.max(open, close) + Math.random() * 0.6;
+  const low = Math.min(open, close) - Math.random() * 0.6;
+  price = close;
+  return {
+    open: Number(open.toFixed(2)),
+    high: Number(high.toFixed(2)),
+    low: Number(low.toFixed(2)),
+    close: Number(close.toFixed(2)),
+  };
+});
+const VOLUME = SESSIONS.map(() =>
+  Number((0.8 + Math.random() * 2.2).toFixed(1)) * 1_000_000,
+);
+const RSI = SESSIONS.map((_, index) =>
+  Math.round(35 + Math.sin(index / 4) * 12 + (Math.random() - 0.5) * 8),
+);
 
 const HEATMAP = {
   xCategories: ["Tech", "Energy", "Finance", "Health"],
@@ -85,8 +103,13 @@ function TradingDeskMockup(): ReactElement {
                 categories={SESSIONS}
                 data={OHLC}
                 volume={VOLUME}
+                brush
+                brushEnd={45}
               />
             </ChartContainer>
+            <p style={{ marginTop: 6, fontSize: 11, color: "#94a3b8" }}>
+              OHLC + volume · drag slider or scroll to zoom
+            </p>
           </div>
 
           <div style={{ marginTop: 12 }}>
@@ -130,7 +153,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Trading vertical — OHLC + volume, synced RSI panel, live stat strip, correlation heatmap.",
+          "Trading vertical — OHLC + volume with brush/zoom, synced RSI panel, live stat strip, correlation heatmap.",
       },
     },
   },

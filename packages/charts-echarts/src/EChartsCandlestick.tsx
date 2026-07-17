@@ -11,6 +11,7 @@ import {
   splitLineStyle,
   upDownColors,
 } from "./themeBridge";
+import { buildDataZoom } from "./dataZoom";
 import { useEChart, type EChartCursorEvent } from "./useEChart";
 import type { OhlcPoint } from "./types";
 
@@ -21,6 +22,8 @@ export type EChartsCandlestickProps = {
   data: OhlcPoint[];
   volume?: number[];
   theme: ChartTheme;
+  brush?: boolean;
+  brushEnd?: number;
   chartId?: string;
   onSyncIndex?: (index: number | null) => void;
   syncIndex?: number | null;
@@ -35,6 +38,8 @@ export function EChartsCandlestick({
   data,
   volume,
   theme,
+  brush = false,
+  brushEnd,
   chartId,
   onSyncIndex,
   syncIndex,
@@ -43,19 +48,32 @@ export function EChartsCandlestick({
 }: EChartsCandlestickProps): ReactElement {
   const { up, down } = upDownColors();
   const ohlc = data.map((point) => [point.open, point.close, point.low, point.high]);
+  const mainGrid = {
+    ...gridOptions(theme),
+    ...(brush && !volume ? { bottom: 40 } : {}),
+  };
 
   const option: EChartsOption = {
     grid: volume
       ? [
-          { ...gridOptions(theme), height: "58%", bottom: "32%" },
-          { ...gridOptions(theme), top: "72%", height: "18%" },
+          { ...mainGrid, height: brush ? "52%" : "58%", bottom: brush ? "38%" : "32%" },
+          { ...gridOptions(theme), top: brush ? "68%" : "72%", height: "16%" },
         ]
-      : [gridOptions(theme)],
+      : [mainGrid],
     tooltip: hiddenTooltip(),
     axisPointer: {
       link: [{ xAxisIndex: volume ? [0, 1] : [0] }],
       ...reactAxisPointer(),
     },
+    ...(brush
+      ? {
+          dataZoom: buildDataZoom({
+            withVolume: Boolean(volume),
+            theme,
+            end: brushEnd,
+          }),
+        }
+      : {}),
     xAxis: volume
       ? [
           {

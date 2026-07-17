@@ -7,6 +7,7 @@ import {
 } from "echarts/charts";
 import {
   GridComponent,
+  DataZoomComponent,
   LegendComponent,
   TooltipComponent,
   VisualMapComponent,
@@ -21,12 +22,14 @@ echarts.use([
   LineChart,
   PieChart,
   GridComponent,
+  DataZoomComponent,
   LegendComponent,
   TooltipComponent,
   VisualMapComponent,
   CanvasRenderer,
 ]);
 
+export { buildDataZoom, type BuildDataZoomInput } from "./dataZoom";
 export { EChartsCandlestick, type EChartsCandlestickProps } from "./EChartsCandlestick";
 export { EChartsHeatmap, type EChartsHeatmapProps } from "./EChartsHeatmap";
 export { EChartsPie, type EChartsPieProps } from "./EChartsPie";
