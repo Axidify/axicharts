@@ -26,6 +26,8 @@ import {
   plannerFeedGalleryDeepLink,
   plannerFeedGalleryIndexDeepLink,
   runtimeShareImportDeepLink,
+  runtimeSchemaShareMetaDeepLink,
+  runtimeDeepLinkShareImportDeepLink,
   feedAdapterGalleryDeepLink,
   adapterFixtureGalleryDeepLink,
   formatValidatePresetCommand,
@@ -203,6 +205,12 @@ describe("hosted import presets", () => {
     );
     expect(runtimeShareImportDeepLink()).toBe(
       "https://axidify.github.io/axicharts/runtime#share-import",
+    );
+    expect(runtimeSchemaShareMetaDeepLink()).toBe(
+      "https://axidify.github.io/axicharts/runtime/schema#share-meta",
+    );
+    expect(runtimeDeepLinkShareImportDeepLink()).toBe(
+      "https://axidify.github.io/axicharts/runtime/links#share-import",
     );
     const mosaicFixturesFromSample = plannerAdapterFixtures({
       layout: "mosaic",

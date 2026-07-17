@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import {
   formatValidatePresetCommand,
   HOSTED_IMPORT_PRESETS,
+  runtimeDeepLinkShareImportDeepLink,
+  runtimeShareImportDeepLink,
+  SHARE_EXPORT_REFERENCE_PRESET,
 } from "@axicharts/charts-runtime/validation";
 import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
 import { RuntimeHubNav } from "../components/RuntimeHubNav";
@@ -11,9 +14,11 @@ import shareSchema from "../../../../packages/charts-runtime/schema/share-export
 import {
   EDITOR_RUNTIME_HEADER,
   EDITOR_SHARE_HEADER,
+  EDITOR_SHARE_WITH_META_HEADER,
   EDITOR_VSCODE_SETTINGS,
   GITOPS_CODE,
   SCHEMA_IMPORT_CODE,
+  SHARE_META_FIELD_ROWS,
   VALIDATE_RUNTIME_CODE,
 } from "../demos/runtimeSchemaDemo";
 
@@ -215,6 +220,108 @@ export function RuntimeSchemaPage(): ReactElement {
 
       <Section title="GitOps workflow" subtitle="pull request gate">
         <CodeBlock dark>{GITOPS_CODE}</CodeBlock>
+      </Section>
+
+      <Section
+        title="Share export planner meta"
+        subtitle="dashboardMeta · Dashboarder round-trip"
+        id="share-meta"
+      >
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Optional <code>meta</code> on dashboard and workspace share exports preserves Dashboarder
+          builder state — layout, feed, template, mosaic preset, and presentation. Portable runtime
+          JSON omits <code>meta</code>; use share envelopes for planner round-trip. Import restores
+          fields via <code>applyDashboardMeta</code> — see{" "}
+          <Link to="/runtime#share-import">share ↔ import flow</Link>
+          {" · "}
+          <Link to="/runtime/links#share-import">deep-link presets</Link>
+          {" · "}
+          <a href={runtimeShareImportDeepLink()}>hosted overview</a>.
+        </p>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: 13,
+            marginBottom: 16,
+          }}
+        >
+          <thead>
+            <tr>
+              <th
+                style={{
+                  borderBottom: "1px solid #e2e8f0",
+                  padding: "8px 6px",
+                  textAlign: "left",
+                }}
+              >
+                Field
+              </th>
+              <th
+                style={{
+                  borderBottom: "1px solid #e2e8f0",
+                  padding: "8px 6px",
+                  textAlign: "left",
+                }}
+              >
+                Type
+              </th>
+              <th
+                style={{
+                  borderBottom: "1px solid #e2e8f0",
+                  padding: "8px 6px",
+                  textAlign: "left",
+                }}
+              >
+                Description
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {SHARE_META_FIELD_ROWS.map((row) => (
+              <tr key={row.field}>
+                <td style={{ borderBottom: "1px solid #f1f5f9", padding: "8px 6px" }}>
+                  <code>{row.field}</code>
+                </td>
+                <td
+                  style={{
+                    borderBottom: "1px solid #f1f5f9",
+                    padding: "8px 6px",
+                    color: "#64748b",
+                    fontSize: 12,
+                  }}
+                >
+                  {row.type}
+                </td>
+                <td
+                  style={{
+                    borderBottom: "1px solid #f1f5f9",
+                    padding: "8px 6px",
+                    color: "#475569",
+                  }}
+                >
+                  {row.description}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Share export with meta</strong>
+        </p>
+        <CodeBlock>{EDITOR_SHARE_WITH_META_HEADER}</CodeBlock>
+        <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b" }}>
+          Shipped fixtures:{" "}
+          <Link to={`/runtime/import?preset=${SHARE_EXPORT_REFERENCE_PRESET.dashboard}`}>
+            {SHARE_EXPORT_REFERENCE_PRESET.dashboard}
+          </Link>
+          {" · "}
+          <Link to={`/runtime/import?preset=${SHARE_EXPORT_REFERENCE_PRESET.workspace}`}>
+            {SHARE_EXPORT_REFERENCE_PRESET.workspace}
+          </Link>
+          {" · "}
+          <a href={runtimeDeepLinkShareImportDeepLink()}>deep-link table</a>
+        </p>
       </Section>
 
       <Section title="Runtime spec schema" subtitle="draft-07 · embed + mosaic">

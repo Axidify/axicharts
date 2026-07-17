@@ -60,6 +60,45 @@ export const EDITOR_SHARE_HEADER = `{
   }
 }`;
 
+export const EDITOR_SHARE_WITH_META_HEADER = `{
+  "$schema": "https://axidify.github.io/axicharts/schema/share-export.schema.json",
+  "version": 1,
+  "kind": "dashboard",
+  "exportedAt": "2026-01-01T00:00:00.000Z",
+  "name": "Line 3",
+  "meta": {
+    "layout": "embed",
+    "feed": "rest",
+    "template": "ops-2x2",
+    "presentation": false
+  },
+  "spec": {
+    "layout": "embed",
+    "dashboard": {
+      "template": "ops-2x2",
+      "title": "Line 3",
+      "mode": "live",
+      "dataSource": { "type": "rest", "url": "/api/metrics", "intervalMs": 2000 }
+    }
+  }
+}`;
+
+export const SHARE_META_FIELD_ROWS = [
+  { field: "layout", type: "embed | mosaic", description: "Builder layout mode restored on import" },
+  {
+    field: "feed",
+    type: "static | historian | rest | websocket | mqtt | mock-live",
+    description: "Planner feed intent — maps to gallery adapter fixtures",
+  },
+  { field: "template", type: "string", description: "charts-spec template id (e.g. ops-2x2)" },
+  {
+    field: "mosaicPreset",
+    type: "string",
+    description: "Named mosaic wall preset when layout is mosaic",
+  },
+  { field: "presentation", type: "boolean", description: "Presentation mode flag for embed chrome" },
+] as const;
+
 export const GITOPS_CODE = `name: Validate dashboards
 on: [pull_request]
 jobs:

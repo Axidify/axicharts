@@ -1,5 +1,37 @@
 import { useState, type ReactElement } from "react";
-import type { ImportShape, ShareExport } from "@axicharts/charts-runtime/validation";
+import {
+  runtimeDeepLinkShareImportDeepLink,
+  runtimeSchemaShareMetaDeepLink,
+  runtimeShareImportDeepLink,
+  type ImportShape,
+  type ShareExport,
+} from "@axicharts/charts-runtime/validation";
+
+const docsLinkStyle = { color: "#93c5fd" } as const;
+
+export function ShareImportDocsLinks(): ReactElement {
+  return (
+    <div style={{ marginTop: 8 }}>
+      Docs:{" "}
+      <a href={runtimeSchemaShareMetaDeepLink()} style={docsLinkStyle} target="_blank" rel="noreferrer">
+        Schema § meta
+      </a>
+      {" · "}
+      <a href={runtimeShareImportDeepLink()} style={docsLinkStyle} target="_blank" rel="noreferrer">
+        Share ↔ import
+      </a>
+      {" · "}
+      <a
+        href={runtimeDeepLinkShareImportDeepLink()}
+        style={docsLinkStyle}
+        target="_blank"
+        rel="noreferrer"
+      >
+        Deep links
+      </a>
+    </div>
+  );
+}
 
 export function LayerStatus({
   label,

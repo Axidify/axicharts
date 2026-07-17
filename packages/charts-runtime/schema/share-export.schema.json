@@ -16,7 +16,7 @@
         "layout": { "type": "string", "enum": ["embed", "mosaic"] },
         "feed": {
           "type": "string",
-          "enum": ["static", "historian", "websocket", "mqtt"]
+          "enum": ["static", "historian", "rest", "websocket", "mqtt", "mock-live"]
         },
         "template": { "type": "string" },
         "mosaicPreset": { "type": "string" },

@@ -20,7 +20,7 @@ import {
   shareExportReferencePreset,
   validateShareExportDualJson,
 } from "@axicharts/charts-runtime/validation";
-import { ErrorList, importSummary, LayerStatus, ValidateCommandCopy } from "./validationChrome";
+import { ErrorList, importSummary, LayerStatus, ShareImportDocsLinks, ValidateCommandCopy } from "./validationChrome";
 
 const overlayStyle = {
   position: "fixed" as const,
@@ -345,6 +345,7 @@ export function ShareDialog({
                 </strong>
               </div>
             ) : null}
+            <ShareImportDocsLinks />
           </div>
         ) : null}
 
@@ -373,6 +374,7 @@ export function ShareDialog({
             >
               Planner feed index
             </a>
+            <ShareImportDocsLinks />
           </div>
         ) : null}
       </div>

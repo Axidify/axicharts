@@ -297,6 +297,18 @@ export function runtimeShareImportDeepLink(origin = DOCS_SITE_ORIGIN): string {
   return `${base}/runtime#share-import`;
 }
 
+/** Docs schema page anchor for share-export planner meta fields. */
+export function runtimeSchemaShareMetaDeepLink(origin = DOCS_SITE_ORIGIN): string {
+  const base = origin.endsWith("/") ? origin.slice(0, -1) : origin;
+  return `${base}/runtime/schema#share-meta`;
+}
+
+/** Docs deep-link index anchor for share preset round-trip table. */
+export function runtimeDeepLinkShareImportDeepLink(origin = DOCS_SITE_ORIGIN): string {
+  const base = origin.endsWith("/") ? origin.slice(0, -1) : origin;
+  return `${base}/runtime/links#share-import`;
+}
+
 /** Docs gallery URL for a planner feed row. */
 export function plannerFeedGalleryDeepLink(
   feed: PlannerFeedLike,

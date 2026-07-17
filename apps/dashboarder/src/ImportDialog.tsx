@@ -17,7 +17,7 @@ import {
   type ShareExport,
 } from "@axicharts/charts-runtime/validation";
 import { LOCAL_IMPORT_FIXTURES } from "./importPresetFixtures";
-import { ErrorList, importSummary, LayerStatus, ValidateCommandCopy } from "./validationChrome";
+import { ErrorList, importSummary, LayerStatus, ShareImportDocsLinks, ValidateCommandCopy } from "./validationChrome";
 
 const overlayStyle = {
   position: "fixed" as const,
@@ -147,6 +147,7 @@ function PlannerMetaRestoreHint({
           </strong>
         </div>
       ) : null}
+      <ShareImportDocsLinks />
     </div>
   );
 }
@@ -484,6 +485,7 @@ export function ImportDialog({
             >
               Planner feed index
             </a>
+            <ShareImportDocsLinks />
           </div>
         ) : null}
 
