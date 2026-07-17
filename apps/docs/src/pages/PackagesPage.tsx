@@ -8,6 +8,7 @@ const PACKAGES = [
   { name: "@axicharts/charts-core", description: "layout math + tick formatters" },
   { name: "@axicharts/charts-spec", description: "templates, planner, eject CLI" },
   { name: "@axicharts/charts-runtime", description: "adapters, embed SDK, spec portability" },
+  { name: "@axicharts/charts-tank", description: "community tank level plugin (registerChartType)" },
 ] as const;
 
 export function PackagesPage(): ReactElement {

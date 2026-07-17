@@ -6,6 +6,7 @@ const links = [
   { to: "/start", label: "Getting started" },
   { to: "/verticals", label: "Verticals" },
   { to: "/runtime", label: "Runtime" },
+  { to: "/plugins", label: "Plugins" },
   { to: "/packages", label: "Packages" },
 ] as const;
 

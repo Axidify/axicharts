@@ -6,7 +6,7 @@ Line/bar/area via uPlot; pie, candlestick, waterfall, and heatmap via ECharts; i
 
 - **GitHub:** https://github.com/Axidify/axicharts
 - **Storybook:** `pnpm storybook` → http://localhost:6006
-- **Docs:** `pnpm docs` → http://localhost:3001
+- **Docs:** `pnpm docs` → http://localhost:3001 ([GitHub Pages](https://axidify.github.io/axicharts/))
 - **Dashboarder:** `pnpm dashboarder` → http://localhost:3000
 - **License:** MIT
 
@@ -48,6 +48,7 @@ export function LatencyPanel() {
 | `@axicharts/charts-core` | Layout math + `formatTick` / `registerTickFormat` |
 | `@axicharts/charts-spec` | Vertical templates, planner, eject CLI |
 | `@axicharts/charts-runtime` | Data adapters, embed SDK, spec portability |
+| `@axicharts/charts-tank` | Community plugin — tank level chart (`registerChartType`) |
 
 ## Develop
 

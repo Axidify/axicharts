@@ -34,6 +34,12 @@ const config: StorybookConfig = {
             root,
             "packages/charts-echarts/src",
           ),
+          "@axicharts/charts-spec": path.resolve(root, "packages/charts-spec/src"),
+          "@axicharts/charts-runtime": path.resolve(
+            root,
+            "packages/charts-runtime/src",
+          ),
+          "@axicharts/charts-tank": path.resolve(root, "packages/charts-tank/src"),
         },
       },
     });

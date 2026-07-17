@@ -40,5 +40,11 @@
     "path": "packages/charts-runtime/dist/index.js",
     "limit": "6 KB",
     "gzip": true
+  },
+  {
+    "name": "@axicharts/charts-tank",
+    "path": "packages/charts-tank/dist/index.js",
+    "limit": "3 KB",
+    "gzip": true
   }
 ]
