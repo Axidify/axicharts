@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { useEffect, useMemo, useState, type ReactElement } from "react";
 import type { TemplateId } from "@axicharts/charts-spec";
 import {
   RuntimeDashboard,
@@ -10,7 +10,6 @@ import {
   importSharedWorkspace,
   loadWorkspaceStore,
   parseDashboardSpec,
-  parseShareExport,
   persistWorkspaceStore,
   renameDashboard,
   renameWorkspace,
@@ -18,10 +17,12 @@ import {
   selectDashboard,
   selectWorkspace,
   type RuntimeDashboardSpec,
+  type ShareExport,
   type WorkspaceStore,
 } from "@axicharts/charts-runtime";
 import type { DashboardPlan } from "@axicharts/charts-planner";
 import { EmbedDialog } from "./EmbedDialog";
+import { ImportDialog } from "./ImportDialog";
 import { PlannerPanel } from "./PlannerPanel";
 import { ShareDialog } from "./ShareDialog";
 import { PluginStrip } from "./PluginStrip";
@@ -106,7 +107,9 @@ export function App(): ReactElement {
   const [embedOpen, setEmbedOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [shareTab, setShareTab] = useState<"dashboard" | "workspace">("dashboard");
-  const importInputRef = useRef<HTMLInputElement>(null);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importJson, setImportJson] = useState("");
+  const [importFilename, setImportFilename] = useState<string | undefined>();
 
   useEffect(() => {
     const loaded = loadWorkspaceStore(localStorage, undefined, defaultSeedSpec());
@@ -234,54 +237,52 @@ export function App(): ReactElement {
     setDirty(true);
   };
 
-  const handleImportFile = async (file: File): Promise<void> => {
+  const applyImport = (imported: ShareExport): void => {
     if (!store) return;
-    const text = await file.text();
 
-    try {
-      const imported = parseShareExport(text);
-
-      if (imported.kind === "workspace") {
-        const next = importSharedWorkspace(store, imported);
-        persist(next);
-        applyDashboardMeta(
-          getActiveDashboard(next),
-          setLayout,
-          setFeed,
-          setTemplate,
-          setPresentation,
-          setMosaicPreset,
-        );
-        setDirty(false);
-        return;
-      }
-
-      const next = saveDashboardSpec(
-        store,
-        store.activeWorkspaceId,
-        store.activeDashboardId,
-        imported.spec,
-        {
-          name: imported.name,
-          meta: imported.meta,
-        },
-      );
+    if (imported.kind === "workspace") {
+      const next = importSharedWorkspace(store, imported);
       persist(next);
-      if (imported.meta) {
-        applyDashboardMeta(
-          getActiveDashboard(next),
-          setLayout,
-          setFeed,
-          setTemplate,
-          setPresentation,
-          setMosaicPreset,
-        );
-      }
+      applyDashboardMeta(
+        getActiveDashboard(next),
+        setLayout,
+        setFeed,
+        setTemplate,
+        setPresentation,
+        setMosaicPreset,
+      );
       setDirty(false);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      window.alert(`Import failed: ${message}`);
+      return;
     }
+
+    const next = saveDashboardSpec(
+      store,
+      store.activeWorkspaceId,
+      store.activeDashboardId,
+      imported.spec,
+      {
+        name: imported.name,
+        meta: imported.meta,
+      },
+    );
+    persist(next);
+    if (imported.meta) {
+      applyDashboardMeta(
+        getActiveDashboard(next),
+        setLayout,
+        setFeed,
+        setTemplate,
+        setPresentation,
+        setMosaicPreset,
+      );
+    }
+    setDirty(false);
+  };
+
+  const openImportDialog = (): void => {
+    setImportJson("");
+    setImportFilename(undefined);
+    setImportOpen(true);
   };
 
   if (!store || !activeSpec) {
@@ -433,20 +434,9 @@ export function App(): ReactElement {
           <button type="button" onClick={handleExport} style={buttonStyle}>
             Export
           </button>
-          <button type="button" onClick={() => importInputRef.current?.click()} style={buttonStyle}>
+          <button type="button" onClick={openImportDialog} style={buttonStyle}>
             Import
           </button>
-          <input
-            ref={importInputRef}
-            type="file"
-            accept="application/json,.json"
-            hidden
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              event.target.value = "";
-              if (file) void handleImportFile(file);
-            }}
-          />
         </div>
       </header>
 
@@ -512,6 +502,13 @@ export function App(): ReactElement {
         spec={activeSpec}
         meta={builderMeta}
         onClose={() => setShareOpen(false)}
+      />
+      <ImportDialog
+        open={importOpen}
+        initialJson={importJson}
+        initialFilename={importFilename}
+        onClose={() => setImportOpen(false)}
+        onApply={applyImport}
       />
     </div>
   );

@@ -3,10 +3,12 @@ import {
   formatValidationErrors,
   validateRuntimeSpecRaw,
 } from "../runtimeValidation";
+import { SHARE_EXPORT_SCHEMA_URL, withSchemaHint, type WithSchemaHint } from "../schemaUrls";
 import type { RuntimeDashboardSpec } from "../types";
 import type { SavedDashboard, Workspace } from "./types";
 
 export type DashboardExport = {
+  $schema?: string;
   version: 1;
   kind: "dashboard";
   exportedAt: string;
@@ -16,6 +18,7 @@ export type DashboardExport = {
 };
 
 export type WorkspaceShareExport = {
+  $schema?: string;
   version: 1;
   kind: "workspace";
   exportedAt: string;
@@ -35,7 +38,17 @@ export type ShareValidationResult =
 
 export type SerializeExportOptions = {
   exportedAt?: string;
+  includeSchema?: boolean;
+  schemaUrl?: string;
 };
+
+function buildExportEnvelope<T extends Record<string, unknown>>(
+  envelope: T,
+  options?: SerializeExportOptions,
+): T | WithSchemaHint<T> {
+  if (options?.includeSchema === false) return envelope;
+  return withSchemaHint(envelope, options?.schemaUrl ?? SHARE_EXPORT_SCHEMA_URL);
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -150,7 +163,7 @@ export function serializeDashboardExport(
     meta,
     spec: JSON.parse(serializeRuntimeSpec(validated, false)) as RuntimeDashboardSpec,
   };
-  return JSON.stringify(envelope, null, 2);
+  return JSON.stringify(buildExportEnvelope(envelope, options), null, 2);
 }
 
 export function serializeWorkspaceExport(
@@ -171,7 +184,7 @@ export function serializeWorkspaceExport(
       ),
     })),
   };
-  return JSON.stringify(envelope, null, 2);
+  return JSON.stringify(buildExportEnvelope(envelope, options), null, 2);
 }
 
 function parseDashboardEnvelope(raw: Record<string, unknown>): {

@@ -87,7 +87,7 @@ export function buildEmbedBundle(
 }
 
 export function buildPortableSpecJson(spec: RuntimeDashboardSpec, pretty = true): string {
-  return serializeRuntimeSpec(spec, pretty);
+  return serializeRuntimeSpec(spec, pretty, { schema: true });
 }
 
 export function validateRuntimeSpecJson(json: string): {

@@ -96,7 +96,12 @@ export {
   parseRuntimeSpec,
   serializeRuntimeSpec,
   toPortableRuntimeSpec,
+  type SerializeRuntimeSpecOptions,
 } from "./runtimeSpec";
+export {
+  RUNTIME_SPEC_SCHEMA_URL,
+  SHARE_EXPORT_SCHEMA_URL,
+} from "./schemaUrls";
 export {
   assertRuntimeSpec,
   formatValidationErrors,

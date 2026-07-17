@@ -6,6 +6,7 @@ import {
   buildReactEmbedSnippet,
   validateRuntimeSpecJson,
 } from "./embedSnippet";
+import { RUNTIME_SPEC_SCHEMA_URL } from "./schemaUrls";
 
 const spec = {
   layout: "embed" as const,
@@ -36,6 +37,7 @@ describe("embedSnippet", () => {
   it("serializes portable runtime JSON", () => {
     const json = buildPortableSpecJson(spec, false);
     expect(json).toContain("ops-2x2");
+    expect(JSON.parse(json).$schema).toBe(RUNTIME_SPEC_SCHEMA_URL);
   });
 
   it("validates runtime spec JSON", () => {

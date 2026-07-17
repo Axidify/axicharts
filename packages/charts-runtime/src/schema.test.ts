@@ -44,4 +44,14 @@ describe("runtime JSON schema", () => {
   it("accepts dashboard share export envelope", () => {
     expect(validateShareSchema(readExample("ops-dashboard.share.json"))).toBe(true);
   });
+
+  it("accepts runtime specs with $schema hints", () => {
+    expect(
+      validateRuntimeSchema({
+        $schema: "https://axidify.github.io/axicharts/schema/runtime-spec.schema.json",
+        layout: "embed",
+        dashboard: { template: "ops-2x2", title: "Ops" },
+      }),
+    ).toBe(true);
+  });
 });

@@ -2,6 +2,7 @@ import {
   formatValidationErrors,
   validateRuntimeSpecJson,
 } from "./runtimeValidation";
+import { RUNTIME_SPEC_SCHEMA_URL, withSchemaHint } from "./schemaUrls";
 import type { RuntimeDashboardSpec } from "./types";
 
 export type {
@@ -19,9 +20,22 @@ export function toPortableRuntimeSpec(spec: RuntimeDashboardSpec): RuntimeDashbo
   return JSON.parse(JSON.stringify(spec)) as RuntimeDashboardSpec;
 }
 
-export function serializeRuntimeSpec(spec: RuntimeDashboardSpec, pretty = true): string {
+export type SerializeRuntimeSpecOptions = {
+  schema?: boolean;
+  schemaUrl?: string;
+};
+
+export function serializeRuntimeSpec(
+  spec: RuntimeDashboardSpec,
+  pretty = true,
+  options?: SerializeRuntimeSpecOptions,
+): string {
   const portable = toPortableRuntimeSpec(spec);
-  return JSON.stringify(portable, null, pretty ? 2 : undefined);
+  const payload =
+    options?.schema === true
+      ? withSchemaHint(portable, options.schemaUrl ?? RUNTIME_SPEC_SCHEMA_URL)
+      : portable;
+  return JSON.stringify(payload, null, pretty ? 2 : undefined);
 }
 
 export function parseRuntimeSpec(json: string): RuntimeDashboardSpec {

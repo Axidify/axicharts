@@ -1,4 +1,5 @@
 {
+  "$schema": "https://axidify.github.io/axicharts/schema/share-export.schema.json",
   "version": 1,
   "kind": "dashboard",
   "exportedAt": "2026-01-01T00:00:00.000Z",

@@ -3,6 +3,7 @@ import {
   getActiveWorkspace,
   serializeDashboardExport,
   serializeWorkspaceExport,
+  SHARE_EXPORT_SCHEMA_URL,
   validateShareExportJson,
   type RuntimeDashboardSpec,
   type SavedDashboard,
@@ -127,7 +128,11 @@ export function ShareDialog({
               Share export
             </div>
             <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
-              Portable JSON envelopes with version, kind, and exportedAt metadata
+              Portable JSON envelopes with version, kind, exportedAt, and{" "}
+              <a href={SHARE_EXPORT_SCHEMA_URL} style={{ color: "#93c5fd" }}>
+                $schema
+              </a>{" "}
+              hints
               {validation.ok ? (
                 <span style={{ color: "#4ade80" }}> · validated</span>
               ) : (

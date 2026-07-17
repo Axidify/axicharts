@@ -156,6 +156,7 @@
       "type": "object",
       "required": ["dashboard"],
       "properties": {
+        "$schema": { "type": "string", "format": "uri" },
         "layout": { "const": "embed" },
         "dashboard": { "$ref": "#/$defs/dashboard" }
       },
@@ -165,6 +166,7 @@
       "type": "object",
       "required": ["wall"],
       "properties": {
+        "$schema": { "type": "string", "format": "uri" },
         "layout": { "const": "mosaic" },
         "wall": { "$ref": "#/$defs/mosaicWall" }
       },

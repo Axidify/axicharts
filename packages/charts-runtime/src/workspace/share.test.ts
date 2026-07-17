@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { RuntimeDashboardSpec } from "../types";
+import { SHARE_EXPORT_SCHEMA_URL } from "../schemaUrls";
 import { createDefaultWorkspaceStore, importSharedWorkspace } from "./store";
 import {
   parseDashboardExport,
@@ -25,10 +26,18 @@ describe("dashboard export", () => {
       template: "ops-2x2",
       presentation: true,
     });
-    const parsed = parseDashboardExport(json);
-    expect(parsed.name).toBe("Ops wall");
-    expect(parsed.meta?.presentation).toBe(true);
-    expect(parsed.spec.dashboard?.template).toBe("ops-2x2");
+    const parsed = JSON.parse(json) as { $schema?: string };
+    expect(parsed.$schema).toBe(SHARE_EXPORT_SCHEMA_URL);
+    const exported = parseDashboardExport(json);
+    expect(exported.name).toBe("Ops wall");
+    expect(exported.meta?.presentation).toBe(true);
+    expect(exported.spec.dashboard?.template).toBe("ops-2x2");
+  });
+
+  it("accepts imports that include $schema", () => {
+    const json = serializeDashboardExport("Schema hint", spec);
+    const result = validateShareExportJson(json);
+    expect(result.ok).toBe(true);
   });
 
   it("parses legacy bare runtime JSON", () => {
