@@ -6,6 +6,13 @@ export {
 } from "./container/ChartLayoutContext";
 export { LineChart, type LineChartProps } from "./line/LineChart";
 export { BarChart, type BarChartProps } from "./bar/BarChart";
+export { Gauge, type GaugeProps } from "./gauge/Gauge";
+export { Digital, type DigitalProps } from "./digital/Digital";
+export {
+  StatusLamp,
+  type LampStatus,
+  type StatusLampProps,
+} from "./status/StatusLamp";
 export { Stat, type StatProps, type StatSurface, type StatTone } from "./stat/Stat";
 export type {
   PlotSeries,
