@@ -52,6 +52,12 @@ export function DashboardEmbed({ dashboard }: DashboardEmbedProps): ReactElement
       error={snapshot.error}
       live={mode === "live"}
       alarms={readAlarms(data)}
+      interactiveAlarms={
+        dashboard.template === "ops-2x2" || dashboard.theme === "industrial"
+      }
+      alarmSurface={
+        dashboard.theme === "industrial" || mode === "live" ? "dark" : "light"
+      }
     >
       <Dashboard
         template={dashboard.template}

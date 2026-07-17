@@ -30,6 +30,7 @@ export type {
   WebSocketDataSourceSpec,
 } from "./types";
 
+export { useAlarmState, type AlarmState } from "./useAlarmState";
 export { AlarmBanner, type AlarmBannerProps } from "./AlarmBanner";
 export { DashboardEmbed, type DashboardEmbedProps } from "./DashboardEmbed";
 export { MosaicWall, type MosaicWallProps } from "./MosaicWall";

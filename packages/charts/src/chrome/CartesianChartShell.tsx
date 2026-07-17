@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement, ReactNode } from "react";
+import { useEffect } from "react";
 import type { PlotSeries } from "@axicharts/charts-canvas";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import {
@@ -11,6 +12,10 @@ import {
 } from "../chrome";
 import { ChartInteractionProvider } from "../interaction/ChartInteractionContext";
 import { getInteractionChrome } from "../interaction/mode";
+import {
+  ensurePresentationStyles,
+  presentationEnterStyle,
+} from "../presentation/motion";
 
 import type { TooltipRow } from "./Tooltip";
 
@@ -37,9 +42,19 @@ function CartesianChromeInner({
     chrome.showLegend && series.length > 1 && !compact;
   const legendHeight = getLegendHeight(showLegend);
 
+  useEffect(() => {
+    if (mode === "presentation") {
+      ensurePresentationStyles();
+    }
+  }, [mode]);
+
   return (
     <>
-      {showLegend ? <Legend series={series} /> : null}
+      {showLegend ? (
+        <div style={presentationEnterStyle(mode === "presentation")}>
+          <Legend series={series} />
+        </div>
+      ) : null}
       <div
         style={{
           position: "absolute",
@@ -47,6 +62,7 @@ function CartesianChromeInner({
           left: 0,
           right: 0,
           bottom: 0,
+          ...presentationEnterStyle(mode === "presentation"),
         }}
       >
         {plot}

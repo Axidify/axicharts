@@ -68,6 +68,26 @@ describe("compilePanel alarm tones", () => {
   });
 });
 
+describe("compilePanel alert", () => {
+  it("renders alarms from spec data", () => {
+    const panel = compilePanel(
+      {
+        type: "alert",
+        title: "Line alarms",
+      },
+      {
+        alarms: [
+          { id: "cpu", message: "CPU high", severity: "warning" },
+        ],
+      },
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("CPU high");
+    expect(container.textContent).toContain("Line alarms");
+  });
+});
+
 describe("compilePanel table", () => {
   it("renders tabular rows from spec data", () => {
     const panel = compilePanel(

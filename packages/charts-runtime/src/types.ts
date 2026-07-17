@@ -78,6 +78,7 @@ export type AlarmItem = {
   message: string;
   severity?: AlarmSeverity;
   acknowledged?: boolean;
+  shelved?: boolean;
   timestamp?: number;
   tag?: string;
   metric?: string;

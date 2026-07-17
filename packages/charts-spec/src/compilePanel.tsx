@@ -13,7 +13,9 @@ import {
   Stat,
   TreemapChart,
   WaterfallChart,
+  AlertPanel,
   DataTable,
+  type AlertItem,
   type PlotSeries,
   type StatTone,
   type SeriesTone,
@@ -329,6 +331,18 @@ export function compilePanel(
         surface: props.surface as "light" | "dark" | undefined,
         compact: props.compact as boolean | undefined,
         caption: String(props.caption ?? resolved.title ?? ""),
+      });
+    }
+
+    case "alert": {
+      const objectData = objectDataFromSpec(data);
+      const alarmRows =
+        (props.alarms as AlertItem[]) ??
+        (Array.isArray(objectData.alarms) ? (objectData.alarms as AlertItem[]) : []);
+      return createElement(AlertPanel, {
+        alarms: alarmRows,
+        surface: props.surface as "light" | "dark" | undefined,
+        title: String(props.title ?? resolved.title ?? "Active alarms"),
       });
     }
 

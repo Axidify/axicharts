@@ -3,6 +3,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { StaleBadge, useIsStale } from "@axicharts/charts";
 import { AlarmBanner } from "./AlarmBanner";
+import { useAlarmState } from "./useAlarmState";
 import type { AlarmItem, ConnectionState } from "./types";
 
 export type RuntimeShellProps = {
@@ -13,6 +14,8 @@ export type RuntimeShellProps = {
   error?: string;
   live?: boolean;
   alarms?: AlarmItem[];
+  interactiveAlarms?: boolean;
+  alarmSurface?: "dark" | "light";
 };
 
 export function RuntimeShell({
@@ -22,13 +25,17 @@ export function RuntimeShell({
   staleAfterMs,
   error,
   live = false,
-  alarms = [],
+  alarms: initialAlarms = [],
+  interactiveAlarms = false,
+  alarmSurface = "light",
 }: RuntimeShellProps): ReactElement {
   const isStale = useIsStale(
     lastUpdatedAt,
     staleAfterMs,
     live && connection === "ready",
   );
+  const managed = useAlarmState(initialAlarms);
+  const alarms = interactiveAlarms ? managed.alarms : initialAlarms;
 
   return (
     <div
@@ -57,7 +64,12 @@ export function RuntimeShell({
           <StaleBadge />
         </div>
       ) : null}
-      <AlarmBanner alarms={alarms} />
+      <AlarmBanner
+        alarms={alarms}
+        surface={alarmSurface}
+        onAck={interactiveAlarms ? managed.ack : undefined}
+        onShelve={interactiveAlarms ? managed.shelve : undefined}
+      />
     </div>
   );
 }

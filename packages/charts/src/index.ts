@@ -53,6 +53,8 @@ export {
   type TableColumn,
   type TableRow,
 } from "./table/DataTable";
+export { AlertPanel, type AlertPanelProps } from "./alert/AlertPanel";
+export type { AlertItem, AlertSeverity, AlertSurface } from "./alert/types";
 export {
   ChartStateOverlay,
   StaleBadge,
