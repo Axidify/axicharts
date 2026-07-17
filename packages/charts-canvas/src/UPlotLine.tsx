@@ -8,11 +8,12 @@ import {
   AXIS_COLOR,
   CANVAS_BG,
   GRID_COLOR,
-  SERIES_COLORS,
   withAlpha,
 } from "./colors";
 import type { UPlotLineProps } from "./types";
 import { applySyncedCursor } from "./plotCursor";
+import { shouldStackSeries, STACK_GROUP } from "./stack";
+import { resolveSeriesColor } from "./seriesColor";
 
 function seriesSpan(data: number[]): number {
   if (data.length === 0) return 1;
@@ -44,6 +45,7 @@ function buildOptions({
   fill,
   showAxes = true,
   dualAxis = "auto",
+  stacked = false,
   showCursor = false,
   useNativeLegend = true,
 }: UPlotLineProps): uPlot.Options {
@@ -71,7 +73,9 @@ function buildOptions({
     ? Math.min(theme.area.fillOpacity + 0.12, 0.35)
     : theme.area.fillOpacity;
 
-  const useDualAxis = shouldUseDualAxis(series, dualAxis);
+  const useDualAxis = shouldStackSeries(stacked, series.length)
+    ? false
+    : shouldUseDualAxis(series, dualAxis);
   const showLegend = useNativeLegend && series.length > 1;
   const topPad = showLegend && !compact ? 28 : compact ? 4 : 8;
 
@@ -148,13 +152,15 @@ function buildOptions({
     series: [
       {},
       ...series.map((item, index) => {
-        const color = SERIES_COLORS[item.tone ?? "default"];
+        const color = resolveSeriesColor(item.tone, index);
+        const stackSeries = shouldStackSeries(stacked, series.length);
         return {
           label: item.name,
           scale: useDualAxis && index > 0 ? "y2" : "y",
           stroke: color,
           width: theme.line.strokeWidth,
           fill: fill && theme.area.show ? withAlpha(color, fillOpacity) : undefined,
+          stack: stackSeries ? STACK_GROUP : undefined,
           points: { show: false },
         };
       }),
@@ -177,6 +183,7 @@ export function UPlotLine(props: UPlotLineProps): ReactElement {
     fill,
     showAxes,
     dualAxis,
+    stacked,
     showCursor,
     useNativeLegend,
     onCursor,
@@ -234,6 +241,7 @@ export function UPlotLine(props: UPlotLineProps): ReactElement {
     fill,
     showAxes,
     dualAxis,
+    stacked,
     showCursor,
     useNativeLegend,
     onCursor,

@@ -37,6 +37,7 @@ export type UPlotLineProps = {
   showAxes?: boolean;
   valueSuffix?: string;
   dualAxis?: DualAxisMode;
+  stacked?: boolean;
   showCursor?: boolean;
   useNativeLegend?: boolean;
   onCursor?: (event: PlotCursorEvent) => void;
@@ -56,6 +57,7 @@ export type UPlotBarProps = {
   showValues?: boolean;
   valueSuffix?: string;
   referenceLines?: ReferenceLine[];
+  stacked?: boolean;
   showCursor?: boolean;
   useNativeLegend?: boolean;
   onCursor?: (event: PlotCursorEvent) => void;

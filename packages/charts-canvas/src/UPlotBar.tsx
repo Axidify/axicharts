@@ -13,6 +13,8 @@ import {
 } from "./colors";
 import type { ReferenceLine, UPlotBarProps } from "./types";
 import { applySyncedCursor } from "./plotCursor";
+import { shouldStackSeries, STACK_GROUP } from "./stack";
+import { resolveSeriesColor } from "./seriesColor";
 
 type BarLayout = {
   left: number;
@@ -39,14 +41,16 @@ function buildOptions({
   valueSuffix = "",
   referenceLines = [],
   barLayoutsRef,
+  stacked = false,
   showCursor = false,
   useNativeLegend = true,
 }: UPlotBarProps & {
   barLayoutsRef: React.MutableRefObject<BarLayout[]>;
 }): uPlot.Options {
   const gridStroke = withAlpha(GRID_COLOR, theme.grid.opacity);
-  const color = SERIES_COLORS[series[0]?.tone ?? "default"];
   const gapPx = Math.max(2, Math.round(theme.bar.gap * 24));
+  const stackSeries = shouldStackSeries(stacked, series.length);
+  const showBarValues = showValues && !stackSeries;
 
   return {
     width,
@@ -103,28 +107,34 @@ function buildOptions({
       : [],
     series: [
       {},
-      ...series.map((item) => ({
-        label: item.name,
-        stroke: color,
-        fill: color,
-        width: 0,
-        paths: uPlot.paths.bars!({
-          gap: gapPx,
-          size: [0.6, 100],
-          each: (u, _seriesIdx, idx, left, top, barWidth, barHeight) => {
-            if (idx === 0) barLayoutsRef.current = [];
-            const value = (u.data[1] as number[] | undefined)?.[idx] ?? 0;
-            barLayoutsRef.current.push({
-              left,
-              top,
-              width: barWidth,
-              height: barHeight,
-              value,
-            });
-          },
-        }),
-        points: { show: false },
-      })),
+      ...series.map((item, index) => {
+        const color = resolveSeriesColor(item.tone, index);
+        return {
+          label: item.name,
+          stroke: color,
+          fill: color,
+          width: 0,
+          stack: stackSeries ? STACK_GROUP : undefined,
+          paths: uPlot.paths.bars!({
+            gap: gapPx,
+            size: [0.6, 100],
+            each: (u, seriesIdx, idx, left, top, barWidth, barHeight) => {
+              if (!showBarValues) return;
+              if (seriesIdx === 1 && idx === 0) barLayoutsRef.current = [];
+              const value =
+                (u.data[seriesIdx] as number[] | undefined)?.[idx] ?? 0;
+              barLayoutsRef.current.push({
+                left,
+                top,
+                width: barWidth,
+                height: barHeight,
+                value,
+              });
+            },
+          }),
+          points: { show: false },
+        };
+      }),
     ],
     hooks: {
       draw: [
@@ -160,7 +170,7 @@ function buildOptions({
             ctx.restore();
           }
 
-          if (!showValues) return;
+          if (!showBarValues) return;
 
           ctx.save();
           ctx.fillStyle = AXIS_COLOR;
@@ -195,6 +205,7 @@ export function UPlotBar(props: UPlotBarProps): ReactElement {
     series,
     theme,
     showAxes,
+    stacked,
     showCursor,
     useNativeLegend,
     onCursor,
@@ -254,6 +265,7 @@ export function UPlotBar(props: UPlotBarProps): ReactElement {
     props.valueSuffix,
     props.referenceLines,
     showAxes,
+    stacked,
     showCursor,
     useNativeLegend,
     onCursor,

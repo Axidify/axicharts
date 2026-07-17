@@ -21,6 +21,7 @@ export type BarChartProps = {
   showValues?: boolean;
   valueSuffix?: string;
   referenceLines?: ReferenceLine[];
+  stacked?: boolean;
 };
 
 function BarPlot({
@@ -30,6 +31,7 @@ function BarPlot({
   showValues,
   valueSuffix,
   referenceLines,
+  stacked = false,
 }: BarChartProps): ReactElement {
   const { size, theme, mode } = useChartLayout();
   const plotSync = usePlotSync();
@@ -49,6 +51,7 @@ function BarPlot({
       showValues={showValues}
       valueSuffix={valueSuffix}
       referenceLines={referenceLines}
+      stacked={stacked}
       showCursor={chrome.showCrosshair}
       useNativeLegend={false}
       onCursor={plotSync.onCursor}
@@ -67,6 +70,7 @@ export function BarChart({
   showValues = false,
   valueSuffix,
   referenceLines,
+  stacked = false,
 }: BarChartProps): ReactElement | null {
   const { size, ready, theme } = useChartLayout();
 
@@ -98,6 +102,7 @@ export function BarChart({
             showValues={showValues}
             valueSuffix={valueSuffix}
             referenceLines={referenceLines}
+            stacked={stacked}
           />
         }
       />

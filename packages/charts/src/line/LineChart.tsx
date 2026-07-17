@@ -17,6 +17,7 @@ export type LineChartProps = {
   showAxes?: boolean;
   valueSuffix?: string;
   dualAxis?: boolean | "auto";
+  stacked?: boolean;
 };
 
 function LinePlot({
@@ -27,6 +28,7 @@ function LinePlot({
   valueSuffix,
   dualAxis,
   compact,
+  stacked,
 }: LineChartProps & { compact: boolean }): ReactElement {
   const { size, theme, mode } = useChartLayout();
   const plotSync = usePlotSync();
@@ -46,7 +48,8 @@ function LinePlot({
       fill={fill}
       showAxes={showAxes}
       valueSuffix={valueSuffix}
-      dualAxis={dualAxis}
+      dualAxis={stacked ? false : dualAxis}
+      stacked={stacked}
       showCursor={chrome.showCrosshair}
       useNativeLegend={false}
       onCursor={plotSync.onCursor}
@@ -65,6 +68,7 @@ export function LineChart({
   showAxes,
   valueSuffix,
   dualAxis = "auto",
+  stacked = false,
 }: LineChartProps): ReactElement | null {
   const { size, ready, theme, mode } = useChartLayout();
 
@@ -99,6 +103,7 @@ export function LineChart({
             showAxes={axes}
             valueSuffix={valueSuffix}
             dualAxis={dualAxis}
+            stacked={stacked}
             compact={compact}
           />
         }
