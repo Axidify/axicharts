@@ -15,6 +15,11 @@ export {
   type ScatterSeries,
 } from "./scatter/ScatterChart";
 export {
+  TreemapChart,
+  type TreemapChartProps,
+  type TreemapNode,
+} from "./treemap/TreemapChart";
+export {
   CandlestickChart,
   type CandlestickChartProps,
   type OhlcPoint,

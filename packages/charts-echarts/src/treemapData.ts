@@ -1,0 +1,44 @@
+import { SERIES_PALETTE } from "./types";
+import { toneColor } from "./themeBridge";
+import type { TreemapNode } from "./treemapTypes";
+
+type EChartsTreemapDatum = {
+  name: string;
+  value?: number;
+  itemStyle?: { color: string };
+  children?: EChartsTreemapDatum[];
+};
+
+export function mapTreemapData(
+  nodes: TreemapNode[],
+  paletteStart = 0,
+): EChartsTreemapDatum[] {
+  return nodes.map((node, index) => {
+    const color =
+      toneColor(node.tone) ??
+      SERIES_PALETTE[(paletteStart + index) % SERIES_PALETTE.length]!;
+    const mapped: EChartsTreemapDatum = {
+      name: node.name,
+      itemStyle: { color },
+    };
+    if (node.value != null) {
+      mapped.value = node.value;
+    }
+    if (node.children?.length) {
+      mapped.children = mapTreemapData(node.children, paletteStart + index + 1);
+    }
+    return mapped;
+  });
+}
+
+export function flattenTreemapValues(nodes: TreemapNode[]): number[] {
+  const values: number[] = [];
+  for (const node of nodes) {
+    if (node.children?.length) {
+      values.push(...flattenTreemapValues(node.children));
+    } else if (node.value != null) {
+      values.push(node.value);
+    }
+  }
+  return values;
+}

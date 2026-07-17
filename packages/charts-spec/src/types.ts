@@ -24,6 +24,7 @@ export type PanelChartType =
   | "candlestick"
   | "heatmap"
   | "scatter"
+  | "treemap"
   | "stat"
   | "gauge"
   | string;

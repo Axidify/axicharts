@@ -40,7 +40,9 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
                   ? "HeatmapChart"
                   : spec.type === "scatter"
                     ? "ScatterChart"
-                    : spec.type === "stat"
+                    : spec.type === "treemap"
+                      ? "TreemapChart"
+                      : spec.type === "stat"
                     ? "Stat"
                     : "Gauge";
 
@@ -90,6 +92,11 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
           label: row.label != null ? String(row.label) : undefined,
         })),
       }]}`;
+  } else if (spec.type === "treemap") {
+    chartBody = `nodes={${dataVar}.nodes ?? ${dataVar}.map((row) => ({
+        name: String(row.name),
+        value: Number(row.value),
+      }))}`;
   } else if (spec.type === "heatmap") {
     chartBody = `matrix={${dataVar}.matrix}
       min={${dataVar}.min}

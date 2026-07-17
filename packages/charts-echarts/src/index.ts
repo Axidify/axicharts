@@ -5,6 +5,7 @@ import {
   LineChart,
   PieChart,
   ScatterChart,
+  TreemapChart,
 } from "echarts/charts";
 import {
   GridComponent,
@@ -23,6 +24,7 @@ echarts.use([
   LineChart,
   PieChart,
   ScatterChart,
+  TreemapChart,
   GridComponent,
   DataZoomComponent,
   LegendComponent,
@@ -33,10 +35,12 @@ echarts.use([
 
 export { buildDataZoom, type BuildDataZoomInput } from "./dataZoom";
 export { EChartsCandlestick, type EChartsCandlestickProps } from "./EChartsCandlestick";
+export { EChartsTreemap, type EChartsTreemapProps } from "./EChartsTreemap";
 export { EChartsScatter, type EChartsScatterProps } from "./EChartsScatter";
 export { EChartsHeatmap, type EChartsHeatmapProps } from "./EChartsHeatmap";
 export { EChartsPie, type EChartsPieProps } from "./EChartsPie";
 export { EChartsWaterfall, type EChartsWaterfallProps } from "./EChartsWaterfall";
+export type { TreemapNode } from "./treemapTypes";
 export type { ScatterPoint, ScatterSeries } from "./scatterTypes";
 export {
   useEChart,

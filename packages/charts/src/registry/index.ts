@@ -6,6 +6,7 @@ import { HeatmapChart } from "../heatmap/HeatmapChart";
 import { LineChart } from "../line/LineChart";
 import { PieChart } from "../pie/PieChart";
 import { ScatterChart } from "../scatter/ScatterChart";
+import { TreemapChart } from "../treemap/TreemapChart";
 import { WaterfallChart } from "../waterfall/WaterfallChart";
 import { registerChartType } from "./registry";
 
@@ -19,6 +20,11 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "scatter",
     Chart: ScatterChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "treemap",
+    Chart: TreemapChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
   {

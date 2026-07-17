@@ -10,6 +10,7 @@ import {
   PieChart,
   ScatterChart,
   Stat,
+  TreemapChart,
   WaterfallChart,
   type PlotSeries,
   type StatTone,
@@ -157,6 +158,25 @@ export function compilePanel(
         resolved,
         createElement(ScatterChart, {
           series: scatterSeries,
+          ...props,
+        }),
+        options,
+      );
+    }
+
+    case "treemap": {
+      const nameField = resolved.encoding?.name?.field ?? "name";
+      const valueField = resolved.encoding?.value?.field ?? "value";
+      const nodes =
+        (props.nodes as Parameters<typeof TreemapChart>[0]["nodes"]) ??
+        rows.map((row) => ({
+          name: String(row[nameField]),
+          value: Number(row[valueField]),
+        }));
+      return wrapChart(
+        resolved,
+        createElement(TreemapChart, {
+          nodes,
           ...props,
         }),
         options,
