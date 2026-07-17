@@ -7,6 +7,7 @@ import {
   RUNTIME_SPEC_SCHEMA_URL,
   SHARE_EXPORT_SCHEMA_URL,
 } from "@axicharts/charts-runtime/validation";
+import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
 
 const base = import.meta.env.BASE_URL;
 
@@ -107,7 +108,10 @@ export function RuntimeDeepLinkPage(): ReactElement {
                   <a href={entry.dashboarderUrl}>{entry.dashboarderUrl}</a>
                 </td>
                 <td style={cellStyle}>
-                  <code>{formatValidatePresetCommand(entry.preset.id)}</code>
+                  <ValidateCommandCopy
+                    compact
+                    command={formatValidatePresetCommand(entry.preset.id)}
+                  />
                 </td>
                 <td style={cellStyle}>
                   <a href={entry.localMirrorPath} style={{ display: "block" }}>

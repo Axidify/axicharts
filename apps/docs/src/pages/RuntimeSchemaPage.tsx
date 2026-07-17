@@ -1,10 +1,10 @@
 import type { ReactElement, ReactNode } from "react";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   formatValidatePresetCommand,
   HOSTED_IMPORT_PRESETS,
 } from "@axicharts/charts-runtime/validation";
+import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
 import runtimeSchema from "../../../../packages/charts-runtime/schema/runtime-spec.schema.json";
 import shareSchema from "../../../../packages/charts-runtime/schema/share-export.schema.json";
 import {
@@ -64,64 +64,6 @@ function CodeBlock({ children, dark = false }: { children: string; dark?: boolea
     >
       {children}
     </pre>
-  );
-}
-
-function PresetValidateRow({
-  presetId,
-  label,
-}: {
-  presetId: string;
-  label: string;
-}): ReactElement {
-  const [copied, setCopied] = useState(false);
-  const command = formatValidatePresetCommand(presetId);
-
-  const copy = async (): Promise<void> => {
-    await navigator.clipboard.writeText(command);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1500);
-  };
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 8,
-        alignItems: "center",
-        marginBottom: 10,
-      }}
-    >
-      <span style={{ fontSize: 12, color: "#64748b", minWidth: 120 }}>{label}</span>
-      <code
-        style={{
-          flex: 1,
-          minWidth: 240,
-          padding: "6px 10px",
-          borderRadius: 6,
-          background: "#f1f5f9",
-          color: "#0f172a",
-          fontSize: 11,
-        }}
-      >
-        {command}
-      </code>
-      <button
-        type="button"
-        onClick={() => void copy()}
-        style={{
-          fontSize: 12,
-          padding: "6px 12px",
-          borderRadius: 6,
-          border: "1px solid #cbd5e1",
-          background: "#f8fafc",
-          cursor: "pointer",
-        }}
-      >
-        {copied ? "Copied" : "Copy"}
-      </button>
-    </div>
   );
 }
 
@@ -187,7 +129,11 @@ export function RuntimeSchemaPage(): ReactElement {
           gate on every preset via <code>--preset &lt;id&gt; --all</code>.
         </p>
         {HOSTED_IMPORT_PRESETS.map((preset) => (
-          <PresetValidateRow key={preset.id} presetId={preset.id} label={preset.label} />
+          <ValidateCommandCopy
+            key={preset.id}
+            label={preset.label}
+            command={formatValidatePresetCommand(preset.id)}
+          />
         ))}
         <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b" }}>
           <Link to="/runtime/import">Import gallery</Link> previews the same fixtures with live

@@ -75,4 +75,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm validate:runtime
+      - run: charts-runtime validate --preset ops-embed --all
+      - run: charts-runtime validate --preset ops-dashboard --all
       - run: charts-runtime validate --all path/to/dashboard.runtime.json`;
