@@ -22,6 +22,7 @@ for (const name of [
   "ops-workspace.workspace.json",
   "ops-historian.runtime.json",
   "ops-mqtt.runtime.json",
+  "ops-rest.runtime.json",
 ]) {
   cpSync(join(examplesSrc, name), join(examplesDest, name));
 }

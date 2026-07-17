@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { RuntimeDashboard, buildEmbedBundle, serializeRuntimeSpec } from "@axicharts/charts-runtime";
+import { ADAPTER_FIXTURE_PRESETS } from "@axicharts/charts-runtime/validation";
 import {
   ADAPTER_ROWS,
   EMBED_RUNTIME_SPEC,
@@ -92,11 +93,12 @@ export function RuntimePage(): ReactElement {
         <Link to="/runtime/links">Deep links →</Link>
       </p>
 
-      <Section title="Data adapters" subtitle="connectSource + hooks">
-        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
-          Field reference, payload shapes, and mosaic wiring — see the{" "}
-          <Link to="/runtime/adapters">adapter cookbook</Link> for REST, WebSocket, historian, and
-          MQTT details.
+      <Section title="Adapter overview" subtitle="connectSource · gallery fixtures">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Runtime dashboards bind templates through <code>dataSource</code> or mosaic{" "}
+          <code>dataSources</code>. Each adapter type has a shipped import preset for validation and
+          copy-paste wiring — open the{" "}
+          <Link to="/runtime/adapters">adapter cookbook</Link> for field tables and payload shapes.
         </p>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
@@ -104,25 +106,40 @@ export function RuntimePage(): ReactElement {
               <th style={{ padding: "8px 6px" }}>Type</th>
               <th style={{ padding: "8px 6px" }}>Use case</th>
               <th style={{ padding: "8px 6px" }}>Key fields</th>
+              <th style={{ padding: "8px 6px" }}>Gallery fixture</th>
             </tr>
           </thead>
           <tbody>
-            {ADAPTER_ROWS.map((row) => (
-              <tr key={row.type} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                <td style={{ padding: "8px 6px" }}>
-                  <code>{row.type}</code>
-                </td>
-                <td style={{ padding: "8px 6px", color: "#475569" }}>{row.useCase}</td>
-                <td style={{ padding: "8px 6px", color: "#64748b", fontSize: 12 }}>
-                  {row.fields}
-                </td>
-              </tr>
-            ))}
+            {ADAPTER_ROWS.map((row) => {
+              const presetId = ADAPTER_FIXTURE_PRESETS[row.type];
+              return (
+                <tr key={row.type} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                  <td style={{ padding: "8px 6px" }}>
+                    <code>{row.type}</code>
+                  </td>
+                  <td style={{ padding: "8px 6px", color: "#475569" }}>{row.useCase}</td>
+                  <td style={{ padding: "8px 6px", color: "#64748b", fontSize: 12 }}>
+                    {row.fields}
+                  </td>
+                  <td style={{ padding: "8px 6px", fontSize: 12 }}>
+                    {presetId ? (
+                      <Link to={`/runtime/import?preset=${presetId}`}>{presetId}</Link>
+                    ) : (
+                      <span style={{ color: "#94a3b8" }}>—</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </Section>
 
       <Section title="Embed layout" subtitle="single dashboard template">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
+          Static fixture demo — live REST wiring:{" "}
+          <Link to="/runtime/import?preset=ops-rest">ops-rest</Link>.
+        </p>
         <div style={{ maxWidth: 720, marginBottom: 16 }}>
           <RuntimeDashboard spec={EMBED_RUNTIME_SPEC} />
         </div>

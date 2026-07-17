@@ -174,6 +174,12 @@ export function RuntimeDeepLinkPage(): ReactElement {
             </Link>
           </li>
           <li>
+            REST adapter →{" "}
+            <Link to={`/runtime/import?preset=ops-rest`}>
+              {HOSTED_IMPORT_PRESETS.find((item) => item.id === "ops-rest")?.label}
+            </Link>
+          </li>
+          <li>
             MQTT adapter →{" "}
             <Link to={`/runtime/import?preset=ops-mqtt`}>
               {HOSTED_IMPORT_PRESETS.find((item) => item.id === "ops-mqtt")?.label}

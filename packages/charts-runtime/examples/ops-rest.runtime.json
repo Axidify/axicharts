@@ -1,0 +1,18 @@
+{
+  "$schema": "https://axidify.github.io/axicharts/schema/runtime-spec.schema.json",
+  "layout": "embed",
+  "dashboard": {
+    "version": "0.1",
+    "title": "Line 3 REST",
+    "subtitle": "HTTP metrics poller",
+    "theme": "industrial",
+    "mode": "live",
+    "template": "ops-2x2",
+    "dataSource": {
+      "type": "rest",
+      "url": "/api/line3/metrics",
+      "intervalMs": 2000,
+      "staleAfterMs": 5000
+    }
+  }
+}

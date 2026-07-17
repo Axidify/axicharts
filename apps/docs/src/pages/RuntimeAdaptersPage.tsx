@@ -171,6 +171,12 @@ export function RuntimeAdaptersPage(): ReactElement {
           <strong>Custom mapResponse</strong>
         </p>
         <CodeBlock>{CUSTOM_MAP_RESPONSE}</CodeBlock>
+        <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b" }}>
+          Shipped fixture:{" "}
+          <Link to={`/runtime/import?preset=${ADAPTER_FIXTURE_PRESETS.rest}`}>
+            ops-rest.runtime.json
+          </Link>
+        </p>
       </Section>
 
       <Section title="WebSocket adapter" subtitle="push · merge frames · reconnect">

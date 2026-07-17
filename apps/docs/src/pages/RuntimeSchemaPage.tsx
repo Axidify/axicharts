@@ -137,6 +137,9 @@ export function RuntimeSchemaPage(): ReactElement {
             <a href={`${base}examples/ops-historian.runtime.json`}>ops-historian.runtime.json</a>
           </li>
           <li>
+            <a href={`${base}examples/ops-rest.runtime.json`}>ops-rest.runtime.json</a>
+          </li>
+          <li>
             <a href={`${base}examples/ops-mqtt.runtime.json`}>ops-mqtt.runtime.json</a>
           </li>
           <li>

@@ -226,6 +226,20 @@ export function RuntimeImportPage(): ReactElement {
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <Link
+            to="/runtime/import?preset=ops-rest"
+            style={{
+              fontSize: 12,
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: "1px solid #cbd5e1",
+              background: "#f8fafc",
+              color: "#1e293b",
+              textDecoration: "none",
+            }}
+          >
+            REST embed
+          </Link>
+          <Link
             to="/runtime/import?preset=ops-historian"
             style={{
               fontSize: 12,

@@ -30,6 +30,13 @@ export const HOSTED_IMPORT_PRESETS: HostedImportPreset[] = [
   { id: "ops-embed", label: "Ops embed", filename: "ops-embed.runtime.json", kind: "runtime", adapter: "static" },
   { id: "ops-mosaic", label: "Ops mosaic", filename: "ops-mosaic.runtime.json", kind: "runtime", adapter: "mosaic" },
   {
+    id: "ops-rest",
+    label: "REST embed",
+    filename: "ops-rest.runtime.json",
+    kind: "runtime",
+    adapter: "rest",
+  },
+  {
     id: "ops-historian",
     label: "Historian embed",
     filename: "ops-historian.runtime.json",
@@ -57,7 +64,10 @@ export const HOSTED_IMPORT_PRESETS: HostedImportPreset[] = [
   },
 ];
 
-export const ADAPTER_FIXTURE_PRESETS: Record<"historian" | "mqtt", string> = {
+export const ADAPTER_FIXTURE_PRESETS: Partial<Record<ImportPresetAdapter, string>> = {
+  static: "ops-embed",
+  mosaic: "ops-mosaic",
+  rest: "ops-rest",
   historian: "ops-historian",
   mqtt: "ops-mqtt",
 };

@@ -66,6 +66,7 @@ describe("charts-runtime cli", () => {
     expect(runCli(["validate", "--preset", "ops-dashboard", "--all"])).toBe(0);
     expect(runCli(["validate", "--preset", "ops-workspace", "--all"])).toBe(0);
     expect(runCli(["validate", "--preset", "ops-historian", "--all"])).toBe(0);
+    expect(runCli(["validate", "--preset", "ops-rest", "--all"])).toBe(0);
     expect(runCli(["validate", "--preset", "ops-mqtt", "--all"])).toBe(0);
   });
 
