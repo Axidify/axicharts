@@ -16,6 +16,7 @@ import {
   selectDashboard,
   selectWorkspace,
   serializeDashboardExport,
+  buildReactEmbedSnippet,
   type RuntimeDashboardSpec,
   type WorkspaceStore,
 } from "@axicharts/charts-runtime";
@@ -89,6 +90,7 @@ export function App(): ReactElement {
   const [layout, setLayout] = useState<LayoutMode>("embed");
   const [feed, setFeed] = useState<FeedMode>("historian");
   const [presentation, setPresentation] = useState(false);
+  const [presenting, setPresenting] = useState(false);
   const [dirty, setDirty] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
 
@@ -270,6 +272,12 @@ export function App(): ReactElement {
     setDirty(false);
   };
 
+  const handleCopyEmbed = async (): Promise<void> => {
+    if (!activeSpec) return;
+    await navigator.clipboard.writeText(buildReactEmbedSnippet(activeSpec));
+    window.alert("React embed snippet copied to clipboard.");
+  };
+
   if (!store || !activeSpec) {
     return <div style={{ padding: 24, color: "#e2e8f0" }}>Loading workspace…</div>;
   }
@@ -277,6 +285,40 @@ export function App(): ReactElement {
   const activeDashboard = getActiveDashboard(store);
   const activeWorkspace = store.workspaces.find((item) => item.id === store.activeWorkspaceId);
   const canDeleteDashboard = (activeWorkspace?.dashboards.length ?? 0) > 1;
+
+  if (presenting) {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 50,
+          background: "#0f172a",
+          color: "#e2e8f0",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "12px 20px",
+            borderBottom: "1px solid #334155",
+          }}
+        >
+          <div style={{ fontSize: 14, fontWeight: 600 }}>{activeDashboard.name}</div>
+          <button type="button" onClick={() => setPresenting(false)} style={buttonStyle}>
+            Exit presentation
+          </button>
+        </div>
+        <main style={{ flex: 1, padding: 24, overflow: "auto" }}>
+          <RuntimeDashboard spec={activeSpec} presentation />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: "#0f172a", color: "#e2e8f0" }}>
@@ -348,6 +390,12 @@ export function App(): ReactElement {
           <button type="button" onClick={() => void handlePlan()} style={buttonStyle}>
             Plan
           </button>
+          <button type="button" onClick={() => setPresenting(true)} style={buttonStyle}>
+            Present
+          </button>
+          <button type="button" onClick={() => void handleCopyEmbed()} style={buttonStyle}>
+            Copy embed
+          </button>
           <button type="button" onClick={handleSave} style={buttonStyle}>
             Save
           </button>
@@ -397,8 +445,8 @@ export function App(): ReactElement {
           }}
           onDeleteDashboard={handleDeleteDashboard}
         />
-        <main style={{ flex: 1, padding: 24, maxWidth: 900 }}>
-          <RuntimeDashboard spec={activeSpec} />
+        <main style={{ flex: 1, padding: 24, maxWidth: presentation ? 1100 : 900 }}>
+          <RuntimeDashboard spec={activeSpec} presentation={presentation} />
           <PluginStrip />
         </main>
       </div>

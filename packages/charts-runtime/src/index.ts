@@ -1,4 +1,9 @@
 export {
+  buildPortableSpecJson,
+  buildReactEmbedSnippet,
+  type EmbedSnippetOptions,
+} from "./embedSnippet";
+export {
   parseDashboardExport,
   serializeDashboardExport,
   type DashboardExport,

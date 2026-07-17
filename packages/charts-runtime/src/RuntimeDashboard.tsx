@@ -7,12 +7,41 @@ import type { RuntimeDashboardSpec } from "./types";
 
 export type RuntimeDashboardProps = {
   spec: RuntimeDashboardSpec;
+  className?: string;
+  presentation?: boolean;
 };
 
-export function RuntimeDashboard({ spec }: RuntimeDashboardProps): ReactElement {
+export function RuntimeDashboard({
+  spec,
+  className,
+  presentation = false,
+}: RuntimeDashboardProps): ReactElement {
   if (spec.layout === "mosaic") {
-    return <MosaicWall wall={spec.wall} />;
+    const wall = presentation
+      ? {
+          ...spec.wall,
+          mode: "presentation" as const,
+          theme: spec.wall.theme ?? "presentation",
+        }
+      : spec.wall;
+    return (
+      <div className={className} style={{ width: "100%", height: "100%" }}>
+        <MosaicWall wall={wall} />
+      </div>
+    );
   }
 
-  return <DashboardEmbed dashboard={spec.dashboard} />;
+  const dashboard = presentation
+    ? {
+        ...spec.dashboard,
+        mode: "presentation" as const,
+        theme: spec.dashboard.theme ?? "presentation",
+      }
+    : spec.dashboard;
+
+  return (
+    <div className={className} style={{ width: "100%", height: "100%" }}>
+      <DashboardEmbed dashboard={dashboard} />
+    </div>
+  );
 }

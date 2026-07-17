@@ -19,6 +19,10 @@ import {
   useIsStale,
   type ChartDataState,
 } from "../state";
+import {
+  ensurePresentationStyles,
+  presentationEnterStyle,
+} from "../presentation/motion";
 
 export type { ChartDataState };
 
@@ -96,6 +100,12 @@ export function ChartContainer({
   const contentHeight = height ?? minHeight;
 
   useEffect(() => {
+    if (mode === "presentation") {
+      ensurePresentationStyles();
+    }
+  }, [mode]);
+
+  useEffect(() => {
     if (onResize && ready) {
       onResize(size);
     }
@@ -158,6 +168,7 @@ export function ChartContainer({
                 opacity: showStale ? 0.55 : dataState === "ready" ? 1 : 0.35,
                 filter: showStale ? "saturate(0.65)" : undefined,
                 transition: "opacity 180ms ease",
+                ...presentationEnterStyle(mode === "presentation" && dataState === "ready"),
               }}
             >
               {children}

@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactElement } from "react";
 import { useOptionalChartLayout } from "../container/useOptionalChartLayout";
 import { resolveTagStatTone } from "../alarm/tagTones";
+import { usePresentationCountUp } from "./usePresentationCountUp";
 
 export type StatTone = "neutral" | "success" | "warning" | "critical";
 
@@ -41,17 +42,22 @@ export function Stat({
   style,
 }: StatProps): ReactElement {
   const layout = useOptionalChartLayout();
+  const animatedValue = usePresentationCountUp(
+    value,
+    layout?.mode === "presentation",
+  );
   const resolvedTone =
     resolveTagStatTone(layout?.tagTones, label, tone) ?? tone ?? "neutral";
   const colors = TONE_COLORS[surface];
   const labelColor = surface === "light" ? "#64748b" : "#94a3b8";
   const staleColor = surface === "light" ? "#94a3b8" : "#64748b";
+  const hero = layout?.mode === "presentation";
 
   return (
     <div style={style}>
       <div
         style={{
-          fontSize: 20,
+          fontSize: hero ? 28 : 20,
           fontWeight: 600,
           lineHeight: 1.2,
           color: stale ? staleColor : colors[resolvedTone],
@@ -61,7 +67,7 @@ export function Stat({
             : undefined,
         }}
       >
-        {value}
+        {animatedValue}
       </div>
       <div
         style={{

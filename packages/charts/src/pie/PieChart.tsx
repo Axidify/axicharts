@@ -26,7 +26,7 @@ function PiePlot({
   innerRadius?: number;
   showLabels?: boolean;
 }): ReactElement {
-  const { size, theme } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
 
   return (
@@ -37,6 +37,7 @@ function PiePlot({
       theme={theme}
       innerRadius={innerRadius}
       showLabels={showLabels}
+      animate={mode === "presentation"}
       onItemHover={interaction.onItemHover}
     />
   );

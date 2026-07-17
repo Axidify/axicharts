@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import { gridOptions, hiddenTooltip, toneColor } from "./themeBridge";
+import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { SERIES_PALETTE, type PieSlice } from "./types";
 
@@ -14,6 +15,7 @@ export type EChartsPieProps = {
   theme: ChartTheme;
   innerRadius?: number;
   showLabels?: boolean;
+  animate?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -24,6 +26,7 @@ export function EChartsPie({
   theme,
   innerRadius = 0,
   showLabels = true,
+  animate = false,
   onItemHover,
 }: EChartsPieProps): ReactElement {
   const total = slices.reduce((sum, slice) => sum + slice.value, 0);
@@ -39,24 +42,27 @@ export function EChartsPie({
     },
   }));
 
-  const option: EChartsOption = {
-    grid: gridOptions(theme),
-    tooltip: hiddenTooltip(),
-    series: [
-      {
-        type: "pie",
-        radius: innerRadius > 0 ? [`${innerRadius}%`, "70%"] : "70%",
-        center: ["50%", "50%"],
-        data,
-        label: {
-          show: showLabels,
-          formatter: "{b}: {d}%",
-          fontSize: 11,
+  const option: EChartsOption = withPresentationAnimation(
+    {
+      grid: gridOptions(theme),
+      tooltip: hiddenTooltip(),
+      series: [
+        {
+          type: "pie",
+          radius: innerRadius > 0 ? [`${innerRadius}%`, "70%"] : "70%",
+          center: ["50%", "50%"],
+          data,
+          label: {
+            show: showLabels,
+            formatter: "{b}: {d}%",
+            fontSize: 11,
+          },
+          labelLine: { show: showLabels },
         },
-        labelLine: { show: showLabels },
-      },
-    ],
-  };
+      ],
+    },
+    animate,
+  );
 
   const rootRef = useEChart({
     option,
