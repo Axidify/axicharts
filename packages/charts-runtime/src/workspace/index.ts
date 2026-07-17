@@ -10,14 +10,20 @@ export {
   parseDashboardSpec,
   persistWorkspaceStore,
   renameDashboard,
+  renameWorkspace,
   saveDashboardSpec,
   selectDashboard,
   selectWorkspace,
+  importSharedWorkspace,
 } from "./store";
 export {
   parseDashboardExport,
+  parseShareExport,
   serializeDashboardExport,
+  serializeWorkspaceExport,
   type DashboardExport,
+  type ShareExport,
+  type WorkspaceShareExport,
 } from "./export";
 export {
   DEFAULT_WORKSPACE_STORE_KEY,

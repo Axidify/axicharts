@@ -9,8 +9,12 @@ export {
 } from "./embedSnippet";
 export {
   parseDashboardExport,
+  parseShareExport,
   serializeDashboardExport,
+  serializeWorkspaceExport,
   type DashboardExport,
+  type ShareExport,
+  type WorkspaceShareExport,
 } from "./workspace/export";
 export { RUNTIME_VERSION } from "./types";
 export type {
@@ -65,9 +69,11 @@ export {
   parseDashboardSpec,
   persistWorkspaceStore,
   renameDashboard,
+  renameWorkspace,
   saveDashboardSpec,
   selectDashboard,
   selectWorkspace,
+  importSharedWorkspace,
 } from "./workspace/store";
 export {
   DEFAULT_WORKSPACE_STORE_KEY,

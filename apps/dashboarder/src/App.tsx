@@ -7,21 +7,23 @@ import {
   addWorkspace,
   deleteDashboard,
   getActiveDashboard,
+  importSharedWorkspace,
   loadWorkspaceStore,
-  parseDashboardExport,
   parseDashboardSpec,
+  parseShareExport,
   persistWorkspaceStore,
   renameDashboard,
+  renameWorkspace,
   saveDashboardSpec,
   selectDashboard,
   selectWorkspace,
-  serializeDashboardExport,
   type RuntimeDashboardSpec,
   type WorkspaceStore,
 } from "@axicharts/charts-runtime";
 import type { DashboardPlan } from "@axicharts/charts-planner";
 import { EmbedDialog } from "./EmbedDialog";
 import { PlannerPanel } from "./PlannerPanel";
+import { ShareDialog } from "./ShareDialog";
 import { PluginStrip } from "./PluginStrip";
 import { WorkspaceSidebar } from "./WorkspaceSidebar";
 import {
@@ -91,6 +93,8 @@ export function App(): ReactElement {
   const [dirty, setDirty] = useState(false);
   const [plannerOpen, setPlannerOpen] = useState(false);
   const [embedOpen, setEmbedOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareTab, setShareTab] = useState<"dashboard" | "workspace">("dashboard");
   const importInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -201,16 +205,13 @@ export function App(): ReactElement {
   };
 
   const handleExport = (): void => {
-    if (!store || !activeSpec) return;
-    const dashboard = getActiveDashboard(store);
-    const portable = serializeDashboardExport(dashboard.name, activeSpec, builderMeta);
-    const blob = new Blob([portable], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${slugifyName(dashboard.name) || "dashboard"}.runtime.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+    setShareTab("dashboard");
+    setShareOpen(true);
+  };
+
+  const handleShareWorkspace = (): void => {
+    setShareTab("workspace");
+    setShareOpen(true);
   };
 
   const handleApplyPlan = (plan: DashboardPlan): void => {
@@ -221,28 +222,49 @@ export function App(): ReactElement {
   const handleImportFile = async (file: File): Promise<void> => {
     if (!store) return;
     const text = await file.text();
-    const imported = parseDashboardExport(text);
-    const next = saveDashboardSpec(
-      store,
-      store.activeWorkspaceId,
-      store.activeDashboardId,
-      imported.spec,
-      {
-        name: imported.name,
-        meta: imported.meta,
-      },
-    );
-    persist(next);
-    if (imported.meta) {
-      applyDashboardMeta(
-        getActiveDashboard(next),
-        setLayout,
-        setFeed,
-        setTemplate,
-        setPresentation,
+
+    try {
+      const imported = parseShareExport(text);
+
+      if (imported.kind === "workspace") {
+        const next = importSharedWorkspace(store, imported);
+        persist(next);
+        applyDashboardMeta(
+          getActiveDashboard(next),
+          setLayout,
+          setFeed,
+          setTemplate,
+          setPresentation,
+        );
+        setDirty(false);
+        return;
+      }
+
+      const next = saveDashboardSpec(
+        store,
+        store.activeWorkspaceId,
+        store.activeDashboardId,
+        imported.spec,
+        {
+          name: imported.name,
+          meta: imported.meta,
+        },
       );
+      persist(next);
+      if (imported.meta) {
+        applyDashboardMeta(
+          getActiveDashboard(next),
+          setLayout,
+          setFeed,
+          setTemplate,
+          setPresentation,
+        );
+      }
+      setDirty(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      window.alert(`Import failed: ${message}`);
     }
-    setDirty(false);
   };
 
   if (!store || !activeSpec) {
@@ -415,6 +437,10 @@ export function App(): ReactElement {
               renameDashboard(store, store.activeWorkspaceId, store.activeDashboardId, name),
             );
           }}
+          onRenameWorkspace={(name) => {
+            persist(renameWorkspace(store, store.activeWorkspaceId, name));
+          }}
+          onShareWorkspace={handleShareWorkspace}
           onDeleteDashboard={handleDeleteDashboard}
         />
         <main style={{ flex: 1, padding: 24, maxWidth: presentation ? 1100 : 900 }}>
@@ -439,6 +465,15 @@ export function App(): ReactElement {
         presentation={presentation}
         alarmScopeId={activeDashboard.id}
         onClose={() => setEmbedOpen(false)}
+      />
+      <ShareDialog
+        open={shareOpen}
+        initialTab={shareTab}
+        store={store}
+        dashboard={activeDashboard}
+        spec={activeSpec}
+        meta={builderMeta}
+        onClose={() => setShareOpen(false)}
       />
     </div>
   );

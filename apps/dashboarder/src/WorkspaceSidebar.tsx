@@ -30,7 +30,9 @@ export type WorkspaceSidebarProps = {
   onNewWorkspace: () => void;
   onNewDashboard: () => void;
   onRenameDashboard: (name: string) => void;
+  onRenameWorkspace: (name: string) => void;
   onDeleteDashboard: () => void;
+  onShareWorkspace: () => void;
 };
 
 function activeWorkspace(store: WorkspaceStore): Workspace {
@@ -45,7 +47,9 @@ export function WorkspaceSidebar({
   onNewWorkspace,
   onNewDashboard,
   onRenameDashboard,
+  onRenameWorkspace,
   onDeleteDashboard,
+  onShareWorkspace,
 }: WorkspaceSidebarProps): ReactElement {
   const workspace = activeWorkspace(store);
 
@@ -66,6 +70,23 @@ export function WorkspaceSidebar({
         </select>
         <button type="button" onClick={onNewWorkspace} style={{ ...buttonStyle, marginTop: 8, width: "100%" }}>
           + New workspace
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const name = window.prompt("Workspace name", workspace.name);
+            if (name?.trim()) onRenameWorkspace(name.trim());
+          }}
+          style={{ ...buttonStyle, marginTop: 8, width: "100%" }}
+        >
+          Rename workspace
+        </button>
+        <button
+          type="button"
+          onClick={onShareWorkspace}
+          style={{ ...buttonStyle, marginTop: 8, width: "100%" }}
+        >
+          Share workspace
         </button>
       </div>
 

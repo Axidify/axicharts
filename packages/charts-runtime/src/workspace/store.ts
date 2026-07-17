@@ -226,6 +226,56 @@ export function deleteDashboard(
   };
 }
 
+export function renameWorkspace(
+  store: WorkspaceStore,
+  workspaceId: string,
+  name: string,
+): WorkspaceStore {
+  const workspaces = store.workspaces.map((workspace) =>
+    workspace.id === workspaceId ? { ...workspace, name } : workspace,
+  );
+  return { ...store, workspaces };
+}
+
+export function importSharedWorkspace(
+  store: WorkspaceStore,
+  payload: {
+    name: string;
+    dashboards: Array<{
+      name: string;
+      meta?: SavedDashboard["meta"];
+      spec: RuntimeDashboardSpec;
+    }>;
+  },
+): WorkspaceStore {
+  if (payload.dashboards.length === 0) {
+    throw new Error("Workspace import requires at least one dashboard");
+  }
+
+  const workspaceId = createId("ws");
+  const dashboards = payload.dashboards.map((item) => ({
+    id: createId("dash"),
+    name: item.name,
+    updatedAt: nowIso(),
+    specJson: serializeRuntimeSpec(item.spec),
+    meta: item.meta,
+  }));
+
+  return {
+    ...store,
+    workspaces: [
+      ...store.workspaces,
+      {
+        id: workspaceId,
+        name: payload.name,
+        dashboards,
+      },
+    ],
+    activeWorkspaceId: workspaceId,
+    activeDashboardId: dashboards[0]!.id,
+  };
+}
+
 export function loadWorkspaceStore(
   storage: Pick<Storage, "getItem" | "setItem" | "removeItem">,
   storageKey = DEFAULT_WORKSPACE_STORE_KEY,
