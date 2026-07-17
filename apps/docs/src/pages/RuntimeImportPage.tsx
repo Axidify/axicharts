@@ -375,7 +375,7 @@ export function RuntimeImportPage(): ReactElement {
         }}
       >
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
-          Share/import track release notes (C44–C46)
+          Share/import track release notes (C44–C48)
         </div>
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
           Hardening track for planner <code>meta</code> round-trip: deep-link preset table, schema{" "}

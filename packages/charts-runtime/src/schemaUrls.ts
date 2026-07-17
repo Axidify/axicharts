@@ -309,6 +309,18 @@ export function runtimeDeepLinkShareImportDeepLink(origin = DOCS_SITE_ORIGIN): s
   return `${base}/runtime/links#share-import`;
 }
 
+/** Docs import gallery anchor for share/import track release notes. */
+export function runtimeImportGalleryShareImportTrackDeepLink(origin = DOCS_SITE_ORIGIN): string {
+  const base = origin.endsWith("/") ? origin.slice(0, -1) : origin;
+  return `${base}/runtime/import#share-import-track`;
+}
+
+/** Docs getting-started anchor for share ↔ import round-trip. */
+export function startShareImportDeepLink(origin = DOCS_SITE_ORIGIN): string {
+  const base = origin.endsWith("/") ? origin.slice(0, -1) : origin;
+  return `${base}/start#share-import`;
+}
+
 /** Docs gallery URL for a planner feed row. */
 export function plannerFeedGalleryDeepLink(
   feed: PlannerFeedLike,

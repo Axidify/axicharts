@@ -70,7 +70,7 @@ export function StartPage(): ReactElement {
         {CODE}
       </pre>
 
-      <h2 style={{ fontSize: 16, marginTop: 28 }}>Dashboarder + planner CLI</h2>
+      <h2 id="planner-cli" style={{ fontSize: 16, marginTop: 28 }}>Dashboarder + planner CLI</h2>
       <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 14 }}>
         Layer 3 runtime dashboards use <code>@axicharts/charts-runtime</code> with live adapter
         feeds. Phase 3 <code>@axicharts/charts-planner</code> maps natural-language intent to a{" "}
@@ -92,6 +92,25 @@ export function StartPage(): ReactElement {
         <Link to="/runtime#planner-http">Planner HTTP API</Link>
         {" · "}
         <Link to="/runtime/import#planner-feeds">Planner feed gallery index</Link>
+      </p>
+
+      <h2 id="share-import" style={{ fontSize: 16, marginTop: 28 }}>
+        Share ↔ import round-trip
+      </h2>
+      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 14 }}>
+        Dashboarder <strong>Share</strong> exports portable JSON with planner <code>meta</code>{" "}
+        (layout, feed, template, mosaic preset). <strong>Import</strong> validates the envelope and
+        restores builder state — portable runtime embed JSON omits <code>meta</code>. Shipped
+        fixtures: <code>ops-dashboard.share.json</code> and <code>ops-workspace.workspace.json</code>.
+      </p>
+      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 13 }}>
+        <Link to="/runtime#share-import">Runtime share ↔ import flow</Link>
+        {" · "}
+        <Link to="/runtime/schema#share-meta">Schema § meta</Link>
+        {" · "}
+        <Link to="/runtime/import#share-import-track">Import gallery track notes</Link>
+        {" · "}
+        <Link to="/runtime/links#share-import">Deep-link presets</Link>
       </p>
     </div>
   );

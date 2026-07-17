@@ -13,6 +13,7 @@ export const RUNTIME_HUB_LINKS = [
 export const RUNTIME_HUB_ANCHORS = [
   { to: "/runtime#share-import", label: "Share ↔ import" },
   { to: "/runtime/schema#share-meta", label: "Schema § meta" },
+  { to: "/runtime/import#share-import-track", label: "Gallery tracks" },
   { to: "/runtime#planner-http", label: "Planner HTTP" },
 ] as const;
 

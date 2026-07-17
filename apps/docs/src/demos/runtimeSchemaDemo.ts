@@ -113,6 +113,14 @@ export const SHARE_IMPORT_TRACK_RELEASE_NOTES = [
     slice: "C46",
     summary: "RuntimeHubNav schema share-meta anchor, share-import track wrap-up notes",
   },
+  {
+    slice: "C47",
+    summary: "Import gallery share-import track section, share meta import tests",
+  },
+  {
+    slice: "C48",
+    summary: "Start page share-import cross-link, RuntimeHubNav import gallery anchor",
+  },
 ] as const;
 
 export const GITOPS_CODE = `name: Validate dashboards
