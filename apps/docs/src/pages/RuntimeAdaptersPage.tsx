@@ -135,18 +135,33 @@ export function RuntimeAdaptersPage(): ReactElement {
               <th style={cellStyle}>Type</th>
               <th style={cellStyle}>Use case</th>
               <th style={cellStyle}>Key fields</th>
+              <th style={cellStyle}>Planner feed</th>
             </tr>
           </thead>
           <tbody>
-            {ADAPTER_OVERVIEW.map((row) => (
-              <tr key={row.type}>
-                <td style={cellStyle}>
-                  <code>{row.type}</code>
-                </td>
-                <td style={{ ...cellStyle, color: "#475569" }}>{row.useCase}</td>
-                <td style={{ ...cellStyle, color: "#64748b", fontSize: 12 }}>{row.fields}</td>
-              </tr>
-            ))}
+            {ADAPTER_OVERVIEW.map((row) => {
+              const plannerRow = PLANNER_FEED_ROWS.find((item) => item.adapter === row.type);
+              return (
+                <tr key={row.type}>
+                  <td style={cellStyle}>
+                    <code>{row.type}</code>
+                  </td>
+                  <td style={{ ...cellStyle, color: "#475569" }}>{row.useCase}</td>
+                  <td style={{ ...cellStyle, color: "#64748b", fontSize: 12 }}>{row.fields}</td>
+                  <td style={{ ...cellStyle, color: "#475569", fontSize: 12 }}>
+                    {plannerRow ? (
+                      <>
+                        <code>{plannerRow.feed}</code>
+                        {" · "}
+                        <Link to="/runtime/import#planner-feeds">{plannerRow.intentSample}</Link>
+                      </>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </Section>
@@ -290,7 +305,7 @@ export function RuntimeAdaptersPage(): ReactElement {
             <tr>
               <th style={cellStyle}>Adapter</th>
               <th style={cellStyle}>Preset</th>
-              <th style={cellStyle}>Planner sample</th>
+              <th style={cellStyle}>Planner feed</th>
               <th style={cellStyle}>Gallery filter</th>
             </tr>
           </thead>

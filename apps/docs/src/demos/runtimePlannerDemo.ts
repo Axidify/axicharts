@@ -58,7 +58,34 @@ export const PLANNER_TRACK_RELEASE_NOTES = [
   { slice: "C39", summary: "Planner CLI on Start page, EmbedDialog feed/intent gallery hints" },
   { slice: "C40", summary: "ShareDialog planner meta export, Spec page Phase 3 planner section" },
   { slice: "C41", summary: "ImportDialog planner meta restore hints, planner track release notes" },
+  { slice: "C42", summary: "Runtime adapters planner feed column, share-import round-trip docs" },
 ] as const;
+
+export const SHARE_EXPORT_META_EXAMPLE = `{
+  "$schema": "https://axidify.github.io/axicharts/schema/share-export.schema.json",
+  "version": 1,
+  "kind": "dashboard",
+  "exportedAt": "2026-07-18T00:00:00.000Z",
+  "name": "Line 3 ops",
+  "meta": {
+    "layout": "embed",
+    "feed": "rest",
+    "template": "ops-2x2",
+    "presentation": false
+  },
+  "spec": {
+    "layout": "embed",
+    "dashboard": {
+      "template": "ops-2x2",
+      "mode": "live",
+      "dataSource": {
+        "type": "rest",
+        "url": "/api/metrics",
+        "intervalMs": 2000
+      }
+    }
+  }
+}`;
 
 export const PLANNER_CLIENT_CODE = `import { requestDashboardPlan, fetchPlannerHealth } from "@axicharts/charts-planner";
 

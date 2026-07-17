@@ -11,6 +11,7 @@ import {
   PLANNER_PLAN_CURL_INLINE,
   PLANNER_PLAN_RESPONSE,
   PLANNER_SERVE_CODE,
+  SHARE_EXPORT_META_EXAMPLE,
 } from "../demos/runtimePlannerDemo";
 import {
   ADAPTER_ROWS,
@@ -113,12 +114,14 @@ export function RuntimePage(): ReactElement {
               <th style={{ padding: "8px 6px" }}>Type</th>
               <th style={{ padding: "8px 6px" }}>Use case</th>
               <th style={{ padding: "8px 6px" }}>Key fields</th>
+              <th style={{ padding: "8px 6px" }}>Planner feed</th>
               <th style={{ padding: "8px 6px" }}>Gallery fixture</th>
             </tr>
           </thead>
           <tbody>
             {ADAPTER_ROWS.map((row) => {
               const presetId = ADAPTER_FIXTURE_PRESETS[row.type];
+              const plannerRow = PLANNER_FEED_ROWS.find((item) => item.adapter === row.type);
               return (
                 <tr key={row.type} style={{ borderBottom: "1px solid #f1f5f9" }}>
                   <td style={{ padding: "8px 6px" }}>
@@ -127,6 +130,17 @@ export function RuntimePage(): ReactElement {
                   <td style={{ padding: "8px 6px", color: "#475569" }}>{row.useCase}</td>
                   <td style={{ padding: "8px 6px", color: "#64748b", fontSize: 12 }}>
                     {row.fields}
+                  </td>
+                  <td style={{ padding: "8px 6px", fontSize: 12 }}>
+                    {plannerRow ? (
+                      <>
+                        <code>{plannerRow.feed}</code>
+                        {" · "}
+                        <Link to={`/runtime/import#planner-feeds`}>{plannerRow.intentSample}</Link>
+                      </>
+                    ) : (
+                      <span style={{ color: "#94a3b8" }}>—</span>
+                    )}
                   </td>
                   <td style={{ padding: "8px 6px", fontSize: 12 }}>
                     {presetId ? (
@@ -140,6 +154,73 @@ export function RuntimePage(): ReactElement {
             })}
           </tbody>
         </table>
+      </Section>
+
+      <Section
+        title="Share → import round-trip"
+        subtitle="planner meta · Dashboarder"
+        id="share-import"
+      >
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Dashboarder <strong>Share</strong> serializes portable JSON with optional planner{" "}
+          <code>meta</code> (layout, feed, template, mosaic preset, presentation).{" "}
+          <strong>Import</strong> validates the envelope, previews meta restore, and calls{" "}
+          <code>applyDashboardMeta</code> on apply — same fields the builder uses after{" "}
+          <strong>Plan</strong>. Workspace bundles include <code>meta</code> per dashboard.
+        </p>
+        <ol
+          style={{
+            margin: "0 0 16px",
+            paddingLeft: 20,
+            fontSize: 13,
+            color: "#475569",
+            lineHeight: 1.7,
+          }}
+        >
+          <li>
+            Plan or tune layout/feed in Dashboarder — builder state lives in{" "}
+            <code>dashboard.meta</code>.
+          </li>
+          <li>
+            Share export (dashboard or workspace) — ShareDialog shows the planner meta block and
+            gallery links.
+          </li>
+          <li>
+            Import JSON — ImportDialog validates schema + semantics and previews what meta will
+            restore.
+          </li>
+          <li>
+            Apply — spec replaces the active dashboard; meta restores feed, template, and mosaic
+            preset without re-planning.
+          </li>
+        </ol>
+        <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Dashboard export with meta</strong>
+        </p>
+        <pre
+          style={{
+            margin: "0 0 12px",
+            padding: 14,
+            background: "#0f172a",
+            color: "#e2e8f0",
+            fontSize: 11,
+            lineHeight: 1.5,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {SHARE_EXPORT_META_EXAMPLE}
+        </pre>
+        <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>
+          Shipped presets:{" "}
+          <Link to="/runtime/import?preset=ops-dashboard">ops-dashboard</Link>
+          {" · "}
+          <Link to="/runtime/import?preset=ops-workspace">ops-workspace</Link>
+          {" · "}
+          <Link to="/runtime/import#planner-track">planner track notes</Link>
+          {" · "}
+          <Link to="/runtime/schema">share-export schema</Link>
+        </p>
       </Section>
 
       <Section title="Planner feeds" subtitle="intent → feed → gallery fixture">

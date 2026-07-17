@@ -109,3 +109,4 @@ presentation). Import restores the same fields — see the
 | C39 | Start page CLI, EmbedDialog feed hints |
 | C40 | ShareDialog meta export, Spec Phase 3 cross-link |
 | C41 | ImportDialog meta restore hints, track release notes |
+| C42 | Runtime adapters planner feed column, share-import round-trip docs |
