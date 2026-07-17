@@ -13,6 +13,12 @@ export type PlotSeries = {
   tone?: SeriesTone;
 };
 
+export type ReferenceLine = {
+  value: number;
+  label?: string;
+  tone?: SeriesTone;
+};
+
 export type UPlotLineProps = {
   width: number;
   height: number;
@@ -22,4 +28,16 @@ export type UPlotLineProps = {
   fill?: boolean;
   showAxes?: boolean;
   valueSuffix?: string;
+};
+
+export type UPlotBarProps = {
+  width: number;
+  height: number;
+  categories: string[];
+  series: PlotSeries[];
+  theme: ChartTheme;
+  showAxes?: boolean;
+  showValues?: boolean;
+  valueSuffix?: string;
+  referenceLines?: ReferenceLine[];
 };
