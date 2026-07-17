@@ -19,6 +19,13 @@ describe("runtime JSON schema", () => {
     expect(validateRuntimeSpecSchemaRaw(readExample("ops-mosaic.runtime.json")).ok).toBe(true);
   });
 
+  it("ships runtime examples with $schema hints", () => {
+    const embed = readExample("ops-embed.runtime.json") as { $schema?: string };
+    const mosaic = readExample("ops-mosaic.runtime.json") as { $schema?: string };
+    expect(embed.$schema).toContain("runtime-spec.schema.json");
+    expect(mosaic.$schema).toContain("runtime-spec.schema.json");
+  });
+
   it("rejects embed specs without template", () => {
     expect(
       validateRuntimeSpecSchemaRaw({

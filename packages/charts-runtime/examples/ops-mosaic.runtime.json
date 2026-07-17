@@ -1,4 +1,5 @@
 {
+  "$schema": "https://axidify.github.io/axicharts/schema/runtime-spec.schema.json",
   "layout": "mosaic",
   "wall": {
     "version": "0.1",

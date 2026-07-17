@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import {
+  RUNTIME_SPEC_SCHEMA_URL,
   SHARE_EXPORT_SCHEMA_URL,
-  validateShareExportJson,
   type ShareExport,
 } from "@axicharts/charts-runtime";
+import { validateShareImportJson } from "@axicharts/charts-runtime/validation";
 
 const overlayStyle = {
   position: "fixed" as const,
@@ -54,6 +55,57 @@ function importSummary(exported: ShareExport): string {
   return `Dashboard · ${exported.name}`;
 }
 
+function LayerStatus({
+  label,
+  ok,
+  schemaUrl,
+}: {
+  label: string;
+  ok: boolean;
+  schemaUrl?: string;
+}): ReactElement {
+  return (
+    <span style={{ marginRight: 12 }}>
+      {label}
+      {schemaUrl ? (
+        <>
+          {" "}
+          (
+          <a href={schemaUrl} style={{ color: "#93c5fd" }}>
+            schema
+          </a>
+          )
+        </>
+      ) : null}
+      {": "}
+      <span style={{ color: ok ? "#4ade80" : "#f87171" }}>{ok ? "ok" : "failed"}</span>
+    </span>
+  );
+}
+
+function ErrorList({
+  title,
+  errors,
+}: {
+  title: string;
+  errors: Array<{ path: string; message: string }>;
+}): ReactElement | null {
+  if (errors.length === 0) return null;
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>{title}</div>
+      <ul style={{ margin: 0, paddingLeft: 18, color: "#f87171", fontSize: 12 }}>
+        {errors.map((item) => (
+          <li key={`${title}:${item.path}:${item.message}`}>
+            <code>{item.path}</code> — {item.message}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function ImportDialog({
   open,
   initialJson = "",
@@ -70,7 +122,8 @@ export function ImportDialog({
     }
   }, [open, initialJson]);
 
-  const validation = useMemo(() => validateShareExportJson(jsonText), [jsonText]);
+  const validation = useMemo(() => validateShareImportJson(jsonText), [jsonText]);
+  const hasInput = jsonText.trim().length > 0;
 
   if (!open) return null;
 
@@ -92,21 +145,26 @@ export function ImportDialog({
               Import JSON
             </div>
             <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
-              Validates against{" "}
-              <a href={SHARE_EXPORT_SCHEMA_URL} style={{ color: "#93c5fd" }}>
-                share-export.schema.json
-              </a>
-              {initialFilename ? ` · ${initialFilename}` : null}
-              {validation.ok ? (
-                <span style={{ color: "#4ade80" }}> · {importSummary(validation.export)}</span>
-              ) : jsonText.trim() ? (
-                <span style={{ color: "#f87171" }}>
-                  {" "}
-                  · {validation.errors.length} validation issue
-                  {validation.errors.length === 1 ? "" : "s"}
-                </span>
+              {initialFilename ? `${initialFilename} · ` : null}
+              {hasInput ? (
+                <>
+                  <LayerStatus
+                    label="JSON Schema"
+                    ok={validation.schemaOk}
+                    schemaUrl={SHARE_EXPORT_SCHEMA_URL}
+                  />
+                  <LayerStatus label="Semantic" ok={validation.semanticOk} />
+                  {validation.ok && validation.export ? (
+                    <span style={{ color: "#4ade80" }}>{importSummary(validation.export)}</span>
+                  ) : null}
+                </>
               ) : (
-                <span> · paste JSON or choose a file</span>
+                <span>
+                  Paste JSON or choose a file · expects share export or bare runtime with{" "}
+                  <a href={RUNTIME_SPEC_SCHEMA_URL} style={{ color: "#93c5fd" }}>
+                    $schema
+                  </a>
+                </span>
               )}
             </div>
           </div>
@@ -121,9 +179,9 @@ export function ImportDialog({
           </button>
           <button
             type="button"
-            disabled={!validation.ok}
+            disabled={!validation.ok || !validation.export}
             onClick={() => {
-              if (!validation.ok) return;
+              if (!validation.ok || !validation.export) return;
               onApply(validation.export);
               onClose();
             }}
@@ -148,7 +206,7 @@ export function ImportDialog({
           value={jsonText}
           onChange={(event) => setJsonText(event.target.value)}
           spellCheck={false}
-          placeholder='{ "version": 1, "kind": "dashboard", ... }'
+          placeholder='{ "$schema": "...", "version": 1, "kind": "dashboard", ... }'
           style={{
             marginTop: 12,
             width: "100%",
@@ -157,7 +215,7 @@ export function ImportDialog({
             padding: 14,
             borderRadius: 8,
             background: "#020617",
-            border: `1px solid ${validation.ok || !jsonText.trim() ? "#334155" : "#7f1d1d"}`,
+            border: `1px solid ${validation.ok || !hasInput ? "#334155" : "#7f1d1d"}`,
             color: "#e2e8f0",
             fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
             fontSize: 11,
@@ -166,14 +224,11 @@ export function ImportDialog({
           }}
         />
 
-        {!validation.ok && jsonText.trim() ? (
-          <ul style={{ margin: "12px 0 0", paddingLeft: 18, color: "#f87171", fontSize: 12 }}>
-            {validation.errors.map((item) => (
-              <li key={`${item.path}:${item.message}`}>
-                <code>{item.path}</code> — {item.message}
-              </li>
-            ))}
-          </ul>
+        {hasInput && !validation.ok ? (
+          <>
+            <ErrorList title="JSON Schema" errors={validation.schemaErrors} />
+            <ErrorList title="Semantic" errors={validation.semanticErrors} />
+          </>
         ) : null}
       </div>
     </div>

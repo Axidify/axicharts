@@ -1,8 +1,7 @@
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import Ajv, { type ErrorObject, type ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
+import runtimeSchemaJson from "../schema/runtime-spec.schema.json";
+import shareSchemaJson from "../schema/share-export.schema.json";
 
 export type SchemaValidationIssue = {
   path: string;
@@ -13,29 +12,11 @@ export type SchemaValidationResult =
   | { ok: true }
   | { ok: false; errors: SchemaValidationIssue[] };
 
-const packageRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
-const schemaDir = join(packageRoot, "schema");
-
 const ajv = new Ajv({ allErrors: true, strict: false });
 addFormats(ajv);
 
-let validateRuntimeSchema: ValidateFunction | undefined;
-let validateShareSchema: ValidateFunction | undefined;
-
-function loadValidator(name: string): ValidateFunction {
-  const schema = JSON.parse(readFileSync(join(schemaDir, name), "utf8")) as object;
-  return ajv.compile(schema);
-}
-
-function getRuntimeValidator(): ValidateFunction {
-  validateRuntimeSchema ??= loadValidator("runtime-spec.schema.json");
-  return validateRuntimeSchema;
-}
-
-function getShareValidator(): ValidateFunction {
-  validateShareSchema ??= loadValidator("share-export.schema.json");
-  return validateShareSchema;
-}
+const validateRuntimeSchema = ajv.compile(runtimeSchemaJson as object);
+const validateShareSchema = ajv.compile(shareSchemaJson as object);
 
 function formatAjvErrors(errors: ErrorObject[] | null | undefined): SchemaValidationIssue[] {
   return (errors ?? []).map((error) => ({
@@ -64,11 +45,11 @@ function parseJson(json: string): { ok: true; raw: unknown } | { ok: false; erro
 }
 
 export function validateRuntimeSpecSchemaRaw(raw: unknown): SchemaValidationResult {
-  return validateParsed(getRuntimeValidator(), raw);
+  return validateParsed(validateRuntimeSchema, raw);
 }
 
 export function validateShareExportSchemaRaw(raw: unknown): SchemaValidationResult {
-  return validateParsed(getShareValidator(), raw);
+  return validateParsed(validateShareSchema, raw);
 }
 
 export function validateRuntimeSpecSchemaJson(json: string): SchemaValidationResult {

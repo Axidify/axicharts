@@ -75,8 +75,9 @@ export function RuntimeSchemaPage(): ReactElement {
       <p style={{ color: "#475569", maxWidth: 720, lineHeight: 1.6 }}>
         Portable runtime JSON is validated in two layers: draft-07 JSON Schema for shape and
         enums, plus semantic checks for template IDs, adapter fields, and mosaic{" "}
-        <code>dataSourceId</code> references. CI runs <code>pnpm validate:runtime</code> on every
-        build; npm publish runs the same gate before packages ship.
+        <code>dataSourceId</code> references. Shipped examples and Dashboarder exports include
+        top-level <code>$schema</code> hints. CI runs <code>pnpm validate:runtime</code> with the
+        dual <code>--all</code> gate on every build.
       </p>
 
       <Section title="Hosted schema URLs" subtitle="GitHub Pages · npm subpaths">
