@@ -20,7 +20,7 @@ import {
   WEBSOCKET_TELEMETRY_FRAME,
   type AdapterFieldRow,
 } from "../demos/runtimeAdapterDemo";
-import { ADAPTER_FIXTURE_PRESETS } from "@axicharts/charts-runtime/validation";
+import { ADAPTER_FIXTURE_PRESETS, IMPORT_GALLERY_ADAPTER_FILTERS, importGalleryFilterPath } from "@axicharts/charts-runtime/validation";
 
 const tableStyle = {
   width: "100%",
@@ -276,6 +276,47 @@ export function RuntimeAdaptersPage(): ReactElement {
           </Link>
           .
         </p>
+      </Section>
+
+      <Section title="Adapter fixture index" subtitle="import gallery · C28–C32">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Each adapter type maps to a shipped preset validated in CI via{" "}
+          <code>pnpm validate:runtime</code>. Filter the{" "}
+          <Link to="/runtime/import">import gallery</Link> by adapter or open a fixture directly.
+        </p>
+        <table style={tableStyle}>
+          <thead>
+            <tr>
+              <th style={cellStyle}>Adapter</th>
+              <th style={cellStyle}>Preset</th>
+              <th style={cellStyle}>Gallery filter</th>
+            </tr>
+          </thead>
+          <tbody>
+            {IMPORT_GALLERY_ADAPTER_FILTERS.map((adapter) => {
+              const presetId = ADAPTER_FIXTURE_PRESETS[adapter];
+              return (
+                <tr key={adapter}>
+                  <td style={cellStyle}>
+                    <code>{adapter}</code>
+                  </td>
+                  <td style={cellStyle}>
+                    {presetId ? (
+                      <Link to={`/runtime/import?preset=${presetId}`}>{presetId}</Link>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td style={cellStyle}>
+                    <Link to={importGalleryFilterPath({ type: "adapter", value: adapter })}>
+                      ?adapter={adapter}
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </Section>
 
       <p style={{ marginTop: 24, fontSize: 13, color: "#64748b" }}>

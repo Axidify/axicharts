@@ -3,26 +3,73 @@ import { Link, useSearchParams } from "react-router-dom";
 import {
   dashboarderImportDeepLink,
   fetchImportPreset,
+  filterImportPresets,
+  findImportPreset,
   formatValidatePresetCommand,
   hostedImportPresetUrl,
   HOSTED_IMPORT_PRESETS,
+  importGalleryFilterPath,
+  IMPORT_GALLERY_ADAPTER_FILTERS,
+  IMPORT_GALLERY_KIND_FILTERS,
+  isImportGalleryFilterActive,
   localImportPresetUrl,
+  parseImportGalleryFilter,
   validatePortableImportJson,
   type HostedImportPreset,
+  type ImportGalleryFilter,
+  type ImportPresetKind,
   type ImportPresetSource,
 } from "@axicharts/charts-runtime/validation";
 import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
 
 const base = import.meta.env.BASE_URL;
 
+const chipStyle = {
+  fontSize: 12,
+  padding: "6px 12px",
+  borderRadius: 6,
+  border: "1px solid #cbd5e1",
+  background: "#f8fafc",
+  color: "#1e293b",
+  textDecoration: "none",
+  cursor: "pointer",
+} as const;
+
+function activeChipStyle(active: boolean): typeof chipStyle {
+  return {
+    ...chipStyle,
+    background: active ? "#dbeafe" : "#f8fafc",
+    borderColor: active ? "#93c5fd" : "#cbd5e1",
+    fontWeight: active ? 600 : 400,
+  };
+}
+
 function presetGalleryPath(presetId: string): string {
   return `/runtime/import?preset=${encodeURIComponent(presetId)}`;
+}
+
+function kindLabel(kind: ImportPresetKind): string {
+  if (kind === "runtime") return "Runtime";
+  if (kind === "dashboard") return "Dashboard";
+  return "Workspace";
 }
 
 function sourceLabel(source: ImportPresetSource): string {
   if (source === "hosted") return "GitHub Pages";
   if (source === "local") return "docs mirror";
   return "bundled fixture";
+}
+
+function visiblePresets(
+  filter: ImportGalleryFilter,
+  activePresetId: string | null,
+): HostedImportPreset[] {
+  const filtered = filterImportPresets(filter);
+  if (!activePresetId || filtered.some((preset) => preset.id === activePresetId)) {
+    return filtered;
+  }
+  const highlighted = findImportPreset(activePresetId);
+  return highlighted ? [highlighted, ...filtered] : filtered;
 }
 
 function PresetCard({
@@ -193,6 +240,11 @@ function PresetCard({
 export function RuntimeImportPage(): ReactElement {
   const [searchParams] = useSearchParams();
   const activePresetId = searchParams.get("preset");
+  const galleryFilter = parseImportGalleryFilter(searchParams.toString());
+  const presets = useMemo(
+    () => visiblePresets(galleryFilter, activePresetId),
+    [galleryFilter, activePresetId],
+  );
 
   return (
     <div>
@@ -202,10 +254,9 @@ export function RuntimeImportPage(): ReactElement {
       <h1 style={{ marginTop: 8 }}>Import gallery</h1>
       <p style={{ color: "#475569", maxWidth: 720, lineHeight: 1.6 }}>
         Shipped runtime, dashboard, and workspace export fixtures with <code>$schema</code> hints.
-        Deep-link a preset with <code>?preset=ops-embed</code> or open directly in Dashboarder via{" "}
-        <code>?import=ops-embed</code>. Each card runs the dual JSON Schema + semantic gate used by{" "}
-        <code>charts-runtime validate --preset &lt;id&gt; --all</code> (also what{" "}
-        <code>pnpm validate:runtime</code> runs in CI).
+        Deep-link a preset with <code>?preset=ops-embed</code> or filter by adapter with{" "}
+        <code>?adapter=rest</code>. Each card runs the dual JSON Schema + semantic gate used by{" "}
+        <code>charts-runtime validate --preset &lt;id&gt; --all</code>.
         {" "}
         <Link to="/runtime/adapters">Adapter cookbook →</Link>
       </p>
@@ -220,81 +271,45 @@ export function RuntimeImportPage(): ReactElement {
           maxWidth: 720,
         }}
       >
-        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Adapter fixtures</div>
-        <p style={{ margin: "0 0 10px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
-          Live adapter wiring examples with portable JSON specs:
+        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Adapter fixture track</div>
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          All six runtime adapter types ship a validated import preset — use the filters below or
+          browse the <Link to="/runtime/adapters">cookbook</Link> for field tables and payload
+          shapes.
         </p>
+        <div style={{ fontSize: 12, color: "#64748b", marginBottom: 8 }}>Kind</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+          <Link
+            to={importGalleryFilterPath({ type: "all" })}
+            style={activeChipStyle(isImportGalleryFilterActive(galleryFilter, { type: "all" }))}
+          >
+            All ({HOSTED_IMPORT_PRESETS.length})
+          </Link>
+          {IMPORT_GALLERY_KIND_FILTERS.map((kind) => (
+            <Link
+              key={kind}
+              to={importGalleryFilterPath({ type: "kind", value: kind })}
+              style={activeChipStyle(
+                isImportGalleryFilterActive(galleryFilter, { type: "kind", value: kind }),
+              )}
+            >
+              {kindLabel(kind)} ({filterImportPresets({ type: "kind", value: kind }).length})
+            </Link>
+          ))}
+        </div>
+        <div style={{ fontSize: 12, color: "#64748b", marginBottom: 8 }}>Adapter</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          <Link
-            to="/runtime/import?preset=ops-rest"
-            style={{
-              fontSize: 12,
-              padding: "6px 12px",
-              borderRadius: 6,
-              border: "1px solid #cbd5e1",
-              background: "#f8fafc",
-              color: "#1e293b",
-              textDecoration: "none",
-            }}
-          >
-            REST embed
-          </Link>
-          <Link
-            to="/runtime/import?preset=ops-historian"
-            style={{
-              fontSize: 12,
-              padding: "6px 12px",
-              borderRadius: 6,
-              border: "1px solid #cbd5e1",
-              background: "#f8fafc",
-              color: "#1e293b",
-              textDecoration: "none",
-            }}
-          >
-            Historian embed
-          </Link>
-          <Link
-            to="/runtime/import?preset=ops-mqtt"
-            style={{
-              fontSize: 12,
-              padding: "6px 12px",
-              borderRadius: 6,
-              border: "1px solid #cbd5e1",
-              background: "#f8fafc",
-              color: "#1e293b",
-              textDecoration: "none",
-            }}
-          >
-            MQTT embed
-          </Link>
-          <Link
-            to="/runtime/import?preset=ops-websocket"
-            style={{
-              fontSize: 12,
-              padding: "6px 12px",
-              borderRadius: 6,
-              border: "1px solid #cbd5e1",
-              background: "#f8fafc",
-              color: "#1e293b",
-              textDecoration: "none",
-            }}
-          >
-            WebSocket mosaic
-          </Link>
-          <Link
-            to="/runtime/import?preset=ops-mock-live"
-            style={{
-              fontSize: 12,
-              padding: "6px 12px",
-              borderRadius: 6,
-              border: "1px solid #cbd5e1",
-              background: "#f8fafc",
-              color: "#1e293b",
-              textDecoration: "none",
-            }}
-          >
-            Mock-live embed
-          </Link>
+          {IMPORT_GALLERY_ADAPTER_FILTERS.map((adapter) => (
+            <Link
+              key={adapter}
+              to={importGalleryFilterPath({ type: "adapter", value: adapter })}
+              style={activeChipStyle(
+                isImportGalleryFilterActive(galleryFilter, { type: "adapter", value: adapter }),
+              )}
+            >
+              {adapter} ({filterImportPresets({ type: "adapter", value: adapter }).length})
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -313,7 +328,7 @@ export function RuntimeImportPage(): ReactElement {
           Shipped presets map to <code>charts-runtime validate --preset</code> shortcuts. Run all
           fixtures with <code>pnpm validate:runtime</code>.
         </p>
-        {HOSTED_IMPORT_PRESETS.map((preset) => (
+        {presets.map((preset) => (
           <ValidateCommandCopy
             key={preset.id}
             label={preset.label}
@@ -323,18 +338,14 @@ export function RuntimeImportPage(): ReactElement {
       </section>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 }}>
-        {HOSTED_IMPORT_PRESETS.map((preset) => (
+        {presets.map((preset) => (
           <Link
             key={preset.id}
             to={presetGalleryPath(preset.id)}
             style={{
-              fontSize: 12,
-              padding: "6px 12px",
-              borderRadius: 6,
-              border: "1px solid #cbd5e1",
+              ...chipStyle,
               background: activePresetId === preset.id ? "#dbeafe" : "#f8fafc",
-              color: "#1e293b",
-              textDecoration: "none",
+              fontWeight: activePresetId === preset.id ? 600 : 400,
             }}
           >
             {preset.label}
@@ -343,7 +354,7 @@ export function RuntimeImportPage(): ReactElement {
       </div>
 
       <div style={{ display: "grid", gap: 16, marginTop: 24 }}>
-        {HOSTED_IMPORT_PRESETS.map((preset) => (
+        {presets.map((preset) => (
           <PresetCard
             key={preset.id}
             preset={preset}
@@ -352,6 +363,13 @@ export function RuntimeImportPage(): ReactElement {
         ))}
       </div>
 
+      {presets.length === 0 ? (
+        <p style={{ marginTop: 16, fontSize: 13, color: "#64748b" }}>
+          No presets match this filter.{" "}
+          <Link to={importGalleryFilterPath({ type: "all" })}>Show all</Link>.
+        </p>
+      ) : null}
+
       <p style={{ marginTop: 24, fontSize: 13, color: "#64748b" }}>
         <Link to="/runtime/links" style={{ color: "#2563eb" }}>
           Deep link index
@@ -359,6 +377,10 @@ export function RuntimeImportPage(): ReactElement {
         {" · "}
         <Link to="/runtime/schema" style={{ color: "#2563eb" }}>
           Runtime schema
+        </Link>
+        {" · "}
+        <Link to="/runtime" style={{ color: "#2563eb" }}>
+          Runtime SDK
         </Link>
       </p>
     </div>

@@ -6,11 +6,16 @@ import {
   dashboarderImportDeepLink,
   docsImportGalleryDeepLink,
   findImportPreset,
+  filterImportPresets,
   hostedImportPresetUrl,
   HOSTED_IMPORT_PRESETS,
   importGalleryDeepLink,
+  importGalleryFilterPath,
+  IMPORT_GALLERY_ADAPTER_FILTERS,
+  isImportGalleryFilterActive,
   listImportDeepLinks,
   localImportPresetUrl,
+  parseImportGalleryFilter,
   parseImportPresetQuery,
   shareExportReferencePreset,
   runtimeEmbedReferencePreset,
@@ -173,5 +178,21 @@ describe("hosted import presets", () => {
     expect(links[8]?.localMirrorPath).toContain("ops-workspace.workspace.json");
     expect(findImportPreset("ops-websocket")?.adapter).toBe("websocket");
     expect(findImportPreset("ops-mock-live")?.adapter).toBe("mock-live");
+  });
+
+  it("filters import gallery presets by kind and adapter", () => {
+    expect(parseImportGalleryFilter("?kind=runtime").type).toBe("kind");
+    expect(parseImportGalleryFilter("?adapter=rest")).toEqual({ type: "adapter", value: "rest" });
+    expect(filterImportPresets({ type: "kind", value: "dashboard" })).toHaveLength(1);
+    expect(filterImportPresets({ type: "adapter", value: "mqtt" })[0]?.id).toBe("ops-mqtt");
+    expect(importGalleryFilterPath({ type: "adapter", value: "historian" })).toBe(
+      "/runtime/import?adapter=historian",
+    );
+    expect(
+      isImportGalleryFilterActive(
+        parseImportGalleryFilter("?adapter=rest"),
+        { type: "adapter", value: "rest" },
+      ),
+    ).toBe(true);
   });
 });

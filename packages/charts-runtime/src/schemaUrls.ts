@@ -88,6 +88,76 @@ export const ADAPTER_FIXTURE_PRESETS: Partial<Record<ImportPresetAdapter, string
   "mock-live": "ops-mock-live",
 };
 
+export const IMPORT_GALLERY_ADAPTER_FILTERS: ImportPresetAdapter[] = [
+  "static",
+  "mosaic",
+  "rest",
+  "historian",
+  "mqtt",
+  "websocket",
+  "mock-live",
+];
+
+export const IMPORT_GALLERY_KIND_FILTERS: ImportPresetKind[] = [
+  "runtime",
+  "dashboard",
+  "workspace",
+];
+
+export type ImportGalleryFilter =
+  | { type: "all" }
+  | { type: "kind"; value: ImportPresetKind }
+  | { type: "adapter"; value: ImportPresetAdapter };
+
+function isImportPresetAdapter(value: string): value is ImportPresetAdapter {
+  return IMPORT_GALLERY_ADAPTER_FILTERS.includes(value as ImportPresetAdapter);
+}
+
+export function parseImportGalleryFilter(search: string): ImportGalleryFilter {
+  const params = new URLSearchParams(search.startsWith("?") ? search : `?${search}`);
+  const adapter = params.get("adapter");
+  if (adapter && isImportPresetAdapter(adapter)) {
+    return { type: "adapter", value: adapter };
+  }
+  const kind = params.get("kind");
+  if (kind === "runtime" || kind === "dashboard" || kind === "workspace") {
+    return { type: "kind", value: kind };
+  }
+  return { type: "all" };
+}
+
+export function filterImportPresets(filter: ImportGalleryFilter): HostedImportPreset[] {
+  if (filter.type === "all") return HOSTED_IMPORT_PRESETS;
+  if (filter.type === "kind") {
+    return HOSTED_IMPORT_PRESETS.filter((preset) => preset.kind === filter.value);
+  }
+  return HOSTED_IMPORT_PRESETS.filter((preset) => preset.adapter === filter.value);
+}
+
+export function importGalleryFilterPath(
+  filter: ImportGalleryFilter,
+  basePath = "/runtime/import",
+): string {
+  if (filter.type === "all") return basePath;
+  if (filter.type === "kind") return `${basePath}?kind=${filter.value}`;
+  return `${basePath}?adapter=${encodeURIComponent(filter.value)}`;
+}
+
+export function isImportGalleryFilterActive(
+  current: ImportGalleryFilter,
+  candidate: ImportGalleryFilter,
+): boolean {
+  if (current.type !== candidate.type) return false;
+  if (current.type === "all") return true;
+  if (current.type === "kind" && candidate.type === "kind") {
+    return current.value === candidate.value;
+  }
+  if (current.type === "adapter" && candidate.type === "adapter") {
+    return current.value === candidate.value;
+  }
+  return false;
+}
+
 export const SHARE_EXPORT_REFERENCE_PRESET: Record<"dashboard" | "workspace", string> = {
   dashboard: "ops-dashboard",
   workspace: "ops-workspace",
