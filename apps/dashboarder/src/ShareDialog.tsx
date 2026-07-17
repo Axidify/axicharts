@@ -3,6 +3,7 @@ import {
   getActiveWorkspace,
   serializeDashboardExport,
   serializeWorkspaceExport,
+  validateShareExportJson,
   type RuntimeDashboardSpec,
   type SavedDashboard,
   type WorkspaceStore,
@@ -97,6 +98,8 @@ export function ShareDialog({
     return serializeDashboardExport(dashboard.name, spec, meta);
   }, [tab, workspace, dashboard.name, spec, meta]);
 
+  const validation = useMemo(() => validateShareExportJson(exportJson), [exportJson]);
+
   if (!open) return null;
 
   const filename =
@@ -125,6 +128,15 @@ export function ShareDialog({
             </div>
             <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
               Portable JSON envelopes with version, kind, and exportedAt metadata
+              {validation.ok ? (
+                <span style={{ color: "#4ade80" }}> · validated</span>
+              ) : (
+                <span style={{ color: "#f87171" }}>
+                  {" "}
+                  · {validation.errors.length} validation issue
+                  {validation.errors.length === 1 ? "" : "s"}
+                </span>
+              )}
             </div>
           </div>
           <button type="button" onClick={onClose} style={buttonStyle}>
@@ -151,12 +163,13 @@ export function ShareDialog({
               {label}
             </button>
           ))}
-          <button type="button" onClick={() => void copy()} style={{ ...buttonStyle, marginLeft: "auto" }}>
+          <button type="button" onClick={() => void copy()} disabled={!validation.ok} style={{ ...buttonStyle, marginLeft: "auto" }}>
             {copied ? "Copied" : "Copy JSON"}
           </button>
           <button
             type="button"
             onClick={() => downloadJson(filename, exportJson)}
+            disabled={!validation.ok}
             style={buttonStyle}
           >
             Download
@@ -178,6 +191,15 @@ export function ShareDialog({
         >
           {exportJson}
         </pre>
+        {!validation.ok ? (
+          <ul style={{ margin: "12px 0 0", paddingLeft: 18, color: "#f87171", fontSize: 12 }}>
+            {validation.errors.map((item) => (
+              <li key={`${item.path}:${item.message}`}>
+                <code>{item.path}</code> — {item.message}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
     </div>
   );

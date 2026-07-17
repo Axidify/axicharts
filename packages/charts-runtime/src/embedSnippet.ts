@@ -1,4 +1,9 @@
-import { parseRuntimeSpec, serializeRuntimeSpec } from "./runtimeSpec";
+import { serializeRuntimeSpec } from "./runtimeSpec";
+import {
+  formatValidationErrors,
+  validateRuntimeSpecJson as validateRuntimeSpecDeep,
+  type RuntimeValidationIssue,
+} from "./runtimeValidation";
 import type { RuntimeDashboardSpec } from "./types";
 
 export type EmbedSnippetOptions = {
@@ -88,14 +93,18 @@ export function buildPortableSpecJson(spec: RuntimeDashboardSpec, pretty = true)
 export function validateRuntimeSpecJson(json: string): {
   spec: RuntimeDashboardSpec;
   error?: undefined;
+  errors?: undefined;
 } | {
   spec?: undefined;
   error: string;
+  errors: RuntimeValidationIssue[];
 } {
-  try {
-    return { spec: parseRuntimeSpec(json) };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return { error: message };
+  const result = validateRuntimeSpecDeep(json);
+  if (result.ok) {
+    return { spec: result.spec };
   }
+  return {
+    error: formatValidationErrors(result.errors),
+    errors: result.errors,
+  };
 }

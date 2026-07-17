@@ -24,6 +24,9 @@ export {
   type DashboardExport,
   type ShareExport,
   type WorkspaceShareExport,
+  validateShareExportJson,
+  type SerializeExportOptions,
+  type ShareValidationResult,
 } from "./export";
 export {
   DEFAULT_WORKSPACE_STORE_KEY,

@@ -1,0 +1,27 @@
+{
+  "layout": "embed",
+  "dashboard": {
+    "version": "0.1",
+    "title": "Line 3",
+    "subtitle": "Static ops embed",
+    "theme": "industrial",
+    "mode": "interactive",
+    "template": "ops-2x2",
+    "data": {
+      "categories": ["Mon", "Tue", "Wed", "Thu"],
+      "cells": [
+        { "title": "CPU", "data": [22, 28, 31, 34], "suffix": "%" },
+        { "title": "Memory", "data": [55, 58, 60, 59], "suffix": "%" },
+        { "title": "Errors", "data": [1, 2, 5, 3], "suffix": "/min", "tone": "warning" },
+        { "title": "p95", "data": [42, 38, 55, 49], "suffix": "ms" }
+      ],
+      "alarms": [
+        {
+          "id": "cpu-high",
+          "message": "CPU above warn threshold",
+          "severity": "warning"
+        }
+      ]
+    }
+  }
+}

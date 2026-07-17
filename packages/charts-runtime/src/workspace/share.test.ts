@@ -6,6 +6,7 @@ import {
   parseShareExport,
   serializeDashboardExport,
   serializeWorkspaceExport,
+  validateShareExportJson,
 } from "./share";
 
 const spec: RuntimeDashboardSpec = {
@@ -49,5 +50,17 @@ describe("workspace share export", () => {
     expect(next.workspaces).toHaveLength(2);
     expect(next.activeWorkspaceId).not.toBe(store.activeWorkspaceId);
     expect(next.workspaces[1]?.dashboards).toHaveLength(1);
+  });
+
+  it("rejects invalid dashboard exports", () => {
+    const json = JSON.stringify({
+      version: 1,
+      kind: "dashboard",
+      exportedAt: "2026-01-01T00:00:00.000Z",
+      name: "Broken",
+      spec: { layout: "embed", dashboard: { template: "not-real" } },
+    });
+    const result = validateShareExportJson(json);
+    expect(result.ok).toBe(false);
   });
 });

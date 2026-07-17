@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseRuntimeSpec, serializeRuntimeSpec, toPortableRuntimeSpec } from "./runtimeSpec";
+import { validateRuntimeSpecRaw } from "./runtimeValidation";
 import type { RuntimeDashboardSpec } from "./types";
 
 const embedSpec: RuntimeDashboardSpec = {
@@ -61,5 +62,29 @@ describe("runtimeSpec", () => {
 
     expect(parsed.layout).toBe("mosaic");
     expect(parsed.wall.cells).toHaveLength(1);
+  });
+
+  it("rejects unknown templates", () => {
+    const result = validateRuntimeSpecRaw({
+      layout: "embed",
+      dashboard: { template: "not-a-template" },
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.errors[0]?.path).toContain("template");
+  });
+
+  it("rejects dangling mosaic dataSourceId refs", () => {
+    const result = validateRuntimeSpecRaw({
+      layout: "mosaic",
+      wall: {
+        dataSourceId: "missing",
+        dataSources: [{ id: "ops", type: "static", data: {} }],
+        cells: [{ id: "ops", template: "ops-2x2", dataSourceId: "missing" }],
+      },
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.errors.some((item) => item.path.includes("dataSourceId"))).toBe(true);
   });
 });

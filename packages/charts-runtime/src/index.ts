@@ -12,8 +12,11 @@ export {
   parseShareExport,
   serializeDashboardExport,
   serializeWorkspaceExport,
+  validateShareExportJson,
   type DashboardExport,
+  type SerializeExportOptions,
   type ShareExport,
+  type ShareValidationResult,
   type WorkspaceShareExport,
 } from "./workspace/export";
 export { RUNTIME_VERSION } from "./types";
@@ -94,6 +97,14 @@ export {
   serializeRuntimeSpec,
   toPortableRuntimeSpec,
 } from "./runtimeSpec";
+export {
+  assertRuntimeSpec,
+  formatValidationErrors,
+  validateRuntimeSpecJson as validateRuntimeSpecDeep,
+  validateRuntimeSpecRaw,
+  type RuntimeValidationIssue,
+  type RuntimeValidationResult,
+} from "./runtimeValidation";
 
 export {
   buildHistorianUrl,
