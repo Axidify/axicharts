@@ -27,9 +27,9 @@ describe("composeFunnelMarks", () => {
 
     expect(composed.sort).toBe("descending");
     expect(composed.stages).toEqual([
-      { name: "Leads", value: 1200 },
-      { name: "Qualified", value: 640 },
-      { name: "Closed won", value: 180 },
+      { key: "Leads", name: "Leads", value: 1200 },
+      { key: "Qualified", name: "Qualified", value: 640 },
+      { key: "Won", name: "Won", value: 180 },
     ]);
   });
 });

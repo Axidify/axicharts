@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement, ReactNode } from "react";
+import { useMemo } from "react";
 import {
   EChartsFunnel,
   type FunnelStage,
@@ -9,6 +10,7 @@ import { useChartLayout } from "../container/ChartLayoutContext";
 import { EChartsInteractionShell } from "../chrome/EChartsInteractionShell";
 import { useEChartsInteraction } from "../sync/useEChartsInteraction";
 import { useResolvedFunnelProps } from "../composable/resolveFunnelProps";
+import { applyChartConfigToFunnelStages } from "../config/applyChartConfig";
 
 export type FunnelChartProps = {
   stages?: FunnelStage[];
@@ -46,7 +48,7 @@ export function FunnelChart({
   sort: sortProp = "descending",
 }: FunnelChartProps): ReactElement | null {
   const { size, ready, config } = useChartLayout();
-  const { stages, sort } = useResolvedFunnelProps(
+  const { stages: resolvedStages, sort } = useResolvedFunnelProps(
     {
       stages: stagesProp,
       data,
@@ -54,6 +56,10 @@ export function FunnelChart({
       sort: sortProp,
     },
     config,
+  );
+  const stages = useMemo(
+    () => applyChartConfigToFunnelStages(resolvedStages, config),
+    [resolvedStages, config],
   );
 
   if (!ready || size.width < 1 || size.height < 1) {

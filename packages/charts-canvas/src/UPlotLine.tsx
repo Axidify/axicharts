@@ -174,7 +174,7 @@ function buildOptions({
     series: [
       {},
       ...series.map((item, index) => {
-        const color = resolveSeriesColor(item.tone, index);
+        const color = item.color ?? resolveSeriesColor(item.tone, index);
         const stackSeries = shouldStackSeries(stacked, series.length);
         return {
           label: item.name,

@@ -135,6 +135,12 @@ export {
   type YAxisMarkProps,
 } from "./composable";
 export {
+  applyChartConfigToFunnelStages,
+  applyChartConfigToPieSlices,
+  applyChartConfigToSeries,
+  configLookupKey,
+} from "./config/applyChartConfig";
+export {
   alarmSeverityToSeriesTone,
   applyTagTonesToSeries,
   mergeSeriesTone,

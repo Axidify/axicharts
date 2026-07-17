@@ -29,9 +29,9 @@ describe("composePieMarks", () => {
     expect(composed.innerRadius).toBe(42);
     expect(composed.showLabels).toBe(true);
     expect(composed.slices).toEqual([
-      { name: "Product revenue", value: 48 },
-      { name: "Services", value: 28 },
-      { name: "Support", value: 14 },
+      { key: "Product", name: "Product", value: 48 },
+      { key: "Services", name: "Services", value: 28 },
+      { key: "Support", name: "Support", value: 14 },
     ]);
   });
 

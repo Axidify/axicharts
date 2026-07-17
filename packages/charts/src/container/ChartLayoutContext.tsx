@@ -9,6 +9,7 @@ export type ChartConfig = Record<
   {
     label?: string;
     color?: string;
+    tone?: SeriesTone;
   }
 >;
 

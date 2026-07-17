@@ -51,7 +51,8 @@ export function composeCartesianMarks(
         if (!seriesKinds.includes(kind)) break;
         const dataKey = String(props.dataKey);
         series.push({
-          name: String(config?.[dataKey]?.label ?? props.name ?? dataKey),
+          key: dataKey,
+          name: String(props.name ?? dataKey),
           data: data.map((row) => Number(row[dataKey])),
           tone: props.tone as PlotSeries["tone"],
         });

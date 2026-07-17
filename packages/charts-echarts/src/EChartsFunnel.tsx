@@ -31,7 +31,9 @@ export function EChartsFunnel({
     value: stage.value,
     itemStyle: {
       color:
-        toneColor(stage.tone) ?? SERIES_PALETTE[index % SERIES_PALETTE.length],
+        stage.color ??
+        toneColor(stage.tone) ??
+        SERIES_PALETTE[index % SERIES_PALETTE.length],
     },
   }));
 

@@ -28,7 +28,8 @@ describe("composeCartesianMarks", () => {
     expect(composed.categories).toEqual(["Mon", "Tue", "Wed"]);
     expect(composed.series).toHaveLength(2);
     expect(composed.series[0]).toMatchObject({
-      name: "Revenue",
+      key: "revenue",
+      name: "revenue",
       data: [120, 132, 101],
     });
     expect(composed.series[1]?.tone).toBe("warning");

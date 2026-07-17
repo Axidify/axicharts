@@ -64,7 +64,8 @@ export function composePieMarks(
     const tone = cellTones.get(rawName);
 
     return {
-      name: String(config?.[rawName]?.label ?? rawName),
+      key: rawName,
+      name: rawName,
       value,
       tone,
     };

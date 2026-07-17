@@ -25,6 +25,8 @@ export const SERIES_PALETTE = [
 export type PieSlice = {
   name: string;
   value: number;
+  key?: string;
+  color?: string;
   tone?: SeriesTone;
 };
 

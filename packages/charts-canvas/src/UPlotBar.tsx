@@ -118,7 +118,7 @@ function buildOptions({
     series: [
       {},
       ...series.map((item, index) => {
-        const color = resolveSeriesColor(item.tone, index);
+        const color = item.color ?? resolveSeriesColor(item.tone, index);
         return {
           label: item.name,
           stroke: color,

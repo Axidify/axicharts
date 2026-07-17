@@ -1,11 +1,13 @@
 "use client";
 
 import type { ReactElement, ReactNode } from "react";
+import { useMemo } from "react";
 import { EChartsPie, type PieSlice } from "@axicharts/charts-echarts";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { EChartsInteractionShell } from "../chrome/EChartsInteractionShell";
 import { useEChartsInteraction } from "../sync/useEChartsInteraction";
 import { useResolvedPieProps } from "../composable/resolvePieProps";
+import { applyChartConfigToPieSlices } from "../config/applyChartConfig";
 
 export type PieChartProps = {
   slices?: PieSlice[];
@@ -48,7 +50,7 @@ export function PieChart({
   showLabels: showLabelsProp,
 }: PieChartProps): ReactElement | null {
   const { size, ready, config } = useChartLayout();
-  const { slices, innerRadius, showLabels } = useResolvedPieProps(
+  const { slices: resolvedSlices, innerRadius, showLabels } = useResolvedPieProps(
     {
       slices: slicesProp,
       data,
@@ -57,6 +59,10 @@ export function PieChart({
       showLabels: showLabelsProp,
     },
     config,
+  );
+  const slices = useMemo(
+    () => applyChartConfigToPieSlices(resolvedSlices, config),
+    [resolvedSlices, config],
   );
 
   if (!ready || size.width < 1 || size.height < 1) {

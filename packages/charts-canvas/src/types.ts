@@ -10,6 +10,8 @@ export type SeriesTone =
 export type PlotSeries = {
   name: string;
   data: number[];
+  key?: string;
+  color?: string;
   tone?: SeriesTone;
 };
 

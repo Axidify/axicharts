@@ -39,7 +39,8 @@ export function composeFunnelMarks(
     const tone = row.tone as SeriesTone | undefined;
 
     return {
-      name: String(config?.[rawName]?.label ?? rawName),
+      key: rawName,
+      name: rawName,
       value,
       tone,
     };

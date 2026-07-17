@@ -20,6 +20,7 @@ import { usePlotSync } from "../sync/usePlotSync";
 import { usePlotSampling } from "../plot/usePlotSampling";
 import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
+import { applyChartConfigToSeries } from "../config/applyChartConfig";
 
 const BAR_SERIES_KINDS = ["bar"] as const;
 
@@ -116,10 +117,10 @@ export function BarChart({
     config,
     [...BAR_SERIES_KINDS],
   );
-  const series = useMemo(
-    () => applyTagTonesToSeries(resolvedSeries, tagTones ?? {}),
-    [resolvedSeries, tagTones],
-  );
+  const series = useMemo(() => {
+    const configured = applyChartConfigToSeries(resolvedSeries, config);
+    return applyTagTonesToSeries(configured, tagTones ?? {});
+  }, [resolvedSeries, config, tagTones]);
   const maxPoints = usePlotSampling({
     pointCount: categories.length,
     renderer,

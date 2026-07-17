@@ -32,7 +32,10 @@ export function EChartsPie({
     name: slice.name,
     value: slice.value,
     itemStyle: {
-      color: toneColor(slice.tone) ?? SERIES_PALETTE[index % SERIES_PALETTE.length],
+      color:
+        slice.color ??
+        toneColor(slice.tone) ??
+        SERIES_PALETTE[index % SERIES_PALETTE.length],
     },
   }));
 
