@@ -28,5 +28,11 @@
     "path": "packages/charts-theme/dist/index.js",
     "limit": "2 KB",
     "gzip": true
+  },
+  {
+    "name": "@axicharts/charts-spec",
+    "path": "packages/charts-spec/dist/index.js",
+    "limit": "8 KB",
+    "gzip": true
   }
 ]
