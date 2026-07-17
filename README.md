@@ -50,6 +50,7 @@ export function LatencyPanel() {
 | `@axicharts/charts-runtime` | Data adapters, embed SDK, spec portability |
 | `@axicharts/charts-tank` | Community plugin — tank level chart (`registerChartType`) |
 | `@axicharts/charts-geo` | Community plugin — regional cartogram map (`registerChartType`) |
+| `@axicharts/charts-andon` | Community plugin — production andon board (`registerChartType`) |
 
 ## Develop
 

@@ -10,6 +10,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      "@axicharts/charts-andon": path.resolve(root, "packages/charts-andon/src"),
       "@axicharts/charts-geo": path.resolve(root, "packages/charts-geo/src"),
       "@axicharts/charts-tank": path.resolve(root, "packages/charts-tank/src"),
       "@axicharts/charts-runtime": path.resolve(root, "packages/charts-runtime/src"),

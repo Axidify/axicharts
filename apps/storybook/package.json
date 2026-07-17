@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@axicharts/charts": "workspace:*",
+    "@axicharts/charts-andon": "workspace:*",
     "@axicharts/charts-geo": "workspace:*",
     "@axicharts/charts-tank": "workspace:*",
     "@axicharts/charts-runtime": "workspace:*",

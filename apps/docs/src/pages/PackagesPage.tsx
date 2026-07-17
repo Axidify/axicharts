@@ -10,6 +10,7 @@ const PACKAGES = [
   { name: "@axicharts/charts-runtime", description: "adapters, embed SDK, spec portability" },
   { name: "@axicharts/charts-tank", description: "community tank level plugin (registerChartType)" },
   { name: "@axicharts/charts-geo", description: "community regional geo map plugin (registerChartType)" },
+  { name: "@axicharts/charts-andon", description: "community production andon board plugin (registerChartType)" },
 ] as const;
 
 export function PackagesPage(): ReactElement {

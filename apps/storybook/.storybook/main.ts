@@ -41,6 +41,7 @@ const config: StorybookConfig = {
           ),
           "@axicharts/charts-tank": path.resolve(root, "packages/charts-tank/src"),
           "@axicharts/charts-geo": path.resolve(root, "packages/charts-geo/src"),
+          "@axicharts/charts-andon": path.resolve(root, "packages/charts-andon/src"),
         },
       },
     });

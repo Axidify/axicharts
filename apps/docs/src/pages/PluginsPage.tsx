@@ -1,5 +1,7 @@
 import type { ReactElement } from "react";
 import { ChartContainer } from "@axicharts/charts";
+import { AndonBoard, SAMPLE_ANDON_STATIONS } from "@axicharts/charts-andon";
+import "@axicharts/charts-andon/register";
 import { GeoMapChart, SAMPLE_GEO_REGIONS } from "@axicharts/charts-geo";
 import "@axicharts/charts-geo/register";
 import { TankChart } from "@axicharts/charts-tank";
@@ -18,6 +20,13 @@ import { GeoMapChart, SAMPLE_GEO_REGIONS } from "@axicharts/charts-geo";
 
 <ChartContainer theme={cleanTheme} height={200} width={320}>
   <GeoMapChart regions={SAMPLE_GEO_REGIONS} />
+</ChartContainer>`;
+
+const ANDON_CODE = `import "@axicharts/charts-andon/register";
+import { AndonBoard, SAMPLE_ANDON_STATIONS } from "@axicharts/charts-andon";
+
+<ChartContainer theme={industrialTheme} height={220} width={420}>
+  <AndonBoard stations={SAMPLE_ANDON_STATIONS} columns={4} />
 </ChartContainer>`;
 
 function PluginSection({
@@ -96,6 +105,16 @@ export function PluginsPage(): ReactElement {
           </ChartContainer>
         }
         code={GEO_CODE}
+      />
+      <PluginSection
+        title="@axicharts/charts-andon"
+        subtitle="Production line andon board"
+        preview={
+          <ChartContainer theme={industrialTheme} width={420} height={220}>
+            <AndonBoard stations={SAMPLE_ANDON_STATIONS} columns={4} />
+          </ChartContainer>
+        }
+        code={ANDON_CODE}
       />
     </div>
   );
