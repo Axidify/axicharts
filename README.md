@@ -61,6 +61,7 @@ pnpm build
 pnpm test
 pnpm test:perf   # uPlot update gates (500 / 5k / 10k + 6-panel)
 pnpm bench       # collect published numbers → benchmarks/BENCHMARKS.md
+pnpm bench:browser  # Chromium competitive vs Recharts/ECharts
 pnpm size        # bundle gzip budgets
 pnpm storybook
 pnpm docs

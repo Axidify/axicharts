@@ -1,5 +1,5 @@
 {
-  "collectedAt": "2026-07-17T21:11:51.250Z",
+  "collectedAt": "2026-07-17T21:19:08.923Z",
   "node": "v24.16.0",
   "platform": "darwin arm64",
   "hostname": "Axidrains-MacBook-Neo.local",
@@ -11,20 +11,8 @@
       "panels": 1,
       "series": 1,
       "updates": 30,
-      "valueMs": 0.010999999999967258,
+      "valueMs": 0.021541999999953987,
       "budgetMs": 8,
-      "passed": true,
-      "environment": "node-happy-dom"
-    },
-    {
-      "id": "medium",
-      "metric": "update_p95",
-      "points": 5000,
-      "panels": 1,
-      "series": 1,
-      "updates": 30,
-      "valueMs": 0.044499999999970896,
-      "budgetMs": 16,
       "passed": true,
       "environment": "node-happy-dom"
     },
@@ -35,7 +23,19 @@
       "panels": 6,
       "series": 1,
       "updates": 30,
-      "valueMs": 0.10829100000000835,
+      "valueMs": 0.10770899999999983,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "node-happy-dom"
+    },
+    {
+      "id": "medium",
+      "metric": "update_p95",
+      "points": 5000,
+      "panels": 1,
+      "series": 1,
+      "updates": 30,
+      "valueMs": 0.036999999999920874,
       "budgetMs": 16,
       "passed": true,
       "environment": "node-happy-dom"
@@ -47,7 +47,7 @@
       "panels": 1,
       "series": 1,
       "updates": 30,
-      "valueMs": 0.0426670000000513,
+      "valueMs": 0.036958000000026914,
       "budgetMs": 16,
       "passed": true,
       "environment": "node-happy-dom"
@@ -59,7 +59,7 @@
       "panels": 1,
       "series": 4,
       "updates": 30,
-      "valueMs": 0.238207999999986,
+      "valueMs": 0.37029199999994944,
       "budgetMs": 16,
       "passed": true,
       "environment": "node-happy-dom"
@@ -69,7 +69,7 @@
     {
       "name": "@axicharts/charts",
       "passed": true,
-      "size": 5563,
+      "size": 5632,
       "sizeLimit": 14000
     },
     {
@@ -131,6 +131,164 @@
       "passed": true,
       "size": 92,
       "sizeLimit": 3000
+    }
+  ],
+  "browser": [
+    {
+      "id": "small",
+      "lib": "axicharts",
+      "fixture": "small",
+      "points": 500,
+      "panels": 1,
+      "updates": 30,
+      "p95Ms": 2.099999964237213,
+      "budgetMs": 8,
+      "passed": true,
+      "environment": "chromium-4x",
+      "metric": "update_p95"
+    },
+    {
+      "id": "small",
+      "lib": "recharts",
+      "fixture": "small",
+      "points": 500,
+      "panels": 1,
+      "updates": 30,
+      "p95Ms": 5.600000023841858,
+      "budgetMs": 8,
+      "passed": true,
+      "environment": "chromium-4x",
+      "metric": "update_p95"
+    },
+    {
+      "id": "small",
+      "lib": "echarts",
+      "fixture": "small",
+      "points": 500,
+      "panels": 1,
+      "updates": 30,
+      "p95Ms": 5.200000047683716,
+      "budgetMs": 8,
+      "passed": true,
+      "environment": "chromium-4x",
+      "metric": "update_p95"
+    },
+    {
+      "id": "medium",
+      "lib": "axicharts",
+      "fixture": "medium",
+      "points": 5000,
+      "panels": 1,
+      "updates": 30,
+      "p95Ms": 2.199999988079071,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "chromium-4x",
+      "metric": "update_p95"
+    },
+    {
+      "id": "medium",
+      "lib": "recharts",
+      "fixture": "medium",
+      "points": 5000,
+      "panels": 1,
+      "updates": 30,
+      "p95Ms": 22.099999964237213,
+      "budgetMs": 16,
+      "passed": false,
+      "environment": "chromium-4x",
+      "metric": "update_p95"
+    },
+    {
+      "id": "medium",
+      "lib": "echarts",
+      "fixture": "medium",
+      "points": 5000,
+      "panels": 1,
+      "updates": 30,
+      "p95Ms": 9.5,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "chromium-4x",
+      "metric": "update_p95"
+    },
+    {
+      "id": "large",
+      "lib": "axicharts",
+      "fixture": "large",
+      "points": 10000,
+      "panels": 1,
+      "updates": 30,
+      "p95Ms": 2.399999976158142,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "chromium-4x",
+      "metric": "update_p95"
+    },
+    {
+      "id": "large",
+      "lib": "recharts",
+      "fixture": "large",
+      "points": 10000,
+      "panels": 1,
+      "updates": 30,
+      "p95Ms": 39.09999996423721,
+      "budgetMs": 16,
+      "passed": false,
+      "environment": "chromium-4x",
+      "metric": "update_p95"
+    },
+    {
+      "id": "large",
+      "lib": "echarts",
+      "fixture": "large",
+      "points": 10000,
+      "panels": 1,
+      "updates": 30,
+      "p95Ms": 15.5,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "chromium-4x",
+      "metric": "update_p95"
+    },
+    {
+      "id": "dashboard-6up",
+      "lib": "axicharts",
+      "fixture": "dashboard-6up",
+      "points": 2000,
+      "panels": 6,
+      "updates": 30,
+      "p95Ms": 2.899999976158142,
+      "budgetMs": 16,
+      "passed": true,
+      "environment": "chromium-4x",
+      "metric": "frame_p95"
+    },
+    {
+      "id": "dashboard-6up",
+      "lib": "recharts",
+      "fixture": "dashboard-6up",
+      "points": 2000,
+      "panels": 6,
+      "updates": 30,
+      "p95Ms": 54.299999952316284,
+      "budgetMs": 16,
+      "passed": false,
+      "environment": "chromium-4x",
+      "metric": "frame_p95"
+    },
+    {
+      "id": "dashboard-6up",
+      "lib": "echarts",
+      "fixture": "dashboard-6up",
+      "points": 2000,
+      "panels": 6,
+      "updates": 30,
+      "p95Ms": 26.5,
+      "budgetMs": 16,
+      "passed": false,
+      "environment": "chromium-4x",
+      "metric": "frame_p95"
     }
   ]
 }

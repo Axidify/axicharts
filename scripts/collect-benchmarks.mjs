@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const withBrowser = process.argv.includes("--browser");
 const date = new Date().toISOString().slice(0, 10);
 const resultsDir = path.join(root, "benchmarks", "results", date);
 const latestDir = path.join(root, "benchmarks", "results", "latest");
@@ -20,6 +21,43 @@ function readJson(filePath) {
 
 function formatKb(bytes) {
   return `${(bytes / 1024).toFixed(1)} KB`;
+}
+
+function formatMs(value) {
+  return value == null ? "—" : `${value.toFixed(2)} ms`;
+}
+
+function scenarioLabel(row) {
+  if (row.metric === "frame_p95") {
+    return `${row.panels} panels × ${row.points} pts`;
+  }
+  return `${row.points} pts`;
+}
+
+function renderBrowserSection(browser) {
+  if (!browser?.length) return "";
+
+  const scenarioIds = [...new Set(browser.map((row) => row.id))];
+  const rows = scenarioIds
+    .map((id) => {
+      const entries = browser.filter((row) => row.id === id);
+      const sample = entries[0];
+      const axi = entries.find((row) => row.lib === "axicharts");
+      const re = entries.find((row) => row.lib === "recharts");
+      const ec = entries.find((row) => row.lib === "echarts");
+      return `| ${id} | ${scenarioLabel(sample)} | ${formatMs(axi?.p95Ms)} | ${formatMs(re?.p95Ms)} | ${formatMs(ec?.p95Ms)} |`;
+    })
+    .join("\n");
+
+  return `
+## Browser competitive update p95 (Chromium 4× CPU)
+
+| Fixture | Scenario | AxiCharts | Recharts | ECharts |
+|---------|----------|-----------|----------|---------|
+${rows}
+
+Profile: Chromium headless, viewport 1280×720, \`flushSync\` state updates, ${browser[0]?.updates ?? 30} frames per scenario. Harness: \`apps/bench-harness\`.
+`;
 }
 
 function renderBenchmarksMd(summary) {
@@ -42,21 +80,32 @@ function renderBenchmarksMd(summary) {
     })
     .join("\n");
 
+  const envParts = [
+    `Node ${summary.node}`,
+    summary.platform,
+    "happy-dom (node proxy)",
+  ];
+  if (summary.browser?.length) {
+    envParts.push("Chromium 4× (browser competitive)");
+  }
+
   return `# Published benchmarks
 
-Reproducible numbers for bundle gzip budgets and uPlot live-update latency.
+Reproducible numbers for bundle gzip budgets and live-update latency.
 
 **Collected:** ${summary.collectedAt}  
-**Environment:** Node ${summary.node}, ${summary.platform}, happy-dom (canvas proxy)  
+**Environment:** ${envParts.join(", ")}  
 **Results:** \`benchmarks/results/${date}/summary.json\`
 
 Re-run locally:
 
 \`\`\`bash
-pnpm bench
+pnpm bench              # node proxy gates + bundle
+pnpm bench:browser      # Chromium competitive table
+pnpm bench:all          # both
 \`\`\`
 
-Methodology (fixtures, budgets, browser profile for future Playwright benches) is documented in Dashboarder [PERFORMANCE.md](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/PERFORMANCE.md).
+Methodology: Dashboarder [PERFORMANCE.md](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/PERFORMANCE.md).
 
 ## Bundle size (gzip)
 
@@ -64,12 +113,12 @@ Methodology (fixtures, budgets, browser profile for future Playwright benches) i
 |---------|------|--------|------|
 ${bundleRows}
 
-## Update latency p95 (ms)
+## Node update latency p95 (ms)
 
 | Fixture | Scenario | p95 | Budget | Pass |
 |---------|----------|-----|--------|------|
 ${perfRows}
-
+${renderBrowserSection(summary.browser)}
 ## Fixtures
 
 | File | Points | Series | Purpose |
@@ -79,8 +128,6 @@ ${perfRows}
 | \`large.json\` | 10,000 | 1 | Canvas-scale path |
 | \`multi-series.json\` | 10,000 | 4 | Multi-series canvas |
 | \`dashboard-6up.json\` | 6 × 2,000 | 1 | Multi-panel frame budget |
-
-> **Note:** These numbers measure uPlot \`setData\` in happy-dom with \`@napi-rs/canvas\`. They gate CI regressions; browser Playwright benches (4× CPU throttle) are planned for competitive comparisons vs Recharts/ECharts.
 `;
 }
 
@@ -90,6 +137,7 @@ console.log("→ build");
 run("pnpm build");
 
 console.log(`→ perf tests → ${resultsDir}`);
+fs.rmSync(path.join(resultsDir, "perf.json"), { force: true });
 run("pnpm --filter @axicharts/charts-canvas test:perf", {
   env: {
     ...process.env,
@@ -105,9 +153,20 @@ const bundleStdout = execSync("npx size-limit --json", {
 });
 fs.writeFileSync(path.join(resultsDir, "bundle.json"), bundleStdout);
 
+let browser = [];
+if (withBrowser) {
+  console.log("→ browser competitive bench");
+  const { runBrowserBench } = await import("../benchmarks/browser/run.mjs");
+  browser = await runBrowserBench(resultsDir);
+} else {
+  const browserPath = path.join(resultsDir, "browser-competitive.json");
+  if (fs.existsSync(browserPath)) {
+    browser = readJson(browserPath);
+  }
+}
+
 const perfPath = path.join(resultsDir, "perf.json");
 const perf = fs.existsSync(perfPath) ? readJson(perfPath) : [];
-
 const bundle = JSON.parse(bundleStdout.trim());
 
 const summary = {
@@ -117,6 +176,7 @@ const summary = {
   hostname: os.hostname(),
   perf,
   bundle,
+  browser,
 };
 
 fs.writeFileSync(

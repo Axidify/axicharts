@@ -6,20 +6,8 @@
     "panels": 1,
     "series": 1,
     "updates": 30,
-    "valueMs": 0.010999999999967258,
+    "valueMs": 0.021541999999953987,
     "budgetMs": 8,
-    "passed": true,
-    "environment": "node-happy-dom"
-  },
-  {
-    "id": "medium",
-    "metric": "update_p95",
-    "points": 5000,
-    "panels": 1,
-    "series": 1,
-    "updates": 30,
-    "valueMs": 0.044499999999970896,
-    "budgetMs": 16,
     "passed": true,
     "environment": "node-happy-dom"
   },
@@ -30,7 +18,19 @@
     "panels": 6,
     "series": 1,
     "updates": 30,
-    "valueMs": 0.10829100000000835,
+    "valueMs": 0.10770899999999983,
+    "budgetMs": 16,
+    "passed": true,
+    "environment": "node-happy-dom"
+  },
+  {
+    "id": "medium",
+    "metric": "update_p95",
+    "points": 5000,
+    "panels": 1,
+    "series": 1,
+    "updates": 30,
+    "valueMs": 0.036999999999920874,
     "budgetMs": 16,
     "passed": true,
     "environment": "node-happy-dom"
@@ -42,7 +42,7 @@
     "panels": 1,
     "series": 1,
     "updates": 30,
-    "valueMs": 0.0426670000000513,
+    "valueMs": 0.036958000000026914,
     "budgetMs": 16,
     "passed": true,
     "environment": "node-happy-dom"
@@ -54,7 +54,7 @@
     "panels": 1,
     "series": 4,
     "updates": 30,
-    "valueMs": 0.238207999999986,
+    "valueMs": 0.37029199999994944,
     "budgetMs": 16,
     "passed": true,
     "environment": "node-happy-dom"

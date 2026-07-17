@@ -12,12 +12,15 @@
     "test": "turbo run test",
     "test:perf": "pnpm --filter @axicharts/charts-canvas test:perf",
     "bench": "node scripts/collect-benchmarks.mjs",
+    "bench:browser": "node benchmarks/browser/run.mjs",
+    "bench:all": "node scripts/collect-benchmarks.mjs --browser",
     "size": "size-limit",
     "typecheck": "turbo run typecheck",
     "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm size"
   },
   "devDependencies": {
     "@size-limit/file": "^11.1.6",
+    "playwright": "^1.51.1",
     "size-limit": "^11.1.6",
     "turbo": "^2.4.4",
     "typescript": "^5.8.2"
