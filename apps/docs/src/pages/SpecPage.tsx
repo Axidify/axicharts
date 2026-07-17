@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
+import { Link } from "react-router-dom";
 import {
   Chart,
   ejectPanel,
@@ -6,6 +7,8 @@ import {
   suggestTemplate,
 } from "@axicharts/charts-spec";
 import { SPEC_PANEL, SPEC_PANEL_DATA, SPEC_PROFILE } from "../demos/specDemo";
+import { PHASE3_PLANNER_CODE } from "../demos/specPlannerDemo";
+import { PLANNER_FEED_ROWS } from "@axicharts/charts-runtime/validation";
 
 const PANEL_CODE = `import { Chart } from "@axicharts/charts-spec";
 
@@ -53,14 +56,17 @@ registerSpecCompiler({
 function Section({
   title,
   subtitle,
+  id,
   children,
 }: {
   title: string;
   subtitle?: string;
+  id?: string;
   children: ReactNode;
 }): ReactElement {
   return (
     <section
+      id={id}
       style={{
         marginTop: 28,
         border: "1px solid #e2e8f0",
@@ -114,7 +120,8 @@ export function SpecPage(): ReactElement {
       <Section title="Profile planner" subtitle="tags → template + panels">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
           Suggested template: <code>{suggestedTemplate}</code> ·{" "}
-          {plannedPanels.length} panels planned
+          {plannedPanels.length} panels planned ·{" "}
+          <Link to="#phase-3-planner">Phase 3 dashboard planner ↓</Link>
         </p>
         <pre
           style={{
@@ -140,6 +147,66 @@ export function SpecPage(): ReactElement {
           }}
         >
           {PLANNER_CODE}
+        </pre>
+      </Section>
+
+      <Section title="Phase 3 dashboard planner" subtitle="@axicharts/charts-planner" id="phase-3-planner">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", maxWidth: 640, lineHeight: 1.6 }}>
+          The profile planner above maps metrics to panels. Phase 3{" "}
+          <code>@axicharts/charts-planner</code> adds natural-language intent for full dashboard
+          plans — template, layout, live <code>feed</code>, and presentation mode. Dashboarder share
+          exports persist planner <code>meta</code> for import.
+        </p>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: 13,
+            marginBottom: 16,
+          }}
+        >
+          <thead>
+            <tr style={{ textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>
+              <th style={{ padding: "8px 6px" }}>Feed</th>
+              <th style={{ padding: "8px 6px" }}>Sample intent</th>
+              <th style={{ padding: "8px 6px" }}>Fixture</th>
+            </tr>
+          </thead>
+          <tbody>
+            {PLANNER_FEED_ROWS.slice(0, 3).map((row) => (
+              <tr key={row.feed} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                <td style={{ padding: "8px 6px" }}>
+                  <code>{row.feed}</code>
+                </td>
+                <td style={{ padding: "8px 6px", color: "#475569", fontSize: 12 }}>
+                  {row.intentSample}
+                </td>
+                <td style={{ padding: "8px 6px", fontSize: 12 }}>
+                  <Link to={`/runtime/import?preset=${row.presetId}`}>{row.presetId}</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
+          <Link to="/runtime/import#planner-feeds">Full planner feed index</Link>
+          {" · "}
+          <Link to="/runtime#planner-http">HTTP API</Link>
+          {" · "}
+          <Link to="/start">CLI on Getting started</Link>
+        </p>
+        <pre
+          style={{
+            margin: 0,
+            padding: 14,
+            background: "#0f172a",
+            color: "#e2e8f0",
+            fontSize: 11,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {PHASE3_PLANNER_CODE}
         </pre>
       </Section>
 

@@ -11,7 +11,12 @@ import {
 import {
   dashboarderImportDeepLink,
   docsImportGalleryDeepLink,
+  feedAdapterGalleryDeepLink,
   formatValidatePresetCommand,
+  PLANNER_FEED_ROWS,
+  plannerAdapterFixtures,
+  plannerFeedGalleryDeepLink,
+  plannerFeedGalleryIndexDeepLink,
   shareExportReferencePreset,
   validateShareExportDualJson,
 } from "@axicharts/charts-runtime/validation";
@@ -109,6 +114,15 @@ export function ShareDialog({
   const validation = useMemo(() => validateShareExportDualJson(exportJson), [exportJson]);
   const referencePreset =
     tab === "workspace" || tab === "dashboard" ? shareExportReferencePreset(tab) : undefined;
+  const feedRow = meta?.feed ? PLANNER_FEED_ROWS.find((row) => row.feed === meta.feed) : undefined;
+  const plannerFixtures =
+    meta?.feed != null
+      ? plannerAdapterFixtures({
+          layout: meta.layout ?? "embed",
+          feed: meta.feed,
+        })
+      : [];
+  const workspaceMetaCount = workspace.dashboards.filter((item) => item.meta?.feed).length;
 
   if (!open) return null;
 
@@ -249,6 +263,116 @@ export function ShareDialog({
               Import in app
             </a>
             <ValidateCommandCopy command={formatValidatePresetCommand(referencePreset.id)} />
+          </div>
+        ) : null}
+
+        {tab === "dashboard" && meta ? (
+          <div
+            style={{
+              marginTop: 12,
+              padding: 12,
+              borderRadius: 8,
+              border: "1px solid #334155",
+              background: "#111827",
+              fontSize: 12,
+              color: "#94a3b8",
+              lineHeight: 1.7,
+            }}
+          >
+            <div style={{ fontWeight: 600, color: "#e2e8f0", marginBottom: 8 }}>
+              Planner meta export
+            </div>
+            <dl
+              style={{
+                display: "grid",
+                gridTemplateColumns: "88px 1fr",
+                gap: "4px 12px",
+                margin: "0 0 10px",
+              }}
+            >
+              <dt>Layout</dt>
+              <dd style={{ margin: 0 }}>{meta.layout}</dd>
+              <dt>Feed</dt>
+              <dd style={{ margin: 0 }}>
+                <code>{meta.feed}</code>
+              </dd>
+              {meta.template ? (
+                <>
+                  <dt>Template</dt>
+                  <dd style={{ margin: 0 }}>{meta.template}</dd>
+                </>
+              ) : null}
+              {meta.layout === "mosaic" && meta.mosaicPreset ? (
+                <>
+                  <dt>Mosaic</dt>
+                  <dd style={{ margin: 0 }}>{meta.mosaicPreset}</dd>
+                </>
+              ) : null}
+              <dt>Presentation</dt>
+              <dd style={{ margin: 0 }}>{meta.presentation ? "Yes" : "No"}</dd>
+            </dl>
+            {feedRow ? (
+              <div style={{ marginBottom: 8 }}>
+                Planner intent: <em>{feedRow.intentSample}</em>
+              </div>
+            ) : null}
+            {meta.feed ? (
+              <>
+                <a
+                  href={feedAdapterGalleryDeepLink(meta.feed, meta.layout)}
+                  style={{ color: "#93c5fd" }}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Feed fixture
+                </a>
+                {" · "}
+                <a
+                  href={plannerFeedGalleryDeepLink(meta.feed)}
+                  style={{ color: "#93c5fd" }}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Planner index
+                </a>
+              </>
+            ) : null}
+            {plannerFixtures.length > 1 ? (
+              <div style={{ marginTop: 8 }}>
+                Adapter fixtures:{" "}
+                <strong style={{ color: "#e2e8f0" }}>
+                  {plannerFixtures.map((item) => item.preset.id).join(" + ")}
+                </strong>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {tab === "workspace" ? (
+          <div
+            style={{
+              marginTop: 12,
+              padding: 12,
+              borderRadius: 8,
+              border: "1px solid #334155",
+              background: "#111827",
+              fontSize: 12,
+              color: "#94a3b8",
+              lineHeight: 1.7,
+            }}
+          >
+            Workspace bundle includes planner <code>meta</code> per dashboard (
+            {workspaceMetaCount}/{workspace.dashboards.length} with feed). Import restores layout,
+            feed, template, and mosaic preset in Dashboarder.
+            {" · "}
+            <a
+              href={plannerFeedGalleryIndexDeepLink()}
+              style={{ color: "#93c5fd" }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Planner feed index
+            </a>
           </div>
         ) : null}
       </div>
