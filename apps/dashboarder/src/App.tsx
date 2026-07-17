@@ -16,15 +16,12 @@ import {
   selectDashboard,
   selectWorkspace,
   serializeDashboardExport,
-  buildReactEmbedSnippet,
   type RuntimeDashboardSpec,
   type WorkspaceStore,
 } from "@axicharts/charts-runtime";
-import {
-  DEFAULT_OPS_PROFILE,
-  planFromIntent,
-  type DashboardPlan,
-} from "@axicharts/charts-planner";
+import type { DashboardPlan } from "@axicharts/charts-planner";
+import { EmbedDialog } from "./EmbedDialog";
+import { PlannerPanel } from "./PlannerPanel";
 import { PluginStrip } from "./PluginStrip";
 import { WorkspaceSidebar } from "./WorkspaceSidebar";
 import {
@@ -92,6 +89,8 @@ export function App(): ReactElement {
   const [presentation, setPresentation] = useState(false);
   const [presenting, setPresenting] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [plannerOpen, setPlannerOpen] = useState(false);
+  const [embedOpen, setEmbedOpen] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -214,35 +213,9 @@ export function App(): ReactElement {
     URL.revokeObjectURL(url);
   };
 
-  const handlePlan = async (): Promise<void> => {
-    const intent = window.prompt(
-      "Describe the dashboard",
-      "Line 3 night shift overview",
-    );
-    if (!intent?.trim()) return;
-
-    let plan: DashboardPlan;
-    if (PLANNER_URL) {
-      const response = await fetch(`${PLANNER_URL.replace(/\/$/, "")}/plan`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ profile: DEFAULT_OPS_PROFILE, intent: intent.trim() }),
-      });
-      if (!response.ok) {
-        window.alert("Planner server failed — using local rules planner.");
-        plan = planFromIntent(DEFAULT_OPS_PROFILE, intent.trim());
-      } else {
-        plan = (await response.json()) as DashboardPlan;
-      }
-    } else {
-      plan = planFromIntent(DEFAULT_OPS_PROFILE, intent.trim());
-    }
-
+  const handleApplyPlan = (plan: DashboardPlan): void => {
     applyPlan(plan, setTemplate, setLayout, setFeed, setPresentation);
     setDirty(true);
-    if (plan.warnings?.length) {
-      window.alert(plan.warnings.join("\n"));
-    }
   };
 
   const handleImportFile = async (file: File): Promise<void> => {
@@ -270,12 +243,6 @@ export function App(): ReactElement {
       );
     }
     setDirty(false);
-  };
-
-  const handleCopyEmbed = async (): Promise<void> => {
-    if (!activeSpec) return;
-    await navigator.clipboard.writeText(buildReactEmbedSnippet(activeSpec));
-    window.alert("React embed snippet copied to clipboard.");
   };
 
   if (!store || !activeSpec) {
@@ -392,14 +359,14 @@ export function App(): ReactElement {
               label="Template"
             />
           ) : null}
-          <button type="button" onClick={() => void handlePlan()} style={buttonStyle}>
+          <button type="button" onClick={() => setPlannerOpen(true)} style={buttonStyle}>
             Plan
           </button>
           <button type="button" onClick={() => setPresenting(true)} style={buttonStyle}>
             Present
           </button>
-          <button type="button" onClick={() => void handleCopyEmbed()} style={buttonStyle}>
-            Copy embed
+          <button type="button" onClick={() => setEmbedOpen(true)} style={buttonStyle}>
+            Embed
           </button>
           <button type="button" onClick={handleSave} style={buttonStyle}>
             Save
@@ -460,6 +427,19 @@ export function App(): ReactElement {
           <PluginStrip />
         </main>
       </div>
+      <PlannerPanel
+        open={plannerOpen}
+        serverUrl={PLANNER_URL}
+        onClose={() => setPlannerOpen(false)}
+        onApply={handleApplyPlan}
+      />
+      <EmbedDialog
+        open={embedOpen}
+        spec={activeSpec}
+        presentation={presentation}
+        alarmScopeId={activeDashboard.id}
+        onClose={() => setEmbedOpen(false)}
+      />
     </div>
   );
 }

@@ -35,6 +35,12 @@ export {
   resolvePlannerProvider,
   type PlannerProviderMode,
 } from "./resolveProvider";
+export {
+  fetchPlannerHealth,
+  requestDashboardPlan,
+  type PlannerHealth,
+  type RequestDashboardPlanOptions,
+} from "./client";
 
 export const DEFAULT_OPS_PROFILE = {
   metrics: [

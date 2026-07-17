@@ -1,6 +1,10 @@
 export {
   buildPortableSpecJson,
   buildReactEmbedSnippet,
+  buildInlineReactEmbedSnippet,
+  buildEmbedBundle,
+  validateRuntimeSpecJson,
+  type EmbedBundle,
   type EmbedSnippetOptions,
 } from "./embedSnippet";
 export {

@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
-import { RuntimeDashboard, serializeRuntimeSpec } from "@axicharts/charts-runtime";
+import { RuntimeDashboard, buildEmbedBundle, serializeRuntimeSpec } from "@axicharts/charts-runtime";
 import {
   ADAPTER_ROWS,
   EMBED_RUNTIME_SPEC,
@@ -70,6 +70,10 @@ function Section({
 
 export function RuntimePage(): ReactElement {
   const portableSpec = serializeRuntimeSpec(MOSAIC_RUNTIME_SPEC);
+  const embedBundle = buildEmbedBundle(EMBED_RUNTIME_SPEC, {
+    presentation: false,
+    alarmScopeId: "line-3",
+  });
 
   return (
     <div>
@@ -137,6 +141,25 @@ export function RuntimePage(): ReactElement {
           }}
         >
           {MOSAIC_CODE}
+        </pre>
+      </Section>
+
+      <Section title="Embed SDK snippets" subtitle="buildEmbedBundle">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
+          Dashboarder exports React file-import, inline-spec, and portable JSON variants from{" "}
+          <code>buildEmbedBundle</code>.
+        </p>
+        <pre
+          style={{
+            margin: 0,
+            padding: 14,
+            background: "#f8fafc",
+            fontSize: 11,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {embedBundle.inlineReactSnippet}
         </pre>
       </Section>
 
