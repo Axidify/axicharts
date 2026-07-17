@@ -23,7 +23,7 @@ import {
 import type { DashboardPlan } from "@axicharts/charts-planner";
 import { EmbedDialog } from "./EmbedDialog";
 import { ImportDialog } from "./ImportDialog";
-import { findImportPreset, parseImportPresetQuery } from "@axicharts/charts-runtime/validation";
+import { findImportPreset, feedAdapterGalleryDeepLink, parseImportPresetQuery } from "@axicharts/charts-runtime/validation";
 import { PlannerPanel } from "./PlannerPanel";
 import { ShareDialog } from "./ShareDialog";
 import { PluginStrip } from "./PluginStrip";
@@ -391,6 +391,15 @@ export function App(): ReactElement {
               <option value="mqtt">MQTT (mock)</option>
               <option value="static">Static</option>
             </select>
+            <a
+              href={feedAdapterGalleryDeepLink(feed, layout)}
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: "#93c5fd", textDecoration: "none" }}
+              title="Open adapter fixture in docs gallery"
+            >
+              Fixture
+            </a>
           </label>
           <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
             <input

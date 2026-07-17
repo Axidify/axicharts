@@ -186,7 +186,7 @@ export function runtimeEmbedReferencePreset(
 
 export type PlannerAdapterPlan = {
   layout: "embed" | "mosaic";
-  feed: "static" | "historian";
+  feed: "static" | "historian" | "websocket" | "mqtt";
 };
 
 /** Maps planner layout + feed to the shipped adapter fixture preset. */
@@ -196,9 +196,22 @@ export function plannerAdapterReferencePreset(
   if (plan.layout === "mosaic") {
     return findImportPreset(ADAPTER_FIXTURE_PRESETS.mosaic!);
   }
-  const adapter = plan.feed === "static" ? "static" : "historian";
-  const presetId = ADAPTER_FIXTURE_PRESETS[adapter];
+  const presetId = ADAPTER_FIXTURE_PRESETS[plan.feed];
   return presetId ? findImportPreset(presetId) : undefined;
+}
+
+export type PlannerFeedLike = PlannerAdapterPlan["feed"];
+
+/** Docs gallery URL for a planner/builder feed + layout pair. */
+export function feedAdapterGalleryDeepLink(
+  feed: PlannerFeedLike,
+  layout: PlannerAdapterPlan["layout"] = "embed",
+  origin = DOCS_SITE_ORIGIN,
+): string {
+  const preset = plannerAdapterReferencePreset({ layout, feed });
+  if (preset) return docsImportGalleryDeepLink(preset.id, origin);
+  const base = origin.endsWith("/") ? origin.slice(0, -1) : origin;
+  return `${base}${importGalleryFilterPath({ type: "adapter", value: feed })}`;
 }
 
 export function formatValidatePresetCommand(

@@ -17,7 +17,8 @@ import { ValidateCommandCopy } from "./validationChrome";
 const QUICK_INTENTS = [
   "Line 3 night shift overview",
   "Finance P&L board",
-  "Trading desk with positions",
+  "WebSocket push trading desk",
+  "MQTT plant floor telemetry",
   "Program sprint burndown",
   "Trading desk program mosaic",
 ] as const;

@@ -14,11 +14,15 @@ function inferLayout(intent: string | undefined): PlannerLayout {
   return "embed";
 }
 
-function inferFeed(intent: string | undefined): PlannerFeed {
+export function inferFeed(intent: string | undefined): PlannerFeed {
   if (!intent) return "historian";
   const lower = intent.toLowerCase();
   if (/static|snapshot|csv|batch|historical/.test(lower)) return "static";
-  if (/live|mqtt|websocket|stream|historian|realtime|real-time/.test(lower)) return "historian";
+  if (/\bmqtt\b|sparkplug|plant\/|pubsub|broker/.test(lower)) return "mqtt";
+  if (/websocket|web\s*socket|\bws\b|push\s*feed|telemetry\s*stream/.test(lower)) {
+    return "websocket";
+  }
+  if (/live|stream|historian|realtime|real-time|telemetry/.test(lower)) return "historian";
   return "historian";
 }
 
@@ -143,7 +147,7 @@ export function buildPlannerPrompt(profile: DataProfile, intent: string): string
     '  "theme": "clean|live|industrial|presentation",',
     '  "mode": "static|interactive|live|presentation",',
     '  "layout": "embed|mosaic",',
-    '  "feed": "static|historian",',
+    '  "feed": "static|historian|websocket|mqtt",',
     '  "mosaicPreset": "ops-finance|ops-overview|trading-program|command-center",',
     '  "presentation": boolean,',
     '  "panels": [ { "specVersion": 1, "type": "line|bar|gauge|table|...", "title": "...", "encoding": {...} } ]',

@@ -38,6 +38,7 @@ const PANEL_TYPES = new Set([
 
 const THEMES = new Set(["clean", "live", "industrial", "presentation"]);
 const MODES = new Set(["static", "interactive", "live", "presentation"]);
+const FEEDS = new Set(["static", "historian", "websocket", "mqtt"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -80,7 +81,10 @@ export function validateDashboardPlan(raw: unknown): DashboardPlan | null {
   if (!panels) return null;
 
   const layout = raw.layout === "mosaic" ? "mosaic" : "embed";
-  const feed = raw.feed === "static" ? "static" : "historian";
+  const feed =
+    typeof raw.feed === "string" && FEEDS.has(raw.feed)
+      ? (raw.feed as DashboardPlan["feed"])
+      : "historian";
   const theme = typeof raw.theme === "string" && THEMES.has(raw.theme) ? raw.theme : undefined;
   const mode = typeof raw.mode === "string" && MODES.has(raw.mode) ? raw.mode : undefined;
   const mosaicPreset =

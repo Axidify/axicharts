@@ -16,7 +16,7 @@ export {
   validatePanelSpecs,
 } from "./validate";
 export { enrichProfileFromIntent } from "./intent";
-export { inferTemplateFromIntent, inferMosaicPresetFromIntent } from "./plan";
+export { inferTemplateFromIntent, inferMosaicPresetFromIntent, inferFeed } from "./plan";
 export {
   buildPlannerPrompt,
   planFromIntent,

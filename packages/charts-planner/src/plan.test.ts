@@ -38,6 +38,23 @@ describe("planFromIntent", () => {
     expect(plan.layout).toBe("mosaic");
     expect(plan.mosaicPreset).toBe("command-center");
   });
+
+  it("maps mqtt intent to mqtt feed", () => {
+    const plan = planFromIntent(profile, "MQTT plant floor sparkplug telemetry");
+    expect(plan.feed).toBe("mqtt");
+    expect(plan.template).toBe("ops-2x2");
+  });
+
+  it("maps websocket push intent to websocket feed", () => {
+    const plan = planFromIntent(profile, "WebSocket push feed trading desk");
+    expect(plan.feed).toBe("websocket");
+    expect(plan.template).toBe("trading-blotter");
+  });
+
+  it("maps static snapshot intent to static feed", () => {
+    const plan = planFromIntent(profile, "Static CSV snapshot batch report");
+    expect(plan.feed).toBe("static");
+  });
 });
 
 describe("planFromProfile", () => {
@@ -80,5 +97,33 @@ describe("planWithProvider", () => {
     const plan = await planWithProvider(profile, "Line 3 overview", provider);
     expect(plan.source).toBe("llm");
     expect(validateDashboardPlan(plan)).not.toBeNull();
+  });
+
+  it("accepts websocket and mqtt feeds from provider JSON", async () => {
+    for (const feed of ["websocket", "mqtt"] as const) {
+      const provider = createMockPlannerProvider(
+        JSON.stringify({
+          template: "ops-2x2",
+          layout: "embed",
+          feed,
+          presentation: false,
+          panels: [
+            {
+              specVersion: 1,
+              type: "line",
+              title: "CPU",
+              encoding: {
+                x: { field: "time", type: "nominal" },
+                y: { field: "cpu", type: "quantitative" },
+              },
+            },
+          ],
+        }),
+      );
+
+      const plan = await planWithProvider(profile, `${feed} desk`, provider);
+      expect(plan.feed).toBe(feed);
+      expect(validateDashboardPlan(plan)?.feed).toBe(feed);
+    }
   });
 });
