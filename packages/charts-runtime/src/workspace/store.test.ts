@@ -43,6 +43,26 @@ describe("workspace store", () => {
     expect(getActiveDashboard(saved).specJson).toContain("finance-pnl");
   });
 
+  it("saves planner meta alongside spec", () => {
+    const store = createDefaultWorkspaceStore(seedSpec);
+    const workspace = store.workspaces[0]!;
+    const dashboard = workspace.dashboards[0]!;
+    const saved = saveDashboardSpec(store, workspace.id, dashboard.id, seedSpec, {
+      meta: {
+        layout: "embed",
+        feed: "rest",
+        template: "ops-2x2",
+        presentation: true,
+      },
+    });
+    expect(getActiveDashboard(saved).meta).toEqual({
+      layout: "embed",
+      feed: "rest",
+      template: "ops-2x2",
+      presentation: true,
+    });
+  });
+
   it("adds dashboards to a workspace", () => {
     const store = createDefaultWorkspaceStore(seedSpec);
     const workspace = store.workspaces[0]!;

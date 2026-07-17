@@ -26,6 +26,7 @@ import {
 import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
 import { RuntimeHubNav } from "../components/RuntimeHubNav";
 import { PLANNER_TRACK_RELEASE_NOTES } from "../demos/runtimePlannerDemo";
+import { SHARE_IMPORT_TRACK_RELEASE_NOTES } from "../demos/runtimeSchemaDemo";
 
 const base = import.meta.env.BASE_URL;
 
@@ -360,6 +361,44 @@ export function RuntimeImportPage(): ReactElement {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section
+        id="share-import-track"
+        style={{
+          marginTop: 16,
+          padding: 14,
+          borderRadius: 10,
+          border: "1px solid #e2e8f0",
+          background: "#ffffff",
+          maxWidth: 720,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+          Share/import track release notes (C44–C46)
+        </div>
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Hardening track for planner <code>meta</code> round-trip: deep-link preset table, schema{" "}
+          <code>dashboardMeta</code> fields, and Dashboarder Share/Import dialog docs links. See{" "}
+          <Link to="/runtime#share-import">share ↔ import flow</Link>,{" "}
+          <Link to="/runtime/schema#share-meta">schema § meta</Link>, and{" "}
+          <Link to="/runtime/links#share-import-track">deep-link track notes</Link>.
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
+          {SHARE_IMPORT_TRACK_RELEASE_NOTES.map((item) => (
+            <li key={item.slice}>
+              <strong>{item.slice}</strong> — {item.summary}
+            </li>
+          ))}
+        </ul>
+        <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b" }}>
+          Try presets:{" "}
+          <Link to="/runtime/import?preset=ops-dashboard">ops-dashboard</Link>
+          {" · "}
+          <Link to="/runtime/import?preset=ops-workspace">ops-workspace</Link>
+          {" · "}
+          Storybook <code>Dashboarder/Share ↔ Import</code>
+        </p>
       </section>
 
       <section

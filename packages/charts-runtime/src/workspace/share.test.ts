@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { RuntimeDashboardSpec } from "../types";
 import { SHARE_EXPORT_SCHEMA_URL } from "../schemaUrls";
-import { createDefaultWorkspaceStore, importSharedWorkspace } from "./store";
+import {
+  createDefaultWorkspaceStore,
+  getActiveDashboard,
+  importSharedWorkspace,
+  saveDashboardSpec,
+} from "./store";
 import {
   parseDashboardExport,
   parseShareExport,
@@ -17,6 +25,12 @@ const spec: RuntimeDashboardSpec = {
     template: "ops-2x2",
   },
 };
+
+const examplesDir = join(dirname(fileURLToPath(import.meta.url)), "../../examples");
+
+function readExample(name: string): string {
+  return readFileSync(join(examplesDir, name), "utf8");
+}
 
 describe("dashboard export", () => {
   it("round-trips envelope with meta", () => {
@@ -71,5 +85,38 @@ describe("workspace share export", () => {
     });
     const result = validateShareExportJson(json);
     expect(result.ok).toBe(false);
+  });
+});
+
+describe("share import meta", () => {
+  it("parses shipped ops-dashboard fixture meta", () => {
+    const exported = parseDashboardExport(readExample("ops-dashboard.share.json"));
+    expect(exported.meta?.layout).toBe("embed");
+    expect(exported.meta?.feed).toBe("static");
+    expect(exported.meta?.template).toBe("ops-2x2");
+  });
+
+  it("saveDashboardSpec preserves meta from share import", () => {
+    const exported = parseDashboardExport(readExample("ops-dashboard.share.json"));
+    const store = createDefaultWorkspaceStore(spec);
+    const workspace = store.workspaces[0]!;
+    const dashboard = workspace.dashboards[0]!;
+    const next = saveDashboardSpec(store, workspace.id, dashboard.id, exported.spec, {
+      name: exported.name,
+      meta: exported.meta,
+    });
+    const saved = getActiveDashboard(next);
+    expect(saved.name).toBe("Line 3");
+    expect(saved.meta).toEqual(exported.meta);
+  });
+
+  it("importSharedWorkspace preserves per-dashboard meta", () => {
+    const parsed = parseShareExport(readExample("ops-workspace.workspace.json"));
+    if (parsed.kind !== "workspace") throw new Error("expected workspace export");
+    const store = createDefaultWorkspaceStore(spec);
+    const next = importSharedWorkspace(store, parsed);
+    const imported = next.workspaces.find((item) => item.id === next.activeWorkspaceId);
+    const withMeta = imported?.dashboards.filter((item) => item.meta?.feed) ?? [];
+    expect(withMeta.length).toBeGreaterThan(0);
   });
 });
