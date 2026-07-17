@@ -5,6 +5,7 @@ import { HomePage } from "./pages/HomePage";
 import { PackagesPage } from "./pages/PackagesPage";
 import { PluginsPage } from "./pages/PluginsPage";
 import { RuntimePage } from "./pages/RuntimePage";
+import { RuntimeSchemaPage } from "./pages/RuntimeSchemaPage";
 import { SpecPage } from "./pages/SpecPage";
 import { StartPage } from "./pages/StartPage";
 import { VerticalsPage } from "./pages/VerticalsPage";
@@ -19,6 +20,7 @@ export function App(): ReactElement {
           <Route path="verticals" element={<VerticalsPage />} />
           <Route path="spec" element={<SpecPage />} />
           <Route path="runtime" element={<RuntimePage />} />
+          <Route path="runtime/schema" element={<RuntimeSchemaPage />} />
           <Route path="plugins" element={<PluginsPage />} />
           <Route path="packages" element={<PackagesPage />} />
         </Route>

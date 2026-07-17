@@ -29,6 +29,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - run: pnpm validate:runtime
       - name: Build docs site
         run: pnpm --filter @axicharts/docs build
         env:

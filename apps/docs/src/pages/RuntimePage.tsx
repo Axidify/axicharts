@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { RuntimeDashboard, buildEmbedBundle, serializeRuntimeSpec } from "@axicharts/charts-runtime";
 import {
   ADAPTER_ROWS,
@@ -81,7 +82,8 @@ export function RuntimePage(): ReactElement {
       <h1 style={{ marginTop: 0 }}>Dashboard runtime</h1>
       <p style={{ color: "#475569", maxWidth: 640 }}>
         Layer 3 embed SDK — bind REST, WebSocket, MQTT, historian, or static data to charts-spec
-        templates with stale overlays and alarm chrome.
+        templates with stale overlays and alarm chrome.{" "}
+        <Link to="/runtime/schema">Runtime JSON schema & validation →</Link>
       </p>
 
       <Section title="Data adapters" subtitle="connectSource + hooks">
@@ -185,10 +187,9 @@ export function RuntimePage(): ReactElement {
 
       <Section title="Portable spec" subtitle="serializeRuntimeSpec / parseRuntimeSpec">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
-          Export runtime JSON for Dashboarder, GitOps, or agent planners — matches{" "}
-          <code>packages/charts-runtime/examples/ops-mosaic.runtime.json</code>. CI validates
-          examples with <code>charts-runtime validate</code>; JSON Schema lives at{" "}
-          <code>@axicharts/charts-runtime/schema/runtime-spec.json</code>.
+          Export runtime JSON for Dashboarder, GitOps, or agent planners — see the{" "}
+          <Link to="/runtime/schema">schema page</Link> for validation and hosted URLs. Example
+          fixture: <code>packages/charts-runtime/examples/ops-mosaic.runtime.json</code>.
         </p>
         <pre
           style={{

@@ -7,8 +7,8 @@ dist
 .env.*
 !.env.example
 storybook-static
-storybook-static
 coverage
+apps/docs/public
 audit-*.png
 .audit-*.png
 grid-cells-audit.png

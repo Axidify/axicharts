@@ -50,7 +50,8 @@ export function HomePage(): ReactElement {
           </li>
           <li>
             <strong>Runtime</strong> — <code>@axicharts/charts-runtime</code> live data + embed —{" "}
-            <Link to="/runtime">see runtime SDK</Link>
+            <Link to="/runtime">see runtime SDK</Link> ·{" "}
+            <Link to="/runtime/schema">schema & validation</Link>
           </li>
         </ul>
       </section>
