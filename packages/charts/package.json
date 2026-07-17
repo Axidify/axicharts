@@ -26,14 +26,26 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./line": {
+      "types": "./dist/entry/line.d.ts",
+      "import": "./dist/entry/line.js"
+    },
+    "./bar": {
+      "types": "./dist/entry/bar.d.ts",
+      "import": "./dist/entry/bar.js"
+    },
+    "./pie": {
+      "types": "./dist/entry/pie.d.ts",
+      "import": "./dist/entry/pie.js"
+    },
     "./registry": {
       "types": "./dist/registry/index.d.ts",
       "import": "./dist/registry/index.js"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/registry/index.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --clean",
-    "dev": "tsup src/index.ts src/registry/index.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --watch",
+    "build": "tsup src/index.ts src/registry/index.ts src/entry/line.ts src/entry/bar.ts src/entry/pie.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --clean",
+    "dev": "tsup src/index.ts src/registry/index.ts src/entry/line.ts src/entry/bar.ts src/entry/pie.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --watch",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

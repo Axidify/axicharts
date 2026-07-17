@@ -115,9 +115,12 @@ export function buildRuntimeSpec(options: {
   template: TemplateId;
   layout: LayoutMode;
   feed: FeedMode;
+  presentation?: boolean;
 }): RuntimeDashboardSpec {
-  const { template, layout, feed } = options;
+  const { template, layout, feed, presentation = false } = options;
   const historianSource = createHistorianSource(feed);
+  const theme = presentation ? "presentation" : layout === "mosaic" ? "industrial" : template === "ops-2x2" ? "industrial" : "clean";
+  const mode = presentation ? "presentation" : feed === "historian" ? "live" : "interactive";
 
   if (layout === "mosaic") {
     return {
@@ -125,8 +128,8 @@ export function buildRuntimeSpec(options: {
       wall: {
         title: "Packaging Line 3",
         subtitle: feed === "historian" ? "Historian · 2s window" : "Static snapshot",
-        theme: "industrial",
-        mode: feed === "historian" ? "live" : "interactive",
+        theme,
+        mode,
         columns: 2,
         staleAfterMs: 5000,
         dataSource: feed === "historian" ? historianSource : undefined,
@@ -167,8 +170,8 @@ export function buildRuntimeSpec(options: {
     dashboard: {
       title: "Dashboarder runtime",
       subtitle: feed === "historian" ? "Historian feed" : "Static feed",
-      theme: template === "ops-2x2" ? "industrial" : "clean",
-      mode: feed === "historian" ? "live" : "interactive",
+      theme,
+      mode,
       template,
       staleAfterMs: 5000,
       data: {
@@ -184,7 +187,10 @@ export function buildRuntimeSpec(options: {
 export function hydrateRuntimeSpec(
   spec: RuntimeDashboardSpec,
   feed: FeedMode,
+  presentation = false,
 ): RuntimeDashboardSpec {
+  if (presentation) return spec;
+
   const historianSource = createHistorianSource(feed);
 
   if (spec.layout === "mosaic") {

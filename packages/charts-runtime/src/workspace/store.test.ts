@@ -3,6 +3,7 @@ import type { RuntimeDashboardSpec } from "../types";
 import {
   addDashboard,
   createDefaultWorkspaceStore,
+  deleteDashboard,
   getActiveDashboard,
   loadWorkspaceStore,
   saveDashboardSpec,
@@ -89,5 +90,19 @@ describe("workspace store", () => {
     store = selectDashboard(store, workspace.id, firstId);
     expect(getActiveDashboard(store).id).toBe(firstId);
     expect(secondId).not.toBe(firstId);
+  });
+
+  it("deletes dashboards but keeps at least one", () => {
+    let store = createDefaultWorkspaceStore(seedSpec);
+    const workspace = store.workspaces[0]!;
+    store = addDashboard(store, workspace.id, "Second", seedSpec);
+    const secondId = getActiveDashboard(store).id;
+
+    store = deleteDashboard(store, workspace.id, secondId);
+    expect(store.workspaces[0]?.dashboards).toHaveLength(1);
+
+    const onlyId = store.workspaces[0]!.dashboards[0]!.id;
+    const blocked = deleteDashboard(store, workspace.id, onlyId);
+    expect(blocked.workspaces[0]?.dashboards).toHaveLength(1);
   });
 });

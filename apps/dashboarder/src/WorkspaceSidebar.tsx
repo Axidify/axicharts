@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import type { Workspace, WorkspaceStore } from "@axicharts/charts-runtime";
+import type { SavedDashboard, Workspace, WorkspaceStore } from "@axicharts/charts-runtime";
 
 const sidebarStyle = {
   width: 240,
@@ -24,11 +24,13 @@ const buttonStyle = {
 
 export type WorkspaceSidebarProps = {
   store: WorkspaceStore;
+  canDeleteDashboard: boolean;
   onSelectWorkspace: (workspaceId: string) => void;
   onSelectDashboard: (workspaceId: string, dashboardId: string) => void;
   onNewWorkspace: () => void;
   onNewDashboard: () => void;
   onRenameDashboard: (name: string) => void;
+  onDeleteDashboard: () => void;
 };
 
 function activeWorkspace(store: WorkspaceStore): Workspace {
@@ -37,11 +39,13 @@ function activeWorkspace(store: WorkspaceStore): Workspace {
 
 export function WorkspaceSidebar({
   store,
+  canDeleteDashboard,
   onSelectWorkspace,
   onSelectDashboard,
   onNewWorkspace,
   onNewDashboard,
   onRenameDashboard,
+  onDeleteDashboard,
 }: WorkspaceSidebarProps): ReactElement {
   const workspace = activeWorkspace(store);
 
@@ -68,7 +72,7 @@ export function WorkspaceSidebar({
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 6 }}>Dashboards</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {workspace.dashboards.map((dashboard) => {
+          {workspace.dashboards.map((dashboard: SavedDashboard) => {
             const active = dashboard.id === store.activeDashboardId;
             return (
               <button
@@ -94,16 +98,36 @@ export function WorkspaceSidebar({
         </button>
       </div>
 
-      <button
-        type="button"
-        onClick={() => {
-          const name = window.prompt("Dashboard name", workspace.dashboards.find((d) => d.id === store.activeDashboardId)?.name);
-          if (name?.trim()) onRenameDashboard(name.trim());
-        }}
-        style={{ ...buttonStyle, width: "100%" }}
-      >
-        Rename dashboard
-      </button>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <button
+          type="button"
+          onClick={() => {
+            const active = workspace.dashboards.find(
+              (dashboard: SavedDashboard) => dashboard.id === store.activeDashboardId,
+            );
+            const name = window.prompt("Dashboard name", active?.name);
+            if (name?.trim()) onRenameDashboard(name.trim());
+          }}
+          style={{ ...buttonStyle, width: "100%" }}
+        >
+          Rename dashboard
+        </button>
+        <button
+          type="button"
+          onClick={onDeleteDashboard}
+          disabled={!canDeleteDashboard}
+          style={{
+            ...buttonStyle,
+            width: "100%",
+            opacity: canDeleteDashboard ? 1 : 0.45,
+            cursor: canDeleteDashboard ? "pointer" : "not-allowed",
+            borderColor: "#7f1d1d",
+            color: "#fecaca",
+          }}
+        >
+          Delete dashboard
+        </button>
+      </div>
     </aside>
   );
 }

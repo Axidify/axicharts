@@ -7,6 +7,7 @@ export type SavedDashboard = {
     layout: "embed" | "mosaic";
     feed: "static" | "historian";
     template?: string;
+    presentation?: boolean;
   };
 };
 

@@ -42,6 +42,30 @@
     "gzip": true
   },
   {
+    "name": "@axicharts/charts/line",
+    "path": "packages/charts/dist/entry/line.js",
+    "limit": "8 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/bar",
+    "path": "packages/charts/dist/entry/bar.js",
+    "limit": "8 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/pie",
+    "path": "packages/charts/dist/entry/pie.js",
+    "limit": "8 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts-runtime/workspace",
+    "path": "packages/charts-runtime/dist/workspace/index.js",
+    "limit": "2 KB",
+    "gzip": true
+  },
+  {
     "name": "@axicharts/charts-tank",
     "path": "packages/charts-tank/dist/index.js",
     "limit": "3 KB",

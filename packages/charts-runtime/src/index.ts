@@ -1,3 +1,8 @@
+export {
+  parseDashboardExport,
+  serializeDashboardExport,
+  type DashboardExport,
+} from "./workspace/export";
 export { RUNTIME_VERSION } from "./types";
 export type {
   AlarmItem,

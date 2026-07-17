@@ -202,16 +202,21 @@ export function deleteDashboard(
   workspaceId: string,
   dashboardId: string,
 ): WorkspaceStore {
-  const workspaces = store.workspaces.map((workspace) => {
-    if (workspace.id !== workspaceId) return workspace;
+  const workspace = store.workspaces.find((item) => item.id === workspaceId);
+  if (!workspace || workspace.dashboards.length <= 1) {
+    return store;
+  }
+
+  const workspaces = store.workspaces.map((item) => {
+    if (item.id !== workspaceId) return item;
     return {
-      ...workspace,
-      dashboards: workspace.dashboards.filter((item) => item.id !== dashboardId),
+      ...item,
+      dashboards: item.dashboards.filter((dashboard) => dashboard.id !== dashboardId),
     };
   });
 
-  const workspace = workspaces.find((item) => item.id === workspaceId);
-  const nextDashboardId = workspace?.dashboards[0]?.id ?? "";
+  const nextWorkspace = workspaces.find((item) => item.id === workspaceId);
+  const nextDashboardId = nextWorkspace?.dashboards[0]?.id ?? "";
 
   return {
     ...store,
