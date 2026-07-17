@@ -11,6 +11,7 @@ const PACKAGES = [
   { name: "@axicharts/charts-tank", description: "community tank level plugin (registerChartType)" },
   { name: "@axicharts/charts-geo", description: "community regional geo map plugin (registerChartType)" },
   { name: "@axicharts/charts-andon", description: "community production andon board plugin (registerChartType)" },
+  { name: "@axicharts/charts-sankey", description: "community Sankey flow plugin (registerChartType, ECharts)" },
 ] as const;
 
 export function PackagesPage(): ReactElement {

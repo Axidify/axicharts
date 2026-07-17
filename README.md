@@ -51,6 +51,7 @@ export function LatencyPanel() {
 | `@axicharts/charts-tank` | Community plugin — tank level chart (`registerChartType`) |
 | `@axicharts/charts-geo` | Community plugin — regional cartogram map (`registerChartType`) |
 | `@axicharts/charts-andon` | Community plugin — production andon board (`registerChartType`) |
+| `@axicharts/charts-sankey` | Community plugin — Sankey flow diagram (`registerChartType`, ECharts) |
 
 ## Develop
 

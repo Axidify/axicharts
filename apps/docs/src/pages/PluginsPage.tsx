@@ -4,6 +4,8 @@ import { AndonBoard, SAMPLE_ANDON_STATIONS } from "@axicharts/charts-andon";
 import "@axicharts/charts-andon/register";
 import { GeoMapChart, SAMPLE_GEO_REGIONS } from "@axicharts/charts-geo";
 import "@axicharts/charts-geo/register";
+import { SankeyChart, SAMPLE_SANKEY_FLOW } from "@axicharts/charts-sankey";
+import "@axicharts/charts-sankey/register";
 import { TankChart } from "@axicharts/charts-tank";
 import "@axicharts/charts-tank/register";
 import { cleanTheme, industrialTheme } from "@axicharts/charts-theme";
@@ -27,6 +29,13 @@ import { AndonBoard, SAMPLE_ANDON_STATIONS } from "@axicharts/charts-andon";
 
 <ChartContainer theme={industrialTheme} height={220} width={420}>
   <AndonBoard stations={SAMPLE_ANDON_STATIONS} columns={4} />
+</ChartContainer>`;
+
+const SANKEY_CODE = `import "@axicharts/charts-sankey/register";
+import { SankeyChart, SAMPLE_SANKEY_FLOW } from "@axicharts/charts-sankey";
+
+<ChartContainer theme={cleanTheme} height={260} width={480}>
+  <SankeyChart {...SAMPLE_SANKEY_FLOW} />
 </ChartContainer>`;
 
 function PluginSection({
@@ -115,6 +124,16 @@ export function PluginsPage(): ReactElement {
           </ChartContainer>
         }
         code={ANDON_CODE}
+      />
+      <PluginSection
+        title="@axicharts/charts-sankey"
+        subtitle="Energy / cost flow (ECharts lazy)"
+        preview={
+          <ChartContainer theme={cleanTheme} width={480} height={260}>
+            <SankeyChart {...SAMPLE_SANKEY_FLOW} />
+          </ChartContainer>
+        }
+        code={SANKEY_CODE}
       />
     </div>
   );

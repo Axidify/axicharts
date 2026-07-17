@@ -58,5 +58,11 @@
     "path": "packages/charts-andon/dist/index.js",
     "limit": "3 KB",
     "gzip": true
+  },
+  {
+    "name": "@axicharts/charts-sankey",
+    "path": "packages/charts-sankey/dist/index.js",
+    "limit": "3 KB",
+    "gzip": true
   }
 ]
