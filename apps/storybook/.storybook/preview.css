@@ -1,0 +1,13 @@
+:root {
+  color-scheme: dark;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  color: #e2e8f0;
+}
+
+body {
+  margin: 0;
+}
+
+.axicharts-uplot .u-legend {
+  font-size: 11px;
+}

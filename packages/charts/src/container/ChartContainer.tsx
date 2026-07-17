@@ -85,7 +85,8 @@ export function ChartContainer({
         className={className}
         style={{
           width,
-          minHeight,
+          height: height ?? undefined,
+          minHeight: height === undefined ? minHeight : undefined,
           maxHeight,
           position: "relative",
           ...style,

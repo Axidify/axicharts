@@ -1,0 +1,39 @@
+import type { StorybookConfig } from "@storybook/react-vite";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { mergeConfig } from "vite";
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(dirname, "../../..");
+
+const config: StorybookConfig = {
+  stories: ["../stories/**/*.stories.@(ts|tsx)"],
+  addons: ["@storybook/addon-essentials"],
+  framework: {
+    name: "@storybook/react-vite",
+    options: {},
+  },
+  async viteFinal(config) {
+    return mergeConfig(config, {
+      resolve: {
+        alias: {
+          "@axicharts/charts": path.resolve(root, "packages/charts/src"),
+          "@axicharts/charts-canvas": path.resolve(
+            root,
+            "packages/charts-canvas/src",
+          ),
+          "@axicharts/charts-theme": path.resolve(
+            root,
+            "packages/charts-theme/src",
+          ),
+          "@axicharts/charts-core": path.resolve(
+            root,
+            "packages/charts-core/src",
+          ),
+        },
+      },
+    });
+  },
+};
+
+export default config;

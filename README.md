@@ -19,6 +19,7 @@
 pnpm install
 pnpm build
 pnpm test
+pnpm storybook   # http://localhost:6006
 ```
 
 ## Roadmap

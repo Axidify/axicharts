@@ -1,9 +1,8 @@
 {
-  "name": "@axicharts/charts",
+  "name": "@axicharts/charts-canvas",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -13,7 +12,6 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --external react --external react-dom --external uplot --clean",
     "dev": "tsup src/index.ts --format esm --dts --external react --external react-dom --external uplot --watch",
-    "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
@@ -22,21 +20,15 @@
     "uplot": "^1.6.31"
   },
   "dependencies": {
-    "@axicharts/charts-canvas": "workspace:*",
     "@axicharts/charts-core": "workspace:*",
     "@axicharts/charts-theme": "workspace:*"
   },
   "devDependencies": {
-    "@testing-library/react": "^16.2.0",
-    "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "jsdom": "^26.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tsup": "^8.4.0",
     "typescript": "^5.8.2",
-    "uplot": "^1.6.31",
-    "vitest": "^3.0.8"
+    "uplot": "^1.6.31"
   }
 }
