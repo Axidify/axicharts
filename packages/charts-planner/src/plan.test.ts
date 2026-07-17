@@ -61,6 +61,11 @@ describe("planFromIntent", () => {
     expect(plan.feed).toBe("rest");
     expect(plan.template).toBe("ops-2x2");
   });
+
+  it("maps mock-live demo intent to mock-live feed", () => {
+    const plan = planFromIntent(profile, "Mock-live synthetic demo drift sandbox");
+    expect(plan.feed).toBe("mock-live");
+  });
 });
 
 describe("planFromProfile", () => {
@@ -106,7 +111,7 @@ describe("planWithProvider", () => {
   });
 
   it("accepts websocket and mqtt feeds from provider JSON", async () => {
-    for (const feed of ["websocket", "mqtt", "rest"] as const) {
+    for (const feed of ["websocket", "mqtt", "rest", "mock-live"] as const) {
       const provider = createMockPlannerProvider(
         JSON.stringify({
           template: "ops-2x2",

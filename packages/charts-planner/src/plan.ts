@@ -25,6 +25,9 @@ export function inferFeed(intent: string | undefined): PlannerFeed {
   if (/\brest\b|\/api\/|polling|poll\b|http\s*pull|endpoint|axios|fetch\b/.test(lower)) {
     return "rest";
   }
+  if (/mock[-\s]?live|synthetic|simulator|sandbox|\bdemo\b|fixture\s*drift/.test(lower)) {
+    return "mock-live";
+  }
   if (/live|stream|historian|realtime|real-time|telemetry/.test(lower)) return "historian";
   return "historian";
 }
@@ -150,7 +153,7 @@ export function buildPlannerPrompt(profile: DataProfile, intent: string): string
     '  "theme": "clean|live|industrial|presentation",',
     '  "mode": "static|interactive|live|presentation",',
     '  "layout": "embed|mosaic",',
-    '  "feed": "static|historian|websocket|mqtt|rest",',
+    '  "feed": "static|historian|websocket|mqtt|rest|mock-live",',
     '  "mosaicPreset": "ops-finance|ops-overview|trading-program|command-center",',
     '  "presentation": boolean,',
     '  "panels": [ { "specVersion": 1, "type": "line|bar|gauge|table|...", "title": "...", "encoding": {...} } ]',

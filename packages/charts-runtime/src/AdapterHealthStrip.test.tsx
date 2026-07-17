@@ -12,6 +12,7 @@ describe("AdapterHealthStrip", () => {
             label: "Ops",
             connection: "ready",
             fixtureHref: "https://example.test/runtime/import?preset=ops-rest",
+            adapterType: "rest",
           },
         ]}
       />,
@@ -19,5 +20,6 @@ describe("AdapterHealthStrip", () => {
 
     const link = screen.getByRole("link", { name: "Fixture" });
     expect(link.getAttribute("href")).toBe("https://example.test/runtime/import?preset=ops-rest");
+    expect(document.body.textContent).toContain("rest");
   });
 });

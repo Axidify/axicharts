@@ -10,13 +10,14 @@ import {
   dashboarderImportDeepLink,
   docsImportGalleryDeepLink,
   formatValidatePresetCommand,
-  plannerAdapterReferencePreset,
+  plannerAdapterFixtures,
 } from "@axicharts/charts-runtime/validation";
 import { ValidateCommandCopy } from "./validationChrome";
 
 const QUICK_INTENTS = [
   "Line 3 night shift overview",
   "Finance P&L board",
+  "Mock-live synthetic demo drift",
   "REST API polling line metrics",
   "WebSocket push trading desk",
   "MQTT plant floor telemetry",
@@ -240,11 +241,11 @@ export function PlannerPanel({
               </ul>
             ) : null}
             {(() => {
-              const referencePreset = plannerAdapterReferencePreset({
+              const fixtures = plannerAdapterFixtures({
                 layout: plan.layout,
                 feed: plan.feed,
               });
-              if (!referencePreset) return null;
+              if (fixtures.length === 0) return null;
               return (
                 <div
                   style={{
@@ -258,31 +259,41 @@ export function PlannerPanel({
                     lineHeight: 1.7,
                   }}
                 >
-                  Adapter fixture:{" "}
-                  <strong style={{ color: "#e2e8f0" }}>{referencePreset.label}</strong>
-                  {referencePreset.adapter ? (
-                    <>
-                      {" "}
-                      (<code>{referencePreset.adapter}</code>)
-                    </>
-                  ) : null}
-                  {" · "}
-                  <a
-                    href={docsImportGalleryDeepLink(referencePreset.id)}
-                    style={{ color: "#93c5fd" }}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Gallery
-                  </a>
-                  {" · "}
-                  <a
-                    href={dashboarderImportDeepLink(referencePreset.id)}
-                    style={{ color: "#93c5fd" }}
-                  >
-                    Import preset
-                  </a>
-                  <ValidateCommandCopy command={formatValidatePresetCommand(referencePreset.id)} />
+                  <div style={{ fontWeight: 600, color: "#e2e8f0", marginBottom: 8 }}>
+                    {fixtures.length > 1 ? "Adapter fixtures" : "Adapter fixture"}
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    {fixtures.map(({ preset, role }) => (
+                      <li key={`${preset.id}:${role}`} style={{ marginBottom: 6 }}>
+                        <strong style={{ color: "#e2e8f0" }}>{preset.label}</strong>
+                        {" · "}
+                        <span>{role}</span>
+                        {preset.adapter ? (
+                          <>
+                            {" "}
+                            (<code>{preset.adapter}</code>)
+                          </>
+                        ) : null}
+                        {" · "}
+                        <a
+                          href={docsImportGalleryDeepLink(preset.id)}
+                          style={{ color: "#93c5fd" }}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Gallery
+                        </a>
+                        {" · "}
+                        <a
+                          href={dashboarderImportDeepLink(preset.id)}
+                          style={{ color: "#93c5fd" }}
+                        >
+                          Import
+                        </a>
+                        <ValidateCommandCopy command={formatValidatePresetCommand(preset.id)} />
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               );
             })()}

@@ -3,13 +3,14 @@
 import type { ReactElement } from "react";
 import { ConnectionBadge } from "./ConnectionBadge";
 import { FixtureLink } from "./FixtureLink";
-import type { ConnectionState } from "./types";
+import type { ConnectionState, DataSourceAdapterType } from "./types";
 
 export type AdapterHealthItem = {
   id: string;
   label: string;
   connection: ConnectionState;
   fixtureHref?: string;
+  adapterType?: DataSourceAdapterType;
 };
 
 export type AdapterHealthStripProps = {
@@ -40,6 +41,12 @@ export function AdapterHealthStrip({ items }: AdapterHealthStripProps): ReactEle
         >
           <ConnectionBadge connection={item.connection} compact />
           {item.label}
+          {item.adapterType ? (
+            <>
+              {" "}
+              <code style={{ fontSize: 10 }}>{item.adapterType}</code>
+            </>
+          ) : null}
           {item.fixtureHref ? <FixtureLink href={item.fixtureHref} /> : null}
         </span>
       ))}

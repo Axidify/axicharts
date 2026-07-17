@@ -44,7 +44,7 @@ export const OPS_DATA = {
 };
 
 export type LayoutMode = "embed" | "mosaic";
-export type FeedMode = "static" | "historian" | "websocket" | "mqtt" | "rest";
+export type FeedMode = "static" | "historian" | "websocket" | "mqtt" | "rest" | "mock-live";
 export type LiveFeedMode = Exclude<FeedMode, "static">;
 
 const OPS_ALARMS = [
@@ -65,6 +65,8 @@ export function feedSubtitle(feed: LiveFeedMode): string {
       return "WebSocket · push";
     case "mqtt":
       return "MQTT · plant/line3/#";
+    case "mock-live":
+      return "Mock-live · synthetic drift";
   }
 }
 
@@ -180,6 +182,43 @@ export function createRestSource() {
   };
 }
 
+function mockLiveMutate(data: Record<string, unknown>): Record<string, unknown> {
+  const cells =
+    (data.cells as Array<{
+      title: string;
+      data: number[];
+      suffix?: string;
+      tone?: string;
+    }>) ?? [];
+
+  return {
+    ...data,
+    categories: CATEGORIES,
+    cells: cells.map((cell) => {
+      const values = [...cell.data];
+      const last = values[values.length - 1] ?? 0;
+      values.push(Math.max(0, last + (Math.random() - 0.5) * 8));
+      if (values.length > CATEGORIES.length) values.shift();
+      return { ...cell, data: values };
+    }),
+    alarms: OPS_ALARMS,
+  };
+}
+
+export function createMockLiveSource() {
+  return {
+    type: "mock-live" as const,
+    intervalMs: 1000,
+    staleAfterMs: 5000,
+    data: {
+      categories: CATEGORIES,
+      cells: OPS_DATA.cells.map((cell) => ({ ...cell, data: [...cell.data] })),
+      alarms: OPS_ALARMS,
+    },
+    mutate: mockLiveMutate,
+  };
+}
+
 export function createWebSocketSource() {
   let tick = 0;
 
@@ -275,6 +314,8 @@ export function createLiveSource(feed: LiveFeedMode): DataSourceSpec {
       return createWebSocketSource();
     case "mqtt":
       return createMqttSource();
+    case "mock-live":
+      return createMockLiveSource();
   }
 }
 
@@ -372,7 +413,7 @@ export function buildRuntimeSpec(options: {
   };
 }
 
-const LIVE_SOURCE_TYPES = new Set(["historian", "rest", "websocket", "mqtt"]);
+const LIVE_SOURCE_TYPES = new Set(["historian", "rest", "websocket", "mqtt", "mock-live"]);
 
 export function hydrateRuntimeSpec(
   spec: RuntimeDashboardSpec,

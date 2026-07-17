@@ -20,6 +20,7 @@ import {
   shareExportReferencePreset,
   runtimeEmbedReferencePreset,
   plannerAdapterReferencePreset,
+  plannerAdapterFixtures,
   feedAdapterGalleryDeepLink,
   adapterFixtureGalleryDeepLink,
   formatValidatePresetCommand,
@@ -172,6 +173,15 @@ describe("hosted import presets", () => {
     );
     expect(plannerAdapterReferencePreset({ layout: "embed", feed: "mqtt" })?.id).toBe("ops-mqtt");
     expect(plannerAdapterReferencePreset({ layout: "embed", feed: "rest" })?.id).toBe("ops-rest");
+    expect(plannerAdapterReferencePreset({ layout: "embed", feed: "mock-live" })?.id).toBe(
+      "ops-mock-live",
+    );
+    const mosaicFixtures = plannerAdapterFixtures({ layout: "mosaic", feed: "historian" });
+    expect(mosaicFixtures.map((item) => item.preset.id)).toEqual(["ops-mosaic", "ops-historian"]);
+    expect(mosaicFixtures.map((item) => item.role)).toEqual(["mosaic wall", "historian bind"]);
+    const embedFixtures = plannerAdapterFixtures({ layout: "embed", feed: "mock-live" });
+    expect(embedFixtures).toHaveLength(1);
+    expect(embedFixtures[0]?.preset.id).toBe("ops-mock-live");
     expect(feedAdapterGalleryDeepLink("mqtt", "embed")).toBe(
       "https://axidify.github.io/axicharts/runtime/import?preset=ops-mqtt",
     );

@@ -186,7 +186,7 @@ export function runtimeEmbedReferencePreset(
 
 export type PlannerAdapterPlan = {
   layout: "embed" | "mosaic";
-  feed: "static" | "historian" | "websocket" | "mqtt" | "rest";
+  feed: "static" | "historian" | "websocket" | "mqtt" | "rest" | "mock-live";
 };
 
 /** Maps planner layout + feed to the shipped adapter fixture preset. */
@@ -198,6 +198,40 @@ export function plannerAdapterReferencePreset(
   }
   const presetId = ADAPTER_FIXTURE_PRESETS[plan.feed];
   return presetId ? findImportPreset(presetId) : undefined;
+}
+
+export type PlannerAdapterFixture = {
+  preset: HostedImportPreset;
+  role: string;
+};
+
+/** Adapter fixture presets for planner preview — mosaic walls may surface multiple binds. */
+export function plannerAdapterFixtures(plan: PlannerAdapterPlan): PlannerAdapterFixture[] {
+  if (plan.layout !== "mosaic") {
+    const preset = plannerAdapterReferencePreset(plan);
+    return preset ? [{ preset, role: "embed" }] : [];
+  }
+
+  const fixtures: PlannerAdapterFixture[] = [];
+  const wallPreset = findImportPreset(ADAPTER_FIXTURE_PRESETS.mosaic!);
+  if (wallPreset) {
+    fixtures.push({ preset: wallPreset, role: "mosaic wall" });
+  }
+
+  if (plan.feed !== "static") {
+    const feedPresetId = ADAPTER_FIXTURE_PRESETS[plan.feed];
+    const feedPreset = feedPresetId ? findImportPreset(feedPresetId) : undefined;
+    if (feedPreset) {
+      fixtures.push({ preset: feedPreset, role: `${plan.feed} bind` });
+    }
+  } else {
+    const staticPreset = findImportPreset(ADAPTER_FIXTURE_PRESETS.static!);
+    if (staticPreset && staticPreset.id !== wallPreset?.id) {
+      fixtures.push({ preset: staticPreset, role: "static cells" });
+    }
+  }
+
+  return fixtures;
 }
 
 export type PlannerFeedLike = PlannerAdapterPlan["feed"];

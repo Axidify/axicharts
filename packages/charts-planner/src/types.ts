@@ -2,7 +2,7 @@ export type PlannerSource = "rules" | "intent" | "llm";
 
 export type PlannerLayout = "embed" | "mosaic";
 
-export type PlannerFeed = "static" | "historian" | "websocket" | "mqtt" | "rest";
+export type PlannerFeed = "static" | "historian" | "websocket" | "mqtt" | "rest" | "mock-live";
 
 export type MosaicPresetId =
   | "ops-finance"

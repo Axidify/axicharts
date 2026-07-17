@@ -404,6 +404,7 @@ export function App(): ReactElement {
             >
               <option value="historian">Historian (mock)</option>
               <option value="rest">REST (mock)</option>
+              <option value="mock-live">Mock-live (mock)</option>
               <option value="websocket">WebSocket (mock)</option>
               <option value="mqtt">MQTT (mock)</option>
               <option value="static">Static</option>

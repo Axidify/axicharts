@@ -94,6 +94,7 @@ export function MosaicWall({
                 label: cell?.title ?? source.id,
                 connection: snapshots[source.id]?.connection ?? "idle",
                 fixtureHref: adapterFixtureHref?.(source.type),
+                adapterType: source.type,
               };
             })}
           />

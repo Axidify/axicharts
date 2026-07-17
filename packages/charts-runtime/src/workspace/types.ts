@@ -5,7 +5,7 @@ export type SavedDashboard = {
   specJson: string;
   meta?: {
     layout: "embed" | "mosaic";
-    feed: "static" | "historian" | "websocket" | "mqtt" | "rest";
+    feed: "static" | "historian" | "websocket" | "mqtt" | "rest" | "mock-live";
     template?: string;
     mosaicPreset?: string;
     presentation?: boolean;
