@@ -4,6 +4,15 @@ import { RuntimeDashboard, buildEmbedBundle, serializeRuntimeSpec } from "@axich
 import { ADAPTER_FIXTURE_PRESETS, PLANNER_FEED_ROWS } from "@axicharts/charts-runtime/validation";
 import { RuntimeHubNav } from "../components/RuntimeHubNav";
 import {
+  DASHBOARDER_PLANNER_ENV,
+  PLANNER_CLIENT_CODE,
+  PLANNER_HEALTH_CURL,
+  PLANNER_HEALTH_RESPONSE,
+  PLANNER_PLAN_CURL_INLINE,
+  PLANNER_PLAN_RESPONSE,
+  PLANNER_SERVE_CODE,
+} from "../demos/runtimePlannerDemo";
+import {
   ADAPTER_ROWS,
   EMBED_RUNTIME_SPEC,
   MOSAIC_PRESET_CODE,
@@ -45,14 +54,17 @@ const MOSAIC_CODE = `import { RuntimeDashboard } from "@axicharts/charts-runtime
 function Section({
   title,
   subtitle,
+  id,
   children,
 }: {
   title: string;
   subtitle?: string;
+  id?: string;
   children: ReactNode;
 }): ReactElement {
   return (
     <section
+      id={id}
       style={{
         marginTop: 28,
         border: "1px solid #e2e8f0",
@@ -135,7 +147,9 @@ export function RuntimePage(): ReactElement {
           Phase 3 <code>@axicharts/charts-planner</code> infers a live feed from intent and applies it
           in Dashboarder via <strong>Plan</strong>. Each feed maps to a shipped import preset — see
           the full index on the{" "}
-          <Link to="/runtime/import#planner-feeds">import gallery planner feed table</Link>.
+          <Link to="/runtime/import#planner-feeds">import gallery planner feed table</Link>
+          {" · "}
+          <Link to="#planner-http">HTTP API examples</Link>.
         </p>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
@@ -161,6 +175,122 @@ export function RuntimePage(): ReactElement {
             ))}
           </tbody>
         </table>
+      </Section>
+
+      <Section title="Planner HTTP API" subtitle="serve · health · plan" id="planner-http">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Run the Phase 3 planner locally and point Dashboarder at it with{" "}
+          <code>VITE_PLANNER_URL</code>. Invalid LLM JSON falls back to rules with a warning on the
+          plan — same behavior as the in-app <strong>Plan</strong> dialog.
+        </p>
+        <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Start server</strong>
+        </p>
+        <pre
+          style={{
+            margin: "0 0 16px",
+            padding: 14,
+            background: "#0f172a",
+            color: "#e2e8f0",
+            fontSize: 11,
+            lineHeight: 1.5,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {PLANNER_SERVE_CODE}
+        </pre>
+        <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Health</strong>
+        </p>
+        <pre
+          style={{
+            margin: "0 0 8px",
+            padding: 14,
+            background: "#f8fafc",
+            fontSize: 11,
+            lineHeight: 1.5,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {PLANNER_HEALTH_CURL}
+        </pre>
+        <pre
+          style={{
+            margin: "0 0 16px",
+            padding: 14,
+            background: "#f8fafc",
+            fontSize: 11,
+            lineHeight: 1.5,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {PLANNER_HEALTH_RESPONSE}
+        </pre>
+        <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>POST /plan</strong>
+        </p>
+        <pre
+          style={{
+            margin: "0 0 8px",
+            padding: 14,
+            background: "#f8fafc",
+            fontSize: 11,
+            lineHeight: 1.5,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {PLANNER_PLAN_CURL_INLINE}
+        </pre>
+        <pre
+          style={{
+            margin: "0 0 16px",
+            padding: 14,
+            background: "#f8fafc",
+            fontSize: 11,
+            lineHeight: 1.5,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {PLANNER_PLAN_RESPONSE}
+        </pre>
+        <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Dashboarder env</strong>
+        </p>
+        <pre
+          style={{
+            margin: "0 0 16px",
+            padding: 14,
+            background: "#f8fafc",
+            fontSize: 11,
+            lineHeight: 1.5,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {DASHBOARDER_PLANNER_ENV}
+        </pre>
+        <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Client</strong>
+        </p>
+        <pre
+          style={{
+            margin: 0,
+            padding: 14,
+            background: "#0f172a",
+            color: "#e2e8f0",
+            fontSize: 11,
+            lineHeight: 1.5,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {PLANNER_CLIENT_CODE}
+        </pre>
       </Section>
 
       <Section title="Embed layout" subtitle="single dashboard template">

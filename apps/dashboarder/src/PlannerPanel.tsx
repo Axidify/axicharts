@@ -305,6 +305,15 @@ export function PlannerPanel({
                     >
                       Gallery table
                     </a>
+                    {" · "}
+                    <a
+                      href="https://axidify.github.io/axicharts/runtime#planner-http"
+                      style={{ color: "#93c5fd" }}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      HTTP API
+                    </a>
                   </p>
                 </div>
               );

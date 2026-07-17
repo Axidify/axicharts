@@ -322,12 +322,13 @@ export function RuntimeImportPage(): ReactElement {
             ))}
           </tbody>
         </table>
-        <p style={{ margin: "12px 0 0", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          <p style={{ margin: "12px 0 0", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
           Mosaic intents (e.g. <em>{PLANNER_MOSAIC_INTENT_SAMPLE}</em>) surface multiple fixtures:{" "}
           {plannerAdapterFixtures({ layout: "mosaic", feed: "historian" })
             .map((item) => item.preset.id)
             .join(" + ")}
-          . See the <Link to="/runtime/adapters">adapter cookbook</Link> for field tables.
+          . See the <Link to="/runtime/adapters">adapter cookbook</Link> or{" "}
+          <Link to="/runtime#planner-http">planner HTTP examples</Link>.
         </p>
       </section>
 

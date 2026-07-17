@@ -28,6 +28,7 @@ import type { DataSourceAdapterType } from "@axicharts/charts-runtime";
 import { PlannerPanel } from "./PlannerPanel";
 import { ShareDialog } from "./ShareDialog";
 import { PluginStrip } from "./PluginStrip";
+import { FeedIntentGlossary } from "./FeedIntentGlossary";
 import { WorkspaceSidebar } from "./WorkspaceSidebar";
 import {
   buildRuntimeSpec,
@@ -392,7 +393,15 @@ export function App(): ReactElement {
               <option value="mosaic">Mosaic wall</option>
             </select>
           </label>
-          <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
+          <label
+            style={{
+              fontSize: 12,
+              display: "inline-flex",
+              gap: 8,
+              alignItems: "center",
+              position: "relative",
+            }}
+          >
             Feed
             <select
               value={feed}
@@ -418,6 +427,14 @@ export function App(): ReactElement {
             >
               Fixture
             </a>
+            <FeedIntentGlossary
+              feed={feed}
+              layout={layout}
+              onSelectFeed={(next) => {
+                setFeed(next);
+                setDirty(true);
+              }}
+            />
           </label>
           <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
             <input
