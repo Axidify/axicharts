@@ -197,6 +197,12 @@ export function RuntimeAdaptersPage(): ReactElement {
           <strong>Tag-per-frame parseMessage</strong>
         </p>
         <CodeBlock>{WEBSOCKET_PARSE_MESSAGE}</CodeBlock>
+        <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b" }}>
+          Shipped fixture:{" "}
+          <Link to={`/runtime/import?preset=${ADAPTER_FIXTURE_PRESETS.websocket}`}>
+            ops-websocket.runtime.json
+          </Link>
+        </p>
       </Section>
 
       <Section title="Historian adapter" subtitle="rolling tag window">
@@ -264,7 +270,11 @@ export function RuntimeAdaptersPage(): ReactElement {
         <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>
           See shipped fixtures in the{" "}
           <Link to="/runtime/import">import gallery</Link> and live embed on the{" "}
-          <Link to="/runtime">runtime SDK page</Link>.
+          <Link to="/runtime">runtime SDK page</Link>. Mock-live wiring:{" "}
+          <Link to={`/runtime/import?preset=${ADAPTER_FIXTURE_PRESETS["mock-live"]}`}>
+            ops-mock-live.runtime.json
+          </Link>
+          .
         </p>
       </Section>
 

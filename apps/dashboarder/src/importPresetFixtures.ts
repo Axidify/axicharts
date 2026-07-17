@@ -1,3 +1,5 @@
+import opsMockLiveRuntime from "../../../packages/charts-runtime/examples/ops-mock-live.runtime.json?raw";
+import opsWebSocketRuntime from "../../../packages/charts-runtime/examples/ops-websocket.runtime.json?raw";
 import opsRestRuntime from "../../../packages/charts-runtime/examples/ops-rest.runtime.json?raw";
 import opsHistorianRuntime from "../../../packages/charts-runtime/examples/ops-historian.runtime.json?raw";
 import opsMqttRuntime from "../../../packages/charts-runtime/examples/ops-mqtt.runtime.json?raw";
@@ -12,6 +14,8 @@ export const LOCAL_IMPORT_FIXTURES: Record<string, string> = {
   "ops-rest.runtime.json": opsRestRuntime,
   "ops-historian.runtime.json": opsHistorianRuntime,
   "ops-mqtt.runtime.json": opsMqttRuntime,
+  "ops-websocket.runtime.json": opsWebSocketRuntime,
+  "ops-mock-live.runtime.json": opsMockLiveRuntime,
   "ops-dashboard.share.json": opsDashboardShare,
   "ops-workspace.workspace.json": opsWorkspaceBundle,
 };

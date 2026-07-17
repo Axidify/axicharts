@@ -143,6 +143,12 @@ export function RuntimeSchemaPage(): ReactElement {
             <a href={`${base}examples/ops-mqtt.runtime.json`}>ops-mqtt.runtime.json</a>
           </li>
           <li>
+            <a href={`${base}examples/ops-websocket.runtime.json`}>ops-websocket.runtime.json</a>
+          </li>
+          <li>
+            <a href={`${base}examples/ops-mock-live.runtime.json`}>ops-mock-live.runtime.json</a>
+          </li>
+          <li>
             <a href={`${base}examples/ops-dashboard.share.json`}>ops-dashboard.share.json</a>
           </li>
           <li>

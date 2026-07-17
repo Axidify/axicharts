@@ -68,6 +68,8 @@ describe("charts-runtime cli", () => {
     expect(runCli(["validate", "--preset", "ops-historian", "--all"])).toBe(0);
     expect(runCli(["validate", "--preset", "ops-rest", "--all"])).toBe(0);
     expect(runCli(["validate", "--preset", "ops-mqtt", "--all"])).toBe(0);
+    expect(runCli(["validate", "--preset", "ops-websocket", "--all"])).toBe(0);
+    expect(runCli(["validate", "--preset", "ops-mock-live", "--all"])).toBe(0);
   });
 
   it("rejects unknown presets and conflicting flags", () => {

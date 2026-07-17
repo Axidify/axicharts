@@ -185,6 +185,18 @@ export function RuntimeDeepLinkPage(): ReactElement {
               {HOSTED_IMPORT_PRESETS.find((item) => item.id === "ops-mqtt")?.label}
             </Link>
           </li>
+          <li>
+            WebSocket adapter →{" "}
+            <Link to={`/runtime/import?preset=ops-websocket`}>
+              {HOSTED_IMPORT_PRESETS.find((item) => item.id === "ops-websocket")?.label}
+            </Link>
+          </li>
+          <li>
+            Mock-live adapter →{" "}
+            <Link to={`/runtime/import?preset=ops-mock-live`}>
+              {HOSTED_IMPORT_PRESETS.find((item) => item.id === "ops-mock-live")?.label}
+            </Link>
+          </li>
         </ul>
       </section>
 

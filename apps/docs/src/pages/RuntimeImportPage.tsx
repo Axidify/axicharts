@@ -267,6 +267,34 @@ export function RuntimeImportPage(): ReactElement {
           >
             MQTT embed
           </Link>
+          <Link
+            to="/runtime/import?preset=ops-websocket"
+            style={{
+              fontSize: 12,
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: "1px solid #cbd5e1",
+              background: "#f8fafc",
+              color: "#1e293b",
+              textDecoration: "none",
+            }}
+          >
+            WebSocket mosaic
+          </Link>
+          <Link
+            to="/runtime/import?preset=ops-mock-live"
+            style={{
+              fontSize: 12,
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: "1px solid #cbd5e1",
+              background: "#f8fafc",
+              color: "#1e293b",
+              textDecoration: "none",
+            }}
+          >
+            Mock-live embed
+          </Link>
         </div>
       </section>
 

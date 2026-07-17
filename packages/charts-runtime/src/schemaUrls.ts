@@ -51,6 +51,20 @@ export const HOSTED_IMPORT_PRESETS: HostedImportPreset[] = [
     adapter: "mqtt",
   },
   {
+    id: "ops-websocket",
+    label: "WebSocket mosaic",
+    filename: "ops-websocket.runtime.json",
+    kind: "runtime",
+    adapter: "websocket",
+  },
+  {
+    id: "ops-mock-live",
+    label: "Mock-live embed",
+    filename: "ops-mock-live.runtime.json",
+    kind: "runtime",
+    adapter: "mock-live",
+  },
+  {
     id: "ops-dashboard",
     label: "Dashboard share",
     filename: "ops-dashboard.share.json",
@@ -70,6 +84,8 @@ export const ADAPTER_FIXTURE_PRESETS: Partial<Record<ImportPresetAdapter, string
   rest: "ops-rest",
   historian: "ops-historian",
   mqtt: "ops-mqtt",
+  websocket: "ops-websocket",
+  "mock-live": "ops-mock-live",
 };
 
 export const SHARE_EXPORT_REFERENCE_PRESET: Record<"dashboard" | "workspace", string> = {

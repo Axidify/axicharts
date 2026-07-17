@@ -169,10 +169,9 @@ describe("hosted import presets", () => {
   it("lists import deep links for docs index", () => {
     const links = listImportDeepLinks("/axicharts/");
     expect(links).toHaveLength(HOSTED_IMPORT_PRESETS.length);
-    expect(links[6]?.galleryPath).toBe("/runtime/import?preset=ops-workspace");
-    expect(links[6]?.localMirrorPath).toContain("ops-workspace.workspace.json");
-    expect(findImportPreset("ops-rest")?.adapter).toBe("rest");
-    expect(findImportPreset("ops-historian")?.adapter).toBe("historian");
-    expect(findImportPreset("ops-mqtt")?.adapter).toBe("mqtt");
+    expect(links[8]?.galleryPath).toBe("/runtime/import?preset=ops-workspace");
+    expect(links[8]?.localMirrorPath).toContain("ops-workspace.workspace.json");
+    expect(findImportPreset("ops-websocket")?.adapter).toBe("websocket");
+    expect(findImportPreset("ops-mock-live")?.adapter).toBe("mock-live");
   });
 });

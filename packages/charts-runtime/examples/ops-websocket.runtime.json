@@ -1,0 +1,30 @@
+{
+  "$schema": "https://axidify.github.io/axicharts/schema/runtime-spec.schema.json",
+  "layout": "mosaic",
+  "wall": {
+    "version": "0.1",
+    "title": "Line 3 WebSocket",
+    "subtitle": "Push telemetry stream",
+    "theme": "industrial",
+    "mode": "live",
+    "columns": 2,
+    "dataSourceId": "telemetry",
+    "dataSources": [
+      {
+        "id": "telemetry",
+        "type": "websocket",
+        "url": "wss://ops.example.com/ws/line3",
+        "reconnectDelayMs": 3000,
+        "staleAfterMs": 8000
+      }
+    ],
+    "cells": [
+      {
+        "id": "ops",
+        "template": "ops-2x2",
+        "title": "Line 3",
+        "dataSourceId": "telemetry"
+      }
+    ]
+  }
+}
