@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from "react";
+import type { ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import {
   ChartContainer,
@@ -7,26 +7,7 @@ import {
   type PlotSeries,
 } from "@axicharts/charts";
 import { industrialTheme } from "@axicharts/charts-theme";
-
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-function useLiveSeries(initial: number[], hz = 2): number[] {
-  const [data, setData] = useState(initial);
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      setData((prev) => {
-        const last = prev[prev.length - 1] ?? 0;
-        const delta = (Math.random() - 0.5) * (last * 0.08 + 1);
-        return [...prev.slice(1), Math.max(0, last + delta)];
-      });
-    }, 1000 / hz);
-
-    return () => window.clearInterval(id);
-  }, [hz]);
-
-  return data;
-}
+import { DAYS, useLiveSeries } from "./utils/liveSeries";
 
 function Panel({
   label,

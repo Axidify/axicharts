@@ -23,11 +23,13 @@ function buildOptions({
   showAxes = true,
 }: UPlotLineProps): uPlot.Options {
   const gridStroke = withAlpha(GRID_COLOR, theme.grid.opacity);
+  const compact = height < 72;
 
   return {
     width,
     height,
     class: "axicharts-uplot",
+    padding: compact ? [4, 6, 4, 6] : [8, 10, 8, 10],
     cursor: { show: false },
     legend: { show: series.length > 1 },
     scales: {
@@ -43,7 +45,7 @@ function buildOptions({
             ticks: { show: false },
             values: (_u, ticks) =>
               ticks.map((tick) => categories[tick] ?? ""),
-            size: 18,
+            size: compact ? 0 : 18,
             font: "11px ui-sans-serif, system-ui, sans-serif",
           },
           {
@@ -52,7 +54,7 @@ function buildOptions({
               ? { stroke: gridStroke, width: theme.grid.strokeWidth }
               : { show: false },
             ticks: { show: false },
-            size: showAxes ? 32 : 0,
+            size: compact ? 0 : 32,
             font: theme.values.monospace
               ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
               : "11px ui-sans-serif, system-ui, sans-serif",
