@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import {
   dashboarderImportDeepLink,
   fetchImportPreset,
+  formatValidatePresetCommand,
   hostedImportPresetUrl,
   HOSTED_IMPORT_PRESETS,
   localImportPresetUrl,
@@ -36,6 +37,7 @@ function PresetCard({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedValidate, setCopiedValidate] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,12 +73,19 @@ function PresetCard({
   const hostedUrl = hostedImportPresetUrl(preset);
   const galleryLink = presetGalleryPath(preset.id);
   const dashboarderLink = dashboarderImportDeepLink(preset.id);
+  const validateCommand = formatValidatePresetCommand(preset.id);
 
   const copy = async (): Promise<void> => {
     if (!json) return;
     await navigator.clipboard.writeText(json);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);
+  };
+
+  const copyValidate = async (): Promise<void> => {
+    await navigator.clipboard.writeText(validateCommand);
+    setCopiedValidate(true);
+    window.setTimeout(() => setCopiedValidate(false), 1500);
   };
 
   return (
@@ -158,6 +167,43 @@ function PresetCard({
                 Open in Dashboarder
               </a>
             </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 8,
+                alignItems: "center",
+                marginBottom: 12,
+                fontSize: 12,
+                color: "#475569",
+              }}
+            >
+              <code
+                style={{
+                  padding: "6px 10px",
+                  borderRadius: 6,
+                  background: "#f1f5f9",
+                  color: "#0f172a",
+                  fontSize: 11,
+                }}
+              >
+                {validateCommand}
+              </code>
+              <button
+                type="button"
+                onClick={() => void copyValidate()}
+                style={{
+                  fontSize: 12,
+                  padding: "6px 12px",
+                  borderRadius: 6,
+                  border: "1px solid #cbd5e1",
+                  background: "#f8fafc",
+                  cursor: "pointer",
+                }}
+              >
+                {copiedValidate ? "Copied" : "Copy validate"}
+              </button>
+            </div>
             <pre
               style={{
                 margin: 0,
@@ -194,8 +240,39 @@ export function RuntimeImportPage(): ReactElement {
         Shipped runtime, dashboard, and workspace export fixtures with <code>$schema</code> hints.
         Deep-link a preset with <code>?preset=ops-embed</code> or open directly in Dashboarder via{" "}
         <code>?import=ops-embed</code>. Each card runs the dual JSON Schema + semantic gate used by{" "}
-        <code>charts-runtime validate --all</code>.
+        <code>charts-runtime validate --preset &lt;id&gt; --all</code> (also what{" "}
+        <code>pnpm validate:runtime</code> runs in CI).
       </p>
+
+      <section
+        style={{
+          marginTop: 20,
+          padding: 16,
+          borderRadius: 10,
+          border: "1px solid #e2e8f0",
+          background: "#f8fafc",
+          maxWidth: 720,
+        }}
+      >
+        <h2 style={{ margin: "0 0 8px", fontSize: 14 }}>Validate in CI</h2>
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Shipped presets map to <code>charts-runtime validate --preset</code> shortcuts. Run all
+          fixtures with <code>pnpm validate:runtime</code>.
+        </p>
+        {HOSTED_IMPORT_PRESETS.map((preset) => (
+          <div
+            key={preset.id}
+            style={{
+              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+              fontSize: 11,
+              color: "#334155",
+              lineHeight: 1.8,
+            }}
+          >
+            {formatValidatePresetCommand(preset.id)}
+          </div>
+        ))}
+      </section>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 }}>
         {HOSTED_IMPORT_PRESETS.map((preset) => (

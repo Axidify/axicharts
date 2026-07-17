@@ -16,7 +16,7 @@ charts-runtime validate --preset ops-embed
 charts-runtime validate --preset ops-embed --all
 charts-runtime validate --preset ops-dashboard --all
 
-# CI gate (all examples)
+# CI gate (all shipped presets via --preset)
 pnpm validate:runtime`;
 
 export const SCHEMA_IMPORT_CODE = `// npm package subpaths

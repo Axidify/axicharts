@@ -1,38 +1,13 @@
-import { readdirSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { runCli } from "../dist/cli.js";
-
-const packageRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
-const examplesDir = join(packageRoot, "examples");
-
-function listFixtures(suffix) {
-  return readdirSync(examplesDir)
-    .filter((name) => name.endsWith(suffix))
-    .map((name) => join(examplesDir, name));
-}
-
-function listShareFixtures() {
-  return readdirSync(examplesDir)
-    .filter((name) => name.endsWith(".share.json") || name.endsWith(".workspace.json"))
-    .map((name) => join(examplesDir, name));
-}
+import { HOSTED_IMPORT_PRESETS } from "../dist/validation/index.js";
 
 let failed = false;
 
-for (const file of listFixtures(".runtime.json")) {
-  const code = runCli(["validate", "--all", file]);
+for (const preset of HOSTED_IMPORT_PRESETS) {
+  const code = runCli(["validate", "--preset", preset.id, "--all"]);
   if (code !== 0) {
     failed = true;
-    process.stderr.write(`validation failed: ${file}\n`);
-  }
-}
-
-for (const file of listShareFixtures()) {
-  const code = runCli(["validate", "--share", "--all", file]);
-  if (code !== 0) {
-    failed = true;
-    process.stderr.write(`share validation failed: ${file}\n`);
+    process.stderr.write(`validation failed: --preset ${preset.id}\n`);
   }
 }
 
@@ -40,6 +15,4 @@ if (failed) {
   process.exit(1);
 }
 
-process.stdout.write(
-  `ok (${listFixtures(".runtime.json").length} runtime, ${listShareFixtures().length} share)\n`,
-);
+process.stdout.write(`ok (${HOSTED_IMPORT_PRESETS.length} presets via --preset --all)\n`);
