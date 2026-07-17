@@ -1,5 +1,10 @@
 import type { TemplateId } from "@axicharts/charts-spec";
-import type { MosaicWallSpec, RuntimeDashboardSpec } from "@axicharts/charts-runtime";
+import type {
+  DataSourceSpec,
+  MosaicWallSpec,
+  MqttConnectFn,
+  RuntimeDashboardSpec,
+} from "@axicharts/charts-runtime";
 import {
   buildMosaicPreset,
   type MosaicPresetId,
@@ -39,7 +44,27 @@ export const OPS_DATA = {
 };
 
 export type LayoutMode = "embed" | "mosaic";
-export type FeedMode = "static" | "historian";
+export type FeedMode = "static" | "historian" | "websocket" | "mqtt";
+export type LiveFeedMode = Exclude<FeedMode, "static">;
+
+const OPS_ALARMS = [
+  { id: "cpu-high", message: "CPU above warn threshold", severity: "warning" as const },
+];
+
+export function isLiveFeed(feed: FeedMode): feed is LiveFeedMode {
+  return feed !== "static";
+}
+
+export function feedSubtitle(feed: LiveFeedMode): string {
+  switch (feed) {
+    case "historian":
+      return "Historian · 2s window";
+    case "websocket":
+      return "WebSocket · push";
+    case "mqtt":
+      return "MQTT · plant/line3/#";
+  }
+}
 
 export function mutateHistorianTags(data: Record<string, unknown>): Record<string, unknown> {
   const tags =
@@ -80,21 +105,31 @@ function mockHistorianPayload(): Record<string, unknown> {
       },
       { name: "p95", timestamps: CATEGORIES, values: [42, 38, 55, 49, 62, 58, 71], suffix: "ms" },
     ],
-    alarms: [{ id: "cpu-high", message: "CPU above warn threshold", severity: "warning" }],
+    alarms: OPS_ALARMS,
   });
 }
 
-export function createHistorianSource(feed: FeedMode) {
+function mockOpsPayload(tick = 0): Record<string, unknown> {
+  const drift = tick % 4;
+  return {
+    categories: CATEGORIES,
+    cells: OPS_DATA.cells.map((cell) => ({
+      ...cell,
+      data: cell.data.map((value) => value + drift),
+    })),
+    alarms: OPS_ALARMS,
+  };
+}
+
+export function createHistorianSource() {
   return {
     type: "historian" as const,
     url: "/api/historian/tags",
     tags: ["cpu", "memory", "errors", "p95"],
     windowMs: 3_600_000,
     intervalMs: 2000,
+    staleAfterMs: 5000,
     mapResponse: (payload: unknown) => {
-      if (feed === "static") {
-        return OPS_DATA;
-      }
       const record = payload as Record<string, unknown>;
       const tags = record.tags as Array<{
         name: string;
@@ -116,34 +151,127 @@ export function createHistorianSource(feed: FeedMode) {
     fetch: async () =>
       ({
         ok: true,
-        json: async () => (feed === "static" ? { tags: [] } : mockHistorianPayload()),
+        json: async () => mockHistorianPayload(),
       }) as Response,
   };
 }
 
-function applyHistorianToMosaicWall(
-  wall: MosaicWallSpec,
-  feed: FeedMode,
-): MosaicWallSpec {
-  const historianSource = createHistorianSource(feed);
+export function createWebSocketSource() {
+  let tick = 0;
+
+  class MockWebSocket {
+    private listeners: Record<string, Array<(...args: unknown[]) => void>> = {};
+    private timer: ReturnType<typeof setInterval> | undefined;
+
+    constructor(_url: string) {
+      queueMicrotask(() => {
+        this.emit("open");
+        this.push();
+        this.timer = setInterval(() => this.push(), 2000);
+      });
+    }
+
+    addEventListener(event: string, listener: (...args: unknown[]) => void) {
+      this.listeners[event] = this.listeners[event] ?? [];
+      this.listeners[event].push(listener);
+    }
+
+    close() {
+      if (this.timer) clearInterval(this.timer);
+      this.emit("close");
+    }
+
+    private emit(event: string, data?: unknown) {
+      this.listeners[event]?.forEach((listener) => listener(data));
+    }
+
+    private push() {
+      tick += 1;
+      this.emit("message", { data: JSON.stringify(mockOpsPayload(tick)) });
+    }
+  }
+
+  return {
+    type: "websocket" as const,
+    url: "wss://telemetry.test/line3",
+    staleAfterMs: 5000,
+    WebSocketImpl: MockWebSocket as unknown as typeof WebSocket,
+  };
+}
+
+export function createMqttSource() {
+  const connect: MqttConnectFn = () => {
+    const handlers: Record<string, Array<(...args: unknown[]) => void>> = {};
+    let tick = 0;
+    let timer: ReturnType<typeof setInterval> | undefined;
+
+    const client = {
+      on(event: string, listener: (...args: unknown[]) => void) {
+        handlers[event] = handlers[event] ?? [];
+        handlers[event].push(listener);
+        if (event === "connect") {
+          queueMicrotask(() => listener());
+        }
+      },
+      subscribe() {
+        const push = () => {
+          tick += 1;
+          handlers.message?.forEach((listener) =>
+            listener("plant/line3/metrics", JSON.stringify(mockOpsPayload(tick))),
+          );
+        };
+        push();
+        timer = setInterval(push, 2000);
+      },
+      end() {
+        if (timer) clearInterval(timer);
+        handlers.close?.forEach((listener) => listener());
+      },
+    };
+
+    return client;
+  };
+
+  return {
+    type: "mqtt" as const,
+    url: "wss://broker.test/mqtt",
+    topic: "plant/line3/#",
+    staleAfterMs: 5000,
+    connect,
+  };
+}
+
+export function createLiveSource(feed: LiveFeedMode): DataSourceSpec {
+  switch (feed) {
+    case "historian":
+      return createHistorianSource();
+    case "websocket":
+      return createWebSocketSource();
+    case "mqtt":
+      return createMqttSource();
+  }
+}
+
+function applyLiveFeedToMosaicWall(wall: MosaicWallSpec, feed: LiveFeedMode): MosaicWallSpec {
+  const liveSource = createLiveSource(feed);
   const opsIndex = wall.dataSources?.findIndex((source) => source.id === "ops") ?? -1;
 
   if (opsIndex >= 0 && wall.dataSources) {
     const dataSources = [...wall.dataSources];
-    dataSources[opsIndex] = { id: "ops", ...historianSource };
+    dataSources[opsIndex] = { id: "ops", ...liveSource };
     return {
       ...wall,
       dataSources,
       mode: "live",
-      subtitle: "Historian · 2s window",
+      subtitle: feedSubtitle(feed),
     };
   }
 
   return {
     ...wall,
-    dataSource: historianSource,
+    dataSource: liveSource,
     mode: "live",
-    subtitle: "Historian · 2s window",
+    subtitle: feedSubtitle(feed),
   };
 }
 
@@ -168,7 +296,7 @@ export function buildRuntimeSpec(options: {
       : template === "ops-2x2"
         ? "industrial"
         : "clean";
-  const mode = presentation ? "presentation" : feed === "historian" ? "live" : "interactive";
+  const mode = presentation ? "presentation" : isLiveFeed(feed) ? "live" : "interactive";
 
   if (layout === "mosaic") {
     let wall = buildMosaicPreset(mosaicPreset, {
@@ -176,9 +304,9 @@ export function buildRuntimeSpec(options: {
       mode,
     });
 
-    if (feed === "historian") {
-      wall = applyHistorianToMosaicWall(wall, feed);
-    } else if (feed === "static") {
+    if (isLiveFeed(feed)) {
+      wall = applyLiveFeedToMosaicWall(wall, feed);
+    } else {
       wall = {
         ...wall,
         subtitle: "Static snapshot",
@@ -203,20 +331,22 @@ export function buildRuntimeSpec(options: {
     layout: "embed",
     dashboard: {
       title: "Dashboarder runtime",
-      subtitle: feed === "historian" ? "Historian feed" : "Static feed",
+      subtitle: isLiveFeed(feed) ? feedSubtitle(feed) : "Static feed",
       theme,
       mode,
       template,
       staleAfterMs: 5000,
       data: {
         ...(data ?? {}),
-        alarms: [{ id: "cpu-high", message: "CPU above warn threshold", severity: "warning" }],
+        alarms: OPS_ALARMS,
       },
       dataSource:
-        feed === "historian" && template === "ops-2x2" ? createHistorianSource(feed) : undefined,
+        isLiveFeed(feed) && template === "ops-2x2" ? createLiveSource(feed) : undefined,
     },
   };
 }
+
+const LIVE_SOURCE_TYPES = new Set(["historian", "websocket", "mqtt"]);
 
 export function hydrateRuntimeSpec(
   spec: RuntimeDashboardSpec,
@@ -225,27 +355,28 @@ export function hydrateRuntimeSpec(
 ): RuntimeDashboardSpec {
   if (presentation) return spec;
 
-  const historianSource = createHistorianSource(feed);
-
   if (spec.layout === "mosaic") {
-    if (feed !== "historian") return spec;
+    if (!isLiveFeed(feed)) return spec;
     return {
       ...spec,
-      wall: applyHistorianToMosaicWall(spec.wall, feed),
+      wall: applyLiveFeedToMosaicWall(spec.wall, feed),
     };
   }
 
+  const sourceType = spec.dashboard.dataSource?.type;
   if (
-    feed === "historian" &&
+    isLiveFeed(feed) &&
     spec.dashboard.template === "ops-2x2" &&
-    spec.dashboard.dataSource?.type === "historian"
+    sourceType &&
+    LIVE_SOURCE_TYPES.has(sourceType)
   ) {
     return {
       ...spec,
       dashboard: {
         ...spec.dashboard,
-        dataSource: historianSource,
+        dataSource: createLiveSource(feed),
         mode: "live" as const,
+        subtitle: feedSubtitle(feed),
       },
     };
   }

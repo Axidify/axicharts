@@ -38,7 +38,7 @@
   {
     "name": "@axicharts/charts-runtime",
     "path": "packages/charts-runtime/dist/index.js",
-    "limit": "7.2 KB",
+    "limit": "8.2 KB",
     "gzip": true
   },
   {

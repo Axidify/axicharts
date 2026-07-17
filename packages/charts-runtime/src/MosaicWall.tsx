@@ -5,7 +5,9 @@ import { Dashboard } from "@axicharts/charts-spec";
 import { aggregateSnapshots } from "./aggregateSnapshots";
 import { mergeMosaicData, pluckMosaicData } from "./mosaicData";
 import { readAlarms } from "./readAlarms";
+import { AdapterHealthStrip } from "./AdapterHealthStrip";
 import { RuntimeShell } from "./RuntimeShell";
+import { isLiveDataSource } from "./isLiveDataSource";
 import type { MosaicWallSpec } from "./types";
 import { useDataSource } from "./useDataSource";
 import { useDataSources, resolveBoundSnapshot } from "./useDataSources";
@@ -43,9 +45,7 @@ export function MosaicWall({
   const liveSource = multiSources?.[0] ?? singleSource;
   const mode =
     wall.mode ??
-    (liveSource?.type === "mock-live" || liveSource?.type === "historian"
-      ? "live"
-      : "interactive");
+    (isLiveDataSource(liveSource) ? "live" : "interactive");
   const staticData = wall.data ?? {};
   const columns = wall.columns ?? 2;
   const alarms = readAlarms({ ...staticData, ...defaultSnapshot.data });
@@ -82,6 +82,18 @@ export function MosaicWall({
               <span style={{ color: "#64748b", fontSize: 12 }}>{wall.subtitle}</span>
             ) : null}
           </div>
+        ) : null}
+        {multiSources?.length ? (
+          <AdapterHealthStrip
+            items={multiSources.map((source) => {
+              const cell = wall.cells.find((item) => item.dataSourceId === source.id);
+              return {
+                id: source.id,
+                label: cell?.title ?? source.id,
+                connection: snapshots[source.id]?.connection ?? "idle",
+              };
+            })}
+          />
         ) : null}
         <div
           style={{

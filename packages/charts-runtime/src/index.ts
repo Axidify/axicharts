@@ -46,6 +46,8 @@ export {
   type PersistedAlarmScope,
 } from "./alarmStateStore";
 export { AlarmBanner, type AlarmBannerProps } from "./AlarmBanner";
+export { ConnectionBadge, type ConnectionBadgeProps } from "./ConnectionBadge";
+export { AdapterHealthStrip, type AdapterHealthItem, type AdapterHealthStripProps } from "./AdapterHealthStrip";
 export { DashboardEmbed, type DashboardEmbedProps } from "./DashboardEmbed";
 export { MosaicWall, type MosaicWallProps } from "./MosaicWall";
 export { RuntimeDashboard, type RuntimeDashboardProps } from "./RuntimeDashboard";
@@ -54,7 +56,7 @@ export { TemplatePicker, type TemplatePickerProps } from "./TemplatePicker";
 export { useDataSource } from "./useDataSource";
 export { useDataSources, resolveBoundSnapshot } from "./useDataSources";
 export { aggregateSnapshots, EMPTY_SNAPSHOT } from "./aggregateSnapshots";
-export { connectSource } from "./connectSource";
+export { isLiveDataSource } from "./isLiveDataSource";
 export { mergeMosaicData, pluckMosaicData } from "./mosaicData";
 export {
   listMosaicPresets,

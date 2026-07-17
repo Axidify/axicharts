@@ -3,6 +3,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { StaleBadge, useIsStale } from "@axicharts/charts";
 import { AlarmBanner } from "./AlarmBanner";
+import { ConnectionBadge } from "./ConnectionBadge";
 import { useAlarmState } from "./useAlarmState";
 import type { AlarmItem, ConnectionState } from "./types";
 
@@ -43,6 +44,8 @@ export function RuntimeShell({
     storage: interactiveAlarms ? alarmStorage : undefined,
   });
   const alarms = interactiveAlarms ? managed.alarms : initialAlarms;
+  const badgeConnection: ConnectionState = isStale ? "stale" : connection;
+  const showConnectionBadge = live || connection !== "idle";
 
   return (
     <div
@@ -50,6 +53,11 @@ export function RuntimeShell({
       style={{ position: "relative", width: "100%" }}
     >
       {children}
+      {showConnectionBadge ? (
+        <div style={{ position: "absolute", top: 8, left: 8, zIndex: 4 }}>
+          <ConnectionBadge connection={badgeConnection} />
+        </div>
+      ) : null}
       {error && connection === "error" ? (
         <div
           role="alert"

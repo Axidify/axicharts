@@ -374,6 +374,8 @@ export function App(): ReactElement {
               style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
             >
               <option value="historian">Historian (mock)</option>
+              <option value="websocket">WebSocket (mock)</option>
+              <option value="mqtt">MQTT (mock)</option>
               <option value="static">Static</option>
             </select>
           </label>

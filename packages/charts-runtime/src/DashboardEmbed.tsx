@@ -5,6 +5,7 @@ import { Dashboard } from "@axicharts/charts-spec";
 import { aggregateSnapshots } from "./aggregateSnapshots";
 import { readAlarms } from "./readAlarms";
 import { RuntimeShell } from "./RuntimeShell";
+import { isLiveDataSource } from "./isLiveDataSource";
 import type { DashboardEmbedSpec } from "./types";
 import { useDataSource } from "./useDataSource";
 import { useDataSources } from "./useDataSources";
@@ -42,9 +43,7 @@ export function DashboardEmbed({
   const liveSource = multiSources?.[0] ?? singleSource;
   const mode =
     dashboard.mode ??
-    (liveSource?.type === "mock-live" || liveSource?.type === "historian"
-      ? "live"
-      : "interactive");
+    (isLiveDataSource(liveSource) ? "live" : "interactive");
   const data = {
     ...(dashboard.data ?? {}),
     ...snapshot.data,
