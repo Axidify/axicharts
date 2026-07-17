@@ -13,6 +13,9 @@ import {
   localImportPresetUrl,
   parseImportPresetQuery,
   shareExportReferencePreset,
+  runtimeEmbedReferencePreset,
+  formatValidatePresetCommand,
+  isShareImportPreset,
 } from "../schemaUrls";
 import { serializeDashboardExport } from "../workspace/share";
 import {
@@ -144,6 +147,16 @@ describe("hosted import presets", () => {
     expect(parseImportPresetQuery("?import=ops-mosaic")).toBe("ops-mosaic");
     expect(findImportPreset("ops-workspace")?.kind).toBe("workspace");
     expect(shareExportReferencePreset("workspace")?.id).toBe("ops-workspace");
+    expect(runtimeEmbedReferencePreset("embed")?.id).toBe("ops-embed");
+    expect(runtimeEmbedReferencePreset("mosaic")?.id).toBe("ops-mosaic");
+    expect(isShareImportPreset(findImportPreset("ops-dashboard")!)).toBe(true);
+    expect(isShareImportPreset(findImportPreset("ops-embed")!)).toBe(false);
+    expect(formatValidatePresetCommand("ops-embed", "all")).toBe(
+      "charts-runtime validate --all --preset ops-embed",
+    );
+    expect(formatValidatePresetCommand("ops-dashboard", "all")).toBe(
+      "charts-runtime validate --share --all --preset ops-dashboard",
+    );
   });
 
   it("lists import deep links for docs index", () => {

@@ -1,6 +1,12 @@
 import { useMemo, useState, type ReactElement } from "react";
 import { buildEmbedBundle, RUNTIME_SPEC_SCHEMA_URL, type RuntimeDashboardSpec } from "@axicharts/charts-runtime";
-import { validateRuntimeSpecDualJson } from "@axicharts/charts-runtime/validation";
+import {
+  dashboarderImportDeepLink,
+  docsImportGalleryDeepLink,
+  formatValidatePresetCommand,
+  runtimeEmbedReferencePreset,
+  validateRuntimeSpecDualJson,
+} from "@axicharts/charts-runtime/validation";
 import { ErrorList, LayerStatus } from "./validationChrome";
 
 const overlayStyle = {
@@ -73,6 +79,8 @@ export function EmbedDialog({
     () => validateRuntimeSpecDualJson(bundle.specJson),
     [bundle.specJson],
   );
+
+  const referencePreset = runtimeEmbedReferencePreset(spec.layout);
 
   if (!open) return null;
 
@@ -179,6 +187,40 @@ export function EmbedDialog({
             <ErrorList title="JSON Schema" errors={validation.schemaErrors} />
             <ErrorList title="Semantic" errors={validation.semanticErrors} />
           </>
+        ) : null}
+
+        {referencePreset ? (
+          <div
+            style={{
+              marginTop: 12,
+              padding: 12,
+              borderRadius: 8,
+              border: "1px solid #334155",
+              background: "#111827",
+              fontSize: 12,
+              color: "#94a3b8",
+              lineHeight: 1.7,
+            }}
+          >
+            Shipped {spec.layout} preset:{" "}
+            <strong style={{ color: "#e2e8f0" }}>{referencePreset.label}</strong>
+            {" · "}
+            <a
+              href={docsImportGalleryDeepLink(referencePreset.id)}
+              style={{ color: "#93c5fd" }}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Gallery
+            </a>
+            {" · "}
+            <a href={dashboarderImportDeepLink(referencePreset.id)} style={{ color: "#93c5fd" }}>
+              Import in app
+            </a>
+            <div style={{ marginTop: 6, fontFamily: "ui-monospace, monospace", fontSize: 11 }}>
+              {formatValidatePresetCommand(referencePreset.id)}
+            </div>
+          </div>
         ) : null}
       </div>
     </div>

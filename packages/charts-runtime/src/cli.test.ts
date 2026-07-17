@@ -59,4 +59,24 @@ describe("charts-runtime cli", () => {
     expect(runCli(["validate", "--schema", invalidPath])).toBe(1);
     expect(runCli(["validate", invalidPath])).toBe(1);
   });
+
+  it("validates shipped presets via --preset", () => {
+    expect(runCli(["validate", "--preset", "ops-mosaic"])).toBe(0);
+    expect(runCli(["validate", "--preset", "ops-mosaic", "--all"])).toBe(0);
+    expect(runCli(["validate", "--preset", "ops-dashboard", "--all"])).toBe(0);
+    expect(runCli(["validate", "--preset", "ops-workspace", "--all"])).toBe(0);
+  });
+
+  it("rejects unknown presets and conflicting flags", () => {
+    expect(runCli(["validate", "--preset", "missing-preset"])).toBe(1);
+    expect(
+      runCli([
+        "validate",
+        "--preset",
+        "ops-embed",
+        join(examplesDir, "ops-embed.runtime.json"),
+      ]),
+    ).toBe(1);
+    expect(runCli(["validate", "--preset", "ops-embed", "--share"])).toBe(1);
+  });
 });

@@ -13,6 +13,10 @@ import {
   validateRuntimeSpecSchemaJson,
   validateShareExportSchemaJson,
 } from "./schemaValidation";
+import {
+  findImportPreset,
+  isShareImportPreset,
+} from "./schemaUrls";
 import { validateShareExportJson } from "./workspace/share";
 
 const packageRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -39,6 +43,25 @@ function removeFlag(args: string[], flag: string): void {
   }
 }
 
+function getFlagValue(args: string[], flag: string): string | undefined {
+  const index = args.indexOf(flag);
+  if (index < 0) return undefined;
+  return args[index + 1];
+}
+
+function removeFlagValue(args: string[], flag: string): void {
+  const index = args.indexOf(flag);
+  if (index >= 0) {
+    args.splice(index, 2);
+  }
+}
+
+export function resolveImportPresetPath(presetId: string): string | null {
+  const preset = findImportPreset(presetId);
+  if (!preset) return null;
+  return join(packageRoot, "examples", preset.filename);
+}
+
 function usage(): string {
   return `charts-runtime — AxiCharts C4 runtime tooling
 
@@ -47,18 +70,24 @@ Usage:
   charts-runtime validate --share <file.workspace.json>
   charts-runtime validate --schema <file.runtime.json>
   charts-runtime validate --all <file.runtime.json>
+  charts-runtime validate --preset <preset-id>
+  charts-runtime validate --preset <preset-id> --all
   charts-runtime schema [runtime-spec|share-export]
 
 Flags:
   --share    Validate a dashboard or workspace share export envelope
   --schema   JSON Schema (draft-07) shape gate only
   --all      Run JSON Schema and semantic validation
+  --preset   Shipped import preset id (ops-embed, ops-mosaic, ops-dashboard, ops-workspace)
 
 Examples:
   charts-runtime validate packages/charts-runtime/examples/ops-mosaic.runtime.json
   charts-runtime validate --schema packages/charts-runtime/examples/ops-mosaic.runtime.json
   charts-runtime validate --all packages/charts-runtime/examples/ops-mosaic.runtime.json
   charts-runtime validate --share packages/charts-runtime/examples/ops-dashboard.share.json
+  charts-runtime validate --preset ops-embed
+  charts-runtime validate --preset ops-embed --all
+  charts-runtime validate --preset ops-dashboard --all
   charts-runtime schema runtime-spec
 `;
 }
@@ -108,10 +137,12 @@ function validateInput(
 
 export function runCli(argv: string[]): number {
   const args = [...argv];
-  const share = hasFlag(args, "--share");
+  const presetId = getFlagValue(args, "--preset");
+  let share = hasFlag(args, "--share");
   const schemaOnly = hasFlag(args, "--schema");
   const allLayers = hasFlag(args, "--all");
 
+  removeFlagValue(args, "--preset");
   removeFlag(args, "--share");
   removeFlag(args, "--schema");
   removeFlag(args, "--all");
@@ -123,7 +154,7 @@ export function runCli(argv: string[]): number {
   }
 
   const layer: ValidateLayer = schemaOnly ? "schema" : allLayers ? "all" : "semantic";
-  const [command, file] = args;
+  const [command, positionalFile] = args;
 
   if (!command || command === "--help" || command === "-h") {
     process.stdout.write(usage());
@@ -131,20 +162,52 @@ export function runCli(argv: string[]): number {
   }
 
   if (command === "schema") {
-    const which = file ?? "runtime-spec";
+    const which = positionalFile ?? "runtime-spec";
     const path =
       which === "share-export" ? SHARE_EXPORT_SCHEMA_PATH : RUNTIME_SPEC_SCHEMA_PATH;
     process.stdout.write(`${readFileSync(path, "utf8")}\n`);
     return 0;
   }
 
-  if (!file) {
-    process.stderr.write(`Missing file argument for "${command}".\n\n${usage()}`);
+  if (command !== "validate") {
+    process.stderr.write(`Unknown command "${command}".\n\n${usage()}`);
     return 1;
   }
 
-  if (command !== "validate") {
-    process.stderr.write(`Unknown command "${command}".\n\n${usage()}`);
+  let file = positionalFile;
+  if (presetId) {
+    if (positionalFile) {
+      process.stderr.write("Use either a file path or --preset, not both.\n\n");
+      process.stderr.write(usage());
+      return 1;
+    }
+
+    const preset = findImportPreset(presetId);
+    if (!preset) {
+      process.stderr.write(`Unknown preset "${presetId}".\n\n${usage()}`);
+      return 1;
+    }
+
+    const presetPath = resolveImportPresetPath(presetId);
+    if (!presetPath) {
+      process.stderr.write(`Unknown preset "${presetId}".\n\n${usage()}`);
+      return 1;
+    }
+
+    if (isShareImportPreset(preset)) {
+      share = true;
+    } else if (share) {
+      process.stderr.write(
+        `Preset "${presetId}" is a runtime preset; omit --share.\n\n${usage()}`,
+      );
+      return 1;
+    }
+
+    file = presetPath;
+  }
+
+  if (!file) {
+    process.stderr.write(`Missing file argument for "${command}".\n\n${usage()}`);
     return 1;
   }
 

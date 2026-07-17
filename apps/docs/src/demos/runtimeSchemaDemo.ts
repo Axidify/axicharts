@@ -11,6 +11,11 @@ charts-runtime validate --all packages/charts-runtime/examples/ops-mosaic.runtim
 charts-runtime validate --share packages/charts-runtime/examples/ops-dashboard.share.json
 charts-runtime validate --share --all packages/charts-runtime/examples/ops-dashboard.share.json
 
+# Shipped import presets (auto-detects runtime vs share)
+charts-runtime validate --preset ops-embed
+charts-runtime validate --preset ops-embed --all
+charts-runtime validate --preset ops-dashboard --all
+
 # CI gate (all examples)
 pnpm validate:runtime`;
 

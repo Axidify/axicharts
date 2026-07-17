@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import {
+  formatValidatePresetCommand,
   HOSTED_IMPORT_PRESETS,
   listImportDeepLinks,
   RUNTIME_SPEC_SCHEMA_URL,
@@ -86,6 +87,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
               <th style={cellStyle}>Preset</th>
               <th style={cellStyle}>Gallery</th>
               <th style={cellStyle}>Dashboarder</th>
+              <th style={cellStyle}>CLI</th>
               <th style={cellStyle}>Fixture</th>
             </tr>
           </thead>
@@ -103,6 +105,9 @@ export function RuntimeDeepLinkPage(): ReactElement {
                 </td>
                 <td style={cellStyle}>
                   <a href={entry.dashboarderUrl}>{entry.dashboarderUrl}</a>
+                </td>
+                <td style={cellStyle}>
+                  <code>{formatValidatePresetCommand(entry.preset.id)}</code>
                 </td>
                 <td style={cellStyle}>
                   <a href={entry.localMirrorPath} style={{ display: "block" }}>
@@ -135,6 +140,18 @@ export function RuntimeDeepLinkPage(): ReactElement {
             Workspace tab →{" "}
             <Link to={`/runtime/import?preset=ops-workspace`}>
               {HOSTED_IMPORT_PRESETS.find((item) => item.id === "ops-workspace")?.label}
+            </Link>
+          </li>
+          <li>
+            Embed layout →{" "}
+            <Link to={`/runtime/import?preset=ops-embed`}>
+              {HOSTED_IMPORT_PRESETS.find((item) => item.id === "ops-embed")?.label}
+            </Link>
+          </li>
+          <li>
+            Mosaic layout →{" "}
+            <Link to={`/runtime/import?preset=ops-mosaic`}>
+              {HOSTED_IMPORT_PRESETS.find((item) => item.id === "ops-mosaic")?.label}
             </Link>
           </li>
         </ul>

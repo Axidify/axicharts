@@ -38,6 +38,38 @@ export const SHARE_EXPORT_REFERENCE_PRESET: Record<"dashboard" | "workspace", st
   workspace: "ops-workspace",
 };
 
+export const RUNTIME_EMBED_REFERENCE_PRESET: Record<"embed" | "mosaic", string> = {
+  embed: "ops-embed",
+  mosaic: "ops-mosaic",
+};
+
+export function isShareImportPreset(preset: HostedImportPreset): boolean {
+  return preset.kind === "dashboard" || preset.kind === "workspace";
+}
+
+export function shareExportReferencePreset(
+  tab: "dashboard" | "workspace",
+): HostedImportPreset | undefined {
+  return findImportPreset(SHARE_EXPORT_REFERENCE_PRESET[tab]);
+}
+
+export function runtimeEmbedReferencePreset(
+  layout: "embed" | "mosaic",
+): HostedImportPreset | undefined {
+  return findImportPreset(RUNTIME_EMBED_REFERENCE_PRESET[layout]);
+}
+
+export function formatValidatePresetCommand(
+  presetId: string,
+  layer: "semantic" | "schema" | "all" = "all",
+): string {
+  const preset = findImportPreset(presetId);
+  if (!preset) return `charts-runtime validate --preset ${presetId}`;
+  const layerFlag = layer === "all" ? " --all" : layer === "schema" ? " --schema" : "";
+  const shareFlag = isShareImportPreset(preset) ? " --share" : "";
+  return `charts-runtime validate${shareFlag}${layerFlag} --preset ${presetId}`;
+}
+
 export function hostedImportPresetUrl(preset: HostedImportPreset): string {
   return `${HOSTED_EXAMPLES_BASE_URL}${preset.filename}`;
 }
@@ -95,12 +127,6 @@ export function listImportDeepLinks(docsBase = "/"): ImportDeepLinkEntry[] {
     hostedUrl: hostedImportPresetUrl(preset),
     localMirrorPath: localImportPresetUrl(preset, examplesBase),
   }));
-}
-
-export function shareExportReferencePreset(
-  tab: "dashboard" | "workspace",
-): HostedImportPreset | undefined {
-  return findImportPreset(SHARE_EXPORT_REFERENCE_PRESET[tab]);
 }
 
 export type WithSchemaHint<T extends Record<string, unknown>> = T & {
