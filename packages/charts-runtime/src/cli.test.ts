@@ -22,4 +22,9 @@ describe("charts-runtime cli", () => {
     writeFileSync(invalidPath, '{"layout":"embed"}');
     expect(runCli(["validate", invalidPath])).toBe(1);
   });
+
+  it("prints runtime JSON schema", () => {
+    const code = runCli(["schema", "runtime-spec"]);
+    expect(code).toBe(0);
+  });
 });

@@ -23,3 +23,4 @@ jobs:
       - run: pnpm test
       - run: pnpm test:perf
       - run: pnpm size
+      - run: pnpm validate:runtime

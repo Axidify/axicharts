@@ -17,8 +17,9 @@
     "bench:stability": "node benchmarks/browser/stability.mjs",
     "bench:all": "node scripts/collect-benchmarks.mjs --browser",
     "size": "size-limit",
+    "validate:runtime": "pnpm --filter @axicharts/charts-runtime validate:examples",
     "typecheck": "turbo run typecheck",
-    "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm size"
+    "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm size && pnpm validate:runtime"
   },
   "devDependencies": {
     "@size-limit/file": "^11.1.6",

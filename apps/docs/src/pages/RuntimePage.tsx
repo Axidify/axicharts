@@ -186,7 +186,9 @@ export function RuntimePage(): ReactElement {
       <Section title="Portable spec" subtitle="serializeRuntimeSpec / parseRuntimeSpec">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
           Export runtime JSON for Dashboarder, GitOps, or agent planners — matches{" "}
-          <code>packages/charts-runtime/examples/ops-mosaic.runtime.json</code>.
+          <code>packages/charts-runtime/examples/ops-mosaic.runtime.json</code>. CI validates
+          examples with <code>charts-runtime validate</code>; JSON Schema lives at{" "}
+          <code>@axicharts/charts-runtime/schema/runtime-spec.json</code>.
         </p>
         <pre
           style={{

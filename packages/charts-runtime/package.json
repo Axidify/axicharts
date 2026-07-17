@@ -13,7 +13,8 @@
   },
   "files": [
     "dist",
-    "examples"
+    "examples",
+    "schema"
   ],
   "type": "module",
   "sideEffects": false,
@@ -32,12 +33,15 @@
     "./mosaic-presets": {
       "types": "./dist/mosaic-presets/index.d.ts",
       "import": "./dist/mosaic-presets/index.js"
-    }
+    },
+    "./schema/runtime-spec.json": "./schema/runtime-spec.schema.json",
+    "./schema/share-export.json": "./schema/share-export.schema.json"
   },
   "scripts": {
     "build": "tsup src/index.ts src/workspace/index.ts src/mosaic-presets/index.ts src/cli.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-theme --clean",
     "dev": "tsup src/index.ts src/workspace/index.ts src/mosaic-presets/index.ts src/cli.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-theme --watch",
     "test": "vitest run",
+    "validate:examples": "node scripts/validate-examples.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
@@ -58,6 +62,8 @@
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tsup": "^8.4.0",

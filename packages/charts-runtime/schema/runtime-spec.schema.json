@@ -1,0 +1,177 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://axidify.github.io/axicharts/schema/runtime-spec.schema.json",
+  "title": "AxiCharts RuntimeDashboardSpec",
+  "oneOf": [
+    { "$ref": "#/$defs/embedRoot" },
+    { "$ref": "#/$defs/mosaicRoot" },
+    { "$ref": "#/$defs/bareEmbedDashboard" }
+  ],
+  "$defs": {
+    "templateId": {
+      "type": "string",
+      "enum": [
+        "finance-pnl",
+        "trading-blotter",
+        "capacity-grid",
+        "ops-2x2",
+        "line-overview",
+        "plugins-wall",
+        "program-dashboard"
+      ]
+    },
+    "themeName": {
+      "type": "string",
+      "enum": ["clean", "live", "industrial", "presentation"]
+    },
+    "chartMode": {
+      "type": "string",
+      "enum": ["static", "interactive", "live", "presentation"]
+    },
+    "dataSource": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": ["static", "rest", "websocket", "mqtt", "historian", "mock-live"]
+        },
+        "url": { "type": "string" },
+        "topic": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "intervalMs": { "type": "number" },
+        "windowMs": { "type": "number" },
+        "staleAfterMs": { "type": "number" },
+        "reconnectDelayMs": { "type": "number" },
+        "clientId": { "type": "string" },
+        "data": { "type": "object" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "static" } } },
+          "then": { "required": ["data"] }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": { "enum": ["rest", "websocket", "historian"] }
+            }
+          },
+          "then": { "required": ["url"] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "mqtt" } } },
+          "then": { "required": ["url", "topic"] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "mock-live" } } },
+          "then": { "required": ["data"] }
+        }
+      ],
+      "additionalProperties": true
+    },
+    "boundDataSource": {
+      "allOf": [
+        { "$ref": "#/$defs/dataSource" },
+        {
+          "type": "object",
+          "required": ["id"],
+          "properties": {
+            "id": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "mosaicCell": {
+      "type": "object",
+      "required": ["id", "template"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "template": { "$ref": "#/$defs/templateId" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "theme": { "$ref": "#/$defs/themeName" },
+        "mode": { "$ref": "#/$defs/chartMode" },
+        "data": { "type": "object" },
+        "dataPath": { "type": "string" },
+        "dataSourceId": { "type": "string" },
+        "colSpan": { "type": "integer", "minimum": 1 },
+        "rowSpan": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": true
+    },
+    "dashboard": {
+      "type": "object",
+      "required": ["template"],
+      "properties": {
+        "version": { "type": "string" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "theme": { "$ref": "#/$defs/themeName" },
+        "mode": { "$ref": "#/$defs/chartMode" },
+        "template": { "$ref": "#/$defs/templateId" },
+        "data": { "type": "object" },
+        "dataSource": { "$ref": "#/$defs/dataSource" },
+        "dataSources": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/boundDataSource" }
+        },
+        "dataSourceId": { "type": "string" },
+        "staleAfterMs": { "type": "number" }
+      },
+      "additionalProperties": true
+    },
+    "mosaicWall": {
+      "type": "object",
+      "required": ["cells"],
+      "properties": {
+        "version": { "type": "string" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "theme": { "$ref": "#/$defs/themeName" },
+        "mode": { "$ref": "#/$defs/chartMode" },
+        "columns": { "type": "integer", "minimum": 1 },
+        "gap": { "type": "number" },
+        "cells": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/mosaicCell" }
+        },
+        "data": { "type": "object" },
+        "dataSource": { "$ref": "#/$defs/dataSource" },
+        "dataSources": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/boundDataSource" }
+        },
+        "dataSourceId": { "type": "string" },
+        "staleAfterMs": { "type": "number" }
+      },
+      "additionalProperties": true
+    },
+    "embedRoot": {
+      "type": "object",
+      "required": ["dashboard"],
+      "properties": {
+        "layout": { "const": "embed" },
+        "dashboard": { "$ref": "#/$defs/dashboard" }
+      },
+      "additionalProperties": false
+    },
+    "mosaicRoot": {
+      "type": "object",
+      "required": ["wall"],
+      "properties": {
+        "layout": { "const": "mosaic" },
+        "wall": { "$ref": "#/$defs/mosaicWall" }
+      },
+      "additionalProperties": false
+    },
+    "bareEmbedDashboard": {
+      "$ref": "#/$defs/dashboard"
+    }
+  }
+}
