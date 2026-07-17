@@ -78,7 +78,7 @@ Flags:
   --share    Validate a dashboard or workspace share export envelope
   --schema   JSON Schema (draft-07) shape gate only
   --all      Run JSON Schema and semantic validation
-  --preset   Shipped import preset id (ops-embed, ops-mosaic, ops-dashboard, ops-workspace)
+  --preset   Shipped import preset id (ops-embed, ops-historian, ops-mqtt, ops-dashboard, …)
 
 Examples:
   charts-runtime validate packages/charts-runtime/examples/ops-mosaic.runtime.json

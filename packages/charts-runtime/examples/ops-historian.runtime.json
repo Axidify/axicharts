@@ -1,0 +1,20 @@
+{
+  "$schema": "https://axidify.github.io/axicharts/schema/runtime-spec.schema.json",
+  "layout": "embed",
+  "dashboard": {
+    "version": "0.1",
+    "title": "Throughput historian",
+    "subtitle": "Rolling tag window",
+    "theme": "industrial",
+    "mode": "live",
+    "template": "line-overview",
+    "dataSource": {
+      "type": "historian",
+      "url": "/api/historian/tags",
+      "tags": ["throughput", "reject-rate", "oee"],
+      "windowMs": 3600000,
+      "intervalMs": 5000,
+      "staleAfterMs": 15000
+    }
+  }
+}

@@ -108,6 +108,12 @@ function PresetCard({
           <strong>{preset.label}</strong>
           <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>
             <code>{preset.filename}</code> · {preset.kind}
+            {preset.adapter ? (
+              <>
+                {" · "}
+                <code>{preset.adapter}</code> adapter
+              </>
+            ) : null}
           </div>
         </div>
         <button
@@ -200,7 +206,55 @@ export function RuntimeImportPage(): ReactElement {
         <code>?import=ops-embed</code>. Each card runs the dual JSON Schema + semantic gate used by{" "}
         <code>charts-runtime validate --preset &lt;id&gt; --all</code> (also what{" "}
         <code>pnpm validate:runtime</code> runs in CI).
+        {" "}
+        <Link to="/runtime/adapters">Adapter cookbook →</Link>
       </p>
+
+      <section
+        style={{
+          marginTop: 16,
+          padding: 14,
+          borderRadius: 10,
+          border: "1px solid #e2e8f0",
+          background: "#ffffff",
+          maxWidth: 720,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Adapter fixtures</div>
+        <p style={{ margin: "0 0 10px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          Live adapter wiring examples with portable JSON specs:
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          <Link
+            to="/runtime/import?preset=ops-historian"
+            style={{
+              fontSize: 12,
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: "1px solid #cbd5e1",
+              background: "#f8fafc",
+              color: "#1e293b",
+              textDecoration: "none",
+            }}
+          >
+            Historian embed
+          </Link>
+          <Link
+            to="/runtime/import?preset=ops-mqtt"
+            style={{
+              fontSize: 12,
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: "1px solid #cbd5e1",
+              background: "#f8fafc",
+              color: "#1e293b",
+              textDecoration: "none",
+            }}
+          >
+            MQTT embed
+          </Link>
+        </div>
+      </section>
 
       <section
         style={{

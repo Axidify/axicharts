@@ -102,6 +102,12 @@ export function RuntimeDeepLinkPage(): ReactElement {
                   <strong>{entry.preset.label}</strong>
                   <div style={{ color: "#64748b", marginTop: 4 }}>
                     <code>{entry.preset.id}</code> · {entry.preset.kind}
+                    {entry.preset.adapter ? (
+                      <>
+                        {" · "}
+                        <code>{entry.preset.adapter}</code>
+                      </>
+                    ) : null}
                   </div>
                 </td>
                 <td style={cellStyle}>
@@ -159,6 +165,18 @@ export function RuntimeDeepLinkPage(): ReactElement {
             Mosaic layout →{" "}
             <Link to={`/runtime/import?preset=ops-mosaic`}>
               {HOSTED_IMPORT_PRESETS.find((item) => item.id === "ops-mosaic")?.label}
+            </Link>
+          </li>
+          <li>
+            Historian adapter →{" "}
+            <Link to={`/runtime/import?preset=ops-historian`}>
+              {HOSTED_IMPORT_PRESETS.find((item) => item.id === "ops-historian")?.label}
+            </Link>
+          </li>
+          <li>
+            MQTT adapter →{" "}
+            <Link to={`/runtime/import?preset=ops-mqtt`}>
+              {HOSTED_IMPORT_PRESETS.find((item) => item.id === "ops-mqtt")?.label}
             </Link>
           </li>
         </ul>

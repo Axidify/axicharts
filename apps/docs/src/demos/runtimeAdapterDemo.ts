@@ -120,6 +120,106 @@ export const WEBSOCKET_FIELD_ROWS: AdapterFieldRow[] = [
   },
 ];
 
+export const HISTORIAN_FIELD_ROWS: AdapterFieldRow[] = [
+  {
+    field: "type",
+    type: `"historian"`,
+    required: true,
+    description: "Discriminator for the historian REST poller.",
+  },
+  {
+    field: "url",
+    type: "string",
+    required: true,
+    description: "Historian endpoint. Query params from, to, and tags are appended automatically.",
+  },
+  {
+    field: "tags",
+    type: "string[]",
+    required: false,
+    description: "Tag names joined as a comma-separated tags query param.",
+  },
+  {
+    field: "windowMs",
+    type: "number",
+    required: false,
+    defaultValue: "3600000",
+    description: "Rolling window length used to compute from/to timestamps.",
+  },
+  {
+    field: "intervalMs",
+    type: "number",
+    required: false,
+    defaultValue: "5000",
+    description: "Poll cadence in milliseconds.",
+  },
+  {
+    field: "staleAfterMs",
+    type: "number",
+    required: false,
+    description: "Stale overlay when polls stop succeeding.",
+  },
+  {
+    field: "mapResponse",
+    type: "(payload) => Record",
+    required: false,
+    defaultValue: "defaultHistorianMapper",
+    description: "Normalizes tag arrays into cells or series for templates.",
+  },
+];
+
+export const MQTT_FIELD_ROWS: AdapterFieldRow[] = [
+  {
+    field: "type",
+    type: `"mqtt"`,
+    required: true,
+    description: "Discriminator for the MQTT subscriber adapter.",
+  },
+  {
+    field: "url",
+    type: "string",
+    required: true,
+    description: "Broker URL (mqtt:// or mqtts://).",
+  },
+  {
+    field: "topic",
+    type: "string",
+    required: true,
+    description: "Topic subscribed after the client connects.",
+  },
+  {
+    field: "staleAfterMs",
+    type: "number",
+    required: false,
+    description: "Stale overlay when messages stop arriving.",
+  },
+  {
+    field: "reconnectDelayMs",
+    type: "number",
+    required: false,
+    description: "Reconnect delay after disconnect when set.",
+  },
+  {
+    field: "clientId",
+    type: "string",
+    required: false,
+    description: "Optional MQTT client id passed to connect().",
+  },
+  {
+    field: "connect",
+    type: "MqttConnectFn",
+    required: true,
+    description: "Inject at runtime (mqtt.js). Omitted from portable JSON fixtures.",
+  },
+  {
+    field: "parsePayload",
+    type: "(raw) => Record",
+    required: false,
+    defaultValue: "JSON.parse when string",
+    description: "Maps each message payload into template data merged with prior frames.",
+  },
+];
+
 export const REST_OPS_PAYLOAD = `{
   "categories": ["08:00", "09:00", "10:00", "11:00"],
   "cells": [
@@ -139,6 +239,59 @@ export const WEBSOCKET_TELEMETRY_FRAME = `{
   ],
   "alarms": [
     { "id": "line-stop", "message": "Line stopped", "severity": "alarm" }
+  ]
+}`;
+
+export const HISTORIAN_TAG_PAYLOAD = `{
+  "tags": [
+    {
+      "name": "throughput",
+      "timestamps": ["08:00", "09:00", "10:00", "11:00"],
+      "values": [980, 1020, 1100, 1180],
+      "suffix": " u/hr"
+    },
+    {
+      "name": "reject-rate",
+      "timestamps": ["08:00", "09:00", "10:00", "11:00"],
+      "values": [1.2, 1.4, 1.1, 0.9],
+      "suffix": "%",
+      "tone": "warning"
+    }
+  ]
+}`;
+
+export const BUILD_HISTORIAN_URL = `import { buildHistorianUrl } from "@axicharts/charts-runtime";
+
+const url = buildHistorianUrl({
+  url: "/api/historian/tags",
+  tags: ["throughput", "reject-rate"],
+  windowMs: 3_600_000,
+});
+// => /api/historian/tags?from=...&to=...&tags=throughput,reject-rate`;
+
+export const MQTT_PORTABLE_SPEC = `{
+  "layout": "embed",
+  "dashboard": {
+    "template": "ops-2x2",
+    "mode": "live",
+    "dataSource": {
+      "type": "mqtt",
+      "url": "mqtt://broker.example.com",
+      "topic": "plant/line3/metrics",
+      "staleAfterMs": 10000,
+      "reconnectDelayMs": 3000
+    }
+  }
+}`;
+
+export const MQTT_SPARKPLUG_PAYLOAD = `{
+  "categories": ["08:00", "09:00", "10:00"],
+  "cells": [
+    { "title": "CPU", "data": [24, 27, 29], "suffix": "%" },
+    { "title": "Memory", "data": [58, 59, 61], "suffix": "%" }
+  ],
+  "alarms": [
+    { "id": "reject-high", "message": "Reject rate elevated", "severity": "warning" }
   ]
 }`;
 

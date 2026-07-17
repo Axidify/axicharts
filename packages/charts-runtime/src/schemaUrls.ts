@@ -9,16 +9,40 @@ export const HOSTED_EXAMPLES_BASE_URL =
 
 export type ImportPresetKind = "runtime" | "dashboard" | "workspace";
 
+export type ImportPresetAdapter =
+  | "static"
+  | "rest"
+  | "websocket"
+  | "historian"
+  | "mqtt"
+  | "mock-live"
+  | "mosaic";
+
 export type HostedImportPreset = {
   id: string;
   label: string;
   filename: string;
   kind: ImportPresetKind;
+  adapter?: ImportPresetAdapter;
 };
 
 export const HOSTED_IMPORT_PRESETS: HostedImportPreset[] = [
-  { id: "ops-embed", label: "Ops embed", filename: "ops-embed.runtime.json", kind: "runtime" },
-  { id: "ops-mosaic", label: "Ops mosaic", filename: "ops-mosaic.runtime.json", kind: "runtime" },
+  { id: "ops-embed", label: "Ops embed", filename: "ops-embed.runtime.json", kind: "runtime", adapter: "static" },
+  { id: "ops-mosaic", label: "Ops mosaic", filename: "ops-mosaic.runtime.json", kind: "runtime", adapter: "mosaic" },
+  {
+    id: "ops-historian",
+    label: "Historian embed",
+    filename: "ops-historian.runtime.json",
+    kind: "runtime",
+    adapter: "historian",
+  },
+  {
+    id: "ops-mqtt",
+    label: "MQTT embed",
+    filename: "ops-mqtt.runtime.json",
+    kind: "runtime",
+    adapter: "mqtt",
+  },
   {
     id: "ops-dashboard",
     label: "Dashboard share",
@@ -32,6 +56,11 @@ export const HOSTED_IMPORT_PRESETS: HostedImportPreset[] = [
     kind: "workspace",
   },
 ];
+
+export const ADAPTER_FIXTURE_PRESETS: Record<"historian" | "mqtt", string> = {
+  historian: "ops-historian",
+  mqtt: "ops-mqtt",
+};
 
 export const SHARE_EXPORT_REFERENCE_PRESET: Record<"dashboard" | "workspace", string> = {
   dashboard: "ops-dashboard",

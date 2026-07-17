@@ -2,9 +2,15 @@ import type { ReactElement, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import {
   ADAPTER_OVERVIEW,
+  BUILD_HISTORIAN_URL,
   CUSTOM_MAP_RESPONSE,
+  HISTORIAN_FIELD_ROWS,
   HISTORIAN_SPEC,
+  HISTORIAN_TAG_PAYLOAD,
+  MQTT_FIELD_ROWS,
+  MQTT_PORTABLE_SPEC,
   MQTT_SPEC,
+  MQTT_SPARKPLUG_PAYLOAD,
   REST_EMBED_SPEC,
   REST_FIELD_ROWS,
   REST_OPS_PAYLOAD,
@@ -14,6 +20,7 @@ import {
   WEBSOCKET_TELEMETRY_FRAME,
   type AdapterFieldRow,
 } from "../demos/runtimeAdapterDemo";
+import { ADAPTER_FIXTURE_PRESETS } from "@axicharts/charts-runtime/validation";
 
 const tableStyle = {
   width: "100%",
@@ -193,15 +200,53 @@ export function RuntimeAdaptersPage(): ReactElement {
           tag arrays into <code>cells</code> or <code>series</code> for line-overview and ops
           templates.
         </p>
+        <FieldTable rows={HISTORIAN_FIELD_ROWS} />
+        <p style={{ margin: "16px 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Example historian response</strong>
+        </p>
+        <CodeBlock dark>{HISTORIAN_TAG_PAYLOAD}</CodeBlock>
+        <p style={{ margin: "16px 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Runtime spec</strong>
+        </p>
         <CodeBlock>{HISTORIAN_SPEC}</CodeBlock>
+        <p style={{ margin: "16px 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>buildHistorianUrl</strong>
+        </p>
+        <CodeBlock>{BUILD_HISTORIAN_URL}</CodeBlock>
+        <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b" }}>
+          Shipped fixture:{" "}
+          <Link to={`/runtime/import?preset=${ADAPTER_FIXTURE_PRESETS.historian}`}>
+            ops-historian.runtime.json
+          </Link>
+        </p>
       </Section>
 
       <Section title="MQTT adapter" subtitle="inject connect factory">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
           Browser bundles do not ship an MQTT client — provide <code>connect</code> (e.g. mqtt.js) and
-          optional <code>parsePayload</code>. Subscribes to <code>topic</code> on connect.
+          optional <code>parsePayload</code>. Subscribes to <code>topic</code> on connect. Portable
+          JSON fixtures omit <code>connect</code>; inject it when mounting{" "}
+          <code>RuntimeDashboard</code>.
+        </p>
+        <FieldTable rows={MQTT_FIELD_ROWS} />
+        <p style={{ margin: "16px 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Portable JSON fixture</strong>
+        </p>
+        <CodeBlock>{MQTT_PORTABLE_SPEC}</CodeBlock>
+        <p style={{ margin: "16px 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>Example Sparkplug payload</strong>
+        </p>
+        <CodeBlock dark>{MQTT_SPARKPLUG_PAYLOAD}</CodeBlock>
+        <p style={{ margin: "16px 0 8px", fontSize: 12, color: "#64748b" }}>
+          <strong>RuntimeDashboard wiring</strong>
         </p>
         <CodeBlock>{MQTT_SPEC}</CodeBlock>
+        <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b" }}>
+          Shipped fixture:{" "}
+          <Link to={`/runtime/import?preset=${ADAPTER_FIXTURE_PRESETS.mqtt}`}>
+            ops-mqtt.runtime.json
+          </Link>
+        </p>
       </Section>
 
       <Section title="Static & mock-live" subtitle="fixtures · synthetic drift">

@@ -20,6 +20,8 @@ for (const name of [
   "ops-mosaic.runtime.json",
   "ops-dashboard.share.json",
   "ops-workspace.workspace.json",
+  "ops-historian.runtime.json",
+  "ops-mqtt.runtime.json",
 ]) {
   cpSync(join(examplesSrc, name), join(examplesDest, name));
 }

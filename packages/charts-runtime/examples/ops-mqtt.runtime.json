@@ -1,0 +1,19 @@
+{
+  "$schema": "https://axidify.github.io/axicharts/schema/runtime-spec.schema.json",
+  "layout": "embed",
+  "dashboard": {
+    "version": "0.1",
+    "title": "Line 3 MQTT",
+    "subtitle": "Sparkplug topic bind",
+    "theme": "industrial",
+    "mode": "live",
+    "template": "ops-2x2",
+    "dataSource": {
+      "type": "mqtt",
+      "url": "mqtt://broker.example.com",
+      "topic": "plant/line3/metrics",
+      "staleAfterMs": 10000,
+      "reconnectDelayMs": 3000
+    }
+  }
+}
