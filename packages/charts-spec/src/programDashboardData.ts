@@ -40,6 +40,7 @@ export const DEFAULT_PROGRAM_DASHBOARD_DATA = {
       { name: "QA", start: 14, end: 18, progress: 0.1, tone: "warning" as const },
     ],
     milestones: [{ label: "Beta", at: 12, tone: "warning" as const }],
+    today: 11,
   },
 };
 

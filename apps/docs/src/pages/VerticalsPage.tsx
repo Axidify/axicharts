@@ -7,8 +7,11 @@ export function VerticalsPage(): ReactElement {
     <div>
       <h1 style={{ marginTop: 0 }}>Vertical gallery</h1>
       <p style={{ color: "#475569", maxWidth: 640 }}>
-        Storybook acceptance gates G–O — SaaS, ops, finance, trading, and resource management on
-        one stack.
+        Storybook acceptance gates G–Q — SaaS, ops, finance, trading, resources, community plugins,
+        and program delivery on one stack.
+      </p>
+      <p style={{ fontSize: 12, color: "#64748b", marginTop: 8 }}>
+        {VERTICAL_GATES.length} live templates · mirrors Storybook gates
       </p>
       <div style={{ display: "grid", gap: 28, marginTop: 28 }}>
         {VERTICAL_GATES.map((gate) => (
@@ -28,12 +31,34 @@ export function VerticalsPage(): ReactElement {
                 display: "flex",
                 justifyContent: "space-between",
                 gap: 12,
+                alignItems: "center",
               }}
             >
-              <strong style={{ fontSize: 14 }}>{gate.title}</strong>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: "0.04em",
+                    color: "#64748b",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: 4,
+                    padding: "2px 6px",
+                  }}
+                >
+                  {gate.id}
+                </span>
+                <strong style={{ fontSize: 14 }}>{gate.title.replace(/^.\s·\s/, "")}</strong>
+              </div>
               <span style={{ fontSize: 12, color: "#64748b" }}>{gate.subtitle}</span>
             </div>
-            <div style={{ padding: 16 }}>
+            <div
+              style={{
+                padding: 16,
+                background:
+                  gate.theme === "industrial" || gate.theme === "live" ? "#0f172a" : "#ffffff",
+              }}
+            >
               <Dashboard
                 template={gate.template}
                 theme={gate.theme}

@@ -204,4 +204,13 @@ export const VERTICAL_GATES: VerticalGate[] = [
     theme: "industrial",
     data: {},
   },
+  {
+    id: "Q",
+    title: "Q · Program dashboard",
+    subtitle: "Burndown + Gantt timeline",
+    template: "program-dashboard",
+    theme: "clean",
+    mode: "interactive",
+    data: {},
+  },
 ];

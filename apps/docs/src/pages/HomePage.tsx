@@ -7,7 +7,8 @@ export function HomePage(): ReactElement {
       <h1 style={{ marginTop: 0, fontSize: 32 }}>The React chart platform for dashboards</h1>
       <p style={{ fontSize: 16, lineHeight: 1.6, color: "#475569", maxWidth: 640 }}>
         AxiCharts ships line, bar, area, pie, candlestick, waterfall, and heatmap charts with
-        industrial primitives, live themes, spec-driven templates, and a portable runtime embed SDK.
+        industrial primitives, live themes, spec-driven templates, community plugins, and a portable
+        runtime embed SDK.
       </p>
       <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
         <Link

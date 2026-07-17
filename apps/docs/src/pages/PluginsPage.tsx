@@ -6,21 +6,15 @@ import { GeoMapChart, SAMPLE_GEO_REGIONS } from "@axicharts/charts-geo";
 import "@axicharts/charts-geo/register";
 import { SankeyChart, SAMPLE_SANKEY_FLOW } from "@axicharts/charts-sankey";
 import "@axicharts/charts-sankey/register";
-import { GanttChart } from "@axicharts/charts-gantt";
+import { GanttChart, SAMPLE_GANTT_PROGRAM } from "@axicharts/charts-gantt";
 import "@axicharts/charts-gantt/register";
 import { cleanTheme, industrialTheme } from "@axicharts/charts-theme";
 
 const GANTT_CODE = `import "@axicharts/charts-gantt/register";
-import { GanttChart } from "@axicharts/charts-gantt";
+import { GanttChart, SAMPLE_GANTT_PROGRAM } from "@axicharts/charts-gantt";
 
-<ChartContainer theme={cleanTheme} height={220} width="100%">
-  <GanttChart
-    tasks={[
-      { name: "Design", start: 0, end: 5, progress: 1 },
-      { name: "Build", start: 4, end: 14, progress: 0.6 },
-    ]}
-    milestones={[{ label: "Beta", at: 10 }]}
-  />
+<ChartContainer theme={cleanTheme} height={240} width="100%">
+  <GanttChart {...SAMPLE_GANTT_PROGRAM} today={11} />
 </ChartContainer>`;
 
 const TANK_CODE = `import "@axicharts/charts-tank/register";
@@ -120,7 +114,7 @@ export function PluginsPage(): ReactElement {
       />
       <PluginSection
         title="@axicharts/charts-geo"
-        subtitle="Regional cartogram map"
+        subtitle="Regional cartogram — hover highlight + value scale"
         preview={
           <ChartContainer theme={cleanTheme} width={320} height={200}>
             <GeoMapChart regions={SAMPLE_GEO_REGIONS} />
@@ -140,7 +134,7 @@ export function PluginsPage(): ReactElement {
       />
       <PluginSection
         title="@axicharts/charts-sankey"
-        subtitle="Energy / cost flow (ECharts lazy)"
+        subtitle="Energy / cost flow — theme-aware ECharts palette"
         preview={
           <ChartContainer theme={cleanTheme} width={480} height={260}>
             <SankeyChart {...SAMPLE_SANKEY_FLOW} />
@@ -150,18 +144,16 @@ export function PluginsPage(): ReactElement {
       />
       <PluginSection
         title="@axicharts/charts-gantt"
-        subtitle="Program timeline (Gantt)"
+        subtitle="Program timeline — milestones, today marker, hover"
         preview={
-          <ChartContainer theme={cleanTheme} width={520} height={220}>
-            <GanttChart
-              tasks={[
-                { name: "Design", start: 0, end: 5, progress: 1, tone: "success" },
-                { name: "Build", start: 4, end: 14, progress: 0.55, tone: "info" },
-                { name: "QA", start: 12, end: 16, progress: 0.15, tone: "warning" },
-              ]}
-              milestones={[{ label: "Beta", at: 10, tone: "warning" }]}
-            />
-          </ChartContainer>
+          <div style={{ display: "grid", gap: 16 }}>
+            <ChartContainer theme={cleanTheme} width={520} height={240}>
+              <GanttChart {...SAMPLE_GANTT_PROGRAM} today={11} />
+            </ChartContainer>
+            <ChartContainer theme={industrialTheme} width={520} height={240}>
+              <GanttChart {...SAMPLE_GANTT_PROGRAM} today={11} />
+            </ChartContainer>
+          </div>
         }
         code={GANTT_CODE}
       />
