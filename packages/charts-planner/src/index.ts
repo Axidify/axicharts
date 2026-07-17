@@ -26,6 +26,15 @@ export {
   createMockPlannerProvider,
   planWithProvider,
 } from "./provider";
+export {
+  createOpenAiChatProvider,
+  resolvePlannerProviderFromEnv,
+  type OpenAiChatProviderOptions,
+} from "./providers/openai";
+export {
+  resolvePlannerProvider,
+  type PlannerProviderMode,
+} from "./resolveProvider";
 
 export const DEFAULT_OPS_PROFILE = {
   metrics: [

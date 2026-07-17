@@ -17,13 +17,43 @@ const plan = planFromIntent(DEFAULT_OPS_PROFILE, "Line 3 night shift overview");
 // → { template: "ops-2x2", layout: "embed", feed: "historian", panels: [...] }
 ```
 
-## LLM provider (server only)
+## OpenAI-compatible provider
+
+Set `OPENAI_API_KEY` (or `AXICHARTS_PLANNER_API_KEY`) and start the server:
+
+```bash
+export OPENAI_API_KEY=sk-...
+pnpm planner
+# or: charts-planner serve --provider openai
+```
+
+Optional env:
+
+| Variable | Default |
+|----------|---------|
+| `OPENAI_MODEL` / `AXICHARTS_PLANNER_MODEL` | `gpt-4o-mini` |
+| `OPENAI_BASE_URL` / `AXICHARTS_PLANNER_BASE_URL` | `https://api.openai.com/v1` |
+
+CLI with LLM:
+
+```bash
+charts-planner plan examples/ops.profile.json --intent "Finance board deck" --llm
+```
+
+Programmatic:
 
 ```ts
-import { createMockPlannerProvider, planWithProvider } from "@axicharts/charts-planner";
+import {
+  createOpenAiChatProvider,
+  planWithProvider,
+  resolvePlannerProviderFromEnv,
+} from "@axicharts/charts-planner";
 
-const plan = await planWithProvider(profile, intent, createMockPlannerProvider(json));
+const provider = resolvePlannerProviderFromEnv();
+// or createOpenAiChatProvider({ apiKey, model, baseUrl })
 ```
+
+Invalid LLM JSON always falls back to the rules planner with a warning on the plan.
 
 ## HTTP server
 
