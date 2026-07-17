@@ -6,6 +6,8 @@ import {
   UPlotLine,
   preparePlotData,
   type PlotSeries,
+  type ReferenceLine,
+  type ThresholdBand,
 } from "@axicharts/charts-canvas";
 import type { RendererPreference } from "@axicharts/charts-core";
 import { useChartLayout } from "../container/ChartLayoutContext";
@@ -27,6 +29,8 @@ export type LineChartProps = {
   stacked?: boolean;
   renderer?: RendererPreference;
   refreshHz?: number;
+  thresholdBands?: ThresholdBand[];
+  referenceLines?: ReferenceLine[];
 };
 
 function LinePlot({
@@ -38,6 +42,8 @@ function LinePlot({
   dualAxis,
   compact,
   stacked,
+  thresholdBands,
+  referenceLines,
 }: LineChartProps & { compact: boolean }): ReactElement {
   const { size, theme, mode } = useChartLayout();
   const plotSync = usePlotSync();
@@ -59,6 +65,8 @@ function LinePlot({
       valueSuffix={valueSuffix}
       dualAxis={stacked ? false : dualAxis}
       stacked={stacked}
+      thresholdBands={thresholdBands}
+      referenceLines={referenceLines}
       showCursor={chrome.showCrosshair}
       useNativeLegend={false}
       onCursor={plotSync.onCursor}
@@ -80,6 +88,8 @@ export function LineChart({
   stacked = false,
   renderer = "auto",
   refreshHz,
+  thresholdBands,
+  referenceLines,
 }: LineChartProps): ReactElement | null {
   const { size, ready, theme, mode } = useChartLayout();
   const maxPoints = usePlotSampling({
@@ -126,6 +136,8 @@ export function LineChart({
             valueSuffix={valueSuffix}
             dualAxis={dualAxis}
             stacked={stacked}
+            thresholdBands={thresholdBands}
+            referenceLines={referenceLines}
             compact={compact}
           />
         }

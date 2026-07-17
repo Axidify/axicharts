@@ -8,11 +8,14 @@ import {
   AXIS_COLOR,
   CANVAS_BG,
   GRID_COLOR,
-  SERIES_COLORS,
   withAlpha,
 } from "./colors";
-import type { ReferenceLine, UPlotBarProps } from "./types";
+import type { UPlotBarProps } from "./types";
 import { applySyncedCursor } from "./plotCursor";
+import {
+  createAnnotationDrawHook,
+  expandYRange,
+} from "./plotAnnotations";
 import { shouldStackSeries, STACK_GROUP } from "./stack";
 import { resolveSeriesColor } from "./seriesColor";
 
@@ -40,6 +43,7 @@ function buildOptions({
   showValues = false,
   valueSuffix = "",
   referenceLines = [],
+  thresholdBands = [],
   barLayoutsRef,
   stacked = false,
   showCursor = false,
@@ -68,12 +72,18 @@ function buildOptions({
       x: { time: false },
       y: {
         range: (_u, dataMin, dataMax) => {
-          const refMax = referenceLines.reduce(
-            (max, line) => Math.max(max, line.value),
+          const [expandedMin, expandedMax] = expandYRange(
+            dataMin,
             dataMax,
+            thresholdBands,
+            referenceLines,
           );
-          const top = Math.max(refMax, dataMax) * 1.12;
-          return [0, top];
+          const top = Math.max(expandedMax, dataMax) * 1.12;
+          const bottom =
+            thresholdBands.length > 0
+              ? Math.min(0, expandedMin)
+              : 0;
+          return [bottom, top];
         },
       },
     },
@@ -138,55 +148,29 @@ function buildOptions({
     ],
     hooks: {
       draw: [
-        (u) => {
-          const ctx = u.ctx;
-          const layouts = barLayoutsRef.current;
-
-          for (const line of referenceLines) {
-            const y = u.valToPos(line.value, "y", true);
-            const tone = line.tone ?? "warning";
-            const stroke = SERIES_COLORS[tone];
-
+        createAnnotationDrawHook({
+          bands: thresholdBands,
+          referenceLines,
+          onDraw: (u) => {
+            if (!showBarValues) return;
+            const ctx = u.ctx;
+            const layouts = barLayoutsRef.current;
             ctx.save();
-            ctx.strokeStyle = stroke;
-            ctx.lineWidth = 1.5;
-            ctx.setLineDash([5, 4]);
-            ctx.beginPath();
-            ctx.moveTo(u.bbox.left, y);
-            ctx.lineTo(u.bbox.left + u.bbox.width, y);
-            ctx.stroke();
-            ctx.setLineDash([]);
+            ctx.fillStyle = AXIS_COLOR;
+            ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
 
-            if (line.label) {
-              ctx.fillStyle = stroke;
-              ctx.font = "11px ui-sans-serif, system-ui, sans-serif";
-              const textWidth = ctx.measureText(line.label).width;
-              ctx.fillText(
-                line.label,
-                u.bbox.left + u.bbox.width - textWidth,
-                y - 5,
-              );
+            for (const layout of layouts) {
+              const label = formatValue(layout.value, valueSuffix);
+              const x = layout.left + layout.width / 2;
+              const y = layout.top - 4;
+              ctx.fillText(label, x, y);
             }
+
             ctx.restore();
-          }
-
-          if (!showBarValues) return;
-
-          ctx.save();
-          ctx.fillStyle = AXIS_COLOR;
-          ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "bottom";
-
-          for (const layout of layouts) {
-            const label = formatValue(layout.value, valueSuffix);
-            const x = layout.left + layout.width / 2;
-            const y = layout.top - 4;
-            ctx.fillText(label, x, y);
-          }
-
-          ctx.restore();
-        },
+          },
+        }) as (u: uPlot) => void,
       ],
     },
   };
@@ -264,6 +248,7 @@ export function UPlotBar(props: UPlotBarProps): ReactElement {
     props.showValues,
     props.valueSuffix,
     props.referenceLines,
+    props.thresholdBands,
     showAxes,
     stacked,
     showCursor,

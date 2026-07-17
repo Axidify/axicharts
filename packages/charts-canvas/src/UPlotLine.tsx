@@ -12,6 +12,10 @@ import {
 } from "./colors";
 import type { UPlotLineProps } from "./types";
 import { applySyncedCursor } from "./plotCursor";
+import {
+  createAnnotationDrawHook,
+  expandYRange,
+} from "./plotAnnotations";
 import { shouldStackSeries, STACK_GROUP } from "./stack";
 import { resolveSeriesColor } from "./seriesColor";
 
@@ -46,6 +50,8 @@ function buildOptions({
   showAxes = true,
   dualAxis = "auto",
   stacked = false,
+  thresholdBands = [],
+  referenceLines = [],
   showCursor = false,
   useNativeLegend = true,
 }: UPlotLineProps): uPlot.Options {
@@ -78,6 +84,8 @@ function buildOptions({
     : shouldUseDualAxis(series, dualAxis);
   const showLegend = useNativeLegend && series.length > 1;
   const topPad = showLegend && !compact ? 28 : compact ? 4 : 8;
+  const annotateY =
+    thresholdBands.length > 0 || referenceLines.length > 0;
 
   return {
     width,
@@ -93,8 +101,22 @@ function buildOptions({
     legend: { show: showLegend },
     scales: {
       x: { time: false },
-      y: { auto: true },
-      ...(useDualAxis ? { y2: { auto: true } } : {}),
+      y: annotateY
+        ? {
+            range: (_u, min, max) =>
+              expandYRange(min, max, thresholdBands, referenceLines),
+          }
+        : { auto: true },
+      ...(useDualAxis
+        ? {
+            y2: annotateY
+              ? {
+                  range: (_u, min, max) =>
+                    expandYRange(min, max, thresholdBands, referenceLines),
+                }
+              : { auto: true },
+          }
+        : {}),
     },
     axes: showAxes
       ? [
@@ -165,6 +187,17 @@ function buildOptions({
         };
       }),
     ],
+    hooks:
+      thresholdBands.length > 0 || referenceLines.length > 0
+        ? {
+            draw: [
+              createAnnotationDrawHook({
+                bands: thresholdBands,
+                referenceLines,
+              }) as (u: uPlot) => void,
+            ],
+          }
+        : undefined,
   };
 }
 
@@ -246,6 +279,8 @@ export function UPlotLine(props: UPlotLineProps): ReactElement {
     useNativeLegend,
     onCursor,
     onSyncIndex,
+    props.thresholdBands,
+    props.referenceLines,
   ]);
 
   const data = useMemo(

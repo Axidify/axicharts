@@ -19,6 +19,13 @@ export type ReferenceLine = {
   tone?: SeriesTone;
 };
 
+export type ThresholdBand = {
+  min: number;
+  max: number;
+  label?: string;
+  tone?: SeriesTone;
+};
+
 export type DualAxisMode = boolean | "auto";
 
 export type PlotCursorEvent = {
@@ -38,6 +45,8 @@ export type UPlotLineProps = {
   valueSuffix?: string;
   dualAxis?: DualAxisMode;
   stacked?: boolean;
+  thresholdBands?: ThresholdBand[];
+  referenceLines?: ReferenceLine[];
   showCursor?: boolean;
   useNativeLegend?: boolean;
   onCursor?: (event: PlotCursorEvent) => void;
@@ -58,6 +67,7 @@ export type UPlotBarProps = {
   valueSuffix?: string;
   referenceLines?: ReferenceLine[];
   stacked?: boolean;
+  thresholdBands?: ThresholdBand[];
   showCursor?: boolean;
   useNativeLegend?: boolean;
   onCursor?: (event: PlotCursorEvent) => void;

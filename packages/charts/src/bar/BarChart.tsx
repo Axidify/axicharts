@@ -7,6 +7,7 @@ import {
   preparePlotData,
   type PlotSeries,
   type ReferenceLine,
+  type ThresholdBand,
 } from "@axicharts/charts-canvas";
 import type { RendererPreference } from "@axicharts/charts-core";
 import { useChartLayout } from "../container/ChartLayoutContext";
@@ -28,6 +29,7 @@ export type BarChartProps = {
   stacked?: boolean;
   renderer?: RendererPreference;
   refreshHz?: number;
+  thresholdBands?: ThresholdBand[];
 };
 
 function BarPlot({
@@ -38,6 +40,7 @@ function BarPlot({
   valueSuffix,
   referenceLines,
   stacked = false,
+  thresholdBands,
 }: BarChartProps): ReactElement {
   const { size, theme, mode } = useChartLayout();
   const plotSync = usePlotSync();
@@ -58,6 +61,7 @@ function BarPlot({
       valueSuffix={valueSuffix}
       referenceLines={referenceLines}
       stacked={stacked}
+      thresholdBands={thresholdBands}
       showCursor={chrome.showCrosshair}
       useNativeLegend={false}
       onCursor={plotSync.onCursor}
@@ -79,6 +83,7 @@ export function BarChart({
   stacked = false,
   renderer = "auto",
   refreshHz,
+  thresholdBands,
 }: BarChartProps): ReactElement | null {
   const { size, ready, theme } = useChartLayout();
   const maxPoints = usePlotSampling({
@@ -122,6 +127,7 @@ export function BarChart({
             valueSuffix={valueSuffix}
             referenceLines={referenceLines}
             stacked={stacked}
+            thresholdBands={thresholdBands}
           />
         }
       />

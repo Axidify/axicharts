@@ -75,6 +75,7 @@ export type {
   PlotSeries,
   ReferenceLine,
   SeriesTone,
+  ThresholdBand,
 } from "@axicharts/charts-canvas";
 export {
   clearTickFormats,

@@ -7,6 +7,7 @@ export type {
   PlotSeries,
   ReferenceLine,
   SeriesTone,
+  ThresholdBand,
   UPlotBarProps,
   UPlotLineProps,
 } from "./types";
