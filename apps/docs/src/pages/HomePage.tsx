@@ -44,7 +44,8 @@ export function HomePage(): ReactElement {
             <strong>Layer 1</strong> — <code>@axicharts/charts</code> composable React charts
           </li>
           <li>
-            <strong>Layer 2</strong> — <code>@axicharts/charts-spec</code> templates + CLI
+            <strong>Layer 2</strong> — <code>@axicharts/charts-spec</code> templates + planner —{" "}
+            <Link to="/spec">see spec layer</Link>
           </li>
           <li>
             <strong>Runtime</strong> — <code>@axicharts/charts-runtime</code> live data + embed
