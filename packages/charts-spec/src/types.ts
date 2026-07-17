@@ -20,6 +20,7 @@ export type PanelChartType =
   | "area"
   | "bar"
   | "pie"
+  | "donut"
   | "funnel"
   | "waterfall"
   | "candlestick"
@@ -53,6 +54,7 @@ export type PanelSpec = {
   valueSuffix?: string;
   fill?: boolean;
   stacked?: boolean;
+  innerRadius?: number;
 };
 
 export type MetricKind = "gauge" | "counter" | "histogram" | "ohlc" | "distribution";

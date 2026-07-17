@@ -26,6 +26,27 @@ describe("compilePanel registered types", () => {
   });
 });
 
+describe("compilePanel donut", () => {
+  it("compiles donut panels with default inner radius", () => {
+    const panel = compilePanel(
+      {
+        type: "donut",
+        props: {
+          slices: [
+            { name: "Done", value: 48 },
+            { name: "Backlog", value: 34 },
+          ],
+        },
+        height: 200,
+      },
+      {},
+    );
+
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+  });
+});
+
 describe("compilePanel table", () => {
   it("renders tabular rows from spec data", () => {
     const panel = compilePanel(

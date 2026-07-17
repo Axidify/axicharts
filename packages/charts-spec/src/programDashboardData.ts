@@ -81,11 +81,10 @@ export const PROGRAM_DASHBOARD_PANELS: PanelSpec[] = [
     },
   },
   {
-    type: "pie",
+    type: "donut",
     title: "Status mix",
     props: {
       slices: DEFAULT_PROGRAM_DASHBOARD_DATA.status.slices,
-      innerRadius: 42,
     },
   },
   {

@@ -45,6 +45,16 @@ describe("plan", () => {
     expect(template).toBe("plugins-wall");
   });
 
+  it("maps share metrics to donut panels", () => {
+    const panel = planPanelFromMetric({
+      name: "revenue_share",
+      kind: "distribution",
+      tags: { vertical: "finance" },
+    });
+
+    expect(panel.type).toBe("donut");
+  });
+
   it("maps position metrics to table panels", () => {
     const panel = planPanelFromMetric({
       name: "open_positions",

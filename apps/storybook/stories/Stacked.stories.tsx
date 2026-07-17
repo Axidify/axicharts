@@ -4,6 +4,7 @@ import {
   AreaChart,
   BarChart,
   ChartContainer,
+  LineChart,
 } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
 
@@ -15,6 +16,24 @@ const SUPPORT = [90, 95, 110, 120];
 function StackedChartsDemo(): ReactElement {
   return (
     <div style={{ display: "grid", gap: 20, maxWidth: 560 }}>
+      <div>
+        <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
+          Stacked line — cumulative trend
+        </p>
+        <ChartContainer theme={cleanTheme} height={180} width="100%">
+          <LineChart
+            categories={QUARTERS}
+            stacked
+            fill
+            series={[
+              { name: "Product", data: PRODUCT, tone: "info" },
+              { name: "Services", data: SERVICES, tone: "success" },
+              { name: "Support", data: SUPPORT, tone: "warning" },
+            ]}
+          />
+        </ChartContainer>
+      </div>
+
       <div>
         <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
           Stacked bar — revenue by line
@@ -60,7 +79,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C2 stacked cartesian charts — pass stacked to BarChart or AreaChart with aligned multi-series data.",
+          "C2 stacked cartesian charts — pass stacked to LineChart, BarChart, or AreaChart with aligned multi-series data.",
       },
     },
   },

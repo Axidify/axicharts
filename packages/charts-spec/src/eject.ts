@@ -32,6 +32,8 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
           ? "BarChart"
           : spec.type === "pie"
             ? "PieChart"
+            : spec.type === "donut"
+              ? "PieChart"
             : spec.type === "funnel"
               ? "FunnelChart"
               : spec.type === "waterfall"
@@ -68,14 +70,18 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       ? encoding.y[0]?.field
       : encoding?.y?.field ?? "value";
     chartBody = `categories={${dataVar}.map((row) => String(row.${xField}))}
-      series={[{ name: ${quote(yField ?? "value")}, data: ${dataVar}.map((row) => Number(row.${yField})) }]}${spec.fill ? "\n      fill" : ""}${spec.valueSuffix ? `\n      valueSuffix=${quote(spec.valueSuffix)}` : ""}`;
-  } else if (spec.type === "pie") {
+      series={[{ name: ${quote(yField ?? "value")}, data: ${dataVar}.map((row) => Number(row.${yField})) }]}${spec.fill ? "\n      fill" : ""}${spec.stacked ? "\n      stacked" : ""}${spec.valueSuffix ? `\n      valueSuffix=${quote(spec.valueSuffix)}` : ""}`;
+  } else if (spec.type === "pie" || spec.type === "donut") {
     const nameField = encoding?.name?.field ?? "name";
     const valueField = encoding?.value?.field ?? "value";
+    const innerRadius =
+      spec.innerRadius ??
+      (spec.props?.innerRadius as number | undefined) ??
+      (spec.type === "donut" ? 42 : undefined);
     chartBody = `slices={${dataVar}.map((row) => ({
         name: String(row.${nameField}),
         value: Number(row.${valueField}),
-      }))}`;
+      }))}${innerRadius != null ? `\n      innerRadius={${innerRadius}}` : ""}`;
   } else if (spec.type === "funnel") {
     const nameField = encoding?.name?.field ?? "name";
     const valueField = encoding?.value?.field ?? "value";

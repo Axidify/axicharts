@@ -36,6 +36,31 @@ describe("ejectPanel", () => {
     expect(jsx).not.toContain("ChartContainer");
   });
 
+  it("emits stacked flag on cartesian panels", () => {
+    const jsx = ejectPanel({
+      type: "bar",
+      stacked: true,
+      encoding: {
+        x: { field: "quarter" },
+        y: { field: "revenue" },
+      },
+    });
+
+    expect(jsx).toContain("stacked");
+  });
+
+  it("emits innerRadius for donut panels", () => {
+    const jsx = ejectPanel({
+      type: "donut",
+      encoding: {
+        name: { field: "segment" },
+        value: { field: "amount" },
+      },
+    });
+
+    expect(jsx).toContain("innerRadius={42}");
+  });
+
   it("emits table without ChartContainer", () => {
     const jsx = ejectPanel({
       type: "table",

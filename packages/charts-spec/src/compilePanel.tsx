@@ -204,18 +204,26 @@ export function compilePanel(
       );
     }
 
-    case "pie": {
+    case "pie":
+    case "donut": {
       const nameField = resolved.encoding?.name?.field ?? "name";
       const valueField = resolved.encoding?.value?.field ?? "value";
-      const slices = rows.map((row) => ({
-        name: String(row[nameField]),
-        value: Number(row[valueField]),
-      }));
+      const slices =
+        (props.slices as Parameters<typeof PieChart>[0]["slices"]) ??
+        rows.map((row) => ({
+          name: String(row[nameField]),
+          value: Number(row[valueField]),
+        }));
+      const innerRadius =
+        resolved.innerRadius ??
+        (props.innerRadius as number | undefined) ??
+        (resolved.type === "donut" ? 42 : undefined);
       return wrapChart(
         resolved,
         createElement(PieChart, {
           slices,
-          ...props,
+          innerRadius,
+          showLabels: props.showLabels as boolean | undefined,
         }),
         options,
       );

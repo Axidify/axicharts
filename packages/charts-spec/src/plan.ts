@@ -6,8 +6,12 @@ function inferChartType(metric: MetricProfile): PanelSpec["type"] {
   const kind = metric.kind;
 
   if (kind === "ohlc") return "candlestick";
-  if (kind === "distribution") return "pie";
   if (kind === "gauge") return "gauge";
+
+  if (name.includes("donut") || name.includes("share") || name.includes("mix") || name.includes("split")) {
+    return "donut";
+  }
+  if (kind === "distribution") return "pie";
 
   if (name.includes("position") || name.includes("blotter") || name.includes("order")) {
     return "table";
@@ -23,9 +27,6 @@ function inferChartType(metric: MetricProfile): PanelSpec["type"] {
   }
   if (name.includes("burndown") || name.includes("burn")) {
     return "line";
-  }
-  if (name.includes("share") || name.includes("mix") || name.includes("split")) {
-    return "pie";
   }
   if (
     name.includes("cpu") ||
