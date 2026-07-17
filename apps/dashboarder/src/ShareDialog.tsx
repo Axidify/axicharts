@@ -4,11 +4,12 @@ import {
   serializeDashboardExport,
   serializeWorkspaceExport,
   SHARE_EXPORT_SCHEMA_URL,
-  validateShareExportJson,
   type RuntimeDashboardSpec,
   type SavedDashboard,
   type WorkspaceStore,
 } from "@axicharts/charts-runtime";
+import { validateShareExportDualJson } from "@axicharts/charts-runtime/validation";
+import { ErrorList, importSummary, LayerStatus } from "./validationChrome";
 
 const overlayStyle = {
   position: "fixed" as const,
@@ -99,14 +100,14 @@ export function ShareDialog({
     return serializeDashboardExport(dashboard.name, spec, meta);
   }, [tab, workspace, dashboard.name, spec, meta]);
 
-  const validation = useMemo(() => validateShareExportJson(exportJson), [exportJson]);
+  const validation = useMemo(() => validateShareExportDualJson(exportJson), [exportJson]);
 
   if (!open) return null;
 
   const filename =
     tab === "workspace"
       ? `${slugifyName(workspace.name) || "workspace"}.workspace.json`
-      : `${slugifyName(dashboard.name) || "dashboard"}.runtime.json`;
+      : `${slugifyName(dashboard.name) || "dashboard"}.share.json`;
 
   const copy = async (): Promise<void> => {
     await navigator.clipboard.writeText(exportJson);
@@ -133,15 +134,18 @@ export function ShareDialog({
                 $schema
               </a>{" "}
               hints
-              {validation.ok ? (
-                <span style={{ color: "#4ade80" }}> · validated</span>
-              ) : (
-                <span style={{ color: "#f87171" }}>
-                  {" "}
-                  · {validation.errors.length} validation issue
-                  {validation.errors.length === 1 ? "" : "s"}
+              {" · "}
+              <LayerStatus
+                label="JSON Schema"
+                ok={validation.schemaOk}
+                schemaUrl={validation.schemaUrl}
+              />
+              <LayerStatus label="Semantic" ok={validation.semanticOk} />
+              {validation.ok && validation.export ? (
+                <span style={{ color: "#4ade80" }}>
+                  {importSummary(validation.export, validation.shape)}
                 </span>
-              )}
+              ) : null}
             </div>
           </div>
           <button type="button" onClick={onClose} style={buttonStyle}>
@@ -168,7 +172,12 @@ export function ShareDialog({
               {label}
             </button>
           ))}
-          <button type="button" onClick={() => void copy()} disabled={!validation.ok} style={{ ...buttonStyle, marginLeft: "auto" }}>
+          <button
+            type="button"
+            onClick={() => void copy()}
+            disabled={!validation.ok}
+            style={{ ...buttonStyle, marginLeft: "auto" }}
+          >
             {copied ? "Copied" : "Copy JSON"}
           </button>
           <button
@@ -196,14 +205,12 @@ export function ShareDialog({
         >
           {exportJson}
         </pre>
+
         {!validation.ok ? (
-          <ul style={{ margin: "12px 0 0", paddingLeft: 18, color: "#f87171", fontSize: 12 }}>
-            {validation.errors.map((item) => (
-              <li key={`${item.path}:${item.message}`}>
-                <code>{item.path}</code> — {item.message}
-              </li>
-            ))}
-          </ul>
+          <>
+            <ErrorList title="JSON Schema" errors={validation.schemaErrors} />
+            <ErrorList title="Semantic" errors={validation.semanticErrors} />
+          </>
         ) : null}
       </div>
     </div>

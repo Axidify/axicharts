@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { RUNTIME_SPEC_SCHEMA_URL, SHARE_EXPORT_SCHEMA_URL } from "@axicharts/charts-runtime";
 import {
-  RUNTIME_SPEC_SCHEMA_URL,
-  SHARE_EXPORT_SCHEMA_URL,
+  validatePortableImportJson,
   type ShareExport,
-} from "@axicharts/charts-runtime";
-import { validateShareImportJson } from "@axicharts/charts-runtime/validation";
+} from "@axicharts/charts-runtime/validation";
+import { ErrorList, importSummary, LayerStatus } from "./validationChrome";
 
 const overlayStyle = {
   position: "fixed" as const,
@@ -46,66 +46,6 @@ export type ImportDialogProps = {
   onApply: (exported: ShareExport) => void;
 };
 
-function importSummary(exported: ShareExport): string {
-  if (exported.kind === "workspace") {
-    return `Workspace · ${exported.name} · ${exported.dashboards.length} dashboard${
-      exported.dashboards.length === 1 ? "" : "s"
-    }`;
-  }
-  return `Dashboard · ${exported.name}`;
-}
-
-function LayerStatus({
-  label,
-  ok,
-  schemaUrl,
-}: {
-  label: string;
-  ok: boolean;
-  schemaUrl?: string;
-}): ReactElement {
-  return (
-    <span style={{ marginRight: 12 }}>
-      {label}
-      {schemaUrl ? (
-        <>
-          {" "}
-          (
-          <a href={schemaUrl} style={{ color: "#93c5fd" }}>
-            schema
-          </a>
-          )
-        </>
-      ) : null}
-      {": "}
-      <span style={{ color: ok ? "#4ade80" : "#f87171" }}>{ok ? "ok" : "failed"}</span>
-    </span>
-  );
-}
-
-function ErrorList({
-  title,
-  errors,
-}: {
-  title: string;
-  errors: Array<{ path: string; message: string }>;
-}): ReactElement | null {
-  if (errors.length === 0) return null;
-
-  return (
-    <div style={{ marginTop: 12 }}>
-      <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>{title}</div>
-      <ul style={{ margin: 0, paddingLeft: 18, color: "#f87171", fontSize: 12 }}>
-        {errors.map((item) => (
-          <li key={`${title}:${item.path}:${item.message}`}>
-            <code>{item.path}</code> — {item.message}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 export function ImportDialog({
   open,
   initialJson = "",
@@ -122,7 +62,7 @@ export function ImportDialog({
     }
   }, [open, initialJson]);
 
-  const validation = useMemo(() => validateShareImportJson(jsonText), [jsonText]);
+  const validation = useMemo(() => validatePortableImportJson(jsonText), [jsonText]);
   const hasInput = jsonText.trim().length > 0;
 
   if (!open) return null;
@@ -151,18 +91,25 @@ export function ImportDialog({
                   <LayerStatus
                     label="JSON Schema"
                     ok={validation.schemaOk}
-                    schemaUrl={SHARE_EXPORT_SCHEMA_URL}
+                    schemaUrl={validation.schemaUrl}
                   />
                   <LayerStatus label="Semantic" ok={validation.semanticOk} />
                   {validation.ok && validation.export ? (
-                    <span style={{ color: "#4ade80" }}>{importSummary(validation.export)}</span>
+                    <span style={{ color: "#4ade80" }}>
+                      {importSummary(validation.export, validation.shape)}
+                    </span>
                   ) : null}
                 </>
               ) : (
                 <span>
-                  Paste JSON or choose a file · expects share export or bare runtime with{" "}
+                  Paste share export, workspace bundle, or bare{" "}
+                  <code>*.runtime.json</code> with{" "}
                   <a href={RUNTIME_SPEC_SCHEMA_URL} style={{ color: "#93c5fd" }}>
                     $schema
+                  </a>{" "}
+                  /{" "}
+                  <a href={SHARE_EXPORT_SCHEMA_URL} style={{ color: "#93c5fd" }}>
+                    share-export
                   </a>
                 </span>
               )}
@@ -206,7 +153,7 @@ export function ImportDialog({
           value={jsonText}
           onChange={(event) => setJsonText(event.target.value)}
           spellCheck={false}
-          placeholder='{ "$schema": "...", "version": 1, "kind": "dashboard", ... }'
+          placeholder='{ "$schema": "...", "layout": "embed", ... } or share export envelope'
           style={{
             marginTop: 12,
             width: "100%",
