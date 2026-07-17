@@ -321,6 +321,8 @@ export function RuntimeSchemaPage(): ReactElement {
           </Link>
           {" · "}
           <a href={runtimeDeepLinkShareImportDeepLink()}>deep-link table</a>
+          {" · "}
+          <Link to="/runtime/links#share-import-track">C44–C46 track notes</Link>
         </p>
       </Section>
 

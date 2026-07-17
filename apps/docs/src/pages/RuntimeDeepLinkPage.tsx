@@ -5,6 +5,7 @@ import {
   formatValidatePresetCommand,
   HOSTED_IMPORT_PRESETS,
   listImportDeepLinks,
+  runtimeSchemaShareMetaDeepLink,
   runtimeShareImportDeepLink,
   RUNTIME_SPEC_SCHEMA_URL,
   SHARE_EXPORT_REFERENCE_PRESET,
@@ -12,6 +13,7 @@ import {
 } from "@axicharts/charts-runtime/validation";
 import { ValidateCommandCopy } from "../components/ValidateCommandCopy";
 import { RuntimeHubNav } from "../components/RuntimeHubNav";
+import { SHARE_IMPORT_TRACK_RELEASE_NOTES } from "../demos/runtimeSchemaDemo";
 
 const base = import.meta.env.BASE_URL;
 
@@ -198,6 +200,42 @@ export function RuntimeDeepLinkPage(): ReactElement {
         <p style={{ margin: "12px 0 0", fontSize: 12, color: "#64748b" }}>
           Storybook: <code>Dashboarder/Share ↔ Import</code> — ShareDialog meta export and
           ImportDialog restore previews.
+          {" · "}
+          <Link to="/runtime/schema#share-meta">schema § meta</Link>
+          {" · "}
+          <a href={runtimeSchemaShareMetaDeepLink()}>hosted schema anchor</a>
+        </p>
+      </section>
+
+      <section
+        id="share-import-track"
+        style={{
+          marginTop: 28,
+          padding: 14,
+          borderRadius: 10,
+          border: "1px solid #e2e8f0",
+          background: "#ffffff",
+          maxWidth: 720,
+        }}
+      >
+        <h2 style={{ fontSize: 16, margin: "0 0 8px" }}>Share/import track release notes (C44–C46)</h2>
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+          The C44–C46 hardening track closes the planner meta round-trip: Share exports{" "}
+          <code>meta</code>, Import restores it, schema documents fields, and Dashboarder dialogs
+          link to hosted docs. Started from C42 overview docs and C43 Storybook fixtures.
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
+          {SHARE_IMPORT_TRACK_RELEASE_NOTES.map((item) => (
+            <li key={item.slice}>
+              <strong>{item.slice}</strong> — {item.summary}
+            </li>
+          ))}
+        </ul>
+        <p style={{ margin: "12px 0 0", fontSize: 12, color: "#64748b" }}>
+          Planner track (C33–C43):{" "}
+          <Link to="/runtime/import#planner-track">import gallery release notes</Link>
+          {" · "}
+          <a href={runtimeShareImportDeepLink()}>share ↔ import overview</a>
         </p>
       </section>
 

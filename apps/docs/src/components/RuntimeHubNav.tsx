@@ -12,6 +12,7 @@ export const RUNTIME_HUB_LINKS = [
 /** In-page anchors on the runtime overview — surfaced in hub nav for quick jumps. */
 export const RUNTIME_HUB_ANCHORS = [
   { to: "/runtime#share-import", label: "Share ↔ import" },
+  { to: "/runtime/schema#share-meta", label: "Schema § meta" },
   { to: "/runtime#planner-http", label: "Planner HTTP" },
 ] as const;
 

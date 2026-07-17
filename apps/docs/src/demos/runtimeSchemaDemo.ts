@@ -99,6 +99,22 @@ export const SHARE_META_FIELD_ROWS = [
   { field: "presentation", type: "boolean", description: "Presentation mode flag for embed chrome" },
 ] as const;
 
+/** Share/import hardening track (C44–C46) — docs + Dashboarder cross-links. */
+export const SHARE_IMPORT_TRACK_RELEASE_NOTES = [
+  {
+    slice: "C44",
+    summary: "Deep-link share-import round-trip table, EmbedDialog share-export hint",
+  },
+  {
+    slice: "C45",
+    summary: "Schema share-meta block, ShareDialog/ImportDialog ShareImportDocsLinks",
+  },
+  {
+    slice: "C46",
+    summary: "RuntimeHubNav schema share-meta anchor, share-import track wrap-up notes",
+  },
+] as const;
+
 export const GITOPS_CODE = `name: Validate dashboards
 on: [pull_request]
 jobs:
