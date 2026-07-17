@@ -62,8 +62,6 @@ export {
 } from "./state";
 export {
   Crosshair,
-  Legend,
-  Tooltip,
   EChartsInteractionShell,
   getInteractionChrome,
   type LegendProps,
@@ -109,3 +107,20 @@ export {
   type RendererPreference,
   type ResolvedRenderer,
 } from "@axicharts/charts-core";
+export {
+  Area,
+  Bar,
+  Grid,
+  Legend,
+  Line,
+  Tooltip,
+  XAxis,
+  YAxis,
+  composeCartesianMarks,
+  type AreaMarkProps,
+  type BarMarkProps,
+  type ComposedCartesian,
+  type LineMarkProps,
+  type XAxisMarkProps,
+  type YAxisMarkProps,
+} from "./composable";

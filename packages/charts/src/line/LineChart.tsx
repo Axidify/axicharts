@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { useMemo } from "react";
 import {
   UPlotLine,
@@ -18,10 +18,15 @@ import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
 import { usePlotSync } from "../sync/usePlotSync";
 import { usePlotSampling } from "../plot/usePlotSampling";
+import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
+
+const LINE_SERIES_KINDS = ["line", "area"] as const;
 
 export type LineChartProps = {
-  categories: string[];
-  series: PlotSeries[];
+  categories?: string[];
+  series?: PlotSeries[];
+  data?: Record<string, unknown>[];
+  children?: ReactNode;
   fill?: boolean;
   showAxes?: boolean;
   valueSuffix?: string;
@@ -31,6 +36,19 @@ export type LineChartProps = {
   refreshHz?: number;
   thresholdBands?: ThresholdBand[];
   referenceLines?: ReferenceLine[];
+};
+
+type LinePlotProps = {
+  categories: string[];
+  series: PlotSeries[];
+  fill?: boolean;
+  showAxes?: boolean;
+  valueSuffix?: string;
+  dualAxis?: boolean | "auto";
+  stacked?: boolean;
+  thresholdBands?: ThresholdBand[];
+  referenceLines?: ReferenceLine[];
+  compact: boolean;
 };
 
 function LinePlot({
@@ -44,7 +62,7 @@ function LinePlot({
   stacked,
   thresholdBands,
   referenceLines,
-}: LineChartProps & { compact: boolean }): ReactElement {
+}: LinePlotProps): ReactElement {
   const { size, theme, mode } = useChartLayout();
   const plotSync = usePlotSync();
   const chrome = getInteractionChrome(mode);
@@ -79,11 +97,13 @@ function LinePlot({
 }
 
 export function LineChart({
-  categories,
-  series,
+  categories: categoriesProp,
+  series: seriesProp,
+  data,
+  children,
   fill = false,
   showAxes,
-  valueSuffix,
+  valueSuffix: valueSuffixProp,
   dualAxis = "auto",
   stacked = false,
   renderer = "auto",
@@ -91,7 +111,18 @@ export function LineChart({
   thresholdBands,
   referenceLines,
 }: LineChartProps): ReactElement | null {
-  const { size, ready, theme, mode } = useChartLayout();
+  const { size, ready, theme, mode, config } = useChartLayout();
+  const { categories, series, valueSuffix } = useResolvedCartesianProps(
+    {
+      categories: categoriesProp,
+      series: seriesProp,
+      data,
+      children,
+      valueSuffix: valueSuffixProp,
+    },
+    config,
+    [...LINE_SERIES_KINDS],
+  );
   const maxPoints = usePlotSampling({
     pointCount: categories.length,
     renderer,
@@ -102,7 +133,7 @@ export function LineChart({
     [categories, series, maxPoints],
   );
 
-  if (!ready || size.width < 1 || size.height < 1) {
+  if (!ready || size.width < 1 || size.height < 1 || categories.length === 0 || series.length === 0) {
     return null;
   }
 

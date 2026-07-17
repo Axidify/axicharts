@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { useMemo } from "react";
 import {
   UPlotBar,
@@ -18,10 +18,15 @@ import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
 import { usePlotSync } from "../sync/usePlotSync";
 import { usePlotSampling } from "../plot/usePlotSampling";
+import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
+
+const BAR_SERIES_KINDS = ["bar"] as const;
 
 export type BarChartProps = {
-  categories: string[];
-  series: PlotSeries[];
+  categories?: string[];
+  series?: PlotSeries[];
+  data?: Record<string, unknown>[];
+  children?: ReactNode;
   showAxes?: boolean;
   showValues?: boolean;
   valueSuffix?: string;
@@ -29,6 +34,17 @@ export type BarChartProps = {
   stacked?: boolean;
   renderer?: RendererPreference;
   refreshHz?: number;
+  thresholdBands?: ThresholdBand[];
+};
+
+type BarPlotProps = {
+  categories: string[];
+  series: PlotSeries[];
+  showAxes?: boolean;
+  showValues?: boolean;
+  valueSuffix?: string;
+  referenceLines?: ReferenceLine[];
+  stacked?: boolean;
   thresholdBands?: ThresholdBand[];
 };
 
@@ -41,7 +57,7 @@ function BarPlot({
   referenceLines,
   stacked = false,
   thresholdBands,
-}: BarChartProps): ReactElement {
+}: BarPlotProps): ReactElement {
   const { size, theme, mode } = useChartLayout();
   const plotSync = usePlotSync();
   const chrome = getInteractionChrome(mode);
@@ -74,18 +90,31 @@ function BarPlot({
 }
 
 export function BarChart({
-  categories,
-  series,
+  categories: categoriesProp,
+  series: seriesProp,
+  data,
+  children,
   showAxes,
   showValues = false,
-  valueSuffix,
+  valueSuffix: valueSuffixProp,
   referenceLines,
   stacked = false,
   renderer = "auto",
   refreshHz,
   thresholdBands,
 }: BarChartProps): ReactElement | null {
-  const { size, ready, theme } = useChartLayout();
+  const { size, ready, theme, config } = useChartLayout();
+  const { categories, series, valueSuffix } = useResolvedCartesianProps(
+    {
+      categories: categoriesProp,
+      series: seriesProp,
+      data,
+      children,
+      valueSuffix: valueSuffixProp,
+    },
+    config,
+    [...BAR_SERIES_KINDS],
+  );
   const maxPoints = usePlotSampling({
     pointCount: categories.length,
     renderer,
@@ -96,7 +125,7 @@ export function BarChart({
     [categories, series, maxPoints],
   );
 
-  if (!ready || size.width < 1 || size.height < 1) {
+  if (!ready || size.width < 1 || size.height < 1 || categories.length === 0 || series.length === 0) {
     return null;
   }
 
