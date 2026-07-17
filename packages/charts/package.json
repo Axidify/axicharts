@@ -1,18 +1,39 @@
 {
   "name": "@axicharts/charts",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Operational React charts for live dashboards — ChartContainer, line/bar, industrial primitives, extension registry.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Axidify/axicharts.git",
+    "directory": "packages/charts"
+  },
+  "bugs": {
+    "url": "https://github.com/Axidify/axicharts/issues"
+  },
+  "homepage": "https://github.com/Axidify/axicharts#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "type": "module",
   "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry/index.d.ts",
+      "import": "./dist/registry/index.js"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --external react --external react-dom --external uplot --clean",
-    "dev": "tsup src/index.ts --format esm --dts --external react --external react-dom --external uplot --watch",
+    "build": "tsup src/index.ts src/registry/index.ts --format esm --dts --external react --external react-dom --external uplot --clean",
+    "dev": "tsup src/index.ts src/registry/index.ts --format esm --dts --external react --external react-dom --external uplot --watch",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

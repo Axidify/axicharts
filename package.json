@@ -8,9 +8,14 @@
     "storybook": "pnpm --filter @axicharts/storybook dev",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "typecheck": "turbo run typecheck"
+    "test:perf": "pnpm --filter @axicharts/charts-canvas test:perf",
+    "size": "size-limit",
+    "typecheck": "turbo run typecheck",
+    "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm size"
   },
   "devDependencies": {
+    "@size-limit/file": "^11.1.6",
+    "size-limit": "^11.1.6",
     "turbo": "^2.4.4",
     "typescript": "^5.8.2"
   }

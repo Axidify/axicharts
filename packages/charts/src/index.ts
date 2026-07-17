@@ -14,6 +14,17 @@ export {
   type StatusLampProps,
 } from "./status/StatusLamp";
 export { Stat, type StatProps, type StatSurface, type StatTone } from "./stat/Stat";
+export {
+  clearChartTypes,
+  getChartType,
+  listChartTypes,
+  registerBuiltinChartTypes,
+  registerChartType,
+} from "./registry";
+export type {
+  ChartRenderer,
+  ChartTypeRegistration,
+} from "./registry";
 export type {
   DualAxisMode,
   PlotSeries,

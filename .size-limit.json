@@ -1,0 +1,26 @@
+[
+  {
+    "name": "@axicharts/charts",
+    "path": "packages/charts/dist/index.js",
+    "limit": "8 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts-canvas",
+    "path": "packages/charts-canvas/dist/index.js",
+    "limit": "6 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts-core",
+    "path": "packages/charts-core/dist/index.js",
+    "limit": "2 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts-theme",
+    "path": "packages/charts-theme/dist/index.js",
+    "limit": "2 KB",
+    "gzip": true
+  }
+]

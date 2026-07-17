@@ -1,16 +1,44 @@
 # AxiCharts
 
-**Operational dashboard runtime** — turn live data into monitoring screens. Spec-driven layouts, industrial-ready charts, embeddable in any React app.
+**Operational dashboard charts for React** — live-native line/bar charts, industrial SVG primitives (gauge, digital, status lamp), and a `ChartContainer` that actually sizes correctly in flex/grid layouts.
 
 - **GitHub:** https://github.com/Axidify/axicharts
-- **Status:** Early implementation — RFC-001 `ChartContainer` landed
+- **Storybook:** `pnpm storybook` → http://localhost:6006
+
+## Install
+
+```bash
+pnpm add @axicharts/charts @axicharts/charts-theme uplot
+```
+
+Peer dependencies: `react`, `react-dom`, `uplot`.
+
+## Quick start
+
+```tsx
+import { ChartContainer, LineChart } from "@axicharts/charts";
+import { cleanTheme } from "@axicharts/charts-theme";
+
+export function LatencyPanel() {
+  return (
+    <ChartContainer theme={cleanTheme} height={200}>
+      <LineChart
+        categories={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+        series={[{ name: "p95", data: [42, 38, 55, 49, 62, 58, 71] }]}
+        fill
+      />
+    </ChartContainer>
+  );
+}
+```
 
 ## Packages
 
 | Package | Description |
 |---------|-------------|
-| `@axicharts/charts` | Layer 1 React API (`ChartContainer`, charts) |
-| `@axicharts/charts-theme` | `cleanTheme`, `liveTheme`, `industrialTheme` |
+| `@axicharts/charts` | React API — `ChartContainer`, `LineChart`, `BarChart`, `Gauge`, `Digital`, `StatusLamp`, `Stat`, registry |
+| `@axicharts/charts-theme` | `cleanTheme`, `liveTheme`, `industrialTheme`, CSS tokens |
+| `@axicharts/charts-canvas` | uPlot adapters (pulled in by `@axicharts/charts`) |
 | `@axicharts/charts-core` | Pure layout/math (no React) |
 
 ## Develop
@@ -19,12 +47,15 @@
 pnpm install
 pnpm build
 pnpm test
-pnpm storybook   # http://localhost:6006
+pnpm test:perf   # 6-panel uPlot setData gate
+pnpm size        # bundle gzip budgets
+pnpm storybook
 ```
 
-## Roadmap
+## C1 Storybook gate (round 2 mockups)
 
-1. `ChartContainer` + themes ✅ (in progress)
-2. Live line charts (uPlot adapter)
-3. Storybook — Rich Ops + Grid Cells mockups
-4. Tag → spec rules + MQTT adapter
+All six acceptance stories live under **Mockups/** in Storybook: G, H, I, J, K, L + Industrial Primitives.
+
+## License
+
+MIT

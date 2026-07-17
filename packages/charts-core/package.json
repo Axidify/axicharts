@@ -1,7 +1,19 @@
 {
   "name": "@axicharts/charts-core",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Pure layout and sizing math for AxiCharts (no React).",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Axidify/axicharts.git",
+    "directory": "packages/charts-core"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "exports": {
     ".": {
