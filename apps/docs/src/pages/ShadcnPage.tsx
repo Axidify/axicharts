@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { Chart, ejectPanel, type PanelSpec } from "@axicharts/charts-spec";
+import { QuickLineChart } from "@axicharts/charts/quick";
 import throughputSpec from "../../../../packages/charts-spec/examples/throughput-bar-color.panel.json";
 import areaSloSpec from "../../../../packages/charts-spec/examples/area-slo-line.panel.json";
 import revenueLineSpec from "../../../../packages/charts-spec/examples/revenue-line.panel.json";
@@ -8,10 +9,13 @@ import revenueChartConfigSpec from "../../../../packages/charts-spec/examples/re
 import donutSpec from "../../../../packages/charts-spec/examples/browser-share-donut.panel.json";
 import stackedBarSpec from "../../../../packages/charts-spec/examples/velocity-stacked-bar.panel.json";
 import multiLineSpec from "../../../../packages/charts-spec/examples/burndown-multi-line.panel.json";
+import comboSpec from "../../../../packages/charts-spec/examples/combo-revenue-bar-line.panel.json";
 import { docBodyStyle, docCardStyle, docColors, docRadii } from "../styles/docTokens";
 
 const STORYBOOK_SHADCN_GALLERY =
   "http://localhost:6006/?path=/story/charts-shadcnparity--gallery";
+const STORYBOOK_RECHARTS_PARITY_WALL =
+  "http://localhost:6006/?path=/story/charts-shadcnparity--recharts-parity-wall";
 const STORYBOOK_RECHARTS_COMPARE =
   "http://localhost:6006/?path=/story/compare-recharts-vs-axicharts--granular-bar-cells";
 
@@ -46,7 +50,27 @@ const BROWSER_SHARE_ROWS = [
   { name: "Other", value: 10 },
 ];
 
+const COMBO_ROWS = [
+  { week: "W1", total: 120, avg: 17 },
+  { week: "W2", total: 90, avg: 13 },
+  { week: "W3", total: 150, avg: 21 },
+  { week: "W4", total: 110, avg: 16 },
+  { week: "W5", total: 180, avg: 26 },
+];
+
 const INSTALL_BLOCK = `npm install @axicharts/charts @axicharts/charts-theme echarts uplot`;
+
+const QUICK_LINE_CODE = `import { QuickLineChart } from "@axicharts/charts/quick";
+
+export function HelloChart() {
+  return (
+    <QuickLineChart
+      title="Weekly revenue"
+      labels={["Mon", "Tue", "Wed", "Thu", "Fri"]}
+      data={[4200, 3800, 5100, 4600, 5900]}
+    />
+  );
+}`;
 
 const MINIMAL_JSX = `import { ChartContainer, BarChart } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
@@ -75,6 +99,7 @@ const MIGRATION_ROWS = [
   ["<Bar><Cell fill /></Bar>", "encoding.color or Cell JSX", "ejectPanel preserves Cell fills"],
   ["PieChart + innerRadius", "PieChart innerRadius or type: donut", "compilePanel + ECharts adapter"],
   ["stacked prop on BarChart", "stacked on panel spec", "Multi-series via props.series"],
+  ["ComposedChart bar+line", "ComboChart or type: combo", "chartConfig + dual-axis optional"],
   ["Recharts data prop", "categories + series or row data", "Chart panel={spec} data={rows}"],
 ] as const;
 
@@ -150,6 +175,10 @@ export function ShadcnPage(): ReactElement {
             Storybook — ShadcnParity Gallery
           </a>
           {" · "}
+          <a href={STORYBOOK_RECHARTS_PARITY_WALL} style={{ color: docColors.accent }}>
+            Storybook — Recharts parity wall
+          </a>
+          {" · "}
           <a href={STORYBOOK_RECHARTS_COMPARE} style={{ color: docColors.accent }}>
             Storybook — Recharts vs AxiCharts
           </a>
@@ -158,6 +187,21 @@ export function ShadcnPage(): ReactElement {
             Community templates
           </Link>
         </p>
+      </div>
+
+      <div style={{ ...docCardStyle(), padding: 20, marginBottom: 24 }}>
+        <h2 style={{ marginTop: 0, fontSize: 18 }}>QuickLineChart — hello-world (C118)</h2>
+        <p style={docBodyStyle()}>
+          Three-line migration entry point — wraps <code>ChartContainer</code> + <code>LineChart</code>{" "}
+          with <code>cleanTheme</code>. Same path as <code>npx @axicharts/charts create-dashboard</code>.
+        </p>
+        <QuickLineChart
+          title="Weekly revenue"
+          labels={["Mon", "Tue", "Wed", "Thu", "Fri"]}
+          data={[4200, 3800, 5100, 4600, 5900]}
+          height={180}
+        />
+        <pre style={{ ...codeBlock, marginTop: 12 }}>{QUICK_LINE_CODE}</pre>
       </div>
 
       <div style={{ ...docCardStyle(), padding: 20, marginBottom: 24 }}>
@@ -239,17 +283,25 @@ export function ShadcnPage(): ReactElement {
         <ChartCard title="Multi-series line — burndown" subtitle="Ideal vs remaining series">
           <Chart panel={multiLineSpec as PanelSpec} data={[]} />
         </ChartCard>
+
+        <ChartCard
+          title="Combo — bar + line"
+          subtitle="combo-revenue-bar-line.panel.json — shadcn mixed chart"
+        >
+          <Chart panel={comboSpec as PanelSpec} data={COMBO_ROWS} />
+        </ChartCard>
       </div>
 
       <div style={{ ...docCardStyle(), padding: 20, marginBottom: 24 }}>
         <h2 style={{ marginTop: 0, fontSize: 18 }}>Spec JSON → eject JSX</h2>
         <p style={docBodyStyle()}>
           Example: <code>throughput-bar-color.panel.json</code> ejects composable Cell fills — same
-          path as <code>compilePanel</code>. Install via{" "}
+          path as <code>compilePanel</code>. Install combo and multi-line blocks via{" "}
           <Link to="/shadcn/registry" style={{ color: docColors.accent }}>
             shadcn custom registry
           </Link>{" "}
-          (<code>registry/</code> at repo root).
+          (<code>chart-axi-combo</code>, <code>chart-axi-multi-line</code>, and 6 other items in{" "}
+          <code>registry/</code>).
         </p>
         <pre style={{ ...codeBlock, maxHeight: 240 }}>{ejectedBar}</pre>
       </div>

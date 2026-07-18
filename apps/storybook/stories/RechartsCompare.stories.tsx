@@ -6,10 +6,12 @@ import {
   Cell,
   ChartContainer,
   LineChart,
+  PieChart,
   Stat,
   XAxis,
   YAxis,
 } from "@axicharts/charts";
+import { Chart } from "@axicharts/charts-spec";
 import { cleanTheme } from "@axicharts/charts-theme";
 import {
   Area,
@@ -18,11 +20,16 @@ import {
   BarChart as RechartsBarChart,
   CartesianGrid,
   Cell as RechartsCell,
+  Legend,
   Line,
   LineChart as RechartsLineChart,
+  Pie,
+  PieChart as RechartsPieChart,
   XAxis as RechartsXAxis,
   YAxis as RechartsYAxis,
 } from "recharts";
+import stackedBarSpec from "../../../packages/charts-spec/examples/velocity-stacked-bar.panel.json";
+import type { PanelSpec } from "@axicharts/charts-spec";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const LATENCY = [42, 38, 55, 49, 62, 58, 71];
@@ -346,6 +353,30 @@ const THROUGHPUT_ROWS = WEEKS.map((week, index) => ({
   aboveTarget: THROUGHPUT[index]! >= TARGET,
 }));
 
+const SPRINT_ROWS = [
+  { sprint: "S1", done: 22, carry: 6 },
+  { sprint: "S2", done: 26, carry: 4 },
+  { sprint: "S3", done: 24, carry: 5 },
+  { sprint: "S4", done: 28, carry: 3 },
+];
+
+const BROWSER_SHARE_ROWS = [
+  { name: "Chrome", value: 48 },
+  { name: "Safari", value: 28 },
+  { name: "Firefox", value: 14 },
+  { name: "Other", value: 10 },
+];
+
+const DONUT_COLORS = ["#2563eb", "#16a34a", "#d97706", "#64748b"];
+
+const COMPARE_LABEL: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: "0.04em",
+  textTransform: "uppercase",
+  marginBottom: 8,
+};
+
 function GranularBarComparison(): ReactElement {
   return (
     <div
@@ -359,12 +390,8 @@ function GranularBarComparison(): ReactElement {
       <div>
         <div
           style={{
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
+            ...COMPARE_LABEL,
             color: "#2563eb",
-            marginBottom: 8,
           }}
         >
           AxiCharts · Cell per category (C68)
@@ -388,12 +415,8 @@ function GranularBarComparison(): ReactElement {
       <div>
         <div
           style={{
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
+            ...COMPARE_LABEL,
             color: "#64748b",
-            marginBottom: 8,
           }}
         >
           Recharts · Cell fill parity
@@ -410,6 +433,80 @@ function GranularBarComparison(): ReactElement {
             ))}
           </RechartsBar>
         </RechartsBarChart>
+      </div>
+    </div>
+  );
+}
+
+function StackedBarComparison(): ReactElement {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 20,
+        maxWidth: 900,
+      }}
+    >
+      <div>
+        <div style={{ ...COMPARE_LABEL, color: "#2563eb" }}>AxiCharts · stacked bar</div>
+        <Chart panel={stackedBarSpec as PanelSpec} data={[]} />
+      </div>
+      <div>
+        <div style={{ ...COMPARE_LABEL, color: "#64748b" }}>Recharts · stacked bar</div>
+        <RechartsBarChart width={420} height={220} data={SPRINT_ROWS}>
+          <RechartsXAxis dataKey="sprint" tick={{ fontSize: 11 }} />
+          <RechartsYAxis tick={{ fontSize: 11 }} width={32} />
+          <Legend wrapperStyle={{ fontSize: 11 }} />
+          <RechartsBar stackId="velocity" dataKey="done" fill="#16a34a" radius={[4, 4, 0, 0]} />
+          <RechartsBar stackId="velocity" dataKey="carry" fill="#d97706" />
+        </RechartsBarChart>
+      </div>
+    </div>
+  );
+}
+
+function DonutComparison(): ReactElement {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 20,
+        maxWidth: 900,
+      }}
+    >
+      <div>
+        <div style={{ ...COMPARE_LABEL, color: "#2563eb" }}>AxiCharts · donut</div>
+        <ChartContainer theme={cleanTheme} height={220} width="100%">
+          <PieChart
+            innerRadius={60}
+            slices={BROWSER_SHARE_ROWS.map((row) => ({
+              name: row.name.toLowerCase(),
+              value: row.value,
+            }))}
+          />
+        </ChartContainer>
+      </div>
+      <div>
+        <div style={{ ...COMPARE_LABEL, color: "#64748b" }}>Recharts · donut</div>
+        <RechartsPieChart width={420} height={220}>
+          <Pie
+            data={BROWSER_SHARE_ROWS}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={90}
+            isAnimationActive={false}
+          >
+            {BROWSER_SHARE_ROWS.map((row, index) => (
+              <RechartsCell key={row.name} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+            ))}
+          </Pie>
+          <Legend wrapperStyle={{ fontSize: 11 }} />
+        </RechartsPieChart>
       </div>
     </div>
   );
@@ -452,6 +549,30 @@ export const CleanDefault: Story = {
       description: {
         story:
           "Same data and card dimensions — AxiCharts G · Clean Default vs Recharts default and a hand-styled Recharts match (grid, gradient fill, KPI strip).",
+      },
+    },
+  },
+};
+
+export const StackedBar: Story = {
+  render: () => <StackedBarComparison />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Stacked bar — AxiCharts spec/compilePanel vs Recharts stacked Bar (C119 parity).",
+      },
+    },
+  },
+};
+
+export const Donut: Story = {
+  render: () => <DonutComparison />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Donut — AxiCharts PieChart innerRadius vs Recharts Pie (C119 parity).",
       },
     },
   },

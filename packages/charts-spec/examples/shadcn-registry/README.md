@@ -12,6 +12,8 @@ Hosted **custom registry** for AxiCharts chart blocks — install via `npx shadc
 | Donut | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-donut.json` |
 | Area | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-area.json` |
 | Stacked bar | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-stacked-bar.json` |
+| Combo (bar + line) | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-combo.json` |
+| Multi-line | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-multi-line.json` |
 | chartConfig lib | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-chart-config.json` |
 
 Docs install guide: https://axidify.github.io/axicharts/shadcn/registry

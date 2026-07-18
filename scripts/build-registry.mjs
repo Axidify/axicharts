@@ -54,6 +54,20 @@ const ITEMS = [
     target: "components/charts/chart-axi-stacked-bar.tsx",
   },
   {
+    name: "chart-axi-combo",
+    title: "AxiCharts Combo",
+    description: "Mixed bar + line on shared categories — shadcn mixed chart pattern with chartConfig.",
+    file: "chart-axi-combo.tsx",
+    target: "components/charts/chart-axi-combo.tsx",
+  },
+  {
+    name: "chart-axi-multi-line",
+    title: "AxiCharts Multi-Line",
+    description: "Multi-series line chart with chartConfig — burndown / trend comparison dashboards.",
+    file: "chart-axi-multi-line.tsx",
+    target: "components/charts/chart-axi-multi-line.tsx",
+  },
+  {
     name: "chart-axi-chart-config",
     title: "AxiCharts chartConfig helper",
     description: "Shared ChartConfig labels/colors — import into registry chart blocks or your own panels.",

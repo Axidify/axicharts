@@ -20,6 +20,10 @@ const config: StorybookConfig = {
       },
       resolve: {
         alias: {
+          "@axicharts/charts/quick": path.resolve(
+            root,
+            "packages/charts/src/entry/quick.ts",
+          ),
           "@axicharts/charts": path.resolve(root, "packages/charts/src"),
           "@axicharts/charts-canvas": path.resolve(
             root,

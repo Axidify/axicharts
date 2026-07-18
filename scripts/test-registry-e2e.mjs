@@ -143,6 +143,12 @@ function assertBuiltRegistryContract() {
   if (!catalog.items?.some((entry) => entry.name === "chart-axi-bar")) {
     throw new Error("registry.json catalog missing chart-axi-bar");
   }
+  const expectedItemCount = 8;
+  if (catalog.items?.length !== expectedItemCount) {
+    throw new Error(
+      `registry.json catalog expected ${expectedItemCount} items, got ${catalog.items?.length ?? 0}`,
+    );
+  }
 }
 
 function resolveInstalledFile(workDir) {

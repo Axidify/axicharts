@@ -20,6 +20,7 @@ Runnable fixtures for `compilePanel`, `ejectPanel`, and the CLI.
 | [browser-share-donut.panel.json](./browser-share-donut.panel.json) | **Donut** — `type: donut`, `innerRadius`, row-driven slices |
 | [velocity-stacked-bar.panel.json](./velocity-stacked-bar.panel.json) | **Stacked bar** — `stacked: true`, multi-series `props.series` |
 | [burndown-multi-line.panel.json](./burndown-multi-line.panel.json) | **Multi-series line** — burndown ideal vs remaining |
+| [combo-revenue-bar-line.panel.json](./combo-revenue-bar-line.panel.json) | **Combo** — bar + line mixed chart (shadcn ComposedChart migration) |
 
 Registry prep (shadcn custom registry): [shadcn-registry/](./shadcn-registry/) · source in repo `registry/`.
 

@@ -31,6 +31,16 @@ const ITEMS = [
     description: "BarChart stacked — sprint velocity / multi-series totals.",
   },
   {
+    name: "chart-axi-combo",
+    title: "Combo chart (bar + line)",
+    description: "ComboChart mixed bar + line — shadcn ComposedChart migration path.",
+  },
+  {
+    name: "chart-axi-multi-line",
+    title: "Multi-line chart",
+    description: "Multi-series LineChart with chartConfig — burndown / trend comparison.",
+  },
+  {
     name: "chart-axi-chart-config",
     title: "chartConfig helper (lib)",
     description: "Shared ChartConfig labels/colors — import into your chart blocks.",

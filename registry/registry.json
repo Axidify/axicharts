@@ -13,8 +13,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.33",
-        "@axicharts/charts-theme@0.3.33"
+        "@axicharts/charts@0.3.34",
+        "@axicharts/charts-theme@0.3.34"
       ],
       "registryDependencies": [],
       "files": [
@@ -34,8 +34,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.33",
-        "@axicharts/charts-theme@0.3.33"
+        "@axicharts/charts@0.3.34",
+        "@axicharts/charts-theme@0.3.34"
       ],
       "registryDependencies": [],
       "files": [
@@ -55,8 +55,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.33",
-        "@axicharts/charts-theme@0.3.33"
+        "@axicharts/charts@0.3.34",
+        "@axicharts/charts-theme@0.3.34"
       ],
       "registryDependencies": [],
       "files": [
@@ -76,8 +76,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.33",
-        "@axicharts/charts-theme@0.3.33"
+        "@axicharts/charts@0.3.34",
+        "@axicharts/charts-theme@0.3.34"
       ],
       "registryDependencies": [],
       "files": [
@@ -97,13 +97,55 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.33",
-        "@axicharts/charts-theme@0.3.33"
+        "@axicharts/charts@0.3.34",
+        "@axicharts/charts-theme@0.3.34"
       ],
       "registryDependencies": [],
       "files": [
         {
           "path": "components/charts/chart-axi-stacked-bar.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "chart-axi-combo",
+      "type": "registry:block",
+      "title": "AxiCharts Combo",
+      "description": "Mixed bar + line on shared categories — shadcn mixed chart pattern with chartConfig.",
+      "categories": [
+        "charts",
+        "dashboard"
+      ],
+      "dependencies": [
+        "@axicharts/charts@0.3.34",
+        "@axicharts/charts-theme@0.3.34"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "components/charts/chart-axi-combo.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "chart-axi-multi-line",
+      "type": "registry:block",
+      "title": "AxiCharts Multi-Line",
+      "description": "Multi-series line chart with chartConfig — burndown / trend comparison dashboards.",
+      "categories": [
+        "charts",
+        "dashboard"
+      ],
+      "dependencies": [
+        "@axicharts/charts@0.3.34",
+        "@axicharts/charts-theme@0.3.34"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "components/charts/chart-axi-multi-line.tsx",
           "type": "registry:component"
         }
       ]
@@ -118,8 +160,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.33",
-        "@axicharts/charts-theme@0.3.33"
+        "@axicharts/charts@0.3.34",
+        "@axicharts/charts-theme@0.3.34"
       ],
       "registryDependencies": [],
       "files": [

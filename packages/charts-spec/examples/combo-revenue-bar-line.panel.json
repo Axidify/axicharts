@@ -1,0 +1,18 @@
+{
+  "specVersion": 1,
+  "type": "combo",
+  "title": "Weekly throughput",
+  "theme": "clean",
+  "height": 220,
+  "encoding": {
+    "x": { "field": "week" },
+    "y": [
+      { "field": "total", "label": "Weekly total", "kind": "bar" },
+      { "field": "avg", "label": "Daily avg", "kind": "line" }
+    ]
+  },
+  "props": {
+    "showValues": true,
+    "legendVariant": "inline"
+  }
+}
