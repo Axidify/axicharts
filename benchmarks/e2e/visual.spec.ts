@@ -32,6 +32,12 @@ const VISUAL_STORIES = [
     waitFor: ".axicharts-uplot",
   },
   {
+    id: "charts-scatter--market-cap-bubble",
+    name: "scatter-market-cap-bubble",
+    waitFor: "canvas",
+    settleMs: 2000,
+  },
+  {
     id: "charts-annotations--ops-finance-wall",
     name: "annotations-ops-finance",
     waitFor: ".axicharts-uplot",

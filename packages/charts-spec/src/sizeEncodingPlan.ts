@@ -66,7 +66,7 @@ function metricSuggestsSizeEncoding(metric: MetricProfile): boolean {
 }
 
 function isCartesianPanelType(type: PanelSpec["type"]): boolean {
-  return type === "bar" || type === "line" || type === "area";
+  return type === "bar" || type === "line" || type === "area" || type === "scatter";
 }
 
 export function inferSizeEncodingForPanel(args: {

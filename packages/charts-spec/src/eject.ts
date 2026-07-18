@@ -11,6 +11,10 @@ import { chartPropsWithoutChromeMeta, readPanelChrome } from "./panelChrome";
 import { chartPropsWithoutChartConfig, readPanelChartConfig } from "./panelChartConfig";
 import { chartPropsWithoutStyle, readPanelStyle } from "./panelStyle";
 import { mapDrillEjectProps } from "./mapEncoding";
+import {
+  SIZE_SCALE_HELPER,
+  sizeFieldMinMaxBlock,
+} from "./ejectSizeEncoding";
 
 function quote(value: string): string {
   return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
@@ -201,14 +205,35 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     const yField = Array.isArray(encoding?.y)
       ? encoding.y[0]?.field
       : encoding?.y?.field ?? "y";
-    chartBody = `series={[{
+    const labelField =
+      (spec.props?.labelField as string | undefined) ?? "label";
+    const sizeField = encoding?.size?.field;
+    const sizeRange =
+      encoding?.size?.range != null
+        ? `, ${JSON.stringify(encoding.size.range)}`
+        : "";
+    if (sizeField) {
+      const prefix = sizeField.replace(/[^a-zA-Z0-9]/g, "") || "size";
+      preamble = `${SIZE_SCALE_HELPER}\n\n${sizeFieldMinMaxBlock(dataVar, sizeField, prefix)}`;
+      chartBody = `series={[{
       name: "Series",
       points: ${dataVar}.map((row) => ({
         x: Number(row.${xField}),
         y: Number(row.${yField}),
-        label: row.label != null ? String(row.label) : undefined,
+        label: row.${labelField} != null ? String(row.${labelField}) : undefined,
+        size: resolveSizeMark(row.${sizeField}, ${prefix}SizeMinMax.min, ${prefix}SizeMinMax.max, "bubble"${sizeRange}),
+      })),
+    }]}${spec.props?.showSizeLegend === false ? "" : "\n    showSizeLegend"}`;
+    } else {
+      chartBody = `series={[{
+      name: "Series",
+      points: ${dataVar}.map((row) => ({
+        x: Number(row.${xField}),
+        y: Number(row.${yField}),
+        label: row.${labelField} != null ? String(row.${labelField}) : undefined,
       })),
     }]}`;
+    }
   } else if (spec.type === "treemap") {
     chartBody = `nodes={${dataVar}.nodes ?? ${dataVar}.map((row) => ({
       name: String(row.name),

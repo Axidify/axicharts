@@ -20,7 +20,17 @@ describe("sizeEncoding", () => {
     expect(sizesFromSizeField(rows, "score", "point")).toEqual([3, 6.5, 10]);
   });
 
+  it("scales quantitative values into bubble radii", () => {
+    const rows = [
+      { symbol: "AAPL", marketCap: 10 },
+      { symbol: "MSFT", marketCap: 30 },
+      { symbol: "NVDA", marketCap: 50 },
+    ];
+    expect(sizesFromSizeField(rows, "marketCap", "bubble")).toEqual([6, 17, 28]);
+  });
+
   it("honors custom output range", () => {
     expect(resolveEncodingSize(50, 0, 100, "point", [4, 8])).toBe(6);
+    expect(resolveEncodingSize(50, 0, 100, "bubble", [8, 20])).toBe(14);
   });
 });

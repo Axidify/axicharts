@@ -131,6 +131,27 @@ describe("ejectPanel", () => {
     expect(jsx).not.toContain("encoding.color");
   });
 
+  it("emits bubble size encoding for scatter panels", () => {
+    const jsx = ejectPanel({
+      type: "scatter",
+      encoding: {
+        x: { field: "risk" },
+        y: { field: "returnPct" },
+        size: { field: "marketCap", range: [8, 24] },
+      },
+      props: {
+        xLabel: "Risk",
+        yLabel: "Return %",
+        showPointLabels: true,
+      },
+    });
+
+    expect(jsx).toContain("resolveSizeMark");
+    expect(jsx).toContain("size: resolveSizeMark");
+    expect(jsx).toContain("showSizeLegend");
+    expect(jsx).toContain('xLabel={"Risk"}');
+  });
+
   it("emits Cell size for encoding.size on line panels", () => {
     const jsx = ejectPanel({
       type: "line",

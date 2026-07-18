@@ -13,20 +13,24 @@ export type ScatterChartProps = {
   series: ScatterSeries[];
   showAxes?: boolean;
   showPointLabels?: boolean;
+  showSizeLegend?: boolean;
   xLabel?: string;
   yLabel?: string;
   xSuffix?: string;
   ySuffix?: string;
+  sizeRange?: [number, number];
 };
 
 function ScatterPlot({
   series,
   showAxes,
   showPointLabels,
+  showSizeLegend,
   xLabel,
   yLabel,
   xSuffix,
   ySuffix,
+  sizeRange,
 }: ScatterChartProps): ReactElement {
   const { size, theme } = useChartLayout();
   const interaction = useEChartsInteraction();
@@ -39,10 +43,12 @@ function ScatterPlot({
       theme={theme}
       showAxes={showAxes}
       showPointLabels={showPointLabels}
+      showSizeLegend={showSizeLegend}
       xLabel={xLabel}
       yLabel={yLabel}
       xSuffix={xSuffix}
       ySuffix={ySuffix}
+      sizeRange={sizeRange}
       onItemHover={interaction.onItemHover}
     />
   );
@@ -52,10 +58,12 @@ export function ScatterChart({
   series,
   showAxes,
   showPointLabels,
+  showSizeLegend,
   xLabel,
   yLabel,
   xSuffix,
   ySuffix,
+  sizeRange,
 }: ScatterChartProps): ReactElement | null {
   const { size, ready, theme } = useChartLayout();
 
@@ -72,10 +80,12 @@ export function ScatterChart({
           series={series}
           showAxes={axes}
           showPointLabels={showPointLabels}
+          showSizeLegend={showSizeLegend}
           xLabel={xLabel}
           yLabel={yLabel}
           xSuffix={xSuffix}
           ySuffix={ySuffix}
+          sizeRange={sizeRange}
         />
       }
     />

@@ -1,8 +1,9 @@
-export type SizeScaleKind = "bar" | "point";
+export type SizeScaleKind = "bar" | "point" | "bubble";
 
 const DEFAULT_RANGES: Record<SizeScaleKind, [number, number]> = {
   bar: [0.35, 1],
   point: [3, 10],
+  bubble: [6, 28],
 };
 
 function toNumeric(raw: unknown): number | null {

@@ -317,27 +317,43 @@ export function compilePanel(
         ? yEnc[0]?.field
         : yEnc?.field ?? "y";
       const labelField = (props.labelField as string | undefined) ?? "label";
+      const basePoints = rows.map((row) => ({
+        x: Number(row[xField]),
+        y: Number(row[yField]),
+        label:
+          row[labelField] != null ? String(row[labelField]) : undefined,
+      }));
+      const points =
+        resolved.encoding?.size != null
+          ? basePoints.map((point, index) => ({
+              ...point,
+              size: sizesFromSizeField(
+                rows,
+                resolved.encoding!.size!.field,
+                "bubble",
+                resolved.encoding!.size!.range,
+              )[index],
+            }))
+          : basePoints;
       const scatterSeries =
         (props.series as Parameters<typeof ScatterChart>[0]["series"]) ??
         [
           {
             name: (props.seriesName as string | undefined) ?? "Series",
-            points: rows.map((row) => ({
-              x: Number(row[xField]),
-              y: Number(row[yField]),
-              label:
-                row[labelField] != null
-                  ? String(row[labelField])
-                  : undefined,
-            })),
+            points,
           },
         ];
-      return wrap(
-        createElement(ScatterChart, {
-          series: scatterSeries,
-          ...props,
-        }),
-      );
+      const chartProps = {
+        series: scatterSeries,
+        ...props,
+        ...(resolved.encoding?.size
+          ? {
+              showSizeLegend:
+                (props.showSizeLegend as boolean | undefined) ?? true,
+            }
+          : {}),
+      };
+      return wrap(createElement(ScatterChart, chartProps));
     }
 
     case "funnel": {

@@ -4,10 +4,10 @@ export const SIZE_SCALE_HELPER = `function resolveSizeMark(
   raw: unknown,
   min: number,
   max: number,
-  kind: "bar" | "point",
+  kind: "bar" | "point" | "bubble",
   range?: [number, number],
 ): number {
-  const output = range ?? (kind === "bar" ? [0.35, 1] : [3, 10]);
+  const output = range ?? (kind === "bar" ? [0.35, 1] : kind === "bubble" ? [6, 28] : [3, 10]);
   const numeric =
     typeof raw === "number" && Number.isFinite(raw)
       ? raw
@@ -50,7 +50,8 @@ export function ejectSizeProp(
   const size = spec.encoding?.size;
   if (!size?.field) return undefined;
 
-  const kind = spec.type === "bar" ? "bar" : "point";
+  const kind =
+    spec.type === "bar" ? "bar" : spec.type === "scatter" ? "bubble" : "point";
   const prop = kind === "bar" ? "size" : "radius";
   const range =
     size.range != null ? `, ${JSON.stringify(size.range)}` : "";
@@ -63,4 +64,8 @@ export function cartesianHasSizeEncoding(spec: PanelSpec): boolean {
     (spec.type === "line" || spec.type === "area" || spec.type === "bar") &&
     Boolean(spec.encoding?.size?.field)
   );
+}
+
+export function scatterHasSizeEncoding(spec: PanelSpec): boolean {
+  return spec.type === "scatter" && Boolean(spec.encoding?.size?.field);
 }
