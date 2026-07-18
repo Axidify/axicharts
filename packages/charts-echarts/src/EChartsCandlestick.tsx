@@ -12,6 +12,7 @@ import {
   upDownColors,
 } from "./themeBridge";
 import { buildDataZoom } from "./dataZoom";
+import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartCursorEvent } from "./useEChart";
 import type { OhlcPoint } from "./types";
 
@@ -30,6 +31,8 @@ export type EChartsCandlestickProps = {
   syncSourceId?: string | null;
   onCursor?: (event: EChartCursorEvent) => void;
   onBrushRange?: (range: { start: number; end: number } | null) => void;
+  mergeOption?: boolean;
+  animate?: boolean;
 };
 
 export function EChartsCandlestick({
@@ -47,6 +50,8 @@ export function EChartsCandlestick({
   syncSourceId,
   onCursor,
   onBrushRange,
+  mergeOption = false,
+  animate = false,
 }: EChartsCandlestickProps): ReactElement {
   const { up, down } = upDownColors(theme);
   const ohlc = data.map((point) => [point.open, point.close, point.low, point.high]);
@@ -55,7 +60,8 @@ export function EChartsCandlestick({
     ...(brush && !volume ? { bottom: 40 } : {}),
   };
 
-  const option: EChartsOption = {
+  const option: EChartsOption = withPresentationAnimation(
+    {
     grid: volume
       ? [
           { ...mainGrid, height: brush ? "52%" : "58%", bottom: brush ? "38%" : "32%" },
@@ -147,7 +153,9 @@ export function EChartsCandlestick({
           ]
         : []),
     ],
-  };
+    },
+    animate,
+  );
 
   const rootRef = useEChart({
     option,
@@ -160,6 +168,7 @@ export function EChartsCandlestick({
     syncSourceId,
     onCursor,
     onBrushRange,
+    mergeOption,
   });
 
   return (

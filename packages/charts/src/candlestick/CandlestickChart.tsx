@@ -44,7 +44,7 @@ function CandlestickPlot({
   brush,
   brushEnd,
 }: CandlestickChartProps): ReactElement {
-  const { size, theme } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
 
   return (
@@ -63,6 +63,8 @@ function CandlestickPlot({
       syncSourceId={interaction.syncSourceId}
       onCursor={interaction.onCursor}
       onBrushRange={interaction.onBrushRange}
+      mergeOption={mode === "live"}
+      animate={mode === "presentation"}
     />
   );
 }

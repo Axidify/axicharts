@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-core",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Pure layout and sizing math for AxiCharts (no React).",
   "license": "MIT",
   "repository": {

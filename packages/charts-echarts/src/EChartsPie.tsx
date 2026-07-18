@@ -16,6 +16,7 @@ export type EChartsPieProps = {
   innerRadius?: number;
   showLabels?: boolean;
   animate?: boolean;
+  mergeOption?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -27,6 +28,7 @@ export function EChartsPie({
   innerRadius = 0,
   showLabels = true,
   animate = false,
+  mergeOption,
   onItemHover,
 }: EChartsPieProps): ReactElement {
   const total = slices.reduce((sum, slice) => sum + slice.value, 0);
@@ -70,7 +72,7 @@ export function EChartsPie({
     width,
     height,
     onItemHover,
-    mergeOption: !animate,
+    mergeOption: mergeOption ?? !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse || params.name == null) return null;

@@ -38,6 +38,7 @@ function PiePlot({
       innerRadius={innerRadius}
       showLabels={showLabels}
       animate={mode === "presentation"}
+      mergeOption={mode === "live"}
       onItemHover={interaction.onItemHover}
     />
   );

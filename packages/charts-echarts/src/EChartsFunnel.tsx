@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import { hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
+import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { FunnelStage } from "./funnelTypes";
 
@@ -14,6 +15,8 @@ export type EChartsFunnelProps = {
   theme: ChartTheme;
   sort?: "ascending" | "descending" | "none";
   onItemHover?: (event: EChartItemHoverEvent) => void;
+  mergeOption?: boolean;
+  animate?: boolean;
 };
 
 export function EChartsFunnel({
@@ -23,6 +26,8 @@ export function EChartsFunnel({
   theme,
   sort = "descending",
   onItemHover,
+  mergeOption = false,
+  animate = false,
 }: EChartsFunnelProps): ReactElement {
   const total = stages.reduce((sum, stage) => sum + stage.value, 0);
   const palette = seriesPalette(theme);
@@ -37,7 +42,8 @@ export function EChartsFunnel({
     },
   }));
 
-  const option: EChartsOption = {
+  const option: EChartsOption = withPresentationAnimation(
+    {
     tooltip: hiddenTooltip(),
     series: [
       {
@@ -69,13 +75,16 @@ export function EChartsFunnel({
         data,
       },
     ],
-  };
+    },
+    animate,
+  );
 
   const rootRef = useEChart({
     option,
     width,
     height,
     onItemHover,
+    mergeOption,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse || params.name == null) return null;

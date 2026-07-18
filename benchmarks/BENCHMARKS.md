@@ -54,6 +54,8 @@ Methodology: Dashboarder [PERFORMANCE.md](https://github.com/Axidify/Dashboarder
 
 Profile: Chromium headless, viewport 1280×720, `flushSync` state updates, 30 frames per scenario. Harness: `apps/bench-harness`.
 
+**C101 exotic live path:** Pie, candlestick, and funnel ECharts adapters use the same `mergeOption` + `lazyUpdate` + `replaceMerge: ['series']` path as heatmap when `mode: "live"`. Storybook `Charts/Live ECharts breadth` exercises all three @ 5 Hz; cartesian competitive numbers above remain the published bench — exotic types share the merge machinery without a separate harness fixture yet.
+
 
 ## Browser stability (Chromium 4× CPU)
 

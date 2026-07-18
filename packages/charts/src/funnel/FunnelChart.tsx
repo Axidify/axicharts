@@ -26,7 +26,7 @@ function FunnelPlot({
   stages: FunnelStage[];
   sort?: "ascending" | "descending" | "none";
 }): ReactElement {
-  const { size, theme } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
 
   return (
@@ -37,6 +37,8 @@ function FunnelPlot({
       theme={theme}
       sort={sort}
       onItemHover={interaction.onItemHover}
+      mergeOption={mode === "live"}
+      animate={mode === "presentation"}
     />
   );
 }
