@@ -17,7 +17,6 @@ import {
   StudioLineChart,
 } from "@axicharts/charts/studio";
 import { cleanTheme } from "@axicharts/charts-theme";
-import "@axicharts/charts-theme/studio-tokens.css";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const LATENCY = [42, 38, 55, 49, 62, 58, 71];
