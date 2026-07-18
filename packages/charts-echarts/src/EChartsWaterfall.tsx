@@ -9,10 +9,10 @@ import {
   hiddenTooltip,
   reactAxisPointer,
   splitLineStyle,
-  toneColor,
 } from "./themeBridge";
 import { useEChart, type EChartCursorEvent } from "./useEChart";
 import type { WaterfallItem } from "./types";
+import { buildWaterfallBridge } from "./waterfallBridge";
 
 export type EChartsWaterfallProps = {
   width: number;
@@ -23,39 +23,9 @@ export type EChartsWaterfallProps = {
   onCursor?: (event: EChartCursorEvent) => void;
 };
 
-function buildWaterfallSeries(items: WaterfallItem[]) {
-  const placeholders: number[] = [];
-  const values: number[] = [];
-  const colors: string[] = [];
-  const labels: string[] = [];
-  let running = 0;
-
-  for (const item of items) {
-    labels.push(item.name);
-
-    if (item.isTotal) {
-      placeholders.push(0);
-      values.push(running);
-      colors.push(toneColor(item.tone ?? "default"));
-      running = item.value;
-      continue;
-    }
-
-    const delta = item.value;
-    if (delta >= 0) {
-      placeholders.push(running);
-      values.push(delta);
-      colors.push(toneColor(item.tone ?? "success"));
-      running += delta;
-    } else {
-      placeholders.push(running + delta);
-      values.push(Math.abs(delta));
-      colors.push(toneColor(item.tone ?? "critical"));
-      running += delta;
-    }
-  }
-
-  return { placeholders, values, colors, labels };
+function connectorLineColor(theme: ChartTheme): string {
+  const dark = theme.name === "live" || theme.name === "industrial";
+  return dark ? "#64748b" : "#94a3b8";
 }
 
 export function EChartsWaterfall({
@@ -66,7 +36,8 @@ export function EChartsWaterfall({
   valueFormat = (value) => `${value}`,
   onCursor,
 }: EChartsWaterfallProps): ReactElement {
-  const { placeholders, values, colors, labels } = buildWaterfallSeries(items);
+  const { placeholders, values, colors, labels, connectors } =
+    buildWaterfallBridge(items);
 
   const option: EChartsOption = {
     grid: gridOptions(theme),
@@ -99,6 +70,17 @@ export function EChartsWaterfall({
           position: "top",
           formatter: ({ value }) => valueFormat(Number(value)),
           fontSize: 11,
+        },
+        markLine: {
+          symbol: ["none", "none"],
+          silent: true,
+          animation: false,
+          lineStyle: {
+            color: connectorLineColor(theme),
+            width: 1,
+            type: "solid",
+          },
+          data: connectors,
         },
         data: values.map((value, index) => ({
           value,

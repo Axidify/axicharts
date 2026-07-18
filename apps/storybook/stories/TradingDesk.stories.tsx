@@ -343,7 +343,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Round 3 acceptance target (5/5) — live KPI tiles, session H/L chip, OHLC brush + synced RSI with 30/70 references, correlation callout, net P&L strip on positions table.",
+          "Round 3 acceptance target (5/5) — live KPI tiles, session H/L chip, OHLC brush + synced RSI window/crosshair with 30/70 references, correlation callout, net P&L strip on positions table.",
       },
     },
   },

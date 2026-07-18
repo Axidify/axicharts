@@ -39,7 +39,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C2 unified React tooltips over ECharts — same chrome as uPlot cartesian charts.",
+          "C82 IBCS waterfall bridge — stacked bars with horizontal connector lines at cumulative levels.",
       },
     },
   },
@@ -71,7 +71,15 @@ export const WaterfallHover: Story = {
 export const PieHover: Story = {
   render: (): ReactElement => (
     <ChartContainer theme={cleanTheme} height={260} width={360}>
-      <PieChart slices={SLICES} innerRadius={42} />
+      <PieChart slices={SLICES} innerRadius={42} showLabels />
+    </ChartContainer>
+  ),
+};
+
+export const PieLabelsOff: Story = {
+  render: (): ReactElement => (
+    <ChartContainer theme={cleanTheme} height={260} width={360}>
+      <PieChart slices={SLICES} showLabels={false} />
     </ChartContainer>
   ),
 };

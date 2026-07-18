@@ -69,6 +69,7 @@ export function EChartsPie({
     width,
     height,
     onItemHover,
+    mergeOption: !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse || params.name == null) return null;

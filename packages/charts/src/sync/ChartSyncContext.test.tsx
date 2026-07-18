@@ -34,6 +34,17 @@ describe("ChartSyncGroup", () => {
     expect(result.current.sourceId).toBe("panel-a");
   });
 
+  it("publishes and shares brush range across hooks", () => {
+    const { result } = renderHook(() => useChartSync(), { wrapper });
+
+    act(() => {
+      result.current.publishBrushRange({ start: 0, end: 45 }, "ohlc");
+    });
+
+    expect(result.current.brushRange).toEqual({ start: 0, end: 45 });
+    expect(result.current.brushSourceId).toBe("ohlc");
+  });
+
   it("updates source when another panel publishes", () => {
     const { result } = renderHook(() => useChartSync(), { wrapper });
 

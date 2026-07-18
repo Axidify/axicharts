@@ -36,6 +36,7 @@ echarts.use([
 ]);
 
 export { buildDataZoom, type BuildDataZoomInput } from "./dataZoom";
+export { buildWaterfallBridge, type WaterfallBridge, type WaterfallConnector } from "./waterfallBridge";
 export { EChartsCandlestick, type EChartsCandlestickProps } from "./EChartsCandlestick";
 export { EChartsFunnel, type EChartsFunnelProps } from "./EChartsFunnel";
 export { EChartsTreemap, type EChartsTreemapProps } from "./EChartsTreemap";

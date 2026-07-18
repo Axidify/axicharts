@@ -18,6 +18,8 @@ import {
 import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
 import { usePlotSync } from "../sync/usePlotSync";
+import { sliceCartesianByBrushRange } from "../sync/brushRange";
+import { useOptionalChartSync } from "../sync/ChartSyncContext";
 import { usePlotSampling } from "../plot/usePlotSampling";
 import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
@@ -45,6 +47,7 @@ export type LineChartProps = {
 type LinePlotProps = {
   categories: string[];
   series: PlotSeries[];
+  fullCategoryCount: number;
   fill?: boolean;
   showAxes?: boolean;
   valueSuffix?: string;
@@ -59,6 +62,7 @@ type LinePlotProps = {
 function LinePlot({
   categories,
   series,
+  fullCategoryCount,
   fill,
   showAxes,
   valueSuffix,
@@ -70,7 +74,7 @@ function LinePlot({
   referenceLines,
 }: LinePlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
-  const plotSync = usePlotSync();
+  const plotSync = usePlotSync(fullCategoryCount);
   const chrome = getInteractionChrome(mode);
   const showLegend =
     chrome.showLegend && series.length > 1 && !compact;
@@ -119,7 +123,10 @@ export function LineChart({
   thresholdBands,
   referenceLines,
 }: LineChartProps): ReactElement | null {
-  const { size, ready, theme, mode, config, tagTones } = useChartLayout();
+  const { size, ready, theme, mode, config, tagTones, syncId } = useChartLayout();
+  const sync = useOptionalChartSync();
+  const followerBrushRange =
+    sync?.brushRange && sync.brushSourceId !== syncId ? sync.brushRange : null;
   const { categories, series: resolvedSeries, valueSuffix, curve } = useResolvedCartesianProps(
     {
       categories: categoriesProp,
@@ -136,14 +143,18 @@ export function LineChart({
     const configured = applyChartConfigToSeries(resolvedSeries, config);
     return applyTagTonesToSeries(configured, tagTones ?? {});
   }, [resolvedSeries, config, tagTones]);
+  const brushed = useMemo(
+    () => sliceCartesianByBrushRange(categories, series, followerBrushRange),
+    [categories, series, followerBrushRange],
+  );
   const maxPoints = usePlotSampling({
-    pointCount: categories.length,
+    pointCount: brushed.categories.length,
     renderer,
     refreshHz,
   });
   const prepared = useMemo(
-    () => preparePlotData(categories, series, maxPoints),
-    [categories, series, maxPoints],
+    () => preparePlotData(brushed.categories, brushed.series, maxPoints),
+    [brushed.categories, brushed.series, maxPoints],
   );
 
   if (!ready || size.width < 1 || size.height < 1 || categories.length === 0 || series.length === 0) {
@@ -175,6 +186,7 @@ export function LineChart({
           <LinePlot
             categories={plotCategories}
             series={plotSeries}
+            fullCategoryCount={categories.length}
             fill={fill}
             showAxes={axes}
             valueSuffix={valueSuffix}

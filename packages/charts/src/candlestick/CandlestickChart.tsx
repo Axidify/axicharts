@@ -62,6 +62,7 @@ function CandlestickPlot({
       syncIndex={interaction.syncIndex}
       syncSourceId={interaction.syncSourceId}
       onCursor={interaction.onCursor}
+      onBrushRange={interaction.onBrushRange}
     />
   );
 }

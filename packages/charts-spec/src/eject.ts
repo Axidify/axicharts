@@ -116,7 +116,9 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     chartBody = `slices={${dataVar}.map((row) => ({
       name: String(row.${nameField}),
       value: Number(row.${valueField}),
-    }))}${innerRadius != null ? `\n    innerRadius={${innerRadius}}` : ""}`;
+    }))}${innerRadius != null ? `\n    innerRadius={${innerRadius}}` : ""}${
+      spec.props?.showLabels === false ? "" : "\n    showLabels"
+    }`;
   } else if (spec.type === "funnel") {
     const nameField = encoding?.name?.field ?? "name";
     const valueField = encoding?.value?.field ?? "value";

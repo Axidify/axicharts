@@ -17,6 +17,11 @@ export type EChartCursorEvent = {
   top: number;
 } | null;
 
+export type EChartBrushRange = {
+  start: number;
+  end: number;
+};
+
 type UseEChartOptions = {
   option: EChartsOption;
   width: number;
@@ -27,7 +32,9 @@ type UseEChartOptions = {
   syncIndex?: number | null;
   syncSourceId?: string | null;
   onCursor?: (event: EChartCursorEvent) => void;
+  onBrushRange?: (range: EChartBrushRange | null) => void;
   onItemHover?: (event: EChartItemHoverEvent) => void;
+  mergeOption?: boolean;
   formatItemHover?: (params: {
     name?: string;
     value?: unknown;
@@ -59,19 +66,23 @@ export function useEChart({
   syncIndex,
   syncSourceId,
   onCursor,
+  onBrushRange,
   onItemHover,
+  mergeOption = false,
   formatItemHover,
 }: UseEChartOptions) {
   const rootRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<echarts.ECharts | null>(null);
   const onSyncIndexRef = useRef(onSyncIndex);
   const onCursorRef = useRef(onCursor);
+  const onBrushRangeRef = useRef(onBrushRange);
   const onItemHoverRef = useRef(onItemHover);
   const formatItemHoverRef = useRef(formatItemHover);
   const categoriesRef = useRef(categories);
   const applyingSyncRef = useRef(false);
   onSyncIndexRef.current = onSyncIndex;
   onCursorRef.current = onCursor;
+  onBrushRangeRef.current = onBrushRange;
   onItemHoverRef.current = onItemHover;
   formatItemHoverRef.current = formatItemHover;
   categoriesRef.current = categories;
@@ -160,24 +171,59 @@ export function useEChart({
       onItemHoverRef.current?.(null);
     };
 
+    const handleDataZoom = (...args: unknown[]) => {
+      if (!onBrushRangeRef.current) return;
+      const event = args[0] as {
+        batch?: Array<{ start?: number; end?: number }>;
+        start?: number;
+        end?: number;
+      };
+      const batch = event.batch?.[0];
+      const start = batch?.start ?? event.start;
+      const end = batch?.end ?? event.end;
+      if (typeof start === "number" && typeof end === "number") {
+        onBrushRangeRef.current({ start, end });
+      }
+    };
+
     chart.on("updateAxisPointer", handleAxisPointer);
     chart.getZr().on("globalout", handleGlobalOut);
     chart.on("mouseover", handleMouseOver);
     chart.on("mouseout", handleMouseOut);
+    chart.on("datazoom", handleDataZoom);
 
     return () => {
       chart.off("updateAxisPointer", handleAxisPointer);
       chart.getZr().off("globalout", handleGlobalOut);
       chart.off("mouseover", handleMouseOver);
       chart.off("mouseout", handleMouseOut);
+      chart.off("datazoom", handleDataZoom);
       chart.dispose();
       chartRef.current = null;
     };
   }, [width, height]);
 
   useEffect(() => {
-    chartRef.current?.setOption(option, { notMerge: true });
-  }, [option]);
+    const chart = chartRef.current;
+    if (!chart) return;
+    chart.setOption(option, {
+      notMerge: !mergeOption,
+      lazyUpdate: mergeOption,
+      replaceMerge: mergeOption ? ["series"] : undefined,
+    });
+    if (onBrushRangeRef.current && option.dataZoom) {
+      const dataZoom = option.dataZoom;
+      const zooms = Array.isArray(dataZoom) ? dataZoom : [dataZoom];
+      const primary = zooms.find((zoom) => zoom.type === "slider") ?? zooms[0];
+      if (
+        primary &&
+        typeof primary.start === "number" &&
+        typeof primary.end === "number"
+      ) {
+        onBrushRangeRef.current({ start: primary.start, end: primary.end });
+      }
+    }
+  }, [option, mergeOption]);
 
   useEffect(() => {
     chartRef.current?.resize({ width, height });

@@ -206,7 +206,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Round 3 acceptance target (5/5) — FP&A KPI tiles with revenue sparkline, churn callout, P&L waterfall bridge, monthly area with plan reference line.",
+          "Round 3 acceptance target (5/5) — FP&A KPI tiles with revenue sparkline, churn callout, P&L waterfall bridge with IBCS connector lines, monthly area with plan reference line.",
       },
     },
   },

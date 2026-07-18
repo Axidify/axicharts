@@ -29,6 +29,7 @@ export type EChartsCandlestickProps = {
   syncIndex?: number | null;
   syncSourceId?: string | null;
   onCursor?: (event: EChartCursorEvent) => void;
+  onBrushRange?: (range: { start: number; end: number } | null) => void;
 };
 
 export function EChartsCandlestick({
@@ -45,6 +46,7 @@ export function EChartsCandlestick({
   syncIndex,
   syncSourceId,
   onCursor,
+  onBrushRange,
 }: EChartsCandlestickProps): ReactElement {
   const { up, down } = upDownColors();
   const ohlc = data.map((point) => [point.open, point.close, point.low, point.high]);
@@ -157,6 +159,7 @@ export function EChartsCandlestick({
     syncIndex,
     syncSourceId,
     onCursor,
+    onBrushRange,
   });
 
   return (

@@ -9,6 +9,8 @@ export function withPresentationAnimation(
       ...option,
       animation: false,
       animationDuration: 0,
+      animationDurationUpdate: 280,
+      animationEasingUpdate: "cubicOut",
     };
   }
 
@@ -18,5 +20,7 @@ export function withPresentationAnimation(
     animationDuration: 820,
     animationEasing: "cubicOut",
     animationDelay: (index: number) => index * 60,
+    animationDurationUpdate: 420,
+    animationEasingUpdate: "cubicOut",
   };
 }
