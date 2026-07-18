@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { useOptionalChartSync } from "./ChartSyncContext";
+import { resolveFollowerBrushRange } from "./brushSync";
 import type { BrushRange } from "./brushRange";
 
 export type UseCartesianBrushInput = {
@@ -8,11 +9,16 @@ export type UseCartesianBrushInput = {
   brushEnd?: number;
 };
 
+/** Unified cartesian brush sync — leaders publish; followers slice via ChartSyncGroup. */
+export function useBrushSync(input: UseCartesianBrushInput) {
+  return useCartesianBrush(input);
+}
+
 export function useCartesianBrush({
   brush = false,
   brushEnd = 100,
 }: UseCartesianBrushInput) {
-  const { syncId } = useChartLayout();
+  const { syncId, syncFollower } = useChartLayout();
   const sync = useOptionalChartSync();
 
   const [leaderRange, setLeaderRange] = useState<BrushRange>(() => ({
@@ -20,8 +26,7 @@ export function useCartesianBrush({
     end: brushEnd,
   }));
 
-  const followerRange =
-    sync?.brushRange && sync.brushSourceId !== syncId ? sync.brushRange : null;
+  const followerRange = resolveFollowerBrushRange(sync, syncId, syncFollower);
 
   const effectiveRange = useMemo(() => {
     if (brush) {

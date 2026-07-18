@@ -45,7 +45,7 @@ describe("ChartSyncGroup", () => {
     expect(result.current.brushSourceId).toBe("ohlc");
   });
 
-  it("updates source when another panel publishes", () => {
+  it("updates cursor source when another panel publishes", () => {
     const { result } = renderHook(() => useChartSync(), { wrapper });
 
     act(() => {
@@ -55,5 +55,17 @@ describe("ChartSyncGroup", () => {
 
     expect(result.current.index).toBe(4);
     expect(result.current.sourceId).toBe("panel-b");
+  });
+
+  it("updates brush source when another leader publishes (last wins)", () => {
+    const { result } = renderHook(() => useChartSync(), { wrapper });
+
+    act(() => {
+      result.current.publishBrushRange({ start: 0, end: 40 }, "throughput");
+      result.current.publishBrushRange({ start: 20, end: 80 }, "ohlc");
+    });
+
+    expect(result.current.brushRange).toEqual({ start: 20, end: 80 });
+    expect(result.current.brushSourceId).toBe("ohlc");
   });
 });

@@ -101,6 +101,19 @@ export {
   useChartSync,
   useOptionalChartSync,
 } from "./sync/ChartSyncContext";
+export {
+  resolveFollowerBrushRange,
+  type BrushRange,
+} from "./sync/brushSync";
+export {
+  sliceCartesianByBrushRange,
+  mapSyncIndexForBrushRange,
+} from "./sync/brushRange";
+export {
+  useCartesianBrush,
+  useBrushSync,
+  type UseCartesianBrushInput,
+} from "./sync/useCartesianBrush";
 export { SyncHighlight, type SyncHighlightProps } from "./sync/SyncHighlight";
 export { useEChartsInteraction } from "./sync/useEChartsInteraction";
 export {

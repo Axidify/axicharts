@@ -1,10 +1,11 @@
 import { useCallback } from "react";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { useOptionalChartSync } from "./ChartSyncContext";
+import { resolveFollowerBrushRange } from "./brushSync";
 import type { BrushRange } from "./brushRange";
 
 export function useEChartsSync() {
-  const { syncId } = useChartLayout();
+  const { syncId, syncFollower } = useChartLayout();
   const sync = useOptionalChartSync();
 
   const onSyncIndex = useCallback(
@@ -25,8 +26,7 @@ export function useEChartsSync() {
     [sync, syncId],
   );
 
-  const followerBrushRange =
-    sync?.brushRange && sync.brushSourceId !== syncId ? sync.brushRange : null;
+  const followerBrushRange = resolveFollowerBrushRange(sync, syncId, syncFollower);
 
   return {
     onSyncIndex,

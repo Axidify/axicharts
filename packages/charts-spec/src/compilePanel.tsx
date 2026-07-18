@@ -103,6 +103,10 @@ function wrapChart(
   const chartConfig = toChartConfig(readPanelChartConfig(spec.props));
   const syncId =
     typeof spec.props?.syncId === "string" ? spec.props.syncId : undefined;
+  const syncFollower =
+    typeof spec.props?.syncFollower === "string"
+      ? spec.props.syncFollower
+      : undefined;
 
   const panel = createElement(
     ChartContainer,
@@ -116,6 +120,7 @@ function wrapChart(
       legendVariant: chrome.legendVariant,
       tooltipVariant: chrome.tooltipVariant,
       syncId,
+      syncFollower,
     },
     chart,
   );

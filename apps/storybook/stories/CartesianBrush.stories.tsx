@@ -44,7 +44,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C83 cartesian brush — uPlot overview strip on line/bar leaders publishes range to ChartSyncGroup; follower panels slice to the same window.",
+          "C83 cartesian brush — uPlot overview strip on line/bar leaders publishes range to ChartSyncGroup; follower panels slice to the same window. See Charts/BrushSync for C92 multi-panel hardening.",
       },
     },
   },

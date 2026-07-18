@@ -3,6 +3,7 @@ import type { PlotCursorEvent } from "@axicharts/charts-canvas";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { useChartInteraction } from "../interaction/ChartInteractionContext";
 import { useOptionalChartSync } from "../sync/ChartSyncContext";
+import { resolveFollowerBrushRange } from "./brushSync";
 import { mapSyncIndexForBrushRange } from "./brushRange";
 
 export type PlotSyncProps = {
@@ -14,12 +15,11 @@ export type PlotSyncProps = {
 };
 
 export function usePlotSync(categoryCount = 0): PlotSyncProps {
-  const { syncId } = useChartLayout();
+  const { syncId, syncFollower } = useChartLayout();
   const sync = useOptionalChartSync();
   const { setCursor } = useChartInteraction();
 
-  const followerBrushRange =
-    sync?.brushRange && sync.brushSourceId !== syncId ? sync.brushRange : null;
+  const followerBrushRange = resolveFollowerBrushRange(sync, syncId, syncFollower);
 
   const onSyncIndex = useCallback(
     (index: number | null) => {

@@ -21,6 +21,8 @@ export type ChartLayoutContextValue = {
   config?: ChartConfig;
   mode: "static" | "interactive" | "live" | "presentation";
   syncId?: string;
+  /** When set, brush followers only mirror range from this leader syncId. */
+  syncFollower?: string;
   dataState: ChartDataState;
   isStale: boolean;
   lastUpdatedAt?: number;

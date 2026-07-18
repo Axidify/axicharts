@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { isValidElement, type ReactElement } from "react";
 import { render, waitFor } from "@testing-library/react";
 import { registerBuiltinChartTypes } from "@axicharts/charts/registry";
 import { registerTankChart } from "@axicharts/charts-tank";
@@ -350,5 +351,27 @@ describe("compilePanel markdown", () => {
     expect(container.querySelector("a")?.getAttribute("href")).toBe(
       "https://example.com/runbook",
     );
+  });
+});
+
+describe("compilePanel brush sync", () => {
+  it("passes syncId and syncFollower to ChartContainer", () => {
+    const panel = compilePanel(
+      {
+        type: "line",
+        props: { syncId: "rsi", syncFollower: "ohlc" },
+        encoding: { x: { field: "week" }, y: { field: "value" } },
+        height: 180,
+      },
+      [
+        { week: "W1", value: 1 },
+        { week: "W2", value: 2 },
+      ],
+    );
+
+    expect(isValidElement(panel)).toBe(true);
+    const container = panel as ReactElement<{ syncId?: string; syncFollower?: string }>;
+    expect(container.props.syncId).toBe("rsi");
+    expect(container.props.syncFollower).toBe("ohlc");
   });
 });

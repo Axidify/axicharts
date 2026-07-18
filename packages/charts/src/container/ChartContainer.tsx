@@ -43,6 +43,7 @@ export type ChartContainerProps = {
   config?: ChartConfig;
   mode?: "static" | "interactive" | "live" | "presentation";
   syncId?: string;
+  syncFollower?: string;
   dataState?: ChartDataState;
   staleAfterMs?: number;
   lastUpdatedAt?: number;
@@ -73,6 +74,7 @@ export function ChartContainer({
   config,
   mode = "interactive",
   syncId,
+  syncFollower,
   dataState = "ready",
   staleAfterMs,
   lastUpdatedAt,
@@ -148,6 +150,7 @@ export function ChartContainer({
         config,
         mode,
         syncId,
+        syncFollower,
         dataState,
         isStale: showStale,
         lastUpdatedAt,
