@@ -132,3 +132,13 @@ export function seriesDataSignature(
     .join("|");
   return `${categories.join(",")}::${seriesPart}`;
 }
+
+/** Structure-only signature — categories/series shape, not values (for live crossfade). */
+export function seriesStructureSignature(
+  categories: string[],
+  series: { name: string }[],
+): string {
+  const categoryPart = `${categories.length}:${categories.join(",")}`;
+  const seriesPart = `${series.length}:${series.map((item) => item.name).join("|")}`;
+  return `${categoryPart}::${seriesPart}`;
+}

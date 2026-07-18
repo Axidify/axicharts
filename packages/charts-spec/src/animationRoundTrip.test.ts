@@ -3,6 +3,7 @@ import { render } from "@testing-library/react";
 import { compilePanel } from "./compilePanel";
 import { ejectPanel } from "./eject";
 import { readPanelAnimation } from "./panelAnimation";
+import { readPanelLiveAnimate } from "./panelLiveAnimate";
 
 const ROWS = [
   { month: "Jan", revenue: 120 },
@@ -126,5 +127,33 @@ describe("animation spec round-trip", () => {
 
     const jsx = ejectPanel(spec, "rows");
     expect(jsx).toContain('animate={"stagger"}');
+  });
+
+  it("compiles line panel with liveAnimate crossfade and ejects prop", () => {
+    const spec = {
+      type: "line" as const,
+      liveAnimate: "crossfade" as const,
+      mode: "live" as const,
+      encoding: {
+        x: { field: "month" },
+        y: { field: "revenue" },
+      },
+      height: 200,
+    };
+
+    const panel = compilePanel(spec, ROWS, { mode: "live" });
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain('liveAnimate="crossfade"');
+  });
+
+  it("reads props.liveAnimate fallback", () => {
+    expect(
+      readPanelLiveAnimate({
+        props: { liveAnimate: "crossfade" },
+      }),
+    ).toBe("crossfade");
   });
 });

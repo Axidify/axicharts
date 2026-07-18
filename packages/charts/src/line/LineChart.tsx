@@ -35,10 +35,12 @@ import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations"
 import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
-import type { ChartAnimate } from "../motion/types";
+import type { ChartAnimate, LiveAnimate } from "../motion/types";
 import {
   seriesDataSignature,
+  seriesStructureSignature,
   useCartesianAnimate,
+  useLiveCrossfade,
 } from "../motion";
 
 const LINE_SERIES_KINDS = ["line", "area"] as const;
@@ -63,6 +65,7 @@ export type LineChartProps = {
   brushEnd?: number;
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
   animate?: ChartAnimate;
+  liveAnimate?: LiveAnimate;
 };
 
 type LinePlotProps = {
@@ -213,8 +216,10 @@ export function LineChart({
   brushEnd = 100,
   onMarkerDragEnd,
   animate,
+  liveAnimate: liveAnimateProp,
 }: LineChartProps): ReactElement | null {
-  const { size, ready, theme, mode, config, tagTones } = useChartLayout();
+  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate } =
+    useChartLayout();
   const annotationProps = useCartesianAnnotations({
     annotations,
     thresholdBands,
@@ -259,11 +264,25 @@ export function LineChart({
     () => seriesDataSignature(categories, series),
     [categories, series],
   );
+  const structureSignature = useMemo(
+    () => seriesStructureSignature(categories, series),
+    [categories, series],
+  );
+  const liveAnimate = liveAnimateProp ?? contextLiveAnimate ?? "none";
   const motion = useCartesianAnimate({
     animate,
     kind: fill ? "area" : "line",
     dataSignature,
   });
+  const liveCrossfade = useLiveCrossfade({
+    enabled: liveAnimate === "crossfade",
+    structureSignature,
+    mode,
+  });
+  const plotMotionStyle =
+    motion.plotStyle || liveCrossfade.plotStyle
+      ? { ...motion.plotStyle, ...liveCrossfade.plotStyle }
+      : undefined;
 
   if (!ready || size.width < 1 || size.height < 1 || categories.length === 0 || series.length === 0) {
     return null;
@@ -293,7 +312,7 @@ export function LineChart({
         series={plotSeries}
         valueSuffix={valueSuffix}
         compact={compact}
-        plotMotionStyle={motion.plotStyle}
+        plotMotionStyle={plotMotionStyle}
         plotClassName={motion.plotClassName}
         plotKey={motion.plotKey}
         skipPresentationPlotEnter={motion.skipPresentationPlotEnter}

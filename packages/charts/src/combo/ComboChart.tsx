@@ -24,10 +24,12 @@ import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
 import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
-import type { ChartAnimate } from "../motion/types";
+import type { ChartAnimate, LiveAnimate } from "../motion/types";
 import {
   seriesDataSignature,
+  seriesStructureSignature,
   useCartesianAnimate,
+  useLiveCrossfade,
 } from "../motion";
 import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
@@ -48,6 +50,7 @@ export type ComboChartProps = {
   refreshHz?: number;
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
   animate?: ChartAnimate;
+  liveAnimate?: LiveAnimate;
 };
 
 type ComboPlotProps = ComboChartProps;
@@ -139,8 +142,10 @@ export function ComboChart({
   refreshHz,
   onMarkerDragEnd,
   animate,
+  liveAnimate: liveAnimateProp,
 }: ComboChartProps): ReactElement | null {
-  const { size, ready, theme, config, tagTones } = useChartLayout();
+  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate } =
+    useChartLayout();
   const annotationProps = useCartesianAnnotations({
     annotations,
     thresholdBands,
@@ -163,11 +168,25 @@ export function ComboChart({
     () => seriesDataSignature(categories, series),
     [categories, series],
   );
+  const structureSignature = useMemo(
+    () => seriesStructureSignature(categories, series),
+    [categories, series],
+  );
+  const liveAnimate = liveAnimateProp ?? contextLiveAnimate ?? "none";
   const motion = useCartesianAnimate({
     animate,
     kind: "combo",
     dataSignature,
   });
+  const liveCrossfade = useLiveCrossfade({
+    enabled: liveAnimate === "crossfade",
+    structureSignature,
+    mode,
+  });
+  const plotMotionStyle =
+    motion.plotStyle || liveCrossfade.plotStyle
+      ? { ...motion.plotStyle, ...liveCrossfade.plotStyle }
+      : undefined;
 
   if (
     !ready ||
@@ -200,7 +219,7 @@ export function ComboChart({
         series={prepared.series}
         valueSuffix={valueSuffix}
         compact={compact}
-        plotMotionStyle={motion.plotStyle}
+        plotMotionStyle={plotMotionStyle}
         plotKey={motion.plotKey}
         skipPresentationPlotEnter={motion.skipPresentationPlotEnter}
         plot={

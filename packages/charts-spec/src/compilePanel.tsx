@@ -62,6 +62,10 @@ import {
   readPanelAnimation,
 } from "./panelAnimation";
 import {
+  chartPropsWithoutLiveAnimate,
+  readPanelLiveAnimate,
+} from "./panelLiveAnimate";
+import {
   chartPropsWithoutStyle,
   readPanelStyle,
   themeWithPanelStyle,
@@ -75,9 +79,11 @@ import { wordCloudFromRows } from "./wordCloudEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
-  return chartPropsWithoutAnimation(
-    chartPropsWithoutChartConfig(
-      chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props)),
+  return chartPropsWithoutLiveAnimate(
+    chartPropsWithoutAnimation(
+      chartPropsWithoutChartConfig(
+        chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props)),
+      ),
     ),
   );
 }
@@ -128,6 +134,7 @@ function wrapChart(
     typeof spec.props?.syncFollower === "string"
       ? spec.props.syncFollower
       : undefined;
+  const liveAnimate = readPanelLiveAnimate(spec);
 
   const panel = createElement(
     ChartContainer,
@@ -142,6 +149,7 @@ function wrapChart(
       tooltipVariant: chrome.tooltipVariant,
       syncId,
       syncFollower,
+      ...(liveAnimate != null ? { liveAnimate } : {}),
     },
     chart,
   );
@@ -278,6 +286,8 @@ export function compilePanel(
         ];
       }
 
+      const panelLiveAnimate = readPanelLiveAnimate(resolved);
+
       const chartProps = panelPropsWithAnnotations(resolved, {
         ...props,
         categories,
@@ -286,6 +296,7 @@ export function compilePanel(
         stacked: resolved.stacked,
         valueSuffix: resolved.valueSuffix,
         animate: readPanelAnimation(resolved),
+        ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
       });
 
       const Chart =
@@ -308,6 +319,8 @@ export function compilePanel(
           ? fromEncoding
           : ((props.series as ComboSeries[] | undefined) ?? []);
 
+      const panelLiveAnimate = readPanelLiveAnimate(resolved);
+
       const chartProps = panelPropsWithAnnotations(resolved, {
         ...props,
         categories,
@@ -315,6 +328,7 @@ export function compilePanel(
         fill: resolved.fill,
         valueSuffix: resolved.valueSuffix,
         animate: readPanelAnimation(resolved),
+        ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
       });
 
       return wrap(createElement(ComboChart, chartProps));

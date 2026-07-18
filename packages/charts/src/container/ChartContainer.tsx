@@ -21,7 +21,7 @@ import {
   useIsStale,
   type ChartDataState,
 } from "../state";
-import type { ChartAnimate } from "../motion/types";
+import type { ChartAnimate, LiveAnimate } from "../motion/types";
 import {
   ensurePresentationStyles,
   presentationEnterStyle,
@@ -57,6 +57,8 @@ export type ChartContainerProps = {
   tooltipVariant?: TooltipVariant;
   /** Chart-level animation default — cartesian charts may override. */
   animate?: ChartAnimate;
+  /** Live-mode wholesale replace crossfade — default `"none"`. */
+  liveAnimate?: LiveAnimate;
   onResize?: (size: { width: number; height: number }) => void;
 };
 
@@ -89,6 +91,7 @@ export function ChartContainer({
   legendVariant,
   tooltipVariant,
   animate,
+  liveAnimate = "none",
   onResize,
 }: ChartContainerProps): ReactElement {
   const [ref, measured] = useResizeObserver(debounceMs);
@@ -163,6 +166,7 @@ export function ChartContainer({
         theme: resolvedTheme,
         config,
         mode,
+        liveAnimate,
         syncId,
         syncFollower,
         dataState,

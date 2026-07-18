@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import {
   AreaChart,
@@ -112,4 +112,85 @@ export const LiveIgnoresAnimate: Story = {
       </ChartContainer>
     </Panel>
   ),
+};
+
+const LIVE_TICK = {
+  categories: ["t0", "t1", "t2", "t3", "t4"],
+  series: [{ name: "Signal", data: [42, 44, 43, 45, 44] }],
+};
+
+const LIVE_WHOLESALE = {
+  categories: ["A", "B", "C", "D"],
+  series: [
+    { name: "Alpha", data: [10, 20, 15, 25] },
+    { name: "Beta", data: [8, 12, 18, 14] },
+  ],
+};
+
+function LiveCrossfadeDemo(): ReactElement {
+  const [data, setData] = useState(LIVE_TICK);
+
+  useEffect(() => {
+    let n = 0;
+    const id = window.setInterval(() => {
+      n += 1;
+      setData((current) => ({
+        ...current,
+        series: [
+          {
+            name: current.series[0]!.name,
+            data: current.series[0]!.data.map((value, index) =>
+              value + Math.sin((n + index) * 0.4) * 2,
+            ),
+          },
+        ],
+      }));
+    }, 200);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return (
+    <div style={{ width: 420 }}>
+      <p style={{ fontSize: 12, color: "#64748b", margin: "0 0 12px" }}>
+        Value ticks at 5 Hz — no crossfade. Wholesale replace triggers one
+        brief opacity crossfade.
+      </p>
+      <button
+        type="button"
+        onClick={() => setData(LIVE_WHOLESALE)}
+        style={{
+          marginBottom: 12,
+          marginRight: 8,
+          padding: "6px 12px",
+          borderRadius: 6,
+          border: "1px solid #cbd5e1",
+          background: "#fff",
+          cursor: "pointer",
+        }}
+      >
+        Wholesale replace (structure change)
+      </button>
+      <button
+        type="button"
+        onClick={() => setData(LIVE_TICK)}
+        style={{
+          marginBottom: 12,
+          padding: "6px 12px",
+          borderRadius: 6,
+          border: "1px solid #cbd5e1",
+          background: "#fff",
+          cursor: "pointer",
+        }}
+      >
+        Reset tick stream
+      </button>
+      <ChartContainer theme={cleanTheme} height={220} mode="live" liveAnimate="crossfade">
+        <LineChart {...data} refreshHz={5} />
+      </ChartContainer>
+    </div>
+  );
+}
+
+export const LiveCrossfade: Story = {
+  render: () => <LiveCrossfadeDemo />,
 };

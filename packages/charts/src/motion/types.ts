@@ -46,3 +46,6 @@ export type ResolvedChartAnimate = {
 };
 
 export type CartesianMotionKind = "line" | "bar" | "area" | "combo";
+
+/** Live-mode wholesale data replace animation — separate from `ChartAnimate`. */
+export type LiveAnimate = "none" | "crossfade";

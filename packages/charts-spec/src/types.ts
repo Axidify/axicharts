@@ -124,6 +124,8 @@ export type PanelSpec = {
   annotations?: AnnotationSpec[];
   /** Chart-level animation — also accepted as `props.animation`. */
   animation?: ChartAnimate;
+  /** Live-mode wholesale replace crossfade — also accepted as `props.liveAnimate`. */
+  liveAnimate?: LiveAnimate;
 };
 
 export type ChartMotionPresetName =
@@ -161,6 +163,8 @@ export type ChartAnimate =
   | ChartAnimatePreset
   | CartesianMotionPresetName
   | ChartAnimateConfig;
+
+export type LiveAnimate = "none" | "crossfade";
 
 export type AnnotationSpec =
   | {

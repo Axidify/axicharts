@@ -11,6 +11,7 @@ import { chartPropsWithoutChromeMeta, readPanelChrome } from "./panelChrome";
 import { chartPropsWithoutChartConfig, readPanelChartConfig } from "./panelChartConfig";
 import { chartPropsWithoutStyle, readPanelStyle } from "./panelStyle";
 import { chartPropsWithoutAnimation, readPanelAnimation } from "./panelAnimation";
+import { chartPropsWithoutLiveAnimate } from "./panelLiveAnimate";
 import { mapDrillEjectProps } from "./mapEncoding";
 import {
   SIZE_SCALE_HELPER,
@@ -22,9 +23,11 @@ function quote(value: string): string {
 }
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
-  return chartPropsWithoutAnimation(
-    chartPropsWithoutChartConfig(
-      chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props)),
+  return chartPropsWithoutLiveAnimate(
+    chartPropsWithoutAnimation(
+      chartPropsWithoutChartConfig(
+        chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props)),
+      ),
     ),
   );
 }

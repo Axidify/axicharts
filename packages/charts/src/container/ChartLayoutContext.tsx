@@ -4,6 +4,7 @@ import type { SeriesTone } from "@axicharts/charts-canvas";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartDataState } from "../state/types";
 import type { LegendVariant, TooltipVariant } from "../chrome/chromeVariants";
+import type { LiveAnimate } from "../motion/types";
 
 export type ChartConfig = Record<
   string,
@@ -20,6 +21,8 @@ export type ChartLayoutContextValue = {
   theme: ChartTheme;
   config?: ChartConfig;
   mode: "static" | "interactive" | "live" | "presentation";
+  /** Live-mode wholesale replace crossfade — cartesian charts may override. */
+  liveAnimate?: LiveAnimate;
   syncId?: string;
   /** When set, brush followers only mirror range from this leader syncId. */
   syncFollower?: string;

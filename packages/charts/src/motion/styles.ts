@@ -3,6 +3,9 @@ import type { CartesianMotionKind, ChartAnimateEnterConfig } from "./types";
 
 const STYLE_ID = "axicharts-presentation-motion";
 const CARTESIAN_STYLE_ID = "axicharts-cartesian-motion";
+const LIVE_CROSSFADE_STYLE_ID = "axicharts-live-crossfade-motion";
+
+export const LIVE_CROSSFADE_MS = 150;
 
 const PRESENTATION_ENTER_MS = 620;
 const PRESENTATION_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -133,5 +136,26 @@ export function cartesianEnterStyle(
 export function cartesianUpdateStyle(durationMs: number): CSSProperties {
   return {
     animation: `axicharts-update-fade ${durationMs}ms ease-out both`,
+  };
+}
+
+export function ensureLiveCrossfadeStyles(): void {
+  if (typeof document === "undefined") return;
+  if (document.getElementById(LIVE_CROSSFADE_STYLE_ID)) return;
+
+  const style = document.createElement("style");
+  style.id = LIVE_CROSSFADE_STYLE_ID;
+  style.textContent = `
+    @keyframes axicharts-live-crossfade {
+      from { opacity: 0.55; }
+      to { opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+export function liveCrossfadeStyle(durationMs: number): CSSProperties {
+  return {
+    animation: `axicharts-live-crossfade ${durationMs}ms ease-out both`,
   };
 }

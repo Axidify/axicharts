@@ -30,10 +30,12 @@ import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
 import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
-import type { ChartAnimate } from "../motion/types";
+import type { ChartAnimate, LiveAnimate } from "../motion/types";
 import {
   seriesDataSignature,
+  seriesStructureSignature,
   useCartesianAnimate,
+  useLiveCrossfade,
 } from "../motion";
 import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
@@ -58,6 +60,7 @@ export type BarChartProps = {
   brushEnd?: number;
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
   animate?: ChartAnimate;
+  liveAnimate?: LiveAnimate;
 };
 
 type BarPlotProps = {
@@ -188,8 +191,10 @@ export function BarChart({
   brushEnd = 100,
   onMarkerDragEnd,
   animate,
+  liveAnimate: liveAnimateProp,
 }: BarChartProps): ReactElement | null {
-  const { size, ready, theme, config, tagTones } = useChartLayout();
+  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate } =
+    useChartLayout();
   const annotationProps = useCartesianAnnotations({
     annotations,
     thresholdBands,
@@ -233,11 +238,25 @@ export function BarChart({
     () => seriesDataSignature(categories, series),
     [categories, series],
   );
+  const structureSignature = useMemo(
+    () => seriesStructureSignature(categories, series),
+    [categories, series],
+  );
+  const liveAnimate = liveAnimateProp ?? contextLiveAnimate ?? "none";
   const motion = useCartesianAnimate({
     animate,
     kind: "bar",
     dataSignature,
   });
+  const liveCrossfade = useLiveCrossfade({
+    enabled: liveAnimate === "crossfade",
+    structureSignature,
+    mode,
+  });
+  const plotMotionStyle =
+    motion.plotStyle || liveCrossfade.plotStyle
+      ? { ...motion.plotStyle, ...liveCrossfade.plotStyle }
+      : undefined;
 
   if (!ready || size.width < 1 || size.height < 1 || categories.length === 0 || series.length === 0) {
     return null;
@@ -264,7 +283,7 @@ export function BarChart({
         categories={plotCategories}
         series={plotSeries}
         valueSuffix={valueSuffix}
-        plotMotionStyle={motion.plotStyle}
+        plotMotionStyle={plotMotionStyle}
         plotKey={motion.plotKey}
         skipPresentationPlotEnter={motion.skipPresentationPlotEnter}
         plot={

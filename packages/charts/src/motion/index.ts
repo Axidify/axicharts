@@ -8,6 +8,7 @@ export type {
   ChartAnimateUpdateConfig,
   ChartMotionPresetName,
   CountUpMotionConfig,
+  LiveAnimate,
   ResolvedChartAnimate,
 } from "./types";
 export {
@@ -24,6 +25,7 @@ export {
 export {
   resolveChartAnimate,
   seriesDataSignature,
+  seriesStructureSignature,
   shouldAnimateEnter,
   shouldAnimateUpdate,
 } from "./resolve";
@@ -31,7 +33,10 @@ export {
   cartesianEnterStyle,
   cartesianUpdateStyle,
   ensureCartesianMotionStyles,
+  ensureLiveCrossfadeStyles,
   ensurePresentationStyles,
+  liveCrossfadeStyle,
+  LIVE_CROSSFADE_MS,
   presentationEnterStyle,
 } from "./styles";
 export {
@@ -39,3 +44,8 @@ export {
   type UseCartesianAnimateInput,
   type UseCartesianAnimateResult,
 } from "./useCartesianAnimate";
+export {
+  useLiveCrossfade,
+  type UseLiveCrossfadeInput,
+  type UseLiveCrossfadeResult,
+} from "./useLiveCrossfade";
