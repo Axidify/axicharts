@@ -1,9 +1,9 @@
-# GitHub Discussion draft — AxiCharts v0.3.17
+# GitHub Discussion draft — AxiCharts v0.3.21
 
-> **Ready to post** when GTM-5 social window opens. Copy into a new [Axidify/axicharts Discussion](https://github.com/Axidify/axicharts/discussions/new).
+> **Posted** in GTM-5: https://github.com/Axidify/axicharts/discussions/1
 
 **Category:** Announcements  
-**Title:** AxiCharts v0.3.17 — shadcn registry CI + stacked bar block
+**Title:** AxiCharts v0.3.21 — shadcn registry CI + stacked bar block
 
 ---
 
@@ -48,4 +48,4 @@ npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-cha
 
 - Recharts/shadcn Charts ports — what's still missing?
 - Registry items you'd like next (combo, candlestick, waterfall)?
-- Upstream shadcn/ui registry — see `registry/UPSTREAM.md` for our submission checklist (GTM-5)
+- Upstream shadcn/ui registry — PR https://github.com/shadcn-ui/ui/pull/11215 (GTM-5)

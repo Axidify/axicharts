@@ -1,6 +1,6 @@
 # Upstream shadcn/ui registry PR — checklist
 
-> **Status:** Prep only (GTM-4). Do **not** open the PR until GTM-5 sign-off.
+> **Status:** Submitted (GTM-5). PR: https://github.com/shadcn-ui/ui/pull/11215
 
 ## Goal
 
@@ -14,12 +14,12 @@ without a custom `registries` entry in `components.json`.
 
 ## Prerequisites
 
-- [ ] **Custom registry stable** — 6 items validate (`pnpm test:registry` green on axicharts **v0.3.17+**)
-- [ ] **Hosted catalog** — `https://axidify.github.io/axicharts/registry/registry.json` returns valid JSON after docs deploy
+- [x] **Custom registry stable** — 6 items validate (`pnpm test:registry` green on axicharts **v0.3.17+**)
+- [x] **Hosted catalog** — `https://axidify.github.io/axicharts/registry/registry.json` returns valid JSON after docs deploy
 - [ ] **npm packages published** — `@axicharts/charts` and `@axicharts/charts-theme` at the version pinned in registry item `dependencies`
-- [ ] **License** — MIT, compatible with shadcn/ui ecosystem
-- [ ] **No duplicate upstream chart blocks** — confirm shadcn Charts / Recharts blocks are the comparison target, not duplicates
-- [ ] **Peer deps documented** — `react`, `react-dom`, `echarts`, `uplot`, `tokens.css` / `--chart-*` CSS vars
+- [x] **License** — MIT, compatible with shadcn/ui ecosystem
+- [x] **No duplicate upstream chart blocks** — confirm shadcn Charts / Recharts blocks are the comparison target, not duplicates
+- [x] **Peer deps documented** — `react`, `react-dom`, `echarts`, `uplot`, `tokens.css` / `--chart-*` CSS vars
 
 ## Registry item requirements
 
@@ -41,12 +41,12 @@ Per [registry-item.json schema](https://ui.shadcn.com/docs/registry/registry-ite
 
 ## Submission package
 
-- [ ] Short PR description: MIT React charts, `ChartContainer` + `chartConfig`, live uPlot path
-- [ ] Link: migration gallery `https://axidify.github.io/axicharts/shadcn`
-- [ ] Link: compare demo `https://axidify.github.io/axicharts/compare`
-- [ ] Link: install guide `https://axidify.github.io/axicharts/shadcn/registry`
+- [x] Short PR description: MIT React charts, `ChartContainer` + `chartConfig`, live uPlot path
+- [x] Link: migration gallery `https://axidify.github.io/axicharts/shadcn`
+- [x] Link: compare demo `https://axidify.github.io/axicharts/compare`
+- [x] Link: install guide `https://axidify.github.io/axicharts/shadcn/registry`
 - [ ] Screenshot or Storybook capture from **Charts/ShadcnParity**
-- [ ] Confirm items pass `npx shadcn registry validate -c registry registry.json` in axicharts repo
+- [x] Confirm items pass `npx shadcn registry validate -c registry registry.json` in axicharts repo
 
 ## Out of scope for upstream PR
 

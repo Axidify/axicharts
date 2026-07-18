@@ -74,8 +74,12 @@ export function ChartAxiBar() {
 - Stacked bar + chartConfig lib registry items
 - README npm badges, LAUNCH_DISCUSSION.md, `registry/UPSTREAM.md`
 
-## GTM-5 (defer)
+## GTM-5 (shipped)
 
-- Upstream shadcn/ui registry submission (`registry/UPSTREAM.md`)
+- GitHub Discussion posted — https://github.com/Axidify/axicharts/discussions/1
+- Upstream shadcn/ui registry PR — https://github.com/shadcn-ui/ui/pull/11215
+
+## Defer (post-GTM-5)
+
+- HN / Twitter posting (draft bullets in LAUNCH.md)
 - Paid template marketplace
-- Actual social posting (draft bullets in LAUNCH.md / LAUNCH_DISCUSSION.md)

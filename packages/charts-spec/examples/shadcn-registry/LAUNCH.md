@@ -59,8 +59,12 @@ npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-sta
 4. Live ops wall vs Recharts: https://axidify.github.io/axicharts/compare
 5. Same renderer for JSX and AI panel spec JSON — `compilePanel` / `ejectPanel`
 
-## Defer (GTM-5)
+## Shipped (GTM-5)
 
-- Actually post Discussion / HN / Twitter
-- Upstream shadcn/ui registry PR (`registry/UPSTREAM.md`)
+- **GitHub Discussion** — https://github.com/Axidify/axicharts/discussions/1 (Announcements)
+- **Upstream shadcn/ui registry PR** — https://github.com/shadcn-ui/ui/pull/11215 (`@axicharts` in directory index)
+
+## Defer (post-GTM-5)
+
+- Hacker News / Twitter posting (draft bullets below)
 - Paid template marketplace
