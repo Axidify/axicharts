@@ -72,6 +72,7 @@ export type PanelChartType =
   | "waterfall"
   | "candlestick"
   | "heatmap"
+  | "radar"
   | "scatter"
   | "treemap"
   | "boxplot"
@@ -101,6 +102,7 @@ export type PanelSpec = {
     high?: FieldEncoding;
     low?: FieldEncoding;
     close?: FieldEncoding;
+    series?: FieldEncoding;
   };
   props?: Record<string, unknown>;
   theme?: ThemeName;

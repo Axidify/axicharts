@@ -42,6 +42,12 @@ export {
   type HeatmapMatrix,
 } from "./heatmap/HeatmapChart";
 export {
+  RadarChart,
+  type RadarChartProps,
+  type RadarIndicator,
+  type RadarSeries,
+} from "./radar/RadarChart";
+export {
   BoxplotChart,
   type BoxplotChartProps,
   type BoxplotItem,
@@ -105,6 +111,7 @@ export {
   resolveFollowerBrushRange,
   type BrushRange,
 } from "./sync/brushSync";
+export { sliceHeatmapByBrushRange } from "./sync/heatmapBrush";
 export {
   sliceCartesianByBrushRange,
   mapSyncIndexForBrushRange,
@@ -116,6 +123,14 @@ export {
 } from "./sync/useCartesianBrush";
 export { SyncHighlight, type SyncHighlightProps } from "./sync/SyncHighlight";
 export { useEChartsInteraction } from "./sync/useEChartsInteraction";
+export {
+  downloadExport,
+  exportChart,
+  exportChartBatch,
+  type ExportChartFormat,
+  type ExportChartOptions,
+  type ExportChartResult,
+} from "./export/exportChart";
 export {
   clearChartTypes,
   getChartType,

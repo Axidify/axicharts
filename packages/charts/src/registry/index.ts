@@ -8,6 +8,7 @@ import { HeatmapChart } from "../heatmap/HeatmapChart";
 import { HistogramChart } from "../histogram/HistogramChart";
 import { LineChart } from "../line/LineChart";
 import { PieChart } from "../pie/PieChart";
+import { RadarChart } from "../radar/RadarChart";
 import { ScatterChart } from "../scatter/ScatterChart";
 import { TreemapChart } from "../treemap/TreemapChart";
 import { WaterfallChart } from "../waterfall/WaterfallChart";
@@ -48,6 +49,11 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "heatmap",
     Chart: HeatmapChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "radar",
+    Chart: RadarChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
   {

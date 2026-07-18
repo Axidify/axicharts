@@ -31,6 +31,7 @@ const PANEL_TYPES = new Set([
   "waterfall",
   "candlestick",
   "heatmap",
+  "radar",
   "scatter",
   "treemap",
   "stat",

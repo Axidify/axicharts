@@ -12,6 +12,7 @@ import {
   LineChart,
   PieChart,
   FunnelChart,
+  RadarChart,
   ScatterChart,
   Stat,
   TreemapChart,
@@ -54,6 +55,7 @@ import {
   themeWithPanelStyle,
 } from "./panelStyle";
 import { registerPluginChartTypes } from "./registerPluginChartTypes";
+import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
   return chartPropsWithoutChartConfig(
@@ -423,12 +425,37 @@ export function compilePanel(
     }
 
     case "heatmap": {
-      const matrix = props.matrix as Parameters<typeof HeatmapChart>[0]["matrix"];
+      const matrix = resolveHeatmapMatrix(
+        rows,
+        chartPropsFromPanel(resolved.props ?? {}),
+        resolved.encoding,
+      );
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
       return wrap(
         createElement(HeatmapChart, {
           matrix,
-          min: props.min as number | undefined,
-          max: props.max as number | undefined,
+          min: chartProps.min as number | undefined,
+          max: chartProps.max as number | undefined,
+          showLabels: chartProps.showLabels as boolean | undefined,
+          showAxes: chartProps.showAxes as boolean | undefined,
+        }),
+      );
+    }
+
+    case "radar": {
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
+      const { indicators, series } = radarFromRows(
+        rows,
+        chartProps,
+        resolved.encoding,
+      );
+      return wrap(
+        createElement(RadarChart, {
+          indicators,
+          series,
+          showLabels: chartProps.showLabels as boolean | undefined,
+          showAxes: chartProps.showAxes as boolean | undefined,
+          areaFill: chartProps.areaFill as boolean | undefined,
         }),
       );
     }

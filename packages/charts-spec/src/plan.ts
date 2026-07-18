@@ -31,6 +31,9 @@ function inferChartType(metric: MetricProfile): PanelSpec["type"] {
   if (name.includes("correlation") || name.includes("heatmap")) {
     return "heatmap";
   }
+  if (name.includes("radar") || name.includes("spider") || name.includes("scorecard")) {
+    return "radar";
+  }
   if (name.includes("funnel") || name.includes("pipeline") || name.includes("stage")) {
     return "funnel";
   }

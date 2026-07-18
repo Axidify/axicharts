@@ -6,6 +6,7 @@ import {
   HeatmapChart,
   LineChart,
   PieChart,
+  RadarChart,
   ScatterChart,
   TreemapChart,
 } from "echarts/charts";
@@ -27,6 +28,7 @@ echarts.use([
   HeatmapChart,
   LineChart,
   PieChart,
+  RadarChart,
   ScatterChart,
   TreemapChart,
   GridComponent,
@@ -47,7 +49,14 @@ export { EChartsBoxplot, type EChartsBoxplotProps } from "./EChartsBoxplot";
 export { EChartsHistogram, type EChartsHistogramProps } from "./EChartsHistogram";
 export type { BoxplotItem, BoxplotSeries } from "./boxplotTypes";
 export { EChartsScatter, type EChartsScatterProps } from "./EChartsScatter";
-export { EChartsHeatmap, type EChartsHeatmapProps } from "./EChartsHeatmap";
+export {
+  EChartsHeatmap,
+  sliceHeatmapByBrushRange,
+  type EChartsHeatmapProps,
+  type HeatmapBrushRange,
+} from "./EChartsHeatmap";
+export { EChartsRadar, type EChartsRadarProps } from "./EChartsRadar";
+export type { RadarIndicator, RadarSeries } from "./radarTypes";
 export { EChartsPie, type EChartsPieProps } from "./EChartsPie";
 export { EChartsWaterfall, type EChartsWaterfallProps } from "./EChartsWaterfall";
 export type { TreemapNode } from "./treemapTypes";

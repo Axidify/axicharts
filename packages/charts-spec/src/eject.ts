@@ -55,7 +55,9 @@ function resolveChartName(spec: PanelSpec): string {
               ? "CandlestickChart"
               : spec.type === "heatmap"
                 ? "HeatmapChart"
-                : spec.type === "scatter"
+                : spec.type === "radar"
+                  ? "RadarChart"
+                  : spec.type === "scatter"
                   ? "ScatterChart"
                   : spec.type === "treemap"
                     ? "TreemapChart"
@@ -176,9 +178,47 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       value: Number(row.value),
     }))}`;
   } else if (spec.type === "heatmap") {
-    chartBody = `matrix={${dataVar}.matrix}
+    const xField = encoding?.x?.field ?? "x";
+    const yEncoding = Array.isArray(encoding?.y) ? encoding?.y[0] : encoding?.y;
+    const yField = yEncoding?.field ?? "y";
+    const valueField = encoding?.value?.field ?? "value";
+    if (encoding?.x && encoding?.y && encoding?.value) {
+      chartBody = `matrix={(() => {
+  const xCategories = [...new Set(${dataVar}.map((row) => String(row.${xField})))];
+  const yCategories = [...new Set(${dataVar}.map((row) => String(row.${yField})))];
+  const values = yCategories.map((y) =>
+    xCategories.map((x) => {
+      const match = ${dataVar}.find((row) => String(row.${xField}) === x && String(row.${yField}) === y);
+      return match ? Number(match.${valueField}) : 0;
+    }),
+  );
+  return { xCategories, yCategories, values };
+})()}
     min={${dataVar}.min}
-    max={${dataVar}.max}`;
+    max={${dataVar}.max}${spec.props?.showLabels === false ? "" : "\n    showLabels"}`;
+    } else {
+      chartBody = `matrix={${dataVar}.matrix}
+    min={${dataVar}.min}
+    max={${dataVar}.max}${spec.props?.showLabels === false ? "" : "\n    showLabels"}`;
+    }
+  } else if (spec.type === "radar") {
+    const nameField = encoding?.name?.field ?? "name";
+    const valueField = encoding?.value?.field ?? "value";
+    const seriesField = encoding?.series?.field;
+    chartBody = seriesField
+      ? `indicators={[...new Set(${dataVar}.map((row) => String(row.${nameField})))].map((name) => ({ name }))}
+    series={[...new Set(${dataVar}.map((row) => String(row.${seriesField})))].map((group) => ({
+      name: group,
+      values: [...new Set(${dataVar}.map((row) => String(row.${nameField})))].map((axis) => {
+        const match = ${dataVar}.find((row) => String(row.${seriesField}) === group && String(row.${nameField}) === axis);
+        return match ? Number(match.${valueField}) : 0;
+      }),
+    }))}`
+      : `indicators={${dataVar}.indicators ?? [...new Set(${dataVar}.map((row) => String(row.${nameField})))].map((name) => ({ name }))}
+    series={${dataVar}.series ?? [{
+      name: "Series",
+      values: ${dataVar}.map((row) => Number(row.${valueField})),
+    }]}`;
   } else if (spec.type === "combo") {
     chartBody = ejectComboBody(spec, dataVar);
   } else if (spec.type === "sankey") {

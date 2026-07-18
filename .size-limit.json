@@ -77,10 +77,16 @@
     "limit": "8 KB",
     "gzip": true
   },
-  {
+    {
     "name": "@axicharts/charts/heatmap",
     "path": "packages/charts/dist/entry/heatmap.js",
     "limit": "8 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/export",
+    "path": "packages/charts/dist/entry/export.js",
+    "limit": "3 KB",
     "gzip": true
   },
   {

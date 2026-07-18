@@ -251,4 +251,40 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("<GanttChart");
     expect(jsx).toContain("timeline.tasks");
   });
+
+  it("emits heatmap matrix from encoding rows", () => {
+    const jsx = ejectPanel(
+      {
+        type: "heatmap",
+        encoding: {
+          x: { field: "hour" },
+          y: { field: "symbol" },
+          value: { field: "corr" },
+        },
+      },
+      "rows",
+    );
+
+    expect(jsx).toContain("<HeatmapChart");
+    expect(jsx).toContain("xCategories");
+    expect(jsx).toContain("showLabels");
+  });
+
+  it("emits RadarChart from encoding rows", () => {
+    const jsx = ejectPanel(
+      {
+        type: "radar",
+        encoding: {
+          name: { field: "axis" },
+          value: { field: "score" },
+          series: { field: "team" },
+        },
+      },
+      "scores",
+    );
+
+    expect(jsx).toContain("<RadarChart");
+    expect(jsx).toContain("indicators=");
+    expect(jsx).toContain("series=");
+  });
 });
