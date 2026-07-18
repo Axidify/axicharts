@@ -30,6 +30,7 @@ import {
   runtimeDeepLinkShareImportDeepLink,
   runtimeImportGalleryShareImportTrackDeepLink,
   startShareImportDeepLink,
+  verticalsStorybookRound3DeepLink,
   feedAdapterGalleryDeepLink,
   adapterFixtureGalleryDeepLink,
   formatValidatePresetCommand,
@@ -219,6 +220,9 @@ describe("hosted import presets", () => {
     );
     expect(startShareImportDeepLink()).toBe(
       "https://axidify.github.io/axicharts/start#share-import",
+    );
+    expect(verticalsStorybookRound3DeepLink()).toBe(
+      "https://axidify.github.io/axicharts/verticals#storybook-round3",
     );
     const mosaicFixturesFromSample = plannerAdapterFixtures({
       layout: "mosaic",

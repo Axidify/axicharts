@@ -321,6 +321,12 @@ export function startShareImportDeepLink(origin = DOCS_SITE_ORIGIN): string {
   return `${base}/start#share-import`;
 }
 
+/** Docs vertical gallery anchor for Storybook round 3 release notes. */
+export function verticalsStorybookRound3DeepLink(origin = DOCS_SITE_ORIGIN): string {
+  const base = origin.endsWith("/") ? origin.slice(0, -1) : origin;
+  return `${base}/verticals#storybook-round3`;
+}
+
 /** Docs gallery URL for a planner feed row. */
 export function plannerFeedGalleryDeepLink(
   feed: PlannerFeedLike,

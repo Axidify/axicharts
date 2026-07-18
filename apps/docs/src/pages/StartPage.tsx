@@ -112,6 +112,20 @@ export function StartPage(): ReactElement {
         {" · "}
         <Link to="/runtime/links#share-import">Deep-link presets</Link>
       </p>
+
+      <h2 id="storybook-round3" style={{ fontSize: 16, marginTop: 28 }}>
+        Storybook gates G–Q
+      </h2>
+      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 14 }}>
+        Acceptance mockups G–Q are all <strong>5/5</strong> after round 3 polish (C52–C62): KPI
+        tiles, freshness chips, SLO/plan references, and vertical callouts. Run{" "}
+        <code>pnpm storybook</code> locally or browse the live templates.
+      </p>
+      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 13 }}>
+        <Link to="/verticals#storybook-round3">Vertical gallery release notes</Link>
+        {" · "}
+        <code>pnpm test:e2e:share-import</code>
+      </p>
     </div>
   );
 }
