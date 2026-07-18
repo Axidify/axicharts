@@ -16,6 +16,7 @@ import {
   createAnnotationDrawHook,
   expandYRange,
 } from "./plotAnnotations";
+import { resolveAnnotationPlotProps } from "./annotations";
 import { resolveSeriesColor } from "./seriesColor";
 import { lineSeriesPaths, resolveLineCurve } from "./linePaths";
 import { shouldUseDualAxis } from "./dualAxis";
@@ -54,10 +55,30 @@ export function buildComboOptions(
     dualAxis = "auto",
     referenceLines = [],
     thresholdBands = [],
+    annotations = [],
+    verticalLines: verticalLinesProp = [],
+    plotLabels: plotLabelsProp = [],
+    plotMarkers: plotMarkersProp = [],
     barLayoutsRef,
     showCursor = false,
     useNativeLegend = true,
   } = props;
+
+  const {
+    thresholdBands: thresholdBandsResolved,
+    referenceLines: referenceLinesResolved,
+    verticalLines,
+    labels: plotLabels,
+    markers: plotMarkers,
+    extraY,
+  } = resolveAnnotationPlotProps({
+    annotations,
+    thresholdBands,
+    referenceLines,
+    verticalLines: verticalLinesProp,
+    plotLabels: plotLabelsProp,
+    plotMarkers: plotMarkersProp,
+  });
 
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme);
@@ -66,7 +87,9 @@ export function buildComboOptions(
   const smoothPaths = lineSeriesPaths(curve);
   const fillOpacity = theme.area.fillOpacity;
   const annotateY =
-    thresholdBands.length > 0 || referenceLines.length > 0;
+    thresholdBandsResolved.length > 0 ||
+    referenceLinesResolved.length > 0 ||
+    extraY.length > 0;
   const useDualAxis = shouldUseDualAxis(series, dualAxis);
 
   return {
@@ -87,7 +110,13 @@ export function buildComboOptions(
         ? annotateY
           ? {
               range: (_u, min, max) =>
-                expandYRange(min, max, thresholdBands, referenceLines),
+                expandYRange(
+                  min,
+                  max,
+                  thresholdBandsResolved,
+                  referenceLinesResolved,
+                  extraY,
+                ),
             }
           : { auto: true }
         : {
@@ -95,12 +124,13 @@ export function buildComboOptions(
               const [expandedMin, expandedMax] = expandYRange(
                 dataMin,
                 dataMax,
-                thresholdBands,
-                referenceLines,
+                thresholdBandsResolved,
+                referenceLinesResolved,
+                extraY,
               );
               const top = Math.max(expandedMax, dataMax) * 1.12;
               const bottom =
-                thresholdBands.length > 0 ? Math.min(0, expandedMin) : 0;
+                thresholdBandsResolved.length > 0 ? Math.min(0, expandedMin) : 0;
               return [bottom, top];
             },
           },
@@ -109,7 +139,13 @@ export function buildComboOptions(
             y2: annotateY
               ? {
                   range: (_u, min, max) =>
-                    expandYRange(min, max, thresholdBands, referenceLines),
+                    expandYRange(
+                      min,
+                      max,
+                      thresholdBandsResolved,
+                      referenceLinesResolved,
+                      extraY,
+                    ),
                 }
               : { auto: true },
           }
@@ -223,8 +259,12 @@ export function buildComboOptions(
     hooks: {
       draw: [
         createAnnotationDrawHook({
-          bands: thresholdBands,
-          referenceLines,
+          bands: thresholdBandsResolved,
+          referenceLines: referenceLinesResolved,
+          verticalLines,
+          labels: plotLabels,
+          markers: plotMarkers,
+          categories,
           onDraw: showValues
             ? (u) => {
                 const ctx = u.ctx;
@@ -324,6 +364,10 @@ export function UPlotCombo(props: UPlotComboProps): ReactElement {
     props.valueSuffix,
     props.referenceLines,
     props.thresholdBands,
+    props.annotations,
+    props.verticalLines,
+    props.plotLabels,
+    props.plotMarkers,
     props.dualAxis,
     showAxes,
     showCursor,

@@ -1,5 +1,11 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { LineCurve } from "@axicharts/charts-theme";
+import type {
+  ChartAnnotation,
+  PlotLabelAnnotation,
+  PlotMarkerAnnotation,
+  PlotVerticalLine,
+} from "./annotations";
 
 export type SeriesTone =
   | "default"
@@ -61,6 +67,10 @@ export type UPlotLineProps = {
   stacked?: boolean;
   thresholdBands?: ThresholdBand[];
   referenceLines?: ReferenceLine[];
+  annotations?: ChartAnnotation[];
+  verticalLines?: PlotVerticalLine[];
+  plotLabels?: PlotLabelAnnotation[];
+  plotMarkers?: PlotMarkerAnnotation[];
   showCursor?: boolean;
   useNativeLegend?: boolean;
   onCursor?: (event: PlotCursorEvent) => void;
@@ -82,6 +92,10 @@ export type UPlotBarProps = {
   referenceLines?: ReferenceLine[];
   stacked?: boolean;
   thresholdBands?: ThresholdBand[];
+  annotations?: ChartAnnotation[];
+  verticalLines?: PlotVerticalLine[];
+  plotLabels?: PlotLabelAnnotation[];
+  plotMarkers?: PlotMarkerAnnotation[];
   showCursor?: boolean;
   useNativeLegend?: boolean;
   onCursor?: (event: PlotCursorEvent) => void;
@@ -105,6 +119,10 @@ export type UPlotComboProps = {
   dualAxis?: DualAxisMode;
   referenceLines?: ReferenceLine[];
   thresholdBands?: ThresholdBand[];
+  annotations?: ChartAnnotation[];
+  verticalLines?: PlotVerticalLine[];
+  plotLabels?: PlotLabelAnnotation[];
+  plotMarkers?: PlotMarkerAnnotation[];
   showCursor?: boolean;
   useNativeLegend?: boolean;
   onCursor?: (event: PlotCursorEvent) => void;

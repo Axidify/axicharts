@@ -58,6 +58,41 @@ export type FunnelMarkProps = {
   sort?: "ascending" | "descending" | "none";
 };
 
+export type AnnotationLabelMarkProps = {
+  text: string;
+  x?: number | string;
+  y: number;
+  tone?: SeriesTone;
+  position?: "top" | "bottom" | "left" | "right" | "center";
+  id?: string;
+};
+
+export type AnnotationBandMarkProps = {
+  min: number;
+  max: number;
+  label?: string;
+  tone?: SeriesTone;
+  id?: string;
+};
+
+export type AnnotationLineMarkProps = {
+  value: number;
+  label?: string;
+  tone?: SeriesTone;
+  orientation?: "horizontal" | "vertical";
+  x?: number | string;
+  id?: string;
+};
+
+export type AnnotationMarkerMarkProps = {
+  x?: number | string;
+  y: number;
+  label?: string;
+  tone?: SeriesTone;
+  draggable?: boolean;
+  id?: string;
+};
+
 function lineMark(_props: LineMarkProps): null {
   return null;
 }
@@ -98,6 +133,22 @@ function funnelMark(_props: FunnelMarkProps): null {
   return null;
 }
 
+function annotationLabelMark(_props: AnnotationLabelMarkProps): null {
+  return null;
+}
+
+function annotationBandMark(_props: AnnotationBandMarkProps): null {
+  return null;
+}
+
+function annotationLineMark(_props: AnnotationLineMarkProps): null {
+  return null;
+}
+
+function annotationMarkerMark(_props: AnnotationMarkerMarkProps): null {
+  return null;
+}
+
 export const Line = Object.assign(lineMark, { markKind: "line" as const });
 export const Bar = Object.assign(barMark, { markKind: "bar" as const });
 export const Area = Object.assign(areaMark, { markKind: "area" as const });
@@ -109,6 +160,18 @@ export const Legend = Object.assign(chromeMark, { markKind: "legend" as const })
 export const Pie = Object.assign(pieMark, { markKind: "pie" as const });
 export const Cell = Object.assign(cellMark, { markKind: "cell" as const });
 export const Funnel = Object.assign(funnelMark, { markKind: "funnel" as const });
+export const AnnotationLabel = Object.assign(annotationLabelMark, {
+  markKind: "annotationLabel" as const,
+});
+export const AnnotationBand = Object.assign(annotationBandMark, {
+  markKind: "annotationBand" as const,
+});
+export const AnnotationLine = Object.assign(annotationLineMark, {
+  markKind: "annotationLine" as const,
+});
+export const AnnotationMarker = Object.assign(annotationMarkerMark, {
+  markKind: "annotationMarker" as const,
+});
 
 export type ComposableMarkKind =
   | typeof Line.markKind
@@ -121,7 +184,11 @@ export type ComposableMarkKind =
   | typeof Legend.markKind
   | typeof Pie.markKind
   | typeof Cell.markKind
-  | typeof Funnel.markKind;
+  | typeof Funnel.markKind
+  | typeof AnnotationLabel.markKind
+  | typeof AnnotationBand.markKind
+  | typeof AnnotationLine.markKind
+  | typeof AnnotationMarker.markKind;
 
 export type ComposableMarkType =
   | typeof Line
@@ -134,4 +201,8 @@ export type ComposableMarkType =
   | typeof Legend
   | typeof Pie
   | typeof Cell
-  | typeof Funnel;
+  | typeof Funnel
+  | typeof AnnotationLabel
+  | typeof AnnotationBand
+  | typeof AnnotationLine
+  | typeof AnnotationMarker;

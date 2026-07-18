@@ -113,7 +113,46 @@ export type PanelSpec = {
   fill?: boolean;
   stacked?: boolean;
   innerRadius?: number;
+  /** Declarative cartesian annotations — labels, bands, lines, markers. */
+  annotations?: AnnotationSpec[];
 };
+
+export type AnnotationSpec =
+  | {
+      type: "label";
+      text: string;
+      x?: number | string;
+      y: number;
+      tone?: "default" | "info" | "success" | "warning" | "critical";
+      position?: "top" | "bottom" | "left" | "right" | "center";
+      id?: string;
+    }
+  | {
+      type: "band";
+      min: number;
+      max: number;
+      label?: string;
+      tone?: "default" | "info" | "success" | "warning" | "critical";
+      id?: string;
+    }
+  | {
+      type: "line";
+      value: number;
+      label?: string;
+      tone?: "default" | "info" | "success" | "warning" | "critical";
+      orientation?: "horizontal" | "vertical";
+      x?: number | string;
+      id?: string;
+    }
+  | {
+      type: "marker";
+      x?: number | string;
+      y: number;
+      label?: string;
+      tone?: "default" | "info" | "success" | "warning" | "critical";
+      draggable?: boolean;
+      id?: string;
+    };
 
 export type MetricKind = "gauge" | "counter" | "histogram" | "ohlc" | "distribution";
 

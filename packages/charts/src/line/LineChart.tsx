@@ -7,6 +7,7 @@ import {
   UPlotRangeOverview,
   RANGE_OVERVIEW_HEIGHT,
   preparePlotData,
+  type ChartAnnotation,
   type PlotSeries,
   type ReferenceLine,
   type ThresholdBand,
@@ -29,6 +30,9 @@ import { SvgCartesianLine } from "../svg/SvgCartesianLine";
 import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
+import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
+import { DraggableMarkerOverlay } from "../annotations/DraggableMarkerOverlay";
+import { seriesValueBounds } from "../annotations/seriesValueBounds";
 
 const LINE_SERIES_KINDS = ["line", "area"] as const;
 
@@ -47,6 +51,7 @@ export type LineChartProps = {
   curve?: LineCurve;
   thresholdBands?: ThresholdBand[];
   referenceLines?: ReferenceLine[];
+  annotations?: ChartAnnotation[];
   brush?: boolean;
   brushEnd?: number;
 };
@@ -63,6 +68,8 @@ type LinePlotProps = {
   curve?: LineCurve;
   thresholdBands?: ThresholdBand[];
   referenceLines?: ReferenceLine[];
+  annotations?: ChartAnnotation[];
+  draggableMarkers: ReturnType<typeof useCartesianAnnotations>["draggableMarkers"];
   compact: boolean;
   brush?: boolean;
   brushRange?: BrushRange | null;
@@ -85,6 +92,8 @@ function LinePlot({
   curve,
   thresholdBands,
   referenceLines,
+  annotations,
+  draggableMarkers,
   brush = false,
   brushRange,
   onBrushRangeChange,
@@ -100,9 +109,10 @@ function LinePlot({
   const legendHeight = getLegendHeight(showLegend, legendVariant);
   const overviewHeight = brush ? RANGE_OVERVIEW_HEIGHT : 0;
   const plotHeight = Math.floor(size.height) - legendHeight - overviewHeight;
+  const valueBounds = useMemo(() => seriesValueBounds(series), [series]);
 
   return (
-    <div style={{ width: Math.floor(size.width), height: Math.floor(size.height) - legendHeight }}>
+    <div style={{ width: Math.floor(size.width), height: Math.floor(size.height) - legendHeight, position: "relative" }}>
       {engine === "svg" ? (
         <SvgCartesianLine
           width={Math.floor(size.width)}
@@ -129,6 +139,7 @@ function LinePlot({
           stacked={stacked}
           thresholdBands={thresholdBands}
           referenceLines={referenceLines}
+          annotations={annotations}
           showCursor={chrome.showCrosshair}
           useNativeLegend={false}
           onCursor={plotSync.onCursor}
@@ -138,6 +149,16 @@ function LinePlot({
           chartId={plotSync.chartId}
         />
       )}
+      <DraggableMarkerOverlay
+        width={Math.floor(size.width)}
+        height={plotHeight}
+        categories={categories}
+        seriesMin={valueBounds.min}
+        seriesMax={valueBounds.max}
+        markers={draggableMarkers}
+        thresholdBands={thresholdBands}
+        referenceLines={referenceLines}
+      />
       {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
         <UPlotRangeOverview
           width={Math.floor(size.width)}
@@ -167,10 +188,17 @@ export function LineChart({
   curve: curveProp,
   thresholdBands,
   referenceLines,
+  annotations,
   brush = false,
   brushEnd = 100,
 }: LineChartProps): ReactElement | null {
   const { size, ready, theme, mode, config, tagTones } = useChartLayout();
+  const annotationProps = useCartesianAnnotations({
+    annotations,
+    thresholdBands,
+    referenceLines,
+    children,
+  });
   const { effectiveRange, onBrushRangeChange } = useCartesianBrush({
     brush,
     brushEnd,
@@ -242,8 +270,10 @@ export function LineChart({
             dualAxis={dualAxis}
             stacked={stacked}
             curve={curve}
-            thresholdBands={thresholdBands}
-            referenceLines={referenceLines}
+            thresholdBands={annotationProps.thresholdBands}
+            referenceLines={annotationProps.referenceLines}
+            annotations={annotationProps.annotations}
+            draggableMarkers={annotationProps.draggableMarkers}
             compact={compact}
             brush={brush}
             brushRange={brush ? effectiveRange : null}

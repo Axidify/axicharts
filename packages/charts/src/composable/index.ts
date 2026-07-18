@@ -10,6 +10,10 @@ export {
   Tooltip,
   XAxis,
   YAxis,
+  AnnotationLabel,
+  AnnotationBand,
+  AnnotationLine,
+  AnnotationMarker,
   type AreaMarkProps,
   type BarMarkProps,
   type CellMarkProps,
@@ -20,8 +24,13 @@ export {
   type PieMarkProps,
   type XAxisMarkProps,
   type YAxisMarkProps,
+  type AnnotationLabelMarkProps,
+  type AnnotationBandMarkProps,
+  type AnnotationLineMarkProps,
+  type AnnotationMarkerMarkProps,
 } from "./marks";
 export { composeCartesianMarks, type ComposedCartesian } from "./composeCartesian";
+export { composeCartesianAnnotations } from "./composeCartesianAnnotations";
 export { composePieMarks, type ComposedPie } from "./composePie";
 export { composeFunnelMarks, type ComposedFunnel } from "./composeFunnel";
 export {

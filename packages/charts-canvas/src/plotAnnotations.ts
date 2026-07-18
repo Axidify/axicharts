@@ -1,5 +1,11 @@
 import type uPlot from "uplot";
 import { SERIES_COLORS, withAlpha } from "./colors";
+import type {
+  PlotLabelAnnotation,
+  PlotMarkerAnnotation,
+  PlotVerticalLine,
+} from "./annotations";
+import { categoryToIndex } from "./annotations";
 import type { ReferenceLine, ThresholdBand } from "./types";
 
 export function expandYRange(
@@ -7,6 +13,7 @@ export function expandYRange(
   dataMax: number,
   bands: ThresholdBand[],
   referenceLines: ReferenceLine[] = [],
+  extraY: number[] = [],
 ): [number, number] {
   let min = dataMin;
   let max = dataMax;
@@ -18,6 +25,10 @@ export function expandYRange(
   for (const line of referenceLines) {
     min = Math.min(min, line.value);
     max = Math.max(max, line.value);
+  }
+  for (const y of extraY) {
+    min = Math.min(min, y);
+    max = Math.max(max, y);
   }
 
   const span = max - min || Math.abs(max) || 1;
@@ -93,13 +104,142 @@ export function drawReferenceLines(
   }
 }
 
+export function drawVerticalLines(
+  u: uPlot,
+  verticalLines: PlotVerticalLine[],
+  categories: string[],
+): void {
+  if (verticalLines.length === 0) return;
+
+  const ctx = u.ctx;
+
+  for (const line of verticalLines) {
+    const index = categoryToIndex(line.x, categories);
+    if (index == null) continue;
+
+    const x = u.valToPos(index, "x", true);
+    const tone = line.tone ?? "info";
+    const stroke = SERIES_COLORS[tone];
+
+    ctx.save();
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(x, u.bbox.top);
+    ctx.lineTo(x, u.bbox.top + u.bbox.height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    if (line.label) {
+      ctx.fillStyle = stroke;
+      ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText(line.label, x + 4, u.bbox.top + 12);
+    }
+    ctx.restore();
+  }
+}
+
+function labelOffset(
+  position: PlotLabelAnnotation["position"],
+): { dx: number; dy: number; align: CanvasTextAlign } {
+  switch (position) {
+    case "bottom":
+      return { dx: 0, dy: 14, align: "center" };
+    case "left":
+      return { dx: -8, dy: 4, align: "right" };
+    case "right":
+      return { dx: 8, dy: 4, align: "left" };
+    case "center":
+      return { dx: 0, dy: 4, align: "center" };
+    case "top":
+    default:
+      return { dx: 0, dy: -6, align: "center" };
+  }
+}
+
+export function drawPlotLabels(
+  u: uPlot,
+  labels: PlotLabelAnnotation[],
+  categories: string[],
+): void {
+  if (labels.length === 0) return;
+
+  const ctx = u.ctx;
+
+  for (const label of labels) {
+    const index = categoryToIndex(label.x, categories);
+    const x =
+      index != null
+        ? u.valToPos(index, "x", true)
+        : u.bbox.left + u.bbox.width / 2;
+    const y = u.valToPos(label.y, "y", true);
+    const tone = label.tone ?? "default";
+    const color = SERIES_COLORS[tone];
+    const { dx, dy, align } = labelOffset(label.position);
+
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.font = "11px ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = align;
+    ctx.fillText(label.text, x + dx, y + dy);
+    ctx.restore();
+  }
+}
+
+export function drawPlotMarkers(
+  u: uPlot,
+  markers: PlotMarkerAnnotation[],
+  categories: string[],
+): void {
+  const staticMarkers = markers.filter((marker) => !marker.draggable);
+  if (staticMarkers.length === 0) return;
+
+  const ctx = u.ctx;
+
+  for (const marker of staticMarkers) {
+    const index = categoryToIndex(marker.x, categories);
+    if (index == null) continue;
+
+    const x = u.valToPos(index, "x", true);
+    const y = u.valToPos(marker.y, "y", true);
+    const tone = marker.tone ?? "warning";
+    const color = SERIES_COLORS[tone];
+
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.strokeStyle = withAlpha(color, 0.35);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    if (marker.label) {
+      ctx.fillStyle = color;
+      ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(marker.label, x + 8, y + 4);
+    }
+    ctx.restore();
+  }
+}
+
 export function createAnnotationDrawHook({
   bands,
   referenceLines,
+  verticalLines = [],
+  labels = [],
+  markers = [],
+  categories = [],
   onDraw,
 }: {
   bands: ThresholdBand[];
   referenceLines: ReferenceLine[];
+  verticalLines?: PlotVerticalLine[];
+  labels?: PlotLabelAnnotation[];
+  markers?: PlotMarkerAnnotation[];
+  categories?: string[];
   onDraw?: (u: uPlot, seriesIdx: number) => void;
 }): (u: uPlot, seriesIdx: number) => void {
   return (u, seriesIdx) => {
@@ -108,6 +248,9 @@ export function createAnnotationDrawHook({
     }
     if (seriesIdx === u.series.length - 1) {
       drawReferenceLines(u, referenceLines);
+      drawVerticalLines(u, verticalLines, categories);
+      drawPlotLabels(u, labels, categories);
+      drawPlotMarkers(u, markers, categories);
       onDraw?.(u, seriesIdx);
     }
   };

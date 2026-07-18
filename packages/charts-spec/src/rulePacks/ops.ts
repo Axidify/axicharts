@@ -63,6 +63,14 @@ function applyOpsPanelRules(panel: PanelSpec, ctx: VerticalPanelContext): PanelS
         thresholdBands: [
           { min: 0, max: sloMax, label: "SLO band", tone: "warning" },
         ],
+        annotations: [
+          {
+            type: "line",
+            value: sloMax,
+            label: "SLO limit",
+            tone: "critical",
+          },
+        ],
       },
     };
   }

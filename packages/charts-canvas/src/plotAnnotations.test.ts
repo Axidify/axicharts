@@ -12,4 +12,9 @@ describe("expandYRange", () => {
     const [, max] = expandYRange(10, 20, [], [{ value: 50 }]);
     expect(max).toBeGreaterThan(50);
   });
+
+  it("includes extra annotation y values in the y range", () => {
+    const [, max] = expandYRange(10, 20, [], [], [180]);
+    expect(max).toBeGreaterThan(180);
+  });
 });

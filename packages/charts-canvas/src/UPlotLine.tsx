@@ -17,6 +17,7 @@ import {
   createAnnotationDrawHook,
   expandYRange,
 } from "./plotAnnotations";
+import { resolveAnnotationPlotProps } from "./annotations";
 import { shouldStackSeries, STACK_GROUP } from "./stack";
 import { resolveSeriesColor } from "./seriesColor";
 import {
@@ -41,9 +42,29 @@ function buildOptions({
   stacked = false,
   thresholdBands = [],
   referenceLines = [],
+  annotations = [],
+  verticalLines: verticalLinesProp = [],
+  plotLabels: plotLabelsProp = [],
+  plotMarkers: plotMarkersProp = [],
   showCursor = false,
   useNativeLegend = true,
 }: UPlotLineProps): uPlot.Options {
+  const {
+    thresholdBands: thresholdBandsResolved,
+    referenceLines: referenceLinesResolved,
+    verticalLines,
+    labels: plotLabels,
+    markers: plotMarkers,
+    extraY,
+  } = resolveAnnotationPlotProps({
+    annotations,
+    thresholdBands,
+    referenceLines,
+    verticalLines: verticalLinesProp,
+    plotLabels: plotLabelsProp,
+    plotMarkers: plotMarkersProp,
+  });
+
   const compact = height < 72;
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme, compact);
@@ -98,7 +119,9 @@ function buildOptions({
   const showLegend = useNativeLegend && series.length > 1;
   const topPad = showLegend && !compact ? 28 : compact ? 4 : 8;
   const annotateY =
-    thresholdBands.length > 0 || referenceLines.length > 0;
+    thresholdBandsResolved.length > 0 ||
+    referenceLinesResolved.length > 0 ||
+    extraY.length > 0;
 
   return {
     width,
@@ -117,7 +140,13 @@ function buildOptions({
       y: annotateY
         ? {
             range: (_u, min, max) =>
-              expandYRange(min, max, thresholdBands, referenceLines),
+              expandYRange(
+                min,
+                max,
+                thresholdBandsResolved,
+                referenceLinesResolved,
+                extraY,
+              ),
           }
         : { auto: true },
       ...(useDualAxis
@@ -125,7 +154,13 @@ function buildOptions({
             y2: annotateY
               ? {
                   range: (_u, min, max) =>
-                    expandYRange(min, max, thresholdBands, referenceLines),
+                    expandYRange(
+                      min,
+                      max,
+                      thresholdBandsResolved,
+                      referenceLinesResolved,
+                      extraY,
+                    ),
                 }
               : { auto: true },
           }
@@ -220,15 +255,22 @@ function buildOptions({
       }),
     ],
     hooks:
-      thresholdBands.length > 0 ||
-      referenceLines.length > 0 ||
+      thresholdBandsResolved.length > 0 ||
+      referenceLinesResolved.length > 0 ||
+      verticalLines.length > 0 ||
+      plotLabels.length > 0 ||
+      plotMarkers.length > 0 ||
       segmentedDraw ||
       variablePointDraw
         ? {
             draw: [
               createAnnotationDrawHook({
-                bands: thresholdBands,
-                referenceLines,
+                bands: thresholdBandsResolved,
+                referenceLines: referenceLinesResolved,
+                verticalLines,
+                labels: plotLabels,
+                markers: plotMarkers,
+                categories,
                 onDraw:
                   segmentedDraw || variablePointDraw
                     ? (u) => {
@@ -323,6 +365,10 @@ export function UPlotLine(props: UPlotLineProps): ReactElement {
     onSyncIndex,
     props.thresholdBands,
     props.referenceLines,
+    props.annotations,
+    props.verticalLines,
+    props.plotLabels,
+    props.plotMarkers,
     props.curve,
   ]);
 

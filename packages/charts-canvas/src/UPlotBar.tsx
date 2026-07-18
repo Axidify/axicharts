@@ -15,6 +15,7 @@ import {
   createAnnotationDrawHook,
   expandYRange,
 } from "./plotAnnotations";
+import { resolveAnnotationPlotProps } from "./annotations";
 import { shouldStackSeries, STACK_GROUP } from "./stack";
 import { resolveSeriesColor } from "./seriesColor";
 import type { PlotSeries } from "./types";
@@ -80,6 +81,10 @@ function buildOptions({
   valueSuffix = "",
   referenceLines = [],
   thresholdBands = [],
+  annotations = [],
+  verticalLines: verticalLinesProp = [],
+  plotLabels: plotLabelsProp = [],
+  plotMarkers: plotMarkersProp = [],
   barLayoutsRef,
   stacked = false,
   showCursor = false,
@@ -87,6 +92,22 @@ function buildOptions({
 }: UPlotBarProps & {
   barLayoutsRef: React.MutableRefObject<BarLayout[]>;
 }): uPlot.Options {
+  const {
+    thresholdBands: thresholdBandsResolved,
+    referenceLines: referenceLinesResolved,
+    verticalLines,
+    labels: plotLabels,
+    markers: plotMarkers,
+    extraY,
+  } = resolveAnnotationPlotProps({
+    annotations,
+    thresholdBands,
+    referenceLines,
+    verticalLines: verticalLinesProp,
+    plotLabels: plotLabelsProp,
+    plotMarkers: plotMarkersProp,
+  });
+
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme);
   const gapPx = Math.max(3, Math.round(theme.bar.gap * 28));
@@ -115,12 +136,13 @@ function buildOptions({
           const [expandedMin, expandedMax] = expandYRange(
             dataMin,
             dataMax,
-            thresholdBands,
-            referenceLines,
+            thresholdBandsResolved,
+            referenceLinesResolved,
+            extraY,
           );
           const top = Math.max(expandedMax, dataMax) * 1.12;
           const bottom =
-            thresholdBands.length > 0
+            thresholdBandsResolved.length > 0
               ? Math.min(0, expandedMin)
               : 0;
           return [bottom, top];
@@ -206,8 +228,12 @@ function buildOptions({
     hooks: {
       draw: [
         createAnnotationDrawHook({
-          bands: thresholdBands,
-          referenceLines,
+          bands: thresholdBandsResolved,
+          referenceLines: referenceLinesResolved,
+          verticalLines,
+          labels: plotLabels,
+          markers: plotMarkers,
+          categories,
           onDraw: (u) => {
             const ctx = u.ctx;
             const layouts = barLayoutsRef.current;
@@ -323,6 +349,10 @@ export function UPlotBar(props: UPlotBarProps): ReactElement {
     props.valueSuffix,
     props.referenceLines,
     props.thresholdBands,
+    props.annotations,
+    props.verticalLines,
+    props.plotLabels,
+    props.plotMarkers,
     showAxes,
     stacked,
     showCursor,

@@ -1,3 +1,14 @@
+export {
+  categoryToIndex,
+  extraYValuesFromAnnotations,
+  resolvePlotAnnotations,
+  resolveAnnotationPlotProps,
+  type ChartAnnotation,
+  type PlotLabelAnnotation,
+  type PlotMarkerAnnotation,
+  type PlotVerticalLine,
+  type ResolvedPlotAnnotations,
+} from "./annotations";
 export { preparePlotData, type PreparedPlotData } from "./preparePlotData";
 export { UPlotLine } from "./UPlotLine";
 export { UPlotBar } from "./UPlotBar";
@@ -27,4 +38,5 @@ export type {
 export { SERIES_COLORS, SERIES_PALETTE, resolveChromeColors, chromeGridStroke, isDarkChartTheme } from "./colors";
 export { resolveSeriesColor, resolveSeriesTone } from "./seriesColor";
 export { shouldUseDualAxis } from "./dualAxis";
+export { expandYRange } from "./plotAnnotations";
 export { lineSeriesPaths, resolveLineCurve, type LineCurve } from "./linePaths";

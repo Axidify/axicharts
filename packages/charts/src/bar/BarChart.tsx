@@ -7,6 +7,7 @@ import {
   UPlotRangeOverview,
   RANGE_OVERVIEW_HEIGHT,
   preparePlotData,
+  type ChartAnnotation,
   type PlotSeries,
   type ReferenceLine,
   type ThresholdBand,
@@ -27,6 +28,9 @@ import { SvgCartesianBar } from "../svg/SvgCartesianBar";
 import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
+import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
+import { DraggableMarkerOverlay } from "../annotations/DraggableMarkerOverlay";
+import { seriesValueBounds } from "../annotations/seriesValueBounds";
 
 const BAR_SERIES_KINDS = ["bar"] as const;
 
@@ -43,6 +47,7 @@ export type BarChartProps = {
   renderer?: RendererPreference;
   refreshHz?: number;
   thresholdBands?: ThresholdBand[];
+  annotations?: ChartAnnotation[];
   brush?: boolean;
   brushEnd?: number;
 };
@@ -57,6 +62,8 @@ type BarPlotProps = {
   referenceLines?: ReferenceLine[];
   stacked?: boolean;
   thresholdBands?: ThresholdBand[];
+  annotations?: ChartAnnotation[];
+  draggableMarkers: ReturnType<typeof useCartesianAnnotations>["draggableMarkers"];
   brush?: boolean;
   brushRange?: BrushRange | null;
   onBrushRangeChange?: (range: BrushRange) => void;
@@ -75,6 +82,8 @@ function BarPlot({
   referenceLines,
   stacked = false,
   thresholdBands,
+  annotations,
+  draggableMarkers,
   brush = false,
   brushRange,
   onBrushRangeChange,
@@ -89,9 +98,10 @@ function BarPlot({
   const legendHeight = getLegendHeight(showLegend, legendVariant);
   const overviewHeight = brush ? RANGE_OVERVIEW_HEIGHT : 0;
   const plotHeight = Math.floor(size.height) - legendHeight - overviewHeight;
+  const valueBounds = useMemo(() => seriesValueBounds(series), [series]);
 
   return (
-    <div style={{ width: Math.floor(size.width), height: Math.floor(size.height) - legendHeight }}>
+    <div style={{ width: Math.floor(size.width), height: Math.floor(size.height) - legendHeight, position: "relative" }}>
       {engine === "svg" ? (
         <SvgCartesianBar
           width={Math.floor(size.width)}
@@ -115,6 +125,7 @@ function BarPlot({
           referenceLines={referenceLines}
           stacked={stacked}
           thresholdBands={thresholdBands}
+          annotations={annotations}
           showCursor={chrome.showCrosshair}
           useNativeLegend={false}
           onCursor={plotSync.onCursor}
@@ -124,6 +135,16 @@ function BarPlot({
           chartId={plotSync.chartId}
         />
       )}
+      <DraggableMarkerOverlay
+        width={Math.floor(size.width)}
+        height={plotHeight}
+        categories={categories}
+        seriesMin={valueBounds.min}
+        seriesMax={valueBounds.max}
+        markers={draggableMarkers}
+        thresholdBands={thresholdBands}
+        referenceLines={referenceLines}
+      />
       {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
         <UPlotRangeOverview
           width={Math.floor(size.width)}
@@ -151,10 +172,17 @@ export function BarChart({
   renderer = "auto",
   refreshHz,
   thresholdBands,
+  annotations,
   brush = false,
   brushEnd = 100,
 }: BarChartProps): ReactElement | null {
   const { size, ready, theme, config, tagTones } = useChartLayout();
+  const annotationProps = useCartesianAnnotations({
+    annotations,
+    thresholdBands,
+    referenceLines,
+    children,
+  });
   const { effectiveRange, onBrushRangeChange } = useCartesianBrush({
     brush,
     brushEnd,
@@ -219,9 +247,11 @@ export function BarChart({
             showAxes={axes}
             showValues={showValues}
             valueSuffix={valueSuffix}
-            referenceLines={referenceLines}
+            referenceLines={annotationProps.referenceLines}
             stacked={stacked}
-            thresholdBands={thresholdBands}
+            thresholdBands={annotationProps.thresholdBands}
+            annotations={annotationProps.annotations}
+            draggableMarkers={annotationProps.draggableMarkers}
             brush={brush}
             brushRange={brush ? effectiveRange : null}
             onBrushRangeChange={brush ? onBrushRangeChange : undefined}

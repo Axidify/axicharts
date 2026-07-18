@@ -123,6 +123,14 @@ describe("vertical rule packs (C90)", () => {
     expect(panel.props?.thresholdBands).toEqual([
       { min: 0, max: 500, label: "SLO band", tone: "warning" },
     ]);
+    expect(panel.props?.annotations).toEqual([
+      {
+        type: "line",
+        value: 500,
+        label: "SLO limit",
+        tone: "critical",
+      },
+    ]);
   });
 
   it("ops: maps errors metric to live bar chart", () => {

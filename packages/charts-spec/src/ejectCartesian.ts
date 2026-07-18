@@ -80,12 +80,16 @@ function chartLevelCurveFlag(spec: PanelSpec): string {
 }
 
 function chartLevelFlags(spec: PanelSpec): string[] {
+  const annotations = spec.annotations ?? spec.props?.annotations;
   return [
     spec.fill && spec.type !== "bar" ? "fill" : "",
     spec.stacked ? "stacked" : "",
     spec.valueSuffix ? `valueSuffix="${spec.valueSuffix}"` : "",
     spec.props?.showValues === true ? "showValues" : "",
     chartLevelCurveFlag(spec),
+    Array.isArray(annotations) && annotations.length > 0
+      ? `annotations={${JSON.stringify(annotations)}}`
+      : "",
   ].filter((item): item is string => Boolean(item));
 }
 

@@ -56,6 +56,7 @@ import {
 } from "./panelStyle";
 import { registerPluginChartTypes } from "./registerPluginChartTypes";
 import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
+import { panelPropsWithAnnotations } from "./panelAnnotations";
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
   return chartPropsWithoutChartConfig(
@@ -253,14 +254,14 @@ export function compilePanel(
         ];
       }
 
-      const chartProps = {
+      const chartProps = panelPropsWithAnnotations(resolved, {
         ...props,
         categories,
         series: applyTagTonesToSeries(seriesWithSize, tagTones),
         fill: resolved.fill,
         stacked: resolved.stacked,
         valueSuffix: resolved.valueSuffix,
-      };
+      });
 
       const Chart =
         resolved.type === "area"
@@ -282,13 +283,13 @@ export function compilePanel(
           ? fromEncoding
           : ((props.series as ComboSeries[] | undefined) ?? []);
 
-      const chartProps = {
+      const chartProps = panelPropsWithAnnotations(resolved, {
         ...props,
         categories,
         series: applyTagTonesToSeries(baseSeries, tagTones) as ComboSeries[],
         fill: resolved.fill,
         valueSuffix: resolved.valueSuffix,
-      };
+      });
 
       return wrap(createElement(ComboChart, chartProps));
     }
