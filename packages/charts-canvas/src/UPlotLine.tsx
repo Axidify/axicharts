@@ -11,6 +11,7 @@ import {
   resolveChromeColors,
 } from "./colors";
 import type { UPlotLineProps } from "./types";
+import { shouldUseDualAxis } from "./dualAxis";
 import { applySyncedCursor } from "./plotCursor";
 import {
   createAnnotationDrawHook,
@@ -26,27 +27,6 @@ import {
   segmentedSeriesPaths,
 } from "./segmentedLineDraw";
 import { lineSeriesPaths, resolveLineCurve } from "./linePaths";
-
-function seriesSpan(data: number[]): number {
-  if (data.length === 0) return 1;
-  const max = Math.max(...data);
-  const min = Math.min(...data);
-  return max - min || max || 1;
-}
-
-function shouldUseDualAxis(
-  series: UPlotLineProps["series"],
-  dualAxis: UPlotLineProps["dualAxis"],
-): boolean {
-  if (series.length < 2) return false;
-  if (dualAxis === true) return true;
-  if (dualAxis === false) return false;
-
-  const spans = series.map((item) => seriesSpan(item.data));
-  const hi = Math.max(...spans);
-  const lo = Math.min(...spans);
-  return hi / lo > 3;
-}
 
 function buildOptions({
   width,

@@ -102,6 +102,7 @@ export type UPlotComboProps = {
   showAxes?: boolean;
   showValues?: boolean;
   valueSuffix?: string;
+  dualAxis?: DualAxisMode;
   referenceLines?: ReferenceLine[];
   thresholdBands?: ThresholdBand[];
   showCursor?: boolean;

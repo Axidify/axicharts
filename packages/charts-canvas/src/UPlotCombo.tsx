@@ -18,6 +18,7 @@ import {
 } from "./plotAnnotations";
 import { resolveSeriesColor } from "./seriesColor";
 import { lineSeriesPaths, resolveLineCurve } from "./linePaths";
+import { shouldUseDualAxis } from "./dualAxis";
 
 type BarLayout = {
   left: number;
@@ -50,6 +51,7 @@ export function buildComboOptions(
     showAxes = true,
     showValues = false,
     valueSuffix = "",
+    dualAxis = "auto",
     referenceLines = [],
     thresholdBands = [],
     barLayoutsRef,
@@ -63,12 +65,15 @@ export function buildComboOptions(
   const curve = resolveLineCurve(theme.line.curve, curveOverride);
   const smoothPaths = lineSeriesPaths(curve);
   const fillOpacity = theme.area.fillOpacity;
+  const annotateY =
+    thresholdBands.length > 0 || referenceLines.length > 0;
+  const useDualAxis = shouldUseDualAxis(series, dualAxis);
 
   return {
     width,
     height,
     class: "axicharts-uplot",
-    padding: [8, 10, 8, 10],
+    padding: [8, 10, 8, useDualAxis ? 48 : 10],
     cursor: {
       show: showCursor,
       x: true,
@@ -78,20 +83,37 @@ export function buildComboOptions(
     legend: { show: useNativeLegend && series.length > 1 },
     scales: {
       x: { time: false },
-      y: {
-        range: (_u, dataMin, dataMax) => {
-          const [expandedMin, expandedMax] = expandYRange(
-            dataMin,
-            dataMax,
-            thresholdBands,
-            referenceLines,
-          );
-          const top = Math.max(expandedMax, dataMax) * 1.12;
-          const bottom =
-            thresholdBands.length > 0 ? Math.min(0, expandedMin) : 0;
-          return [bottom, top];
-        },
-      },
+      y: useDualAxis
+        ? annotateY
+          ? {
+              range: (_u, min, max) =>
+                expandYRange(min, max, thresholdBands, referenceLines),
+            }
+          : { auto: true }
+        : {
+            range: (_u, dataMin, dataMax) => {
+              const [expandedMin, expandedMax] = expandYRange(
+                dataMin,
+                dataMax,
+                thresholdBands,
+                referenceLines,
+              );
+              const top = Math.max(expandedMax, dataMax) * 1.12;
+              const bottom =
+                thresholdBands.length > 0 ? Math.min(0, expandedMin) : 0;
+              return [bottom, top];
+            },
+          },
+      ...(useDualAxis
+        ? {
+            y2: annotateY
+              ? {
+                  range: (_u, min, max) =>
+                    expandYRange(min, max, thresholdBands, referenceLines),
+                }
+              : { auto: true },
+          }
+        : {}),
     },
     axes: showAxes
       ? [
@@ -119,15 +141,33 @@ export function buildComboOptions(
               : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
             gap: 4,
           },
+          ...(useDualAxis
+            ? [
+                {
+                  scale: "y2",
+                  side: 1,
+                  stroke: chrome.axis,
+                  grid: { show: false },
+                  ticks: { show: false },
+                  size: 32,
+                  font: theme.values.monospace
+                    ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
+                    : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+                  gap: 4,
+                },
+              ]
+            : []),
         ]
       : [],
     series: [
       {},
       ...series.map((item, index) => {
         const color = item.color ?? resolveSeriesColor(item.tone, index);
+        const scale = useDualAxis && index > 0 ? "y2" : "y";
         if (item.kind === "bar") {
           return {
             label: item.name,
+            scale,
             stroke: color,
             fill: color,
             width: 0,
@@ -158,6 +198,7 @@ export function buildComboOptions(
 
         return {
           label: item.name,
+          scale,
           stroke: color,
           width: theme.line.strokeWidth,
           paths: smoothPaths,
@@ -283,6 +324,7 @@ export function UPlotCombo(props: UPlotComboProps): ReactElement {
     props.valueSuffix,
     props.referenceLines,
     props.thresholdBands,
+    props.dualAxis,
     showAxes,
     showCursor,
     useNativeLegend,

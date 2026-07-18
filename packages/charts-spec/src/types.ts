@@ -13,6 +13,8 @@ export type FieldEncoding = {
   type?: FieldType;
   format?: FieldFormat;
   label?: string;
+  /** Combo panels — mark kind for this y channel. */
+  kind?: "line" | "bar";
 };
 
 /** Color channel for per-mark styling (AI / spec compiler). */
@@ -63,6 +65,7 @@ export type PanelChartType =
   | "line"
   | "area"
   | "bar"
+  | "combo"
   | "pie"
   | "donut"
   | "funnel"

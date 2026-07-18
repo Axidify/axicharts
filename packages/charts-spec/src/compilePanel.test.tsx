@@ -190,6 +190,33 @@ describe("compilePanel chrome variants", () => {
   });
 });
 
+describe("compilePanel combo", () => {
+  it("compiles combo panels from encoding.y with kinds", () => {
+    const panel = compilePanel(
+      {
+        type: "combo",
+        encoding: {
+          x: { field: "week" },
+          y: [
+            { field: "volume", label: "Volume", kind: "bar" },
+            { field: "avg", label: "Daily avg", kind: "line" },
+          ],
+        },
+        props: { dualAxis: "auto" },
+        height: 200,
+      },
+      [
+        { week: "W1", volume: 120, avg: 17 },
+        { week: "W2", volume: 90, avg: 13 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+    expect(container.innerHTML).not.toContain("dualAxis");
+  });
+});
+
 describe("compilePanel chartConfig", () => {
   it("passes chartConfig to ChartContainer", () => {
     const panel = compilePanel(

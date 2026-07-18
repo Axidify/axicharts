@@ -97,6 +97,8 @@ export type {
   ChartTypeRegistration,
 } from "./registry";
 export type {
+  ComboSeries,
+  ComboSeriesKind,
   DualAxisMode,
   PlotCursorEvent,
   PlotSeries,

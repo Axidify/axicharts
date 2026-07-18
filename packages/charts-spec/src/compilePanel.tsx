@@ -4,6 +4,7 @@ import {
   BarChart,
   CandlestickChart,
   ChartContainer,
+  ComboChart,
   Gauge,
   HeatmapChart,
   LineChart,
@@ -19,6 +20,7 @@ import {
   type PlotSeries,
   type StatTone,
   type SeriesTone,
+  type ComboSeries,
   readTagTones,
   applyTagTonesToSeries,
   resolveTagStatTone,
@@ -30,6 +32,7 @@ import { applySpecCompilers } from "./specCompiler";
 import { resolveTheme } from "./themes";
 import { fillsFromColorField } from "./colorEncoding";
 import { sizesFromSizeField } from "./sizeEncoding";
+import { comboSeriesFromEncoding } from "./comboEncoding";
 import {
   chartPropsWithoutChromeMeta,
   readPanelChrome,
@@ -248,6 +251,27 @@ export function compilePanel(
             : LineChart;
 
       return wrap(createElement(Chart, chartProps));
+    }
+
+    case "combo": {
+      const categories = resolved.encoding?.x
+        ? (pluckField(rows, resolved.encoding.x) as string[])
+        : (props.categories as string[] | undefined) ?? [];
+      const fromEncoding = comboSeriesFromEncoding(rows, resolved.encoding?.y);
+      const baseSeries =
+        fromEncoding.length > 0
+          ? fromEncoding
+          : ((props.series as ComboSeries[] | undefined) ?? []);
+
+      const chartProps = {
+        ...props,
+        categories,
+        series: applyTagTonesToSeries(baseSeries, tagTones) as ComboSeries[],
+        fill: resolved.fill,
+        valueSuffix: resolved.valueSuffix,
+      };
+
+      return wrap(createElement(ComboChart, chartProps));
     }
 
     case "scatter": {

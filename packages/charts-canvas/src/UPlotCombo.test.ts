@@ -25,4 +25,25 @@ describe("UPlotCombo", () => {
     expect(lineSeries?.width).toBeGreaterThan(0);
     expect(barSeries?.width).toBe(0);
   });
+
+  it("assigns secondary series to y2 when dual axis is enabled", () => {
+    const barLayoutsRef = { current: [] as never[] };
+    const options = buildComboOptions({
+      width: 320,
+      height: 200,
+      categories: ["W1", "W2"],
+      series: [
+        { name: "Volume", kind: "bar", data: [120, 90] },
+        { name: "Trend", kind: "line", data: [12, 9] },
+      ],
+      theme: cleanTheme,
+      dualAxis: true,
+      barLayoutsRef,
+    });
+
+    expect(options.scales?.y2).toBeDefined();
+    expect(options.series?.[1]?.scale).toBe("y");
+    expect(options.series?.[2]?.scale).toBe("y2");
+    expect(options.axes?.length).toBe(3);
+  });
 });

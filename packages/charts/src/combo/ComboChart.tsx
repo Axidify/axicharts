@@ -6,6 +6,7 @@ import {
   UPlotCombo,
   preparePlotData,
   type ComboSeries,
+  type DualAxisMode,
   type ReferenceLine,
   type ThresholdBand,
 } from "@axicharts/charts-canvas";
@@ -28,6 +29,7 @@ export type ComboChartProps = {
   showValues?: boolean;
   valueSuffix?: string;
   curve?: LineCurve;
+  dualAxis?: DualAxisMode;
   referenceLines?: ReferenceLine[];
   thresholdBands?: ThresholdBand[];
   renderer?: RendererPreference;
@@ -44,6 +46,7 @@ function ComboPlot({
   showValues,
   valueSuffix,
   curve,
+  dualAxis,
   referenceLines,
   thresholdBands,
 }: ComboPlotProps): ReactElement {
@@ -66,6 +69,7 @@ function ComboPlot({
       showAxes={showAxes}
       showValues={showValues}
       valueSuffix={valueSuffix}
+      dualAxis={dualAxis}
       referenceLines={referenceLines}
       thresholdBands={thresholdBands}
       showCursor={chrome.showCrosshair}
@@ -87,6 +91,7 @@ export function ComboChart({
   showValues = false,
   valueSuffix,
   curve,
+  dualAxis = "auto",
   referenceLines,
   thresholdBands,
   renderer = "auto",
@@ -144,6 +149,7 @@ export function ComboChart({
             showValues={showValues}
             valueSuffix={valueSuffix}
             curve={curve}
+            dualAxis={dualAxis}
             referenceLines={referenceLines}
             thresholdBands={thresholdBands}
           />
