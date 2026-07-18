@@ -96,6 +96,12 @@
     "gzip": true
   },
   {
+    "name": "@axicharts/charts-runtime/presentation-deck",
+    "path": "packages/charts-runtime/dist/presentation-deck/index.js",
+    "limit": "4 KB",
+    "gzip": true
+  },
+  {
     "name": "@axicharts/charts-planner",
     "path": "packages/charts-planner/dist/index.js",
     "limit": "4 KB",

@@ -69,6 +69,12 @@ export { normalizePanelSpec, parseDashboardSpecFile, parseDataProfileFile, parse
 export { resolveTheme } from "./themes";
 export { registerPluginChartTypes } from "./registerPluginChartTypes";
 export {
+  compileFinancePnlDeckSlide,
+  compileLineOverviewDeckSlide,
+  compileOps2x2DeckCell,
+  type DeckSlideCompileOptions,
+} from "./deckSlides";
+export {
   chartPropsWithoutStyle,
   readPanelStyle,
   themeWithPanelStyle,

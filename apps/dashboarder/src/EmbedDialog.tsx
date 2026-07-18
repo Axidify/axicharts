@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactElement } from "react";
-import { buildEmbedBundle, RUNTIME_SPEC_SCHEMA_URL, type RuntimeDashboardSpec } from "@axicharts/charts-runtime";
+import { RUNTIME_SPEC_SCHEMA_URL, type RuntimeDashboardSpec } from "@axicharts/charts-runtime";
+import { buildDeckExportBundle } from "@axicharts/charts-runtime/presentation-deck";
 import {
   dashboarderImportDeepLink,
   docsImportGalleryDeepLink,
@@ -48,7 +49,7 @@ const buttonStyle = {
   cursor: "pointer",
 } as const;
 
-type EmbedTab = "react" | "inline" | "json";
+type EmbedTab = "react" | "inline" | "json" | "deck";
 
 export type EmbedDialogProps = {
   open: boolean;
@@ -79,7 +80,7 @@ export function EmbedDialog({
 
   const bundle = useMemo(
     () =>
-      buildEmbedBundle(spec, {
+      buildDeckExportBundle(spec, {
         presentation,
         alarmScopeId,
       }),
@@ -108,7 +109,9 @@ export function EmbedDialog({
       ? bundle.reactSnippet
       : tab === "inline"
         ? bundle.inlineReactSnippet
-        : bundle.specJson;
+        : tab === "deck"
+          ? bundle.deckJson
+          : bundle.specJson;
 
   const copy = async (): Promise<void> => {
     await navigator.clipboard.writeText(activeText);
@@ -161,6 +164,7 @@ export function EmbedDialog({
               ["react", "React + JSON file"],
               ["inline", "React inline spec"],
               ["json", "Runtime JSON"],
+              ["deck", "Deck JSON"],
             ] as const
           ).map(([id, label]) => (
             <button

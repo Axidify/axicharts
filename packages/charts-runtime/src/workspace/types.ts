@@ -9,6 +9,7 @@ export type SavedDashboard = {
     template?: string;
     mosaicPreset?: string;
     presentation?: boolean;
+    presentationDeck?: import("../presentationDeck/types").PresentationDeckSpec;
     chartConfig?: import("@axicharts/charts-spec").ChartConfigSpec;
   };
 };

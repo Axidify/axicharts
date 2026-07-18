@@ -21,6 +21,35 @@
         "template": { "type": "string" },
         "mosaicPreset": { "type": "string" },
         "presentation": { "type": "boolean" },
+        "presentationDeck": {
+          "type": "object",
+          "properties": {
+            "version": { "const": 1 },
+            "startIndex": { "type": "number", "minimum": 0 },
+            "slides": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                  "id": { "type": "string", "minLength": 1 },
+                  "title": { "type": "string" },
+                  "subtitle": { "type": "string" },
+                  "callout": { "type": "string" },
+                  "section": {
+                    "type": "string",
+                    "enum": ["kpis", "waterfall", "revenue", "trend", "cell", "full"]
+                  },
+                  "cellIndex": { "type": "number", "minimum": 0 }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["slides"],
+          "additionalProperties": false
+        },
         "chartConfig": {
           "type": "object",
           "additionalProperties": {

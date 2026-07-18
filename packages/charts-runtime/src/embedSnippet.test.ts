@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
-  buildEmbedBundle,
   buildInlineReactEmbedSnippet,
   buildPortableSpecJson,
   buildReactEmbedSnippet,
   validateRuntimeSpecJson,
 } from "./embedSnippet";
+import { buildDeckExportBundle } from "./presentationDeck/deckExport";
 import { RUNTIME_SPEC_SCHEMA_URL } from "./schemaUrls";
 
 const spec = {
@@ -24,7 +24,7 @@ describe("embedSnippet", () => {
   });
 
   it("builds inline and file-import bundles", () => {
-    const bundle = buildEmbedBundle(spec, {
+    const bundle = buildDeckExportBundle(spec, {
       presentation: true,
       alarmScopeId: "line-3",
     });
@@ -32,6 +32,7 @@ describe("embedSnippet", () => {
     expect(bundle.inlineReactSnippet).toContain("satisfies RuntimeDashboardSpec");
     expect(bundle.inlineReactSnippet).toContain('alarmScopeId="line-3"');
     expect(bundle.specJson).toContain("ops-2x2");
+    expect(bundle.deckJson).toContain("slides");
   });
 
   it("serializes portable runtime JSON", () => {

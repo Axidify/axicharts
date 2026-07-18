@@ -34,17 +34,23 @@ function readExample(name: string): string {
 
 describe("dashboard export", () => {
   it("round-trips envelope with meta", () => {
+    const deck = {
+      version: 1 as const,
+      slides: [{ id: "kpis", title: "KPIs", section: "kpis" as const }],
+    };
     const json = serializeDashboardExport("Ops wall", spec, {
       layout: "embed",
       feed: "historian",
       template: "ops-2x2",
       presentation: true,
+      presentationDeck: deck,
     });
     const parsed = JSON.parse(json) as { $schema?: string };
     expect(parsed.$schema).toBe(SHARE_EXPORT_SCHEMA_URL);
     const exported = parseDashboardExport(json);
     expect(exported.name).toBe("Ops wall");
     expect(exported.meta?.presentation).toBe(true);
+    expect(exported.meta?.presentationDeck?.slides).toHaveLength(1);
     expect(exported.spec.dashboard?.template).toBe("ops-2x2");
   });
 

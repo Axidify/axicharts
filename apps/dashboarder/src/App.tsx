@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactElement } from "react";
 import type { TemplateId } from "@axicharts/charts-spec";
 import {
   RuntimeDashboard,
+  inferPresentationDeck,
   TemplatePicker,
   addDashboard,
   addWorkspace,
@@ -20,6 +21,7 @@ import {
   type ShareExport,
   type WorkspaceStore,
 } from "@axicharts/charts-runtime";
+import { PresentationDeckRuntime } from "@axicharts/charts-runtime/presentation-deck";
 import type { DashboardPlan } from "@axicharts/charts-planner";
 import { EmbedDialog } from "./EmbedDialog";
 import { ImportDialog } from "./ImportDialog";
@@ -182,7 +184,9 @@ export function App(): ReactElement {
   const builderMeta = useMemo(() => {
     const chartConfig =
       activeSpec?.layout === "embed" ? activeSpec.dashboard.chartConfig : undefined;
-    return { layout, feed, template, presentation, mosaicPreset, chartConfig };
+    const presentationDeck =
+      activeSpec && presentation ? inferPresentationDeck(activeSpec) : undefined;
+    return { layout, feed, template, presentation, mosaicPreset, chartConfig, presentationDeck };
   }, [layout, feed, template, presentation, mosaicPreset, activeSpec]);
 
   const handleSave = (): void => {
@@ -333,43 +337,17 @@ export function App(): ReactElement {
   const activeWorkspace = store.workspaces.find((item) => item.id === store.activeWorkspaceId);
   const canDeleteDashboard = (activeWorkspace?.dashboards.length ?? 0) > 1;
 
-  if (presenting) {
+  if (presenting && activeSpec) {
     return (
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 50,
-          background: "#0f172a",
-          color: "#e2e8f0",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "12px 20px",
-            borderBottom: "1px solid #334155",
-          }}
-        >
-          <div style={{ fontSize: 14, fontWeight: 600 }}>{activeDashboard.name}</div>
-          <button type="button" onClick={() => setPresenting(false)} style={buttonStyle}>
-            Exit presentation
-          </button>
-        </div>
-        <main style={{ flex: 1, padding: 24, overflow: "auto" }}>
-          <RuntimeDashboard
-            spec={activeSpec}
-            presentation
-            alarmScopeId={activeDashboard.id}
-            alarmStorage={localStorage}
-            adapterFixtureHref={resolveAdapterFixtureHref}
-          />
-        </main>
-      </div>
+      <PresentationDeckRuntime
+        spec={activeSpec}
+        deck={builderMeta.presentationDeck}
+        title={activeDashboard.name}
+        onExit={() => setPresenting(false)}
+        alarmScopeId={activeDashboard.id}
+        alarmStorage={localStorage}
+        adapterFixtureHref={resolveAdapterFixtureHref}
+      />
     );
   }
 

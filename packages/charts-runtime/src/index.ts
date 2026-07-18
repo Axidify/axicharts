@@ -56,6 +56,12 @@ export { AdapterHealthStrip, type AdapterHealthItem, type AdapterHealthStripProp
 export { DashboardEmbed, type DashboardEmbedProps } from "./DashboardEmbed";
 export { MosaicWall, type MosaicWallProps } from "./MosaicWall";
 export { RuntimeDashboard, type RuntimeDashboardProps } from "./RuntimeDashboard";
+export { inferPresentationDeck, resolvePresentationDeck } from "./presentationDeck/infer";
+export type {
+  PresentationDeckSlideSection,
+  PresentationDeckSlideSpec,
+  PresentationDeckSpec,
+} from "./presentationDeck/types";
 export { RuntimeShell, type RuntimeShellProps } from "./RuntimeShell";
 export { TemplatePicker, type TemplatePickerProps } from "./TemplatePicker";
 export { useDataSource } from "./useDataSource";

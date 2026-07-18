@@ -60,6 +60,10 @@ export {
 } from "./status/StatusLamp";
 export { Stat, type StatProps, type StatSurface, type StatTone } from "./stat/Stat";
 export {
+  ensurePresentationStyles,
+  presentationEnterStyle,
+} from "./presentation/motion";
+export {
   DataTable,
   type DataTableProps,
   type TableColumn,
