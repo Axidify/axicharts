@@ -10,6 +10,7 @@ import { ejectComboBody } from "./ejectCombo";
 import { chartPropsWithoutChromeMeta, readPanelChrome } from "./panelChrome";
 import { chartPropsWithoutChartConfig, readPanelChartConfig } from "./panelChartConfig";
 import { chartPropsWithoutStyle, readPanelStyle } from "./panelStyle";
+import { mapDrillEjectProps } from "./mapEncoding";
 
 function quote(value: string): string {
   return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
@@ -272,7 +273,7 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
   } else if (spec.type === "map") {
     chartBody = `topology={${dataVar}.topology ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).topology ?? {})}}
     values={${dataVar}.values ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).values ?? {})}}
-    showScale={${dataVar}.showScale ?? ${String(chartPropsFromPanel(spec.props ?? {}).showScale ?? true)}}`;
+    showScale={${dataVar}.showScale ?? ${String(chartPropsFromPanel(spec.props ?? {}).showScale ?? true)}}${mapDrillEjectProps(spec.props ?? {})}`;
   } else if (spec.type === "gantt") {
     chartBody = `tasks={${dataVar}.tasks ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).tasks ?? [])}}
     milestones={${dataVar}.milestones ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).milestones ?? [])}}

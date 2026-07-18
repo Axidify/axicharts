@@ -64,6 +64,7 @@ import {
 } from "./panelStyle";
 import { registerPluginChartTypes } from "./registerPluginChartTypes";
 import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
+import { resolveMapDrillProps } from "./mapEncoding";
 import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
 import { wordCloudFromRows } from "./wordCloudEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
@@ -723,6 +724,7 @@ export function compilePanel(
       const values =
         (props.values as Parameters<typeof MapChart>[0]["values"]) ??
         (objectData.values as Parameters<typeof MapChart>[0]["values"]);
+      const drillProps = resolveMapDrillProps(props);
       return wrap(
         createElement(MapChart, {
           topology: topology!,
@@ -736,6 +738,7 @@ export function compilePanel(
           showLabels: props.showLabels as boolean | undefined,
           showScale: props.showScale as boolean | undefined,
           surface: props.surface as "light" | "dark" | undefined,
+          ...drillProps,
         }),
       );
     }

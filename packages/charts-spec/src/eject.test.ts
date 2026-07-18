@@ -250,6 +250,27 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("CA");
   });
 
+  it("emits map drilldown props from spec", () => {
+    const jsx = ejectPanel({
+      type: "map",
+      props: {
+        topology: { type: "Topology", objects: {}, arcs: [] },
+        values: { west: 65 },
+        drilldown: true,
+        hierarchy: {
+          levels: [{ objectKey: "regions" }, { objectKey: "states", parentIdKey: "region" }],
+        },
+        drillPath: ["west"],
+        drillLabels: ["West"],
+      },
+    });
+
+    expect(jsx).toContain("drilldown");
+    expect(jsx).toContain("hierarchy=");
+    expect(jsx).toContain('drillPath={["west"]}');
+    expect(jsx).toContain('drillLabels={["West"]}');
+  });
+
   it("emits GanttChart from plugin package", () => {
     const jsx = ejectPanel(
       {

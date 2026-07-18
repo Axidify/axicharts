@@ -4,6 +4,8 @@ import { render, waitFor } from "@testing-library/react";
 import { registerBuiltinChartTypes } from "@axicharts/charts/registry";
 import { registerTankChart } from "@axicharts/charts-tank";
 import {
+  SAMPLE_DRILL_VALUES,
+  SAMPLE_US_HIERARCHY,
   SAMPLE_US_TOPOLOGY,
   SAMPLE_US_VALUES,
 } from "@axicharts/charts-map";
@@ -74,6 +76,32 @@ describe("compilePanel community breadth", () => {
     expect(container.textContent).toContain("Regional utilization");
     await waitFor(() => {
       expect(container.textContent).toContain("California");
+    });
+  });
+
+  it("compiles map drilldown props from spec", async () => {
+    const panel = compilePanel(
+      {
+        type: "map",
+        title: "Regional drilldown",
+        height: 260,
+        width: 400,
+        props: {
+          topology: SAMPLE_US_TOPOLOGY,
+          values: SAMPLE_DRILL_VALUES,
+          hierarchy: SAMPLE_US_HIERARCHY,
+          drilldown: true,
+          drillPath: ["west"],
+          drillLabels: ["West"],
+        },
+      },
+      {},
+    );
+
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.textContent).toContain("California");
+      expect(container.textContent).not.toContain("Texas");
     });
   });
 
