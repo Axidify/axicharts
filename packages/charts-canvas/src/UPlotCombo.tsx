@@ -19,6 +19,7 @@ import {
 import { resolveAnnotationPlotProps } from "./annotations";
 import { resolveSeriesColor } from "./seriesColor";
 import { lineSeriesPaths, resolveLineCurve } from "./linePaths";
+import { axisCategoryValues } from "./axisCategoryLabel";
 import { shouldUseDualAxis } from "./dualAxis";
 
 type BarLayout = {
@@ -96,7 +97,7 @@ export function buildComboOptions(
     width,
     height,
     class: "axicharts-uplot",
-    padding: [8, 10, 8, useDualAxis ? 48 : 10],
+    padding: [8, 14, 8, useDualAxis ? 48 : 14],
     cursor: {
       show: showCursor,
       x: true,
@@ -159,11 +160,10 @@ export function buildComboOptions(
               ? { stroke: gridStroke, width: theme.grid.strokeWidth }
               : { show: false },
             ticks: { show: false },
-            values: (_u, ticks) =>
-              ticks.map((tick) => categories[tick] ?? ""),
+            values: axisCategoryValues(categories),
             size: 18,
             font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
-            gap: 4,
+            gap: 8,
           },
           {
             stroke: chrome.axis,

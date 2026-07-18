@@ -25,3 +25,4 @@ jobs:
       - run: pnpm size
       - run: pnpm validate:runtime
       - run: pnpm test:registry
+      - run: pnpm test:visual

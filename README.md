@@ -72,6 +72,10 @@ npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-bar
 
 Registry CI: `pnpm test:registry` (validates source + dry-runs `shadcn add`).
 
+Visual regression: `pnpm test:visual` (static Storybook + Playwright snapshots; `UPDATE_SNAPSHOTS=1 pnpm test:visual` to refresh baselines).
+
+Chart catalog: Storybook **Charts/Catalog → AllTypes**.
+
 ## Packages
 
 | Package | Description |

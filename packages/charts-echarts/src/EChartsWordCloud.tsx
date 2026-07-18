@@ -78,7 +78,7 @@ function EChartsWordCloudPlot({
           // @ts-expect-error echarts-wordcloud shrinkToFit
           shrinkToFit: true,
           drawOutOfBound: false,
-          layoutAnimation: true,
+          layoutAnimation: animate,
           textStyle: {
             fontFamily: theme.values.monospace
               ? "ui-monospace, SFMono-Regular, Menlo, monospace"

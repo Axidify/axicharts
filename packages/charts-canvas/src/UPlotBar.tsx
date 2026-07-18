@@ -18,6 +18,7 @@ import {
 import { resolveAnnotationPlotProps } from "./annotations";
 import { shouldStackSeries, STACK_GROUP } from "./stack";
 import { resolveSeriesColor } from "./seriesColor";
+import { axisCategoryValues } from "./axisCategoryLabel";
 import type { PlotSeries } from "./types";
 
 type BarLayout = {
@@ -121,7 +122,7 @@ function buildOptions({
     width,
     height,
     class: "axicharts-uplot",
-    padding: [8, 10, 8, 10],
+    padding: [8, 14, 8, 14],
     cursor: {
       show: showCursor,
       x: true,
@@ -157,11 +158,10 @@ function buildOptions({
               ? { stroke: gridStroke, width: theme.grid.strokeWidth }
               : { show: false },
             ticks: { show: false },
-            values: (_u, ticks) =>
-              ticks.map((tick) => categories[tick] ?? ""),
+            values: axisCategoryValues(categories),
             size: 18,
             font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
-            gap: 4,
+            gap: 8,
           },
           {
             stroke: chrome.axis,

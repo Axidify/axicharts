@@ -26,6 +26,7 @@ import {
   isStruggling,
   libraryDisplayName,
   lookupCiReference,
+  type BenchLibrary,
   type BenchPresetId,
   type LiveBenchState,
   type LivePanelState,
@@ -507,15 +508,6 @@ export function LiveOpsCompareDemo({
   const axiStruggling = isStruggling(bench.axiLive) || primaryAxiP95 > FRAME_BUDGET_MS;
 
   const panelWidth = Math.max(120, Math.floor((threeWay ? 1080 : 720) / gridColumns) - 24);
-  const showAxiColumn =
-    bench.calibrationView === "all" || bench.calibrationView === "axicharts";
-  const showRechartsColumn =
-    bench.calibrationView === "all" || bench.calibrationView === "recharts";
-  const showEchartsColumn =
-    threeWay &&
-    (bench.calibrationView === "all" || bench.calibrationView === "echarts");
-  const visibleColumnCount =
-    (showAxiColumn ? 1 : 0) + (showRechartsColumn ? 1 : 0) + (showEchartsColumn ? 1 : 0);
   const calibrationLabel = bench.calibrationProgress
     ? `Calibrating ${libraryDisplayName(bench.calibrationProgress.library)} ${bench.calibrationProgress.step}/${bench.calibrationProgress.total}…`
     : bench.calibrating
@@ -879,13 +871,13 @@ export function LiveOpsCompareDemo({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: `repeat(${Math.max(visibleColumnCount, 1)}, minmax(0, 1fr))`,
+          gridTemplateColumns: threeWay ? "1fr 1fr 1fr" : "1fr 1fr",
           gap: 20,
           alignItems: "start",
         }}
       >
-        {showAxiColumn ? (
-        <CompareColumn
+        <LiveOpsCompareColumn
+          library="axicharts"
           title="AxiCharts"
           subtitle="uPlot canvas · mode=live"
           accent="#2563eb"
@@ -895,13 +887,13 @@ export function LiveOpsCompareDemo({
           profilerId="axi-live-ops"
           onProfilerRender={onAxiProfiler}
           panels={bench.panels}
+          struggling={axiStruggling}
           renderPanel={(panel) => (
             <AxiPanel key={panel.spec.id} panel={panel} height={panelHeight} />
           )}
         />
-        ) : null}
-        {showRechartsColumn ? (
-        <CompareColumn
+        <LiveOpsCompareColumn
+          library="recharts"
           title="Recharts"
           subtitle="SVG LineChart · isAnimationActive=false"
           accent="#64748b"
@@ -921,28 +913,28 @@ export function LiveOpsCompareDemo({
             />
           )}
         />
-        ) : null}
-        {showEchartsColumn ? (
-        <CompareColumn
-          title="ECharts"
-          subtitle="Canvas line · animation=false"
-          accent="#7c3aed"
-          bench={bench}
-          panelHeight={panelHeight}
-          gridColumns={gridColumns}
-          profilerId="echarts-live-ops"
-          onProfilerRender={onEchartsProfiler}
-          panels={bench.echartsPanels}
-          struggling={echartsStruggling}
-          renderPanel={(panel) => (
-            <EChartsPanel
-              key={panel.spec.id}
-              panel={panel}
-              height={panelHeight}
-              width={panelWidth}
-            />
-          )}
-        />
+        {threeWay ? (
+          <LiveOpsCompareColumn
+            library="echarts"
+            title="ECharts"
+            subtitle="Canvas line · animation=false"
+            accent="#7c3aed"
+            bench={bench}
+            panelHeight={panelHeight}
+            gridColumns={gridColumns}
+            profilerId="echarts-live-ops"
+            onProfilerRender={onEchartsProfiler}
+            panels={bench.echartsPanels}
+            struggling={echartsStruggling}
+            renderPanel={(panel) => (
+              <EChartsPanel
+                key={panel.spec.id}
+                panel={panel}
+                height={panelHeight}
+                width={panelWidth}
+              />
+            )}
+          />
         ) : null}
       </div>
     </div>
@@ -1106,6 +1098,156 @@ function ControlsBar({
         Auto-throttle Recharts when frame budget exceeded (skip frames to recover)
       </label>
     </div>
+  );
+}
+
+function LiveOpsCompareColumn({
+  library,
+  title,
+  subtitle,
+  accent,
+  bench,
+  panelHeight,
+  gridColumns,
+  profilerId,
+  onProfilerRender,
+  panels,
+  struggling,
+  renderPanel,
+}: {
+  library: BenchLibrary;
+  title: string;
+  subtitle: string;
+  accent: string;
+  bench: LiveBenchState;
+  panelHeight: number;
+  gridColumns: number;
+  profilerId: string;
+  onProfilerRender: React.ProfilerOnRenderCallback;
+  panels: LivePanelState[];
+  struggling?: boolean;
+  renderPanel: (panel: LivePanelState) => ReactElement;
+}): ReactElement {
+  const isCalibratingColumn =
+    bench.calibrating &&
+    bench.calibrationView !== "all" &&
+    bench.calibrationView === library;
+  const showSkeleton =
+    bench.calibrating && bench.calibrationView !== "all" && bench.calibrationView !== library;
+
+  if (showSkeleton) {
+    return (
+      <CalibrationSkeletonColumn
+        title={title}
+        subtitle="Waiting for calibration…"
+        accent={accent}
+        panelCount={panels.length}
+        gridColumns={gridColumns}
+        panelHeight={panelHeight}
+      />
+    );
+  }
+
+  return (
+    <CompareColumn
+      title={title}
+      subtitle={isCalibratingColumn ? "Calibrating isolated benchmark…" : subtitle}
+      accent={accent}
+      bench={bench}
+      panelHeight={panelHeight}
+      gridColumns={gridColumns}
+      profilerId={profilerId}
+      onProfilerRender={onProfilerRender}
+      panels={panels}
+      struggling={struggling}
+      renderPanel={renderPanel}
+    />
+  );
+}
+
+function CalibrationSkeletonColumn({
+  title,
+  subtitle,
+  accent,
+  panelCount,
+  gridColumns,
+  panelHeight,
+}: {
+  title: string;
+  subtitle: string;
+  accent: string;
+  panelCount: number;
+  gridColumns: number;
+  panelHeight: number;
+}): ReactElement {
+  return (
+    <section>
+      <div style={{ marginBottom: 10 }}>
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: "0.05em",
+            textTransform: "uppercase",
+            color: accent,
+          }}
+        >
+          {title}
+        </div>
+        <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>{subtitle}</div>
+      </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`,
+          gap: 8,
+          padding: 12,
+          borderRadius: 12,
+          border: "1px solid #334155",
+          background: "#020617",
+        }}
+      >
+        {Array.from({ length: panelCount }, (_, index) => (
+          <div
+            key={index}
+            style={{
+              border: "1px solid #1e293b",
+              borderRadius: 8,
+              padding: "8px 10px",
+              background: "#0f172a",
+              minWidth: 0,
+            }}
+          >
+            <div
+              style={{
+                height: 10,
+                width: "42%",
+                borderRadius: 4,
+                background: "#1e293b",
+                marginBottom: 8,
+                animation: "axi-calibrate-pulse 1.6s ease-in-out infinite",
+              }}
+            />
+            <div
+              style={{
+                height: panelHeight,
+                borderRadius: 6,
+                background:
+                  "repeating-linear-gradient(0deg, #1e293b 0, #1e293b 1px, transparent 1px, transparent 12px), #0b1220",
+                animation: "axi-calibrate-pulse 1.6s ease-in-out infinite",
+                animationDelay: `${(index % gridColumns) * 0.12}s`,
+              }}
+            />
+          </div>
+        ))}
+      </div>
+      <style>{`
+        @keyframes axi-calibrate-pulse {
+          0%, 100% { opacity: 0.45; }
+          50% { opacity: 0.85; }
+        }
+      `}</style>
+    </section>
   );
 }
 

@@ -27,6 +27,44 @@ const HOSTED_ITEM_URL =
   process.env.REGISTRY_E2E_URL ??
   "https://axidify.github.io/axicharts/registry/chart-axi-bar.json";
 
+const workspaceChartsVersion = JSON.parse(
+  readFileSync(join(root, "packages/charts/package.json"), "utf8"),
+).version;
+
+/** Use latest published npm version when workspace version is not on npm yet (CI runs before publish). */
+function resolveInstallVersion() {
+  try {
+    execSync(`npm view @axicharts/charts@${workspaceChartsVersion} version`, {
+      cwd: root,
+      stdio: "pipe",
+    });
+    return workspaceChartsVersion;
+  } catch {
+    const latest = execSync("npm view @axicharts/charts version", {
+      cwd: root,
+      encoding: "utf8",
+    }).trim();
+    console.warn(
+      `registry e2e: @axicharts/charts@${workspaceChartsVersion} not on npm; using @${latest}`,
+    );
+    return latest;
+  }
+}
+
+function writeInstallableRegistryItem(workDir) {
+  const item = JSON.parse(
+    readFileSync(join(registryBuiltDir, "chart-axi-bar.json"), "utf8"),
+  );
+  const version = resolveInstallVersion();
+  item.dependencies = [
+    `@axicharts/charts@${version}`,
+    `@axicharts/charts-theme@${version}`,
+  ];
+  const itemPath = join(workDir, "chart-axi-bar.local.json");
+  writeFileSync(itemPath, JSON.stringify(item, null, 2));
+  return itemPath;
+}
+
 function run(command, options = {}) {
   execSync(command, { cwd: root, stdio: "inherit", ...options });
 }
@@ -136,8 +174,9 @@ async function main() {
     console.log(`registry e2e: shadcn add --dry-run ${HOSTED_ITEM_URL}`);
     shadcn(["add", "-y", "--dry-run", HOSTED_ITEM_URL], workDir);
 
-    console.log(`registry e2e: shadcn add ${HOSTED_ITEM_URL}`);
-    shadcn(["add", "-y", "-o", HOSTED_ITEM_URL], workDir);
+    const localItemPath = writeInstallableRegistryItem(workDir);
+    console.log(`registry e2e: shadcn add ${localItemPath} (npm-resolved deps)`);
+    shadcn(["add", "-y", "-o", localItemPath], workDir);
 
     const target = resolveInstalledFile(workDir);
     const content = readFileSync(target, "utf8");

@@ -28,6 +28,7 @@ import {
   segmentedSeriesPaths,
 } from "./segmentedLineDraw";
 import { lineSeriesPaths, resolveLineCurve } from "./linePaths";
+import { axisCategoryValues } from "./axisCategoryLabel";
 
 function buildOptions({
   width,
@@ -127,7 +128,7 @@ function buildOptions({
     width,
     height,
     class: "axicharts-uplot",
-    padding: compact ? [4, 6, 4, 6] : [topPad, 10, 8, useDualAxis ? 48 : 10],
+    padding: compact ? [4, 6, 4, 6] : [topPad, 14, 8, useDualAxis ? 48 : 14],
     cursor: {
       show: showCursor,
       x: true,
@@ -174,8 +175,8 @@ function buildOptions({
               ? { stroke: gridStroke, width: gridWidth }
               : { show: false },
             ticks: { show: false },
-            values: (_u, ticks) =>
-              ticks.map((tick) => categories[tick] ?? ""),
+            values: axisCategoryValues(categories),
+            gap: 8,
             size: compact ? 0 : 18,
             font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
           },

@@ -8,7 +8,7 @@
   {
     "name": "@axicharts/charts-canvas",
     "path": "packages/charts-canvas/dist/index.js",
-    "limit": "10.5 KB",
+    "limit": "10.52 KB",
     "gzip": true
   },
   {
@@ -77,7 +77,7 @@
     "limit": "8 KB",
     "gzip": true
   },
-    {
+  {
     "name": "@axicharts/charts/heatmap",
     "path": "packages/charts/dist/entry/heatmap.js",
     "limit": "8 KB",
