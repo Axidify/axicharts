@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { useMemo } from "react";
 import {
   UPlotCombo,
@@ -36,10 +36,16 @@ import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
 import { GraphicOverlay } from "../graphic/GraphicOverlay";
 import { useChartGraphics } from "../graphic/useChartGraphics";
+import { composeComboCartesianMarks } from "../composable/composeComboCartesian";
 
-export type ComboChartProps = {
-  categories: string[];
-  series: ComboSeries[];
+export type CartesianChartProps = {
+  /** Row-oriented data for composable children (`<Bar dataKey="revenue" />`, …). */
+  data?: Record<string, unknown>[];
+  children?: ReactNode;
+  /** Imperative categories (compile / eject imperative style). */
+  categories?: string[];
+  /** Imperative combo series (compile / eject imperative style). */
+  series?: ComboSeries[];
   fill?: boolean;
   showAxes?: boolean;
   showValues?: boolean;
@@ -57,9 +63,24 @@ export type ComboChartProps = {
   liveAnimate?: LiveAnimate;
 };
 
-type ComboPlotProps = ComboChartProps;
+type CartesianPlotProps = {
+  categories: string[];
+  series: ComboSeries[];
+  fill?: boolean;
+  showAxes?: boolean;
+  showValues?: boolean;
+  valueSuffix?: string;
+  curve?: LineCurve;
+  dualAxis?: DualAxisMode;
+  referenceLines?: ReferenceLine[];
+  thresholdBands?: ThresholdBand[];
+  annotations?: ChartAnnotation[];
+  chartGraphics: ChartGraphicElement[];
+  draggableMarkers: ReturnType<typeof useCartesianAnnotations>["draggableMarkers"];
+  onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
+};
 
-function ComboPlot({
+function CartesianPlot({
   categories,
   series,
   fill,
@@ -74,11 +95,7 @@ function ComboPlot({
   chartGraphics,
   draggableMarkers,
   onMarkerDragEnd,
-}: ComboPlotProps & {
-  chartGraphics: ChartGraphicElement[];
-  draggableMarkers: ReturnType<typeof useCartesianAnnotations>["draggableMarkers"];
-  onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
-}): ReactElement {
+}: CartesianPlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync();
   const chrome = getInteractionChrome(mode);
@@ -94,28 +111,28 @@ function ComboPlot({
   return (
     <div style={{ position: "relative", width: Math.floor(size.width), height: plotHeight }}>
       <UPlotCombo
-      width={Math.floor(size.width)}
-      height={plotHeight}
-      categories={categories}
-      series={series}
-      theme={theme}
-      fill={fill}
-      curve={curve}
-      showAxes={showAxes}
-      showValues={showValues}
-      valueSuffix={valueSuffix}
-      dualAxis={dualAxis}
-      referenceLines={referenceLines}
-      thresholdBands={thresholdBands}
-      annotations={annotations}
-      showCursor={chrome.showCrosshair}
-      useNativeLegend={false}
-      onCursor={plotSync.onCursor}
-      onSyncIndex={plotSync.onSyncIndex}
-      syncIndex={plotSync.syncIndex}
-      syncSourceId={plotSync.syncSourceId}
-      chartId={plotSync.chartId}
-    />
+        width={Math.floor(size.width)}
+        height={plotHeight}
+        categories={categories}
+        series={series}
+        theme={theme}
+        fill={fill}
+        curve={curve}
+        showAxes={showAxes}
+        showValues={showValues}
+        valueSuffix={valueSuffix}
+        dualAxis={dualAxis}
+        referenceLines={referenceLines}
+        thresholdBands={thresholdBands}
+        annotations={annotations}
+        showCursor={chrome.showCrosshair}
+        useNativeLegend={false}
+        onCursor={plotSync.onCursor}
+        onSyncIndex={plotSync.onSyncIndex}
+        syncIndex={plotSync.syncIndex}
+        syncSourceId={plotSync.syncSourceId}
+        chartId={plotSync.chartId}
+      />
       {chartGraphics.length > 0 ? (
         <GraphicOverlay
           width={Math.floor(size.width)}
@@ -143,15 +160,31 @@ function ComboPlot({
   );
 }
 
-/** @internal Legacy combo adapter — prefer `CartesianChart` + block marks. */
-export function ComboChart({
-  categories,
+/**
+ * Composable cartesian shell — mix bar, line, area data marks with rule/band overlays.
+ *
+ * @example
+ * ```tsx
+ * <CartesianChart data={rows}>
+ *   <Grid />
+ *   <XAxis dataKey="week" />
+ *   <YAxis />
+ *   <Bar dataKey="revenue" name="Revenue" />
+ *   <Line dataKey="target" name="Target" />
+ *   <Rule value={50} label="Quota" tone="warning" />
+ * </CartesianChart>
+ * ```
+ */
+export function CartesianChart({
+  data,
+  children,
+  categories: categoriesProp,
   series: seriesProp,
   fill = false,
   showAxes,
   showValues = false,
-  valueSuffix,
-  curve,
+  valueSuffix: valueSuffixProp,
+  curve: curveProp,
   dualAxis = "auto",
   referenceLines,
   thresholdBands,
@@ -162,19 +195,39 @@ export function ComboChart({
   onMarkerDragEnd,
   animate,
   liveAnimate: liveAnimateProp,
-}: ComboChartProps): ReactElement | null {
+}: CartesianChartProps): ReactElement | null {
   const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate } =
     useChartLayout();
   const annotationProps = useCartesianAnnotations({
     annotations,
     thresholdBands,
     referenceLines,
+    children,
   });
-  const chartGraphics = useChartGraphics({ graphics });
+  const chartGraphics = useChartGraphics({ graphics, children });
+
+  const composed = useMemo(() => {
+    if (data && children) {
+      return composeComboCartesianMarks(children, data, config);
+    }
+    return null;
+  }, [data, children, config]);
+
+  const categories = composed?.categories ?? categoriesProp ?? [];
+  const resolvedSeries = composed?.series ?? seriesProp ?? [];
+  const valueSuffix = valueSuffixProp ?? composed?.valueSuffix;
+  const curve = curveProp ?? composed?.curve;
+
   const series = useMemo(() => {
-    const configured = applyChartConfigToSeries(seriesProp, config);
+    const configured = applyChartConfigToSeries(resolvedSeries, config);
     return applyTagTonesToSeries(configured, tagTones ?? {}) as ComboSeries[];
-  }, [seriesProp, config, tagTones]);
+  }, [resolvedSeries, config, tagTones]);
+
+  const resolvedFill = useMemo(() => {
+    if (series.some((item) => item.fill)) return false;
+    return fill;
+  }, [fill, series]);
+
   const maxPoints = usePlotSampling({
     pointCount: categories.length,
     renderer,
@@ -243,10 +296,10 @@ export function ComboChart({
         plotKey={motion.plotKey}
         skipPresentationPlotEnter={motion.skipPresentationPlotEnter}
         plot={
-          <ComboPlot
+          <CartesianPlot
             categories={prepared.categories}
             series={prepared.series as ComboSeries[]}
-            fill={fill}
+            fill={resolvedFill}
             showAxes={axes}
             showValues={showValues}
             valueSuffix={valueSuffix}

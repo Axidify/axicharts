@@ -47,6 +47,37 @@ Example fixture: [examples/cartesian-revenue-target.panel.json](./examples/carte
 
 JSX uses `dataKey` as an alias for `field`. Legacy `type` on marks is accepted; canonical key is `mark`.
 
+## Human API (Layer 1)
+
+```tsx
+import {
+  ChartContainer,
+  CartesianChart,
+  Grid,
+  XAxis,
+  YAxis,
+  Bar,
+  Line,
+  Rule,
+  Band,
+} from "@axicharts/charts/cartesian";
+import { studioTheme } from "@axicharts/charts-theme";
+
+<ChartContainer theme={studioTheme} mode="static" height={260} width="100%">
+  <CartesianChart data={rows}>
+    <Grid />
+    <XAxis dataKey="week" />
+    <YAxis />
+    <Bar dataKey="revenue" name="Revenue" />
+    <Line dataKey="target" name="Target" type="monotone" />
+    <Rule value={50} label="Quota" tone="warning" />
+    <Band min={44} max={52} label="Healthy band" tone="success" />
+  </CartesianChart>
+</ChartContainer>
+```
+
+`ejectPanel(spec)` emits the same composable shape by default. Pass `{ style: "imperative" }` for legacy `ComboChart series={[…]}` output.
+
 ## Validation (C136)
 
 ```ts
@@ -104,8 +135,8 @@ Empirical simulation: 24 scenarios in `src/compositionSimulation.ts` — run `pn
 
 | Slice | Status | Deliverable |
 |-------|--------|-------------|
-| C136 | 🚧 branch `feat/rfc-002-c136-cartesian` | `validateCartesianSpec`, `normalizeToCartesian`, `type: "cartesian"` |
-| C137 | Planned | Public `CartesianChart` shell; composable eject |
+| C136 | ✅ branch `feat/rfc-002-c136-cartesian` | `validateCartesianSpec`, `normalizeToCartesian`, `type: "cartesian"` |
+| C137 | ✅ branch `feat/rfc-002-c136-cartesian` | Public `CartesianChart` shell; composable eject |
 | C138 | Planned | Blocks Playground (spec ↔ chart ↔ JSX) |
 | C139 | Planned | `createCartesianPanel` in charts-planner |
 | C140 | Planned | `@axicharts/charts-mcp` |

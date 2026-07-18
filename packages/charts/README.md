@@ -4,7 +4,7 @@
 
 Layer 1 React chart API for AxiCharts — `ChartContainer`, line/bar/area charts, industrial primitives, and `registerChartType` extension registry.
 
-**Direction:** Cartesian **building blocks** — `type: "cartesian"` + `marks[]` for agent-safe specs; public `CartesianChart` composable shell (C137). Today: `LineChart` / `ComboChart` presets compile to the same render path. See [charts-spec/CARTESIAN.md](../charts-spec/CARTESIAN.md).
+**Direction:** Cartesian **building blocks** — `CartesianChart` composable shell (`@axicharts/charts/cartesian`) + `type: "cartesian"` / `marks[]` spec (`@axicharts/charts-spec`). `LineChart` / `BarChart` remain thin presets; `ComboChart` is `@internal` legacy adapter. See [charts-spec/CARTESIAN.md](../charts-spec/CARTESIAN.md).
 
 **Recommended batteries-included install:**
 

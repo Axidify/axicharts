@@ -14,6 +14,12 @@ export {
   AnnotationBand,
   AnnotationLine,
   AnnotationMarker,
+  Band,
+  Rule,
+  X,
+  Y,
+  type BandMarkProps,
+  type RuleMarkProps,
   type AreaMarkProps,
   type BarMarkProps,
   type CellMarkProps,
@@ -30,6 +36,10 @@ export {
   type AnnotationMarkerMarkProps,
 } from "./marks";
 export { composeCartesianMarks, type ComposedCartesian } from "./composeCartesian";
+export {
+  composeComboCartesianMarks,
+  type ComposedComboCartesian,
+} from "./composeComboCartesian";
 export { composeCartesianAnnotations } from "./composeCartesianAnnotations";
 export { composePieMarks, type ComposedPie } from "./composePie";
 export { composeFunnelMarks, type ComposedFunnel } from "./composeFunnel";

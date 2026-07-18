@@ -136,7 +136,10 @@ function evaluate(
   }
 
   if (marksNeedFill(marks) && props.series.some((s) => s.kind === "bar")) {
-    notes.push("area mark sets global fill=true alongside bars");
+    const areaSeries = props.series.filter((s) => s.fill);
+    if (areaSeries.length > 0 && props.fill) {
+      notes.push("area mark sets global fill=true alongside bars");
+    }
   }
 
   if (props.series.length >= 2) {
@@ -147,7 +150,12 @@ function evaluate(
     Extract<ChartBlockMarkSpec, { type: "line" | "area" }>
   >;
   if (curves.length > 1 && curves.some((c) => c.curve) && curves.some((c) => c.curve && c.curve !== curves[0]?.curve)) {
-    notes.push(`marksCurve picks first only: ${marksCurve(marks)}`);
+    const perSeries = props.series.every(
+      (s, i) => !curves[i]?.curve || s.curve === curves[i]?.curve,
+    );
+    if (!perSeries) {
+      notes.push(`marksCurve picks first only: ${marksCurve(marks)}`);
+    }
   }
 
   return {

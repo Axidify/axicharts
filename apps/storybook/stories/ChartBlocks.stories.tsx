@@ -18,8 +18,8 @@ function BlocksSpecPanel(): ReactElement {
     <div style={{ maxWidth: 720 }}>
       <Chart panel={blocksSpec} data={BLOCK_ROWS} />
       <p style={{ marginTop: 10, fontSize: 12, color: "#64748b" }}>
-        C135 — <code>type: "blocks"</code> with <code>marks[]</code> (bar + line +
-        rule + band) compiles to <code>ComboChart</code> for AI and runtime agents.
+        C137 — <code>type: "cartesian"</code> with <code>marks[]</code> (bar + line +
+        rule + band) compiles to <code>CartesianChart</code> for AI and runtime agents.
       </p>
     </div>
   );
@@ -58,7 +58,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C135 chart building blocks — `marks[]` on `type: blocks` panels for mix-and-match cartesian charts. AI agents can emit validated block specs; devs can eject to ComboChart JSX.",
+          "C137 chart building blocks — `marks[]` on `type: cartesian` panels compile to `CartesianChart`. Eject emits composable block JSX.",
       },
     },
   },

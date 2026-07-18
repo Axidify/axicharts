@@ -59,7 +59,7 @@ export {
 } from "./templates";
 export { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 export { Chart, Dashboard, type ChartProps, type DashboardProps } from "./Chart";
-export { ejectPanel } from "./eject";
+export { ejectPanel, type EjectOptions } from "./eject";
 export {
   planPanelFromMetric,
   planPanelsFromProfile,

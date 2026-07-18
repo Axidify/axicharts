@@ -105,6 +105,12 @@ export type AnnotationMarkerMarkProps = {
   id?: string;
 };
 
+/** Overlay reference line — alias for agent/human block API (RFC-002). */
+export type RuleMarkProps = AnnotationLineMarkProps;
+
+/** Overlay threshold band — alias for agent/human block API (RFC-002). */
+export type BandMarkProps = AnnotationBandMarkProps;
+
 function lineMark(_props: LineMarkProps): null {
   return null;
 }
@@ -161,6 +167,14 @@ function annotationMarkerMark(_props: AnnotationMarkerMarkProps): null {
   return null;
 }
 
+function ruleMark(_props: RuleMarkProps): null {
+  return null;
+}
+
+function bandMark(_props: BandMarkProps): null {
+  return null;
+}
+
 export const Line = Object.assign(lineMark, { markKind: "line" as const });
 export const Bar = Object.assign(barMark, { markKind: "bar" as const });
 export const Area = Object.assign(areaMark, { markKind: "area" as const });
@@ -184,6 +198,12 @@ export const AnnotationLine = Object.assign(annotationLineMark, {
 export const AnnotationMarker = Object.assign(annotationMarkerMark, {
   markKind: "annotationMarker" as const,
 });
+export const Rule = Object.assign(ruleMark, { markKind: "rule" as const });
+export const Band = Object.assign(bandMark, { markKind: "band" as const });
+/** Recharts-style alias for `XAxis`. */
+export const X = XAxis;
+/** Recharts-style alias for `YAxis`. */
+export const Y = YAxis;
 
 export type ComposableMarkKind =
   | typeof Line.markKind
@@ -200,7 +220,9 @@ export type ComposableMarkKind =
   | typeof AnnotationLabel.markKind
   | typeof AnnotationBand.markKind
   | typeof AnnotationLine.markKind
-  | typeof AnnotationMarker.markKind;
+  | typeof AnnotationMarker.markKind
+  | typeof Rule.markKind
+  | typeof Band.markKind;
 
 export type ComposableMarkType =
   | typeof Line
@@ -217,4 +239,8 @@ export type ComposableMarkType =
   | typeof AnnotationLabel
   | typeof AnnotationBand
   | typeof AnnotationLine
-  | typeof AnnotationMarker;
+  | typeof AnnotationMarker
+  | typeof Rule
+  | typeof Band
+  | typeof X
+  | typeof Y;

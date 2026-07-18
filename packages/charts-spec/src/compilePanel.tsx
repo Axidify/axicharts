@@ -11,6 +11,7 @@ import {
   ChartNavigator,
   CHART_NAVIGATOR_HEIGHT,
   ComboChart,
+  CartesianChart,
   Gauge,
   HeatmapChart,
   HistogramChart,
@@ -60,7 +61,6 @@ import { comboSeriesFromEncoding } from "./comboEncoding";
 import {
   blockMarksToChartProps,
   marksCurve,
-  marksNeedFill,
 } from "./blockMarks";
 import { normalizeToCartesian } from "./normalizeToCartesian";
 import {
@@ -410,7 +410,7 @@ export function compilePanel(
         ...props,
         categories,
         series: applyTagTonesToSeries(fromMarks.series, tagTones) as ComboSeries[],
-        fill: cartesian.fill ?? fromMarks.fill ?? marksNeedFill(marks),
+        fill: cartesian.fill ?? fromMarks.fill,
         valueSuffix: cartesian.valueSuffix,
         referenceLines: [
           ...fromMarks.referenceLines,
@@ -427,7 +427,7 @@ export function compilePanel(
         ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
       });
 
-      return wrap(createElement(ComboChart, chartProps));
+      return wrap(createElement(CartesianChart, chartProps));
     }
 
     case "scatter": {

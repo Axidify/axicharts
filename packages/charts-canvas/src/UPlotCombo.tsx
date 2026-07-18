@@ -84,8 +84,6 @@ export function buildComboOptions(
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme);
   const gapPx = Math.max(3, Math.round(theme.bar.gap * 28));
-  const curve = resolveLineCurve(theme.line.curve, curveOverride);
-  const smoothPaths = lineSeriesPaths(curve);
   const fillOpacity = theme.area.fillOpacity;
   const annotateY =
     thresholdBandsResolved.length > 0 ||
@@ -200,6 +198,12 @@ export function buildComboOptions(
       ...series.map((item, index) => {
         const color = item.color ?? resolveSeriesColor(item.tone, index, theme);
         const scale = useDualAxis && index > 0 ? "y2" : "y";
+        const seriesCurve = resolveLineCurve(
+          theme.line.curve,
+          item.curve ?? curveOverride,
+        );
+        const seriesPaths = lineSeriesPaths(seriesCurve);
+        const seriesFill = item.fill ?? fill;
         if (item.kind === "bar") {
           return {
             label: item.name,
@@ -237,9 +241,9 @@ export function buildComboOptions(
           scale,
           stroke: color,
           width: theme.line.strokeWidth,
-          paths: smoothPaths,
+          paths: seriesPaths,
           fill:
-            fill && theme.area.show
+            seriesFill && theme.area.show
               ? (u: uPlot) => {
                   const top = u.bbox.top;
                   const bottom = u.bbox.top + u.bbox.height;

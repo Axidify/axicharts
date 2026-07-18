@@ -8,6 +8,8 @@ export { useOptionalChartLayout } from "../container/useOptionalChartLayout";
 export { LineChart, type LineChartProps } from "../line/LineChart";
 export { AreaChart, type AreaChartProps } from "../area/AreaChart";
 export { BarChart, type BarChartProps } from "../bar/BarChart";
+export { CartesianChart, type CartesianChartProps } from "../cartesian/CartesianChart";
+/** @internal Legacy combo adapter — prefer `CartesianChart` + block marks. */
 export { ComboChart, type ComboChartProps } from "../combo/ComboChart";
 export { PieChart, type PieChartProps, type PieSlice } from "../pie/PieChart";
 export {
@@ -310,14 +312,18 @@ export {
 export {
   Area,
   Bar,
+  Band,
   Cell,
   Funnel,
   Grid,
   Legend,
   Line,
   Pie,
+  Rule,
   Tooltip,
+  X,
   XAxis,
+  Y,
   YAxis,
   AnnotationBand,
   AnnotationLabel,
@@ -325,17 +331,21 @@ export {
   AnnotationMarker,
   composeCartesianAnnotations,
   composeCartesianMarks,
+  composeComboCartesianMarks,
   composeFunnelMarks,
   composePieMarks,
   type AreaMarkProps,
+  type BandMarkProps,
   type BarMarkProps,
   type CellMarkProps,
   type ComposedCartesian,
+  type ComposedComboCartesian,
   type ComposedFunnel,
   type ComposedPie,
   type FunnelMarkProps,
   type LineMarkProps,
   type PieMarkProps,
+  type RuleMarkProps,
   type XAxisMarkProps,
   type YAxisMarkProps,
   type BarRenderContext,

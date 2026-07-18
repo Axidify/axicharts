@@ -12,6 +12,7 @@ export type BlockMarksChartProps = {
   series: ComboSeries[];
   referenceLines: ReferenceLine[];
   thresholdBands: ThresholdBand[];
+  /** Chart-level fill — only when all data marks are area (no bars). */
   fill: boolean;
 };
 
@@ -30,7 +31,6 @@ export function blockMarksToChartProps(
   const series: ComboSeries[] = [];
   const referenceLines: ReferenceLine[] = [];
   const thresholdBands: ThresholdBand[] = [];
-  let fill = false;
 
   for (const mark of marks) {
     if (isSeriesBlockMark(mark)) {
@@ -39,14 +39,13 @@ export function blockMarksToChartProps(
         type: "quantitative",
       }) as number[];
       const kind = mark.type === "bar" ? "bar" : "line";
-      if (mark.type === "area") {
-        fill = true;
-      }
       series.push({
         name: mark.label ?? mark.field,
         data,
         kind,
         tone: mark.tone as SeriesTone | undefined,
+        ...(mark.type === "area" ? { fill: true } : {}),
+        ...(mark.curve && mark.type !== "bar" ? { curve: mark.curve } : {}),
       });
       continue;
     }
@@ -70,7 +69,16 @@ export function blockMarksToChartProps(
     }
   }
 
-  return { series, referenceLines, thresholdBands, fill };
+  const hasBar = series.some((item) => item.kind === "bar");
+  const allArea =
+    series.length > 0 && series.every((item) => item.kind === "line" && item.fill);
+
+  return {
+    series,
+    referenceLines,
+    thresholdBands,
+    fill: !hasBar && allArea,
+  };
 }
 
 export function marksNeedFill(marks: ChartBlockMarkSpec[]): boolean {
@@ -78,8 +86,11 @@ export function marksNeedFill(marks: ChartBlockMarkSpec[]): boolean {
 }
 
 export function marksCurve(marks: ChartBlockMarkSpec[]): LineCurve | undefined {
-  const curve = marks.find(
-    (mark) => isSeriesBlockMark(mark) && mark.curve,
-  ) as Extract<ChartBlockMarkSpec, { type: "line" | "bar" | "area" }> | undefined;
-  return curve?.curve;
+  const curves = marks
+    .filter(isSeriesBlockMark)
+    .filter((mark) => mark.type !== "bar" && mark.curve)
+    .map((mark) => mark.curve as LineCurve);
+  if (curves.length === 0) return undefined;
+  const first = curves[0];
+  return curves.every((curve) => curve === first) ? first : undefined;
 }
