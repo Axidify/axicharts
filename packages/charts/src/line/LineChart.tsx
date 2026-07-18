@@ -9,6 +9,7 @@ import {
   preparePlotData,
   shouldUseDualAxis,
   type ChartAnnotation,
+  type ChartGraphicElement,
   type PlotSeries,
   type ReferenceLine,
   type ThresholdBand,
@@ -34,6 +35,8 @@ import { applyChartConfigToSeries } from "../config/applyChartConfig";
 import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
 import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
+import { GraphicOverlay } from "../graphic/GraphicOverlay";
+import { useChartGraphics } from "../graphic/useChartGraphics";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
 import type { ChartAnimate, LiveAnimate } from "../motion/types";
 import {
@@ -61,6 +64,7 @@ export type LineChartProps = {
   thresholdBands?: ThresholdBand[];
   referenceLines?: ReferenceLine[];
   annotations?: ChartAnnotation[];
+  graphics?: ChartGraphicElement[];
   brush?: boolean;
   brushEnd?: number;
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
@@ -81,6 +85,7 @@ type LinePlotProps = {
   thresholdBands?: ThresholdBand[];
   referenceLines?: ReferenceLine[];
   annotations?: ChartAnnotation[];
+  chartGraphics: ChartGraphicElement[];
   draggableMarkers: ReturnType<typeof useCartesianAnnotations>["draggableMarkers"];
   compact: boolean;
   brush?: boolean;
@@ -107,6 +112,7 @@ function LinePlot({
   thresholdBands,
   referenceLines,
   annotations,
+  chartGraphics,
   draggableMarkers,
   brush = false,
   brushRange,
@@ -170,6 +176,17 @@ function LinePlot({
           chartId={plotSync.chartId}
         />
       )}
+      {chartGraphics.length > 0 ? (
+        <GraphicOverlay
+          width={Math.floor(size.width)}
+          height={plotHeight}
+          graphics={chartGraphics}
+          categories={categories}
+          yMin={valueBounds.min}
+          yMax={valueBounds.max}
+          dualAxis={overlayDualAxis}
+        />
+      ) : null}
       <DraggableMarkerOverlay
         width={Math.floor(size.width)}
         height={plotHeight}
@@ -212,6 +229,7 @@ export function LineChart({
   thresholdBands,
   referenceLines,
   annotations,
+  graphics,
   brush = false,
   brushEnd = 100,
   onMarkerDragEnd,
@@ -226,6 +244,7 @@ export function LineChart({
     referenceLines,
     children,
   });
+  const chartGraphics = useChartGraphics({ graphics, children });
   const { effectiveRange, onBrushRangeChange } = useCartesianBrush({
     brush,
     brushEnd,
@@ -330,6 +349,7 @@ export function LineChart({
             thresholdBands={annotationProps.thresholdBands}
             referenceLines={annotationProps.referenceLines}
             annotations={annotationProps.annotations}
+            chartGraphics={chartGraphics}
             draggableMarkers={annotationProps.draggableMarkers}
             compact={compact}
             brush={brush}

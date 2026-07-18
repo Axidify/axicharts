@@ -1,6 +1,7 @@
 import type { PanelSpec } from "./types";
 import { readPanelAnimation, animationToSpecField } from "./panelAnimation";
 import { readPanelLiveAnimate } from "./panelLiveAnimate";
+import { ejectGraphicsProp } from "./panelGraphics";
 
 function comboSeriesBlock(spec: PanelSpec, dataVar: string): string {
   const encoding = spec.encoding;
@@ -37,6 +38,8 @@ function comboFlags(spec: PanelSpec): string[] {
   if (animation) flags.push(`animate={${JSON.stringify(animation)}}`);
   const liveAnimate = readPanelLiveAnimate(spec);
   if (liveAnimate) flags.push(`liveAnimate="${liveAnimate}"`);
+  const graphics = ejectGraphicsProp(spec);
+  if (graphics) flags.push(graphics);
   return flags;
 }
 

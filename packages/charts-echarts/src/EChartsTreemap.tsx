@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { hiddenTooltip } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
@@ -20,6 +21,7 @@ export type EChartsTreemapProps = {
   onDrillChange?: (state: TreemapDrillChange) => void;
   onItemHover?: (event: EChartItemHoverEvent) => void;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   animate?: boolean;
 };
 
@@ -39,6 +41,7 @@ export function EChartsTreemap({
   onItemHover,
   mergeOption = false,
   animate = false,
+  graphics,
 }: EChartsTreemapProps): ReactElement {
   const data = mapTreemapData(nodes, theme);
   const leafValues = flattenTreemapValues(nodes);
@@ -95,6 +98,7 @@ export function EChartsTreemap({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     onItemHover,

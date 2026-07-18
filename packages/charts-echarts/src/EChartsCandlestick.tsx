@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import {
   axisLabelStyle,
   gridOptions,
@@ -46,6 +47,7 @@ export type EChartsCandlestickProps = {
   onCursor?: (event: EChartCursorEvent) => void;
   onBrushRange?: (range: EChartBrushRange | null) => void;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   animate?: boolean;
 };
 
@@ -86,6 +88,7 @@ export function EChartsCandlestick({
   onBrushRange,
   mergeOption = false,
   animate = false,
+  graphics,
 }: EChartsCandlestickProps): ReactElement {
   const { up, down } = upDownColors(theme);
   const ohlc = data.map((point) => [point.open, point.close, point.low, point.high]);
@@ -219,6 +222,7 @@ export function EChartsCandlestick({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     categories,

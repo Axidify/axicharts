@@ -8,6 +8,7 @@ import {
   RANGE_OVERVIEW_HEIGHT,
   preparePlotData,
   type ChartAnnotation,
+  type ChartGraphicElement,
   type PlotSeries,
   type ReferenceLine,
   type ThresholdBand,
@@ -39,6 +40,8 @@ import {
 } from "../motion";
 import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
+import { GraphicOverlay } from "../graphic/GraphicOverlay";
+import { useChartGraphics } from "../graphic/useChartGraphics";
 
 const BAR_SERIES_KINDS = ["bar"] as const;
 
@@ -56,6 +59,7 @@ export type BarChartProps = {
   refreshHz?: number;
   thresholdBands?: ThresholdBand[];
   annotations?: ChartAnnotation[];
+  graphics?: ChartGraphicElement[];
   brush?: boolean;
   brushEnd?: number;
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
@@ -74,6 +78,7 @@ type BarPlotProps = {
   stacked?: boolean;
   thresholdBands?: ThresholdBand[];
   annotations?: ChartAnnotation[];
+  chartGraphics: ChartGraphicElement[];
   draggableMarkers: ReturnType<typeof useCartesianAnnotations>["draggableMarkers"];
   brush?: boolean;
   brushRange?: BrushRange | null;
@@ -95,6 +100,7 @@ function BarPlot({
   stacked = false,
   thresholdBands,
   annotations,
+  chartGraphics,
   draggableMarkers,
   brush = false,
   brushRange,
@@ -148,6 +154,16 @@ function BarPlot({
           chartId={plotSync.chartId}
         />
       )}
+      {chartGraphics.length > 0 ? (
+        <GraphicOverlay
+          width={Math.floor(size.width)}
+          height={plotHeight}
+          graphics={chartGraphics}
+          categories={categories}
+          yMin={valueBounds.min}
+          yMax={valueBounds.max}
+        />
+      ) : null}
       <DraggableMarkerOverlay
         width={Math.floor(size.width)}
         height={plotHeight}
@@ -187,6 +203,7 @@ export function BarChart({
   refreshHz,
   thresholdBands,
   annotations,
+  graphics,
   brush = false,
   brushEnd = 100,
   onMarkerDragEnd,
@@ -201,6 +218,7 @@ export function BarChart({
     referenceLines,
     children,
   });
+  const chartGraphics = useChartGraphics({ graphics, children });
   const { effectiveRange, onBrushRangeChange } = useCartesianBrush({
     brush,
     brushEnd,
@@ -298,6 +316,7 @@ export function BarChart({
             stacked={stacked}
             thresholdBands={annotationProps.thresholdBands}
             annotations={annotationProps.annotations}
+            chartGraphics={chartGraphics}
             draggableMarkers={annotationProps.draggableMarkers}
             brush={brush}
             brushRange={brush ? effectiveRange : null}

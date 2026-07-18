@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import {
   axisLabelStyle,
   gridOptions,
@@ -27,6 +28,7 @@ export type EChartsWaterfallProps = {
   connectorStyle?: "solid" | "dashed";
   animate?: boolean;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   onCursor?: (event: EChartCursorEvent) => void;
 };
 
@@ -59,6 +61,7 @@ export function EChartsWaterfall({
   connectorStyle = "dashed",
   animate = false,
   mergeOption,
+  graphics,
   onCursor,
 }: EChartsWaterfallProps): ReactElement {
   const bridge = buildWaterfallBridge(items, theme);
@@ -150,6 +153,7 @@ export function EChartsWaterfall({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     categories: labels,

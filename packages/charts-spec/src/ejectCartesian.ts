@@ -1,4 +1,4 @@
-import type { PanelSpec } from "./types";
+import { ejectGraphicsProp } from "./panelGraphics";
 import { readPanelStyle } from "./panelStyle";
 import { readPanelAnimation, animationToSpecField } from "./panelAnimation";
 import { readPanelLiveAnimate } from "./panelLiveAnimate";
@@ -96,6 +96,7 @@ function chartLevelFlags(spec: PanelSpec): string[] {
     Array.isArray(annotations) && annotations.length > 0
       ? `annotations={${JSON.stringify(annotations)}}`
       : "",
+    ejectGraphicsProp(spec),
   ].filter((item): item is string => Boolean(item));
 }
 

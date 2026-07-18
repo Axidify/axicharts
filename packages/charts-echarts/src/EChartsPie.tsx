@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { gridOptions, hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
@@ -17,6 +18,7 @@ export type EChartsPieProps = {
   showLabels?: boolean;
   animate?: boolean;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -29,6 +31,7 @@ export function EChartsPie({
   showLabels = true,
   animate = false,
   mergeOption,
+  graphics,
   onItemHover,
 }: EChartsPieProps): ReactElement {
   const total = slices.reduce((sum, slice) => sum + slice.value, 0);
@@ -69,6 +72,7 @@ export function EChartsPie({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     onItemHover,

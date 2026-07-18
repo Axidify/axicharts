@@ -10,11 +10,14 @@ import {
   type EChartItemHoverEvent,
 } from "./useEChart";
 
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
+
 export type EChartsOptionChartProps = {
   width: number;
   height: number;
   theme: ChartTheme;
   option: EChartsOption;
+  graphics?: ChartGraphicElement[];
   categories?: string[];
   chartId?: string;
   syncIndex?: number | null;
@@ -53,6 +56,7 @@ export function EChartsOptionChart({
   height,
   theme,
   option,
+  graphics,
   categories,
   chartId,
   syncIndex,
@@ -74,6 +78,7 @@ export function EChartsOptionChart({
 
   const rootRef = useEChart({
     option: resolvedOption,
+    graphics,
     width,
     height,
     categories,

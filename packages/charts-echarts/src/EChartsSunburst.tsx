@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { hiddenTooltip } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
@@ -17,6 +18,7 @@ export type EChartsSunburstProps = {
   showLabels?: boolean;
   animate?: boolean;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -33,6 +35,7 @@ export function EChartsSunburst({
   showLabels = true,
   animate = false,
   mergeOption,
+  graphics,
   onItemHover,
 }: EChartsSunburstProps): ReactElement {
   const data = mapTreemapData(nodes, theme);
@@ -85,6 +88,7 @@ export function EChartsSunburst({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     onItemHover,

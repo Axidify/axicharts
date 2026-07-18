@@ -33,6 +33,7 @@ export {
   EChartsOptionChart,
   type EChartsOptionChartProps,
 } from "./EChartsOptionChart";
+export { mergeGraphicsIntoOption } from "./mergeGraphicsIntoOption";
 export { EChartsRadar, type EChartsRadarProps } from "./EChartsRadar";
 export type { RadarIndicator, RadarSeries } from "./radarTypes";
 export { EChartsParallel, type EChartsParallelProps } from "./EChartsParallel";

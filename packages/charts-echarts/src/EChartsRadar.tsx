@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { axisLabelStyle, hiddenTooltip, seriesPalette, splitLineStyle, toneColor } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
@@ -19,6 +20,7 @@ export type EChartsRadarProps = {
   areaFill?: boolean;
   animate?: boolean;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -33,6 +35,7 @@ export function EChartsRadar({
   areaFill = true,
   animate = false,
   mergeOption,
+  graphics,
   onItemHover,
 }: EChartsRadarProps): ReactElement {
   const palette = seriesPalette(theme);
@@ -102,6 +105,7 @@ export function EChartsRadar({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     onItemHover,

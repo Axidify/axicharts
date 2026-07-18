@@ -20,6 +20,7 @@ import {
   DEFAULT_BUBBLE_SIZE_RANGE,
   DEFAULT_SCATTER_SYMBOL_SIZE,
 } from "./scatterSize";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import type { ScatterSeries } from "./scatterTypes";
 
 export type EChartsScatterProps = {
@@ -37,6 +38,7 @@ export type EChartsScatterProps = {
   sizeRange?: [number, number];
   animate?: boolean;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -67,6 +69,7 @@ export function EChartsScatter({
   sizeRange = DEFAULT_BUBBLE_SIZE_RANGE,
   animate = false,
   mergeOption,
+  graphics,
   onItemHover,
 }: EChartsScatterProps): ReactElement {
   const showLegend = series.length > 1;
@@ -200,6 +203,7 @@ export function EChartsScatter({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     onItemHover,

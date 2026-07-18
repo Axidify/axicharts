@@ -1,0 +1,32 @@
+{
+  "type": "line",
+  "title": "Ops overlay — graphic highlight",
+  "height": 280,
+  "width": 520,
+  "encoding": {
+    "x": { "field": "hour" },
+    "y": { "field": "temp" }
+  },
+  "valueSuffix": " °C",
+  "fill": true,
+  "graphics": [
+    {
+      "type": "rect",
+      "left": "plot:0.12",
+      "top": "plot:0.15",
+      "shape": { "width": 140, "height": 56, "r": 6 },
+      "style": { "fill": "#fef3c7", "opacity": 0.6 }
+    },
+    {
+      "type": "text",
+      "left": "category:10:00",
+      "top": "value:74",
+      "style": {
+        "text": "Incident",
+        "fill": "#dc2626",
+        "fontSize": 12,
+        "fontWeight": "600"
+      }
+    }
+  ]
+}

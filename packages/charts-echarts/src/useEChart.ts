@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { EChartsOption } from "echarts";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { echarts } from "./echartsRuntime";
+import { mergeGraphicsIntoOption } from "./mergeGraphicsIntoOption";
 import { treePathToDrillPath } from "./treemapDrill";
 
 export type EChartItemHoverEvent = {
@@ -25,6 +27,7 @@ export type EChartBrushRange = {
 
 type UseEChartOptions = {
   option: EChartsOption;
+  graphics?: ChartGraphicElement[];
   width: number;
   height: number;
   categories?: string[];
@@ -62,6 +65,7 @@ function resolveCursorLeft(
 
 export function useEChart({
   option,
+  graphics,
   width,
   height,
   categories,
@@ -77,6 +81,10 @@ export function useEChart({
   replaceMerge,
   formatItemHover,
 }: UseEChartOptions) {
+  const mergedOption = useMemo(
+    () => mergeGraphicsIntoOption(option, graphics),
+    [graphics, option],
+  );
   const rootRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<echarts.ECharts | null>(null);
   const onSyncIndexRef = useRef(onSyncIndex);
@@ -241,15 +249,15 @@ export function useEChart({
     const chart = chartRef.current;
     if (!chart) return;
     chart.resize({ width, height });
-    chart.setOption(option, {
+    chart.setOption(mergedOption, {
       notMerge: !mergeOption,
       lazyUpdate: mergeOption,
       ...(mergeOption && replaceMerge !== null
         ? { replaceMerge: replaceMerge ?? ["series"] }
         : {}),
     });
-    if (onBrushRangeRef.current && option.dataZoom) {
-      const dataZoom = option.dataZoom;
+    if (onBrushRangeRef.current && mergedOption.dataZoom) {
+      const dataZoom = mergedOption.dataZoom;
       const zooms = Array.isArray(dataZoom) ? dataZoom : [dataZoom];
       const primary = zooms.find((zoom) => zoom.type === "slider") ?? zooms[0];
       if (
@@ -260,7 +268,7 @@ export function useEChart({
         onBrushRangeRef.current({ start: primary.start, end: primary.end });
       }
     }
-  }, [option, mergeOption, replaceMerge, width, height]);
+  }, [mergedOption, mergeOption, replaceMerge, width, height]);
 
   useEffect(() => {
     chartRef.current?.resize({ width, height });

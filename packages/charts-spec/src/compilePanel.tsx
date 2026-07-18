@@ -78,6 +78,14 @@ import { resolveMapDrillProps } from "./mapEncoding";
 import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
 import { wordCloudFromRows } from "./wordCloudEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
+import { panelPropsWithGraphics } from "./panelGraphics";
+
+function panelChartProps<T extends Record<string, unknown>>(
+  spec: PanelSpec,
+  props: T,
+): T {
+  return panelPropsWithGraphics(spec, panelPropsWithAnnotations(spec, props));
+}
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
   return chartPropsWithoutLiveAnimate(
@@ -289,7 +297,7 @@ export function compilePanel(
 
       const panelLiveAnimate = readPanelLiveAnimate(resolved);
 
-      const chartProps = panelPropsWithAnnotations(resolved, {
+      const chartProps = panelChartProps(resolved, {
         ...props,
         categories,
         series: applyTagTonesToSeries(seriesWithSize, tagTones),
@@ -322,7 +330,7 @@ export function compilePanel(
 
       const panelLiveAnimate = readPanelLiveAnimate(resolved);
 
-      const chartProps = panelPropsWithAnnotations(resolved, {
+      const chartProps = panelChartProps(resolved, {
         ...props,
         categories,
         series: applyTagTonesToSeries(baseSeries, tagTones) as ComboSeries[],
@@ -368,7 +376,7 @@ export function compilePanel(
             points,
           },
         ];
-      const chartProps = {
+      const chartProps = panelChartProps(resolved, {
         series: scatterSeries,
         ...props,
         ...(resolved.encoding?.size
@@ -377,7 +385,7 @@ export function compilePanel(
                 (props.showSizeLegend as boolean | undefined) ?? true,
             }
           : {}),
-      };
+      });
       return wrap(createElement(ScatterChart, chartProps));
     }
 
@@ -447,11 +455,11 @@ export function compilePanel(
         (props.innerRadius as number | undefined) ??
         (resolved.type === "donut" ? 42 : undefined);
       return wrap(
-        createElement(PieChart, {
+        createElement(PieChart, panelChartProps(resolved, {
           slices,
           innerRadius,
           showLabels: props.showLabels as boolean | undefined,
-        }),
+        })),
       );
     }
 
@@ -829,10 +837,10 @@ export function compilePanel(
         );
       }
       return wrap(
-        createElement(EChartsOptionChart, {
+        createElement(EChartsOptionChart, panelChartProps(resolved, {
           option: option as Parameters<typeof EChartsOptionChart>[0]["option"],
           categories,
-        }),
+        })),
       );
     }
 

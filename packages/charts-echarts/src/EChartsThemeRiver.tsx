@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { axisLabelStyle, hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
@@ -16,6 +17,7 @@ export type EChartsThemeRiverProps = {
   showAxes?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   animate?: boolean;
 };
 
@@ -48,6 +50,7 @@ export function EChartsThemeRiver({
   onItemHover,
   mergeOption = false,
   animate = false,
+  graphics,
 }: EChartsThemeRiverProps): ReactElement {
   const palette = seriesPalette(theme);
   const labelStyle = axisLabelStyle(theme);
@@ -97,6 +100,7 @@ export function EChartsThemeRiver({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     onItemHover,

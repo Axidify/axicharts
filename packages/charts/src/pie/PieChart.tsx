@@ -2,6 +2,7 @@
 
 import type { ReactElement, ReactNode } from "react";
 import { useMemo } from "react";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { EChartsPie, type PieSlice } from "@axicharts/charts-echarts";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { EChartsInteractionShell } from "../chrome/EChartsInteractionShell";
@@ -13,6 +14,7 @@ import { EChartsChartA11yRoot } from "../a11y/EChartsChartA11yRoot";
 
 export type PieChartProps = {
   slices?: PieSlice[];
+  graphics?: ChartGraphicElement[];
   data?: Record<string, unknown>[];
   children?: ReactNode;
   innerRadius?: number;
@@ -23,10 +25,12 @@ function PiePlot({
   slices,
   innerRadius,
   showLabels,
+  graphics,
 }: {
   slices: PieSlice[];
   innerRadius?: number;
   showLabels?: boolean;
+  graphics?: ChartGraphicElement[];
 }): ReactElement {
   const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
@@ -39,6 +43,7 @@ function PiePlot({
       theme={theme}
       innerRadius={innerRadius}
       showLabels={showLabels}
+      graphics={graphics}
       animate={mode === "presentation"}
       mergeOption={mode === "live"}
       onItemHover={interaction.onItemHover}
@@ -52,6 +57,7 @@ export function PieChart({
   children,
   innerRadius: innerRadiusProp,
   showLabels: showLabelsProp,
+  graphics,
 }: PieChartProps): ReactElement | null {
   const { size, ready, config } = useChartLayout();
   const { slices: resolvedSlices, innerRadius, showLabels } = useResolvedPieProps(
@@ -88,6 +94,7 @@ export function PieChart({
             slices={slices}
             innerRadius={innerRadius}
             showLabels={showLabels}
+            graphics={graphics}
           />
         }
       />

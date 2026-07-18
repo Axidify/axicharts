@@ -410,6 +410,9 @@ importers:
 
   packages/charts-echarts:
     dependencies:
+      '@axicharts/charts-canvas':
+        specifier: workspace:*
+        version: link:../charts-canvas
       '@axicharts/charts-theme':
         specifier: workspace:*
         version: link:../charts-theme
@@ -672,6 +675,9 @@ importers:
       '@axicharts/charts':
         specifier: workspace:*
         version: link:../charts
+      '@axicharts/charts-canvas':
+        specifier: workspace:*
+        version: link:../charts-canvas
       '@axicharts/charts-gantt':
         specifier: workspace:*
         version: link:../charts-gantt

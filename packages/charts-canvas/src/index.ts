@@ -9,6 +9,10 @@ export {
   type PlotVerticalLine,
   type ResolvedPlotAnnotations,
 } from "./annotations";
+export {
+  type ChartGraphicElement,
+  type GraphicStyle,
+} from "./graphic";
 export { preparePlotData, type PreparedPlotData } from "./preparePlotData";
 export { UPlotLine } from "./UPlotLine";
 export { UPlotBar } from "./UPlotBar";

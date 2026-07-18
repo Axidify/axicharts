@@ -38,6 +38,20 @@ export {
   type HierarchyNode,
 } from "../sunburst/SunburstChart";
 export {
+  ChartGraphic,
+  GraphicRect,
+  GraphicCircle,
+  GraphicText,
+  GraphicLine,
+  GraphicGroup,
+  GraphicImage,
+  composeChartGraphics,
+  GraphicOverlay,
+  useChartGraphics,
+  type ChartGraphicElement,
+  type GraphicStyle,
+} from "./graphic";
+export {
   EChartsOptionChart,
   type EChartsOptionChartProps,
 } from "../echartsOption/EChartsOptionChart";

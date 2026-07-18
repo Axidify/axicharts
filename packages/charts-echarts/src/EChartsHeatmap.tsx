@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import { useMemo } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { axisLabelStyle, gridOptions, hiddenTooltip, seriesPalette, splitLineStyle } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
@@ -25,6 +26,7 @@ export type EChartsHeatmapProps = {
   showAxes?: boolean;
   cellFormatter?: (value: number) => string;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   animate?: boolean;
   brushRange?: HeatmapBrushRange | null;
   syncIndex?: number | null;
@@ -111,6 +113,7 @@ export function EChartsHeatmap({
   syncSourceId,
   onSyncIndex,
   onItemHover,
+  graphics,
 }: EChartsHeatmapProps): ReactElement {
   const slicedMatrix = useMemo(
     () => sliceHeatmapByBrushRange(matrix, brushRange ?? null),
@@ -214,6 +217,7 @@ export function EChartsHeatmap({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     categories: slicedMatrix.xCategories,

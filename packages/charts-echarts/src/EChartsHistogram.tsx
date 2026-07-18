@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import {
   axisLabelStyle,
   gridOptions,
@@ -26,6 +27,7 @@ export type EChartsHistogramProps = {
   valueSuffix?: string;
   animate?: boolean;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -45,6 +47,7 @@ export function EChartsHistogram({
   valueSuffix = "",
   animate = false,
   mergeOption,
+  graphics,
   onItemHover,
 }: EChartsHistogramProps): ReactElement {
   const palette = seriesPalette(theme);
@@ -84,6 +87,7 @@ export function EChartsHistogram({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     onItemHover,

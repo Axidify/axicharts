@@ -1,3 +1,5 @@
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
+
 export const SPEC_VERSION = 1;
 
 export type ThemeName = "clean" | "live" | "industrial" | "presentation";
@@ -123,6 +125,8 @@ export type PanelSpec = {
   innerRadius?: number;
   /** Declarative cartesian annotations — labels, bands, lines, markers. */
   annotations?: AnnotationSpec[];
+  /** ECharts-style graphic overlay elements (separate from annotations). */
+  graphics?: ChartGraphicElement[];
   /** Chart-level animation — also accepted as `props.animation`. */
   animation?: ChartAnimate;
   /** Live-mode wholesale replace crossfade — also accepted as `props.liveAnimate`. */

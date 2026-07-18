@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { axisLabelStyle, hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
@@ -18,6 +19,7 @@ export type EChartsParallelProps = {
   lineOpacity?: number;
   onItemHover?: (event: EChartItemHoverEvent) => void;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   animate?: boolean;
 };
 
@@ -32,6 +34,7 @@ export function EChartsParallel({
   onItemHover,
   mergeOption = false,
   animate = false,
+  graphics,
 }: EChartsParallelProps): ReactElement {
   const palette = seriesPalette(theme);
   const labelStyle = axisLabelStyle(theme);
@@ -104,6 +107,7 @@ export function EChartsParallel({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     onItemHover,

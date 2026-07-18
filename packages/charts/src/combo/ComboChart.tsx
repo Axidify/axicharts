@@ -7,6 +7,7 @@ import {
   preparePlotData,
   shouldUseDualAxis,
   type ChartAnnotation,
+  type ChartGraphicElement,
   type ComboSeries,
   type DualAxisMode,
   type ReferenceLine,
@@ -33,6 +34,8 @@ import {
 } from "../motion";
 import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
+import { GraphicOverlay } from "../graphic/GraphicOverlay";
+import { useChartGraphics } from "../graphic/useChartGraphics";
 
 export type ComboChartProps = {
   categories: string[];
@@ -46,6 +49,7 @@ export type ComboChartProps = {
   referenceLines?: ReferenceLine[];
   thresholdBands?: ThresholdBand[];
   annotations?: ChartAnnotation[];
+  graphics?: ChartGraphicElement[];
   renderer?: RendererPreference;
   refreshHz?: number;
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
@@ -67,9 +71,11 @@ function ComboPlot({
   referenceLines,
   thresholdBands,
   annotations,
+  chartGraphics,
   draggableMarkers,
   onMarkerDragEnd,
 }: ComboPlotProps & {
+  chartGraphics: ChartGraphicElement[];
   draggableMarkers: ReturnType<typeof useCartesianAnnotations>["draggableMarkers"];
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
 }): ReactElement {
@@ -110,6 +116,17 @@ function ComboPlot({
       syncSourceId={plotSync.syncSourceId}
       chartId={plotSync.chartId}
     />
+      {chartGraphics.length > 0 ? (
+        <GraphicOverlay
+          width={Math.floor(size.width)}
+          height={plotHeight}
+          graphics={chartGraphics}
+          categories={categories}
+          yMin={valueBounds.min}
+          yMax={valueBounds.max}
+          dualAxis={overlayDualAxis}
+        />
+      ) : null}
       <DraggableMarkerOverlay
         width={Math.floor(size.width)}
         height={plotHeight}
@@ -138,6 +155,7 @@ export function ComboChart({
   referenceLines,
   thresholdBands,
   annotations,
+  graphics,
   renderer = "auto",
   refreshHz,
   onMarkerDragEnd,
@@ -151,6 +169,7 @@ export function ComboChart({
     thresholdBands,
     referenceLines,
   });
+  const chartGraphics = useChartGraphics({ graphics });
   const series = useMemo(() => {
     const configured = applyChartConfigToSeries(seriesProp, config);
     return applyTagTonesToSeries(configured, tagTones ?? {}) as ComboSeries[];
@@ -235,6 +254,7 @@ export function ComboChart({
             referenceLines={annotationProps.referenceLines}
             thresholdBands={annotationProps.thresholdBands}
             annotations={annotationProps.annotations}
+            chartGraphics={chartGraphics}
             draggableMarkers={annotationProps.draggableMarkers}
             onMarkerDragEnd={onMarkerDragEnd}
           />

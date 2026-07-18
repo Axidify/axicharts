@@ -13,6 +13,7 @@ import { chartPropsWithoutStyle, readPanelStyle } from "./panelStyle";
 import { chartPropsWithoutAnimation, readPanelAnimation } from "./panelAnimation";
 import { chartPropsWithoutLiveAnimate } from "./panelLiveAnimate";
 import { mapDrillEjectProps } from "./mapEncoding";
+import { ejectGraphicsProp } from "./panelGraphics";
 import {
   SIZE_SCALE_HELPER,
   sizeFieldMinMaxBlock,
@@ -371,6 +372,17 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
         ? `\n    minRangePercent={${minRangePercent}}`
         : ""
     }`;
+  }
+
+  const graphicsEject = ejectGraphicsProp(spec);
+  if (
+    graphicsEject &&
+    spec.type !== "line" &&
+    spec.type !== "area" &&
+    spec.type !== "bar" &&
+    spec.type !== "combo"
+  ) {
+    chartBody += `\n    ${graphicsEject}`;
   }
 
   const chartProps = chartPropsFromPanel(spec.props ?? {});

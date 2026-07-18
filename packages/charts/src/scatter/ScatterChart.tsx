@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement } from "react";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import {
   EChartsScatter,
   type ScatterSeries,
@@ -11,6 +12,7 @@ import { useEChartsInteraction } from "../sync/useEChartsInteraction";
 
 export type ScatterChartProps = {
   series: ScatterSeries[];
+  graphics?: ChartGraphicElement[];
   showAxes?: boolean;
   showPointLabels?: boolean;
   showSizeLegend?: boolean;
@@ -31,6 +33,7 @@ function ScatterPlot({
   xSuffix,
   ySuffix,
   sizeRange,
+  graphics,
 }: ScatterChartProps): ReactElement {
   const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
@@ -49,6 +52,7 @@ function ScatterPlot({
       xSuffix={xSuffix}
       ySuffix={ySuffix}
       sizeRange={sizeRange}
+      graphics={graphics}
       animate={mode === "presentation"}
       mergeOption={mode === "live"}
       onItemHover={interaction.onItemHover}
@@ -66,6 +70,7 @@ export function ScatterChart({
   xSuffix,
   ySuffix,
   sizeRange,
+  graphics,
 }: ScatterChartProps): ReactElement | null {
   const { size, ready, theme } = useChartLayout();
 
@@ -88,6 +93,7 @@ export function ScatterChart({
           xSuffix={xSuffix}
           ySuffix={ySuffix}
           sizeRange={sizeRange}
+          graphics={graphics}
         />
       }
     />

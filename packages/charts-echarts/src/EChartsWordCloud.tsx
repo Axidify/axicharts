@@ -3,6 +3,7 @@
 import { useMemo, useRef, type ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
@@ -20,6 +21,7 @@ export type EChartsWordCloudProps = {
   sizeRange?: [number, number];
   onItemHover?: (event: EChartItemHoverEvent) => void;
   mergeOption?: boolean;
+  graphics?: ChartGraphicElement[];
   animate?: boolean;
 };
 
@@ -57,6 +59,7 @@ function EChartsWordCloudPlot({
   sizeRange,
   onItemHover,
   mergeOption = false,
+  graphics,
   animate = false,
 }: EChartsWordCloudProps): ReactElement {
   const palette = seriesPalette(theme);
@@ -122,6 +125,7 @@ function EChartsWordCloudPlot({
 
   const rootRef = useEChart({
     option,
+    graphics,
     width,
     height,
     onItemHover,

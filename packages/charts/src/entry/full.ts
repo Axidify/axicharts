@@ -290,6 +290,19 @@ export {
   type YAxisMarkProps,
 } from "../composable";
 export {
+  ChartGraphic,
+  GraphicRect,
+  GraphicCircle,
+  GraphicText,
+  GraphicLine,
+  GraphicGroup,
+  GraphicImage,
+} from "../graphic/graphicMarks";
+export { composeChartGraphics } from "../composable/composeChartGraphics";
+export { GraphicOverlay } from "../graphic/GraphicOverlay";
+export { useChartGraphics } from "../graphic/useChartGraphics";
+export type { ChartGraphicElement, GraphicStyle } from "@axicharts/charts-canvas";
+export {
   applyChartConfigToFunnelStages,
   applyChartConfigToPieSlices,
   applyChartConfigToSeries,
