@@ -416,6 +416,15 @@ export function LiveOpsCompareDemo({
   const axiStruggling = isStruggling(bench.axiLive) || primaryAxiP95 > FRAME_BUDGET_MS;
 
   const panelWidth = Math.max(160, Math.floor(720 / gridColumns) - 24);
+  const showAxiColumn =
+    bench.calibrationView === "both" || bench.calibrationView === "axicharts";
+  const showRechartsColumn =
+    bench.calibrationView === "both" || bench.calibrationView === "recharts";
+  const calibrationLabel = bench.calibrationProgress
+    ? `Calibrating ${bench.calibrationProgress.library === "axicharts" ? "AxiCharts" : "Recharts"} ${bench.calibrationProgress.step}/${bench.calibrationProgress.total}…`
+    : bench.calibrating
+      ? "Calibrating…"
+      : "Re-run calibration";
 
   return (
     <div style={{ display: "grid", gap: 20, maxWidth: 1200 }}>
@@ -472,7 +481,7 @@ export function LiveOpsCompareDemo({
               fontSize: 13,
             }}
           >
-            {bench.calibrating ? "Calibrating…" : "Re-run calibration"}
+            {calibrationLabel}
           </button>
           <button
             type="button"
@@ -517,6 +526,25 @@ export function LiveOpsCompareDemo({
           onPanelHeight={setCustomPanelHeight}
           onAutoThrottle={setAutoThrottle}
         />
+      ) : null}
+
+      {bench.calibrating ? (
+        <div
+          style={{
+            padding: "10px 14px",
+            borderRadius: 8,
+            border: "1px solid #334155",
+            background: "#0f172a",
+            color: "#94a3b8",
+            fontSize: 12,
+          }}
+        >
+          Running isolated benchmark — one library at a time so measurements stay fair.
+          {bench.calibrationProgress
+            ? ` ${bench.calibrationProgress.library === "axicharts" ? "AxiCharts" : "Recharts"}: ${bench.calibrationProgress.step}/${bench.calibrationProgress.total} updates.`
+            : " Preparing…"}
+          {" "}Live stream resumes when calibration finishes.
+        </div>
       ) : null}
 
       {rechartsStruggling ? (
@@ -635,11 +663,13 @@ export function LiveOpsCompareDemo({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns:
+            showAxiColumn && showRechartsColumn ? "1fr 1fr" : "1fr",
           gap: 20,
           alignItems: "start",
         }}
       >
+        {showAxiColumn ? (
         <CompareColumn
           title="AxiCharts"
           subtitle="uPlot canvas · mode=live"
@@ -654,6 +684,8 @@ export function LiveOpsCompareDemo({
             <AxiPanel key={panel.spec.id} panel={panel} height={panelHeight} />
           )}
         />
+        ) : null}
+        {showRechartsColumn ? (
         <CompareColumn
           title="Recharts"
           subtitle="SVG LineChart · isAnimationActive=false"
@@ -674,6 +706,7 @@ export function LiveOpsCompareDemo({
             />
           )}
         />
+        ) : null}
       </div>
     </div>
   );
