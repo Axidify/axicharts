@@ -5,16 +5,20 @@ import {
   FunnelChart,
   HeatmapChart,
   LineChart,
+  ParallelChart,
   PieChart,
   RadarChart,
   ScatterChart,
   SunburstChart,
+  ThemeRiverChart,
   TreemapChart,
 } from "echarts/charts";
 import {
   GridComponent,
   DataZoomComponent,
   LegendComponent,
+  ParallelComponent,
+  SingleAxisComponent,
   TooltipComponent,
   VisualMapComponent,
 } from "echarts/components";
@@ -28,14 +32,18 @@ echarts.use([
   FunnelChart,
   HeatmapChart,
   LineChart,
+  ParallelChart,
   PieChart,
   RadarChart,
   ScatterChart,
   SunburstChart,
+  ThemeRiverChart,
   TreemapChart,
   GridComponent,
   DataZoomComponent,
   LegendComponent,
+  ParallelComponent,
+  SingleAxisComponent,
   TooltipComponent,
   VisualMapComponent,
   CanvasRenderer,
@@ -66,6 +74,10 @@ export {
 } from "./EChartsHeatmap";
 export { EChartsRadar, type EChartsRadarProps } from "./EChartsRadar";
 export type { RadarIndicator, RadarSeries } from "./radarTypes";
+export { EChartsParallel, type EChartsParallelProps } from "./EChartsParallel";
+export type { ParallelDimension, ParallelSeries } from "./parallelTypes";
+export { EChartsThemeRiver, type EChartsThemeRiverProps } from "./EChartsThemeRiver";
+export type { ThemeRiverPoint } from "./themeRiverTypes";
 export { EChartsPie, type EChartsPieProps } from "./EChartsPie";
 export { EChartsWaterfall, type EChartsWaterfallProps } from "./EChartsWaterfall";
 export type { TreemapNode } from "./treemapTypes";

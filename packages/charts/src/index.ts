@@ -54,6 +54,17 @@ export {
   type RadarSeries,
 } from "./radar/RadarChart";
 export {
+  ParallelChart,
+  type ParallelChartProps,
+  type ParallelDimension,
+  type ParallelSeries,
+} from "./parallel/ParallelChart";
+export {
+  ThemeRiverChart,
+  type ThemeRiverChartProps,
+  type ThemeRiverPoint,
+} from "./themeRiver/ThemeRiverChart";
+export {
   BoxplotChart,
   type BoxplotChartProps,
   type BoxplotItem,

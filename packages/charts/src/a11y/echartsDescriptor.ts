@@ -7,8 +7,10 @@ import type {
   HeatmapA11yDescriptor,
   HierarchyA11yDescriptor,
   HierarchyA11yItem,
+  ParallelA11yDescriptor,
   PieA11yDescriptor,
   SingleValueA11yDescriptor,
+  ThemeRiverA11yDescriptor,
 } from "./types";
 import { singleValueA11ySummary } from "./singleValueDescriptor";
 
@@ -139,6 +141,51 @@ export function buildHierarchyA11yDescriptor({
   };
 }
 
+export function buildParallelA11yDescriptor({
+  dimensions,
+  series,
+  title,
+  description,
+}: {
+  dimensions: { name: string }[];
+  series: { name: string; values: number[] }[];
+  title?: string;
+  description?: string;
+}): ParallelA11yDescriptor {
+  return {
+    kind: "parallel",
+    title: title ?? dimensions.map((dimension) => dimension.name).join(", "),
+    description,
+    dimensions: dimensions.map((dimension) => dimension.name),
+    series: series.map((item) => ({
+      name: item.name,
+      values: [...item.values],
+    })),
+  };
+}
+
+export function buildThemeRiverA11yDescriptor({
+  points,
+  title,
+  description,
+}: {
+  points: { time: string | number; value: number; series: string }[];
+  title?: string;
+  description?: string;
+}): ThemeRiverA11yDescriptor {
+  const seriesNames = [...new Set(points.map((point) => point.series))];
+  return {
+    kind: "theme-river",
+    title: title ?? seriesNames.join(", "),
+    description,
+    points: points.map((point) => ({
+      time: point.time,
+      value: point.value,
+      series: point.series,
+    })),
+  };
+}
+
 export function pieA11ySummary(descriptor: PieA11yDescriptor): string {
   return `${descriptor.chartType} chart with ${descriptor.slices.length} segments`;
 }
@@ -157,6 +204,15 @@ export function funnelA11ySummary(descriptor: FunnelA11yDescriptor): string {
 
 export function hierarchyA11ySummary(descriptor: HierarchyA11yDescriptor): string {
   return `${descriptor.chartType} chart with ${descriptor.items.length} leaf nodes`;
+}
+
+export function parallelA11ySummary(descriptor: ParallelA11yDescriptor): string {
+  return `Parallel coordinates with ${descriptor.dimensions.length} dimensions and ${descriptor.series.length} series`;
+}
+
+export function themeRiverA11ySummary(descriptor: ThemeRiverA11yDescriptor): string {
+  const seriesCount = new Set(descriptor.points.map((point) => point.series)).size;
+  return `Theme river with ${seriesCount} streams and ${descriptor.points.length} points`;
 }
 
 export function chartA11ySummary(descriptor: {
@@ -178,6 +234,10 @@ export function chartA11ySummary(descriptor: {
       return funnelA11ySummary(descriptor as FunnelA11yDescriptor);
     case "hierarchy":
       return hierarchyA11ySummary(descriptor as HierarchyA11yDescriptor);
+    case "parallel":
+      return parallelA11ySummary(descriptor as ParallelA11yDescriptor);
+    case "theme-river":
+      return themeRiverA11ySummary(descriptor as ThemeRiverA11yDescriptor);
     default:
       return "Chart";
   }

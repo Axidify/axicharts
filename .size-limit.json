@@ -14,7 +14,7 @@
   {
     "name": "@axicharts/charts-echarts",
     "path": "packages/charts-echarts/dist/index.js",
-    "limit": "8.25 KB",
+    "limit": "9.5 KB",
     "gzip": true
   },
   {

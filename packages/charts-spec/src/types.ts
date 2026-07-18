@@ -73,6 +73,8 @@ export type PanelChartType =
   | "candlestick"
   | "heatmap"
   | "radar"
+  | "parallel"
+  | "theme-river"
   | "scatter"
   | "treemap"
   | "sunburst"

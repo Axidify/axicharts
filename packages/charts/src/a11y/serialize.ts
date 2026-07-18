@@ -58,6 +58,18 @@ export function parseA11yDescriptor(raw: string): ChartA11yDescriptor | null {
       }
       return parsed;
     }
+    if (parsed.kind === "parallel") {
+      if (!Array.isArray(parsed.dimensions) || !Array.isArray(parsed.series)) {
+        return null;
+      }
+      return parsed;
+    }
+    if (parsed.kind === "theme-river") {
+      if (!Array.isArray(parsed.points)) {
+        return null;
+      }
+      return parsed;
+    }
     return null;
   } catch {
     return null;

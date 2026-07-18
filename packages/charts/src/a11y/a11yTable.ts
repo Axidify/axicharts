@@ -6,7 +6,9 @@ import {
   funnelA11ySummary,
   heatmapA11ySummary,
   hierarchyA11ySummary,
+  parallelA11ySummary,
   pieA11ySummary,
+  themeRiverA11ySummary,
 } from "./echartsDescriptor";
 
 export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yTable {
@@ -117,6 +119,45 @@ export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yT
         value: item.value,
       })),
       caption: descriptor.description ?? hierarchyA11ySummary(descriptor),
+    };
+  }
+
+  if (descriptor.kind === "parallel") {
+    const columns = [
+      { key: "series", label: "Series" },
+      ...descriptor.dimensions.map((dimension) => ({
+        key: dimension,
+        label: dimension,
+        align: "right" as const,
+      })),
+    ];
+    const rows = descriptor.series.map((item) => {
+      const row: Record<string, string | number> = { series: item.name };
+      descriptor.dimensions.forEach((dimension, index) => {
+        row[dimension] = item.values[index] ?? "";
+      });
+      return row;
+    });
+    return {
+      columns,
+      rows,
+      caption: descriptor.description ?? parallelA11ySummary(descriptor),
+    };
+  }
+
+  if (descriptor.kind === "theme-river") {
+    return {
+      columns: [
+        { key: "time", label: "Time" },
+        { key: "series", label: "Series" },
+        { key: "value", label: "Value", align: "right" },
+      ],
+      rows: descriptor.points.map((point) => ({
+        time: point.time,
+        series: point.series,
+        value: point.value,
+      })),
+      caption: descriptor.description ?? themeRiverA11ySummary(descriptor),
     };
   }
 

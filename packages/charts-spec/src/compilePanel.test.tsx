@@ -457,3 +457,61 @@ describe("compilePanel sunburst", () => {
     });
   });
 });
+
+describe("compilePanel analytics breadth", () => {
+  it("compiles parallel panels from wide-form rows", async () => {
+    const panel = compilePanel(
+      {
+        type: "parallel",
+        title: "Host comparison",
+        height: 280,
+        width: 480,
+        props: {
+          dimensions: [
+            { name: "CPU", field: "cpu", max: 100 },
+            { name: "Memory", field: "memory", max: 100 },
+          ],
+        },
+        encoding: {
+          name: { field: "host" },
+        },
+      },
+      [
+        { host: "api-east", cpu: 62, memory: 71 },
+        { host: "api-west", cpu: 48, memory: 58 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Host comparison");
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+
+  it("compiles theme-river panels from long-form rows", async () => {
+    const panel = compilePanel(
+      {
+        type: "theme-river",
+        title: "Workload mix",
+        height: 280,
+        width: 480,
+        encoding: {
+          x: { field: "date", type: "temporal" },
+          value: { field: "value" },
+          series: { field: "stream" },
+        },
+      },
+      [
+        { date: "2026-01-01", value: 12, stream: "API" },
+        { date: "2026-01-02", value: 15, stream: "API" },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Workload mix");
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+});

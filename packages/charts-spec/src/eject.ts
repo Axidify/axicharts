@@ -57,6 +57,10 @@ function resolveChartName(spec: PanelSpec): string {
                 ? "HeatmapChart"
                 : spec.type === "radar"
                   ? "RadarChart"
+                  : spec.type === "parallel"
+                    ? "ParallelChart"
+                    : spec.type === "theme-river"
+                      ? "ThemeRiverChart"
                   : spec.type === "scatter"
                   ? "ScatterChart"
                   : spec.type === "treemap"
@@ -230,6 +234,24 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       name: "Series",
       values: ${dataVar}.map((row) => Number(row.${valueField})),
     }]}`;
+  } else if (spec.type === "parallel") {
+    const nameField = encoding?.name?.field ?? "name";
+    chartBody = `dimensions={${dataVar}.dimensions ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).dimensions ?? [])}}
+    series={${dataVar}.series ?? ${dataVar}.map((row) => ({
+      name: String(row.${nameField}),
+      values: ${dataVar}.dimensions
+        ? ${dataVar}.dimensions.map((dimension) => Number(row[dimension.field ?? dimension.name.toLowerCase().replace(/\\s+/g, "_")]))
+        : Object.keys(row).filter((key) => key !== "${nameField}" && typeof row[key] === "number").map((key) => Number(row[key])),
+    }))}`;
+  } else if (spec.type === "theme-river") {
+    const timeField = encoding?.x?.field ?? "date";
+    const valueField = encoding?.value?.field ?? "value";
+    const seriesField = encoding?.series?.field ?? "series";
+    chartBody = `points={${dataVar}.points ?? ${dataVar}.map((row) => ({
+      time: row.${timeField},
+      value: Number(row.${valueField}),
+      series: String(row.${seriesField}),
+    }))}`;
   } else if (spec.type === "combo") {
     chartBody = ejectComboBody(spec, dataVar);
   } else if (spec.type === "sankey") {

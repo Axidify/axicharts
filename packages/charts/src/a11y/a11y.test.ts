@@ -7,7 +7,9 @@ import {
   buildFunnelA11yDescriptor,
   buildHeatmapA11yDescriptor,
   buildHierarchyA11yDescriptor,
+  buildParallelA11yDescriptor,
   buildPieA11yDescriptor,
+  buildThemeRiverA11yDescriptor,
 } from "./echartsDescriptor";
 import { buildSingleValueA11yDescriptor } from "./singleValueDescriptor";
 import { buildChartA11yTable, chartA11yTableToHtml } from "./a11yTable";
@@ -134,6 +136,30 @@ describe("chart a11y", () => {
     });
     const table = buildChartA11yTable(hierarchy);
     expect(table.rows).toEqual([{ path: "Root > Leaf", value: 5 }]);
+  });
+
+  it("builds parallel a11y table with dimension columns", () => {
+    const parallel = buildParallelA11yDescriptor({
+      dimensions: [{ name: "CPU" }, { name: "Memory" }],
+      series: [{ name: "Host A", values: [42, 68] }],
+    });
+    const table = buildChartA11yTable(parallel);
+    expect(table.rows).toEqual([{ series: "Host A", CPU: 42, Memory: 68 }]);
+  });
+
+  it("builds theme river a11y table with time/series/value", () => {
+    const themeRiver = buildThemeRiverA11yDescriptor({
+      points: [
+        { time: "2026-01-01", value: 12, series: "API" },
+        { time: "2026-01-02", value: 15, series: "API" },
+      ],
+    });
+    const table = buildChartA11yTable(themeRiver);
+    expect(table.rows[0]).toEqual({
+      time: "2026-01-01",
+      series: "API",
+      value: 12,
+    });
   });
 
   it("builds single-value a11y table for stat/gauge panels", () => {

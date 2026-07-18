@@ -15,6 +15,8 @@ import {
   PieChart,
   FunnelChart,
   RadarChart,
+  ParallelChart,
+  ThemeRiverChart,
   ScatterChart,
   Stat,
   SunburstChart,
@@ -61,6 +63,7 @@ import {
 } from "./panelStyle";
 import { registerPluginChartTypes } from "./registerPluginChartTypes";
 import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
+import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
@@ -479,6 +482,38 @@ export function compilePanel(
           showLabels: chartProps.showLabels as boolean | undefined,
           showAxes: chartProps.showAxes as boolean | undefined,
           areaFill: chartProps.areaFill as boolean | undefined,
+        }),
+      );
+    }
+
+    case "parallel": {
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
+      const { dimensions, series } = parallelFromRows(
+        rows,
+        chartProps,
+        resolved.encoding,
+      );
+      return wrap(
+        createElement(ParallelChart, {
+          dimensions,
+          series,
+          showAxes: chartProps.showAxes as boolean | undefined,
+          lineOpacity: chartProps.lineOpacity as number | undefined,
+        }),
+      );
+    }
+
+    case "theme-river": {
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
+      const { points } = themeRiverFromRows(
+        rows,
+        chartProps,
+        resolved.encoding,
+      );
+      return wrap(
+        createElement(ThemeRiverChart, {
+          points,
+          showAxes: chartProps.showAxes as boolean | undefined,
         }),
       );
     }

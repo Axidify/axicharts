@@ -9,6 +9,8 @@ import { HistogramChart } from "../histogram/HistogramChart";
 import { LineChart } from "../line/LineChart";
 import { PieChart } from "../pie/PieChart";
 import { RadarChart } from "../radar/RadarChart";
+import { ParallelChart } from "../parallel/ParallelChart";
+import { ThemeRiverChart } from "../themeRiver/ThemeRiverChart";
 import { ScatterChart } from "../scatter/ScatterChart";
 import { TreemapChart } from "../treemap/TreemapChart";
 import { SunburstChart } from "../sunburst/SunburstChart";
@@ -60,6 +62,16 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "radar",
     Chart: RadarChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "parallel",
+    Chart: ParallelChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "theme-river",
+    Chart: ThemeRiverChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
   {

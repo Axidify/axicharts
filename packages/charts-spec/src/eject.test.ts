@@ -302,4 +302,43 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("indicators=");
     expect(jsx).toContain("series=");
   });
+
+  it("emits ParallelChart from encoding rows", () => {
+    const jsx = ejectPanel(
+      {
+        type: "parallel",
+        props: {
+          dimensions: [
+            { name: "CPU", field: "cpu" },
+            { name: "Memory", field: "memory" },
+          ],
+        },
+        encoding: {
+          name: { field: "host" },
+        },
+      },
+      "hosts",
+    );
+
+    expect(jsx).toContain("<ParallelChart");
+    expect(jsx).toContain("dimensions=");
+    expect(jsx).toContain("series=");
+  });
+
+  it("emits ThemeRiverChart from encoding rows", () => {
+    const jsx = ejectPanel(
+      {
+        type: "theme-river",
+        encoding: {
+          x: { field: "date", type: "temporal" },
+          value: { field: "value" },
+          series: { field: "stream" },
+        },
+      },
+      "streams",
+    );
+
+    expect(jsx).toContain("<ThemeRiverChart");
+    expect(jsx).toContain("points=");
+  });
 });

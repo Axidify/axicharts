@@ -14,7 +14,9 @@ vi.mock("./useEChart", () => ({
 
 import { EChartsCandlestick } from "./EChartsCandlestick";
 import { EChartsFunnel } from "./EChartsFunnel";
+import { EChartsParallel } from "./EChartsParallel";
 import { EChartsPie } from "./EChartsPie";
+import { EChartsThemeRiver } from "./EChartsThemeRiver";
 import { EChartsTreemap } from "./EChartsTreemap";
 import { withPresentationAnimation } from "./presentationAnimation";
 
@@ -102,6 +104,45 @@ describe("live merge adapters", () => {
             name: "Compute",
             children: [{ name: "EC2", value: 42_000 }],
           },
+        ]}
+        theme={cleanTheme}
+        mergeOption
+      />,
+    );
+
+    const call = useEChartCalls.at(-1);
+    expect(call?.mergeOption).toBe(true);
+    expect((call?.option as { animation?: boolean }).animation).toBe(false);
+  });
+
+  it("passes mergeOption to useEChart for parallel in live mode", () => {
+    renderAdapter(
+      <EChartsParallel
+        width={320}
+        height={240}
+        dimensions={[
+          { name: "CPU", max: 100 },
+          { name: "Memory", max: 100 },
+        ]}
+        series={[{ name: "Host A", values: [42, 68] }]}
+        theme={cleanTheme}
+        mergeOption
+      />,
+    );
+
+    const call = useEChartCalls.at(-1);
+    expect(call?.mergeOption).toBe(true);
+    expect((call?.option as { animation?: boolean }).animation).toBe(false);
+  });
+
+  it("passes mergeOption to useEChart for theme river in live mode", () => {
+    renderAdapter(
+      <EChartsThemeRiver
+        width={320}
+        height={240}
+        points={[
+          { time: "2026-01-01", value: 12, series: "API" },
+          { time: "2026-01-02", value: 15, series: "API" },
         ]}
         theme={cleanTheme}
         mergeOption

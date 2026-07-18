@@ -86,6 +86,21 @@ export type HierarchyA11yDescriptor = {
   items: HierarchyA11yItem[];
 };
 
+export type ParallelA11yDescriptor = {
+  kind: "parallel";
+  title?: string;
+  description?: string;
+  dimensions: string[];
+  series: { name: string; values: number[] }[];
+};
+
+export type ThemeRiverA11yDescriptor = {
+  kind: "theme-river";
+  title?: string;
+  description?: string;
+  points: { time: string | number; value: number; series: string }[];
+};
+
 export type ChartA11yDescriptor =
   | CartesianA11yDescriptor
   | SingleValueA11yDescriptor
@@ -93,7 +108,9 @@ export type ChartA11yDescriptor =
   | CandlestickA11yDescriptor
   | HeatmapA11yDescriptor
   | FunnelA11yDescriptor
-  | HierarchyA11yDescriptor;
+  | HierarchyA11yDescriptor
+  | ParallelA11yDescriptor
+  | ThemeRiverA11yDescriptor;
 
 export type ChartA11yTable = {
   columns: { key: string; label: string; align?: "left" | "right" }[];

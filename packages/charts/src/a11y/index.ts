@@ -7,8 +7,10 @@ export type {
   FunnelA11yDescriptor,
   HeatmapA11yDescriptor,
   HierarchyA11yDescriptor,
+  ParallelA11yDescriptor,
   PieA11yDescriptor,
   SingleValueA11yDescriptor,
+  ThemeRiverA11yDescriptor,
 } from "./types";
 export {
   buildCartesianA11yDescriptor,
@@ -25,7 +27,9 @@ export {
   buildFunnelA11yDescriptor,
   buildHeatmapA11yDescriptor,
   buildHierarchyA11yDescriptor,
+  buildParallelA11yDescriptor,
   buildPieA11yDescriptor,
+  buildThemeRiverA11yDescriptor,
   chartA11ySummary,
   flattenHierarchyNodes,
 } from "./echartsDescriptor";
