@@ -6,6 +6,7 @@ import { readMarkKind } from "./readMarkKind";
 export type CartesianCellStyle = {
   color?: string;
   tone?: SeriesTone;
+  size?: number;
 };
 
 export function resolveCellColor(style: CartesianCellStyle): string | undefined {
@@ -27,12 +28,15 @@ export function readCartesianCells(markChild: ReactNode): Map<string, CartesianC
       tone?: SeriesTone;
       color?: string;
       fill?: string;
+      size?: number;
+      radius?: number;
     };
     const key = props.dataKey;
     if (!key) return;
     cells.set(key, {
       color: props.color ?? props.fill,
       tone: props.tone,
+      size: props.size ?? props.radius,
     });
   });
 

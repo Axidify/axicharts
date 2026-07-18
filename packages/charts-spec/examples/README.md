@@ -2,12 +2,14 @@
 
 Runnable fixtures for `compilePanel`, `ejectPanel`, and the CLI.
 
-## Granular styling (C68–C73)
+## Granular styling (C68–C74)
 
 | File | shadcn / Recharts parity |
 |------|--------------------------|
 | [revenue-line.panel.json](./revenue-line.panel.json) | Basic area line — `encoding.x` / `encoding.y` |
 | [throughput-bar-color.panel.json](./throughput-bar-color.panel.json) | **Colored bars** — `encoding.color`, `props.style`, chrome variants |
+| [throughput-bar-size.panel.json](./throughput-bar-size.panel.json) | **Variable bar width** — `encoding.size` by volume field |
+| [latency-line-size.panel.json](./latency-line-size.panel.json) | **Variable point radius** — `encoding.size` on line marks |
 | [area-slo-line.panel.json](./area-slo-line.panel.json) | **Segmented area** — per-point `encoding.color` on area marks |
 
 ## CLI
@@ -31,6 +33,7 @@ Panels with `props.style` eject to `createTheme(cleanTheme, { … })`. Chrome va
 | shadcn / Recharts pattern | AxiCharts spec | AxiCharts JSX |
 |---------------------------|----------------|---------------|
 | `<Bar><Cell fill /></Bar>` | `encoding.color` | `<Bar><Cell dataKey fill /></Bar>` |
+| Variable bar width / dot size | `encoding.size` | `<Bar><Cell dataKey size /></Bar>` |
 | `chartConfig` labels/colors | `chartConfig` on container | `ChartContainer config={…}` |
 | Theme tokens | `props.style` | `createTheme(base, overrides)` |
 | Tooltip / legend chrome | `props.tooltipVariant` / `legendVariant` | `ChartContainer` props |

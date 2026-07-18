@@ -15,6 +15,8 @@ export type PlotSeries = {
   tone?: SeriesTone;
   /** Per-category colors (bar fills, line/area segment + point stroke) — length matches `data`. */
   fills?: string[];
+  /** Per-category sizes — bar width fraction (0–1) or point radius in px. */
+  sizes?: number[];
 };
 
 export type ReferenceLine = {

@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { hasSegmentedFills } from "./segmentedLineDraw";
+import {
+  hasCustomLineDraw,
+  hasPerPointSizes,
+  hasSegmentedFills,
+} from "./segmentedLineDraw";
 
-describe("hasSegmentedFills", () => {
+describe("segmentedLineDraw helpers", () => {
   it("detects per-point fill arrays on series", () => {
     expect(
       hasSegmentedFills([
@@ -13,5 +17,18 @@ describe("hasSegmentedFills", () => {
 
   it("returns false when no fills are present", () => {
     expect(hasSegmentedFills([{ name: "A", data: [1, 2] }])).toBe(false);
+  });
+
+  it("detects per-point size arrays on series", () => {
+    expect(
+      hasPerPointSizes([{ name: "A", data: [1, 2], sizes: [4, 8] }]),
+    ).toBe(true);
+  });
+
+  it("detects custom line draw when fills or sizes are present", () => {
+    expect(hasCustomLineDraw([{ name: "A", data: [1, 2], sizes: [4, 8] }])).toBe(
+      true,
+    );
+    expect(hasCustomLineDraw([{ name: "A", data: [1, 2] }])).toBe(false);
   });
 });

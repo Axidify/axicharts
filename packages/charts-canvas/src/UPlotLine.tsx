@@ -20,6 +20,8 @@ import { shouldStackSeries, STACK_GROUP } from "./stack";
 import { resolveSeriesColor } from "./seriesColor";
 import {
   createSegmentedLineDrawHook,
+  createVariablePointDrawHook,
+  hasCustomLineDraw,
   hasSegmentedFills,
   segmentedSeriesPaths,
 } from "./segmentedLineDraw";
@@ -84,14 +86,21 @@ function buildOptions({
 
   const useSegmentedFills =
     hasSegmentedFills(series) && !shouldStackSeries(stacked, series.length);
-  const segmentedDraw = useSegmentedFills
+  const useCustomLineDraw =
+    hasCustomLineDraw(series) && !shouldStackSeries(stacked, series.length);
+  const defaultPointRadius = compact ? 3 : 4;
+  const segmentedDraw = useCustomLineDraw
     ? createSegmentedLineDrawHook(series, {
         strokeWidth: theme.line.strokeWidth,
         areaFill: Boolean(fill && theme.area.show),
         fillOpacity,
-        pointRadius: compact ? 3 : 4,
+        pointRadius: defaultPointRadius,
       })
     : undefined;
+  const variablePointDraw =
+    useCustomLineDraw && !useSegmentedFills
+      ? createVariablePointDrawHook(series, defaultPointRadius)
+      : undefined;
 
   const useDualAxis = shouldStackSeries(stacked, series.length)
     ? false
@@ -192,14 +201,15 @@ function buildOptions({
         const stackSeries = shouldStackSeries(stacked, series.length);
         const hasPointFills =
           useSegmentedFills && Boolean(item.fills && item.fills.length > 0);
+        const hideNativeSeries = hasPointFills;
         return {
           label: item.name,
           scale: useDualAxis && index > 0 ? "y2" : "y",
-          stroke: hasPointFills ? "transparent" : color,
+          stroke: hideNativeSeries ? "transparent" : color,
           width: theme.line.strokeWidth,
-          paths: hasPointFills ? segmentedSeriesPaths() : undefined,
+          paths: hideNativeSeries ? segmentedSeriesPaths() : undefined,
           fill:
-            !hasPointFills && fill && theme.area.show
+            !hideNativeSeries && fill && theme.area.show
               ? (u: uPlot) => {
                   const top = u.bbox.top;
                   const bottom = u.bbox.top + u.bbox.height;
@@ -220,17 +230,20 @@ function buildOptions({
     hooks:
       thresholdBands.length > 0 ||
       referenceLines.length > 0 ||
-      segmentedDraw
+      segmentedDraw ||
+      variablePointDraw
         ? {
             draw: [
               createAnnotationDrawHook({
                 bands: thresholdBands,
                 referenceLines,
-                onDraw: segmentedDraw
-                  ? (u) => {
-                      segmentedDraw(u);
-                    }
-                  : undefined,
+                onDraw:
+                  segmentedDraw || variablePointDraw
+                    ? (u) => {
+                        segmentedDraw?.(u);
+                        variablePointDraw?.(u);
+                      }
+                    : undefined,
               }) as (u: uPlot) => void,
             ],
           }

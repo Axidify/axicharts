@@ -45,6 +45,9 @@ export type CellMarkProps = {
   /** Explicit stroke/fill color (Recharts `fill` alias supported). */
   color?: string;
   fill?: string;
+  /** Bar width fraction (0–1) or point radius in px. */
+  size?: number;
+  radius?: number;
 };
 
 export type FunnelMarkProps = {

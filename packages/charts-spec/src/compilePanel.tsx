@@ -29,6 +29,7 @@ import { asRows, pluckField } from "./data";
 import { applySpecCompilers } from "./specCompiler";
 import { resolveTheme } from "./themes";
 import { fillsFromColorField } from "./colorEncoding";
+import { sizesFromSizeField } from "./sizeEncoding";
 import {
   chartPropsWithoutChromeMeta,
   readPanelChrome,
@@ -201,10 +202,30 @@ export function compilePanel(
         seriesWithColor = [{ ...baseSeries[0], fills }, ...baseSeries.slice(1)];
       }
 
+      let seriesWithSize = seriesWithColor;
+      if (
+        (resolved.type === "bar" ||
+          resolved.type === "line" ||
+          resolved.type === "area") &&
+        resolved.encoding?.size &&
+        seriesWithSize[0]
+      ) {
+        const sizes = sizesFromSizeField(
+          rows,
+          resolved.encoding.size.field,
+          resolved.type === "bar" ? "bar" : "point",
+          resolved.encoding.size.range,
+        );
+        seriesWithSize = [
+          { ...seriesWithSize[0], sizes },
+          ...seriesWithSize.slice(1),
+        ];
+      }
+
       const chartProps = {
         ...props,
         categories,
-        series: applyTagTonesToSeries(seriesWithColor, tagTones),
+        series: applyTagTonesToSeries(seriesWithSize, tagTones),
         fill: resolved.fill,
         stacked: resolved.stacked,
         valueSuffix: resolved.valueSuffix,

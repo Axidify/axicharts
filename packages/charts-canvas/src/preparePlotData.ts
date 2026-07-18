@@ -50,6 +50,9 @@ export function preparePlotData(
       fills: item.fills
         ? indices.map((index) => item.fills![index] ?? item.fills![0] ?? "")
         : undefined,
+      sizes: item.sizes
+        ? indices.map((index) => item.sizes![index] ?? item.sizes![0] ?? 0)
+        : undefined,
     })),
     sampled: true,
     originalLength,

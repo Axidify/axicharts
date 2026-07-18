@@ -1,0 +1,12 @@
+{
+  "specVersion": 1,
+  "type": "line",
+  "title": "Latency by week",
+  "theme": "clean",
+  "height": 220,
+  "encoding": {
+    "x": { "field": "week", "type": "nominal" },
+    "y": { "field": "latency", "type": "quantitative" },
+    "size": { "field": "weight", "type": "quantitative", "range": [4, 12] }
+  }
+}

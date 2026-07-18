@@ -21,6 +21,14 @@ export type ColorEncoding = {
   type?: "nominal" | "quantitative" | "semantic";
 };
 
+/** Size channel — bar width fraction or point radius (px) by field. */
+export type SizeEncoding = {
+  field: string;
+  type?: "nominal" | "quantitative";
+  /** Scaled output range: bar width multiplier or point radius in px. */
+  range?: [number, number];
+};
+
 /** Per-panel style overrides — AI-tunable without forking the global theme. */
 export type PanelStyleSpec = {
   grid?: {
@@ -66,6 +74,7 @@ export type PanelSpec = {
     x?: FieldEncoding;
     y?: FieldEncoding | FieldEncoding[];
     color?: ColorEncoding;
+    size?: SizeEncoding;
     name?: FieldEncoding;
     value?: FieldEncoding;
     open?: FieldEncoding;

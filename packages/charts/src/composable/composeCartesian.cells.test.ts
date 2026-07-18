@@ -79,4 +79,23 @@ describe("composeCartesianMarks bar cells", () => {
 
     expect(composed.series[0]?.fills?.[0]).toBe("#16a34a");
   });
+
+  it("applies per-category sizes from Cell children on bar marks", () => {
+    const composed = composeCartesianMarks(
+      [
+        createElement(XAxis, { dataKey: "week" }),
+        createElement(
+          Bar,
+          { dataKey: "throughput" },
+          createElement(Cell, { dataKey: "W1", size: 0.5 }),
+          createElement(Cell, { dataKey: "W3", size: 1 }),
+        ),
+      ],
+      DATA,
+      undefined,
+      ["bar"],
+    );
+
+    expect(composed.series[0]?.sizes).toEqual([0.5, 1, 1, 1, 1]);
+  });
 });

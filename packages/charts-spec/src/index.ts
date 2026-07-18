@@ -12,6 +12,7 @@ export type {
   PanelChartType,
   PanelSpec,
   PanelStyleSpec,
+  SizeEncoding,
   SpecData,
   TemplateId,
   ThemeName,

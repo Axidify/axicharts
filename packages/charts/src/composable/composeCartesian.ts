@@ -4,7 +4,7 @@ import { resolveSeriesColor } from "@axicharts/charts-canvas";
 import type { ChartConfig } from "../container/ChartLayoutContext";
 import type { ComposableMarkKind } from "./marks";
 import { readMarkKind } from "./readMarkKind";
-import { readCartesianCells, resolveCellColor } from "./readCartesianCells";
+import { readCartesianCells, resolveCellColor, type CartesianCellStyle } from "./readCartesianCells";
 
 export type ComposedCartesian = {
   categories: string[];
@@ -20,7 +20,8 @@ const Y_AXIS_SUFFIX: Partial<Record<string, string>> = {
 
 type MarkCellBinding = {
   dataKey: string;
-  cells: Map<string, { color?: string; tone?: import("@axicharts/charts-canvas").SeriesTone }>;
+  markKind: "bar" | "line" | "area";
+  cells: Map<string, CartesianCellStyle>;
 };
 
 export function composeCartesianMarks(
@@ -61,6 +62,7 @@ export function composeCartesianMarks(
         if (kind === "bar" || kind === "line" || kind === "area") {
           cellBindings.push({
             dataKey,
+            markKind: kind,
             cells: readCartesianCells(child),
           });
         }
@@ -84,18 +86,29 @@ export function composeCartesianMarks(
 
   const categories = data.map((row) => String(row[xKey] ?? ""));
 
-  const withCellFills = series.map((item) => {
+  const withCellStyles = series.map((item) => {
     const binding = cellBindings.find((entry) => entry.dataKey === item.key);
     if (!binding || binding.cells.size === 0) return item;
 
     const baseColor = item.color ?? resolveSeriesColor(item.tone, 0);
-    const fills = categories.map((category, index) => {
+    const fills = categories.map((category) => {
       const style = binding.cells.get(category);
       return style ? (resolveCellColor(style) ?? baseColor) : baseColor;
     });
+    const rawSizes = categories.map(
+      (category) => binding.cells.get(category)?.size,
+    );
+    const hasSizes = rawSizes.some((value) => value != null);
+    const defaultSize = binding.markKind === "bar" ? 1 : 4;
 
-    return { ...item, fills };
+    return {
+      ...item,
+      fills,
+      ...(hasSizes
+        ? { sizes: rawSizes.map((value) => value ?? defaultSize) }
+        : {}),
+    };
   });
 
-  return { categories, series: withCellFills, valueSuffix };
+  return { categories, series: withCellStyles, valueSuffix };
 }

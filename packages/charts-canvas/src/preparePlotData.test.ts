@@ -36,4 +36,19 @@ describe("preparePlotData", () => {
     expect(result.categories).toContain("t50");
     expect(result.series[1].data).toContain(100);
   });
+
+  it("downsamples per-category sizes with series data", () => {
+    const sizedSeries = [
+      {
+        name: "A",
+        data: Array.from({ length: 100 }, (_, index) =>
+          index === 50 ? 100 : 1,
+        ),
+        sizes: Array.from({ length: 100 }, (_, index) => index + 1),
+      },
+    ];
+    const result = preparePlotData(categories, sizedSeries, 12);
+    expect(result.series[0].sizes).toHaveLength(12);
+    expect(result.series[0].sizes).toContain(51);
+  });
 });

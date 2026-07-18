@@ -32,6 +32,10 @@ function hasCustomFills(series: PlotSeries[]): boolean {
   return series.some((item) => item.fills && item.fills.length > 0);
 }
 
+function hasCustomSizes(series: PlotSeries[]): boolean {
+  return series.some((item) => item.sizes && item.sizes.length > 0);
+}
+
 function drawRoundedBar(
   ctx: CanvasRenderingContext2D,
   left: number,
@@ -89,6 +93,8 @@ function buildOptions({
   const stackSeries = shouldStackSeries(stacked, series.length);
   const showBarValues = showValues && !stackSeries;
   const customFills = hasCustomFills(series) && !stackSeries;
+  const customSizes = hasCustomSizes(series) && !stackSeries;
+  const customMarks = customFills || customSizes;
 
   return {
     width,
@@ -153,7 +159,9 @@ function buildOptions({
       {},
       ...series.map((item, index) => {
         const color = item.color ?? resolveSeriesColor(item.tone, index);
-        const paintCustom = customFills && Boolean(item.fills?.length);
+        const paintCustom =
+          customMarks &&
+          Boolean(item.fills?.length || item.sizes?.length);
         return {
           label: item.name,
           stroke: paintCustom ? "transparent" : color,
@@ -171,6 +179,9 @@ function buildOptions({
                 item.fills?.[idx] ??
                 item.color ??
                 resolveSeriesColor(item.tone, seriesIndex);
+              const sizeMul = item.sizes?.[idx] ?? 1;
+              const width = barWidth * sizeMul;
+              const adjustedLeft = left + (barWidth - width) / 2;
 
               if (seriesIdx === 1 && idx === 0) {
                 barLayoutsRef.current = [];
@@ -178,9 +189,9 @@ function buildOptions({
 
               if (paintCustom || showBarValues) {
                 barLayoutsRef.current.push({
-                  left,
+                  left: adjustedLeft,
                   top,
-                  width: barWidth,
+                  width,
                   height: barHeight,
                   value,
                   fill,
@@ -201,7 +212,7 @@ function buildOptions({
             const ctx = u.ctx;
             const layouts = barLayoutsRef.current;
 
-            if (customFills) {
+            if (customMarks) {
               const radius = theme.bar.radius;
               for (const layout of layouts) {
                 drawRoundedBar(
