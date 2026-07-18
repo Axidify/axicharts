@@ -4,6 +4,8 @@ import type { ReactElement, ReactNode } from "react";
 import { useMemo } from "react";
 import {
   UPlotLine,
+  UPlotRangeOverview,
+  RANGE_OVERVIEW_HEIGHT,
   preparePlotData,
   type PlotSeries,
   type ReferenceLine,
@@ -19,7 +21,8 @@ import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
 import { usePlotSync } from "../sync/usePlotSync";
 import { sliceCartesianByBrushRange } from "../sync/brushRange";
-import { useOptionalChartSync } from "../sync/ChartSyncContext";
+import { useCartesianBrush } from "../sync/useCartesianBrush";
+import type { BrushRange } from "../sync/brushRange";
 import { usePlotSampling } from "../plot/usePlotSampling";
 import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
@@ -42,6 +45,8 @@ export type LineChartProps = {
   curve?: LineCurve;
   thresholdBands?: ThresholdBand[];
   referenceLines?: ReferenceLine[];
+  brush?: boolean;
+  brushEnd?: number;
 };
 
 type LinePlotProps = {
@@ -57,6 +62,11 @@ type LinePlotProps = {
   thresholdBands?: ThresholdBand[];
   referenceLines?: ReferenceLine[];
   compact: boolean;
+  brush?: boolean;
+  brushRange?: BrushRange | null;
+  onBrushRangeChange?: (range: BrushRange) => void;
+  overviewCategories?: string[];
+  overviewSeries?: PlotSeries[];
 };
 
 function LinePlot({
@@ -72,6 +82,11 @@ function LinePlot({
   curve,
   thresholdBands,
   referenceLines,
+  brush = false,
+  brushRange,
+  onBrushRangeChange,
+  overviewCategories,
+  overviewSeries,
 }: LinePlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
@@ -79,31 +94,44 @@ function LinePlot({
   const showLegend =
     chrome.showLegend && series.length > 1 && !compact;
   const legendHeight = getLegendHeight(showLegend, legendVariant);
-  const plotHeight = Math.floor(size.height) - legendHeight;
+  const overviewHeight = brush ? RANGE_OVERVIEW_HEIGHT : 0;
+  const plotHeight = Math.floor(size.height) - legendHeight - overviewHeight;
 
   return (
-    <UPlotLine
-      width={Math.floor(size.width)}
-      height={plotHeight}
-      categories={categories}
-      series={series}
-      theme={theme}
-      curve={curve}
-      fill={fill}
-      showAxes={showAxes}
-      valueSuffix={valueSuffix}
-      dualAxis={stacked ? false : dualAxis}
-      stacked={stacked}
-      thresholdBands={thresholdBands}
-      referenceLines={referenceLines}
-      showCursor={chrome.showCrosshair}
-      useNativeLegend={false}
-      onCursor={plotSync.onCursor}
-      onSyncIndex={plotSync.onSyncIndex}
-      syncIndex={plotSync.syncIndex}
-      syncSourceId={plotSync.syncSourceId}
-      chartId={plotSync.chartId}
-    />
+    <div style={{ width: Math.floor(size.width), height: Math.floor(size.height) - legendHeight }}>
+      <UPlotLine
+        width={Math.floor(size.width)}
+        height={plotHeight}
+        categories={categories}
+        series={series}
+        theme={theme}
+        curve={curve}
+        fill={fill}
+        showAxes={showAxes}
+        valueSuffix={valueSuffix}
+        dualAxis={stacked ? false : dualAxis}
+        stacked={stacked}
+        thresholdBands={thresholdBands}
+        referenceLines={referenceLines}
+        showCursor={chrome.showCrosshair}
+        useNativeLegend={false}
+        onCursor={plotSync.onCursor}
+        onSyncIndex={plotSync.onSyncIndex}
+        syncIndex={plotSync.syncIndex}
+        syncSourceId={plotSync.syncSourceId}
+        chartId={plotSync.chartId}
+      />
+      {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
+        <UPlotRangeOverview
+          width={Math.floor(size.width)}
+          categories={overviewCategories}
+          series={overviewSeries}
+          theme={theme}
+          range={brushRange}
+          onRangeChange={onBrushRangeChange}
+        />
+      ) : null}
+    </div>
   );
 }
 
@@ -122,11 +150,14 @@ export function LineChart({
   curve: curveProp,
   thresholdBands,
   referenceLines,
+  brush = false,
+  brushEnd = 100,
 }: LineChartProps): ReactElement | null {
-  const { size, ready, theme, mode, config, tagTones, syncId } = useChartLayout();
-  const sync = useOptionalChartSync();
-  const followerBrushRange =
-    sync?.brushRange && sync.brushSourceId !== syncId ? sync.brushRange : null;
+  const { size, ready, theme, mode, config, tagTones } = useChartLayout();
+  const { effectiveRange, onBrushRangeChange } = useCartesianBrush({
+    brush,
+    brushEnd,
+  });
   const { categories, series: resolvedSeries, valueSuffix, curve } = useResolvedCartesianProps(
     {
       categories: categoriesProp,
@@ -144,8 +175,8 @@ export function LineChart({
     return applyTagTonesToSeries(configured, tagTones ?? {});
   }, [resolvedSeries, config, tagTones]);
   const brushed = useMemo(
-    () => sliceCartesianByBrushRange(categories, series, followerBrushRange),
-    [categories, series, followerBrushRange],
+    () => sliceCartesianByBrushRange(categories, series, effectiveRange),
+    [categories, series, effectiveRange],
   );
   const maxPoints = usePlotSampling({
     pointCount: brushed.categories.length,
@@ -196,6 +227,11 @@ export function LineChart({
             thresholdBands={thresholdBands}
             referenceLines={referenceLines}
             compact={compact}
+            brush={brush}
+            brushRange={brush ? effectiveRange : null}
+            onBrushRangeChange={brush ? onBrushRangeChange : undefined}
+            overviewCategories={brush ? categories : undefined}
+            overviewSeries={brush ? series : undefined}
           />
         }
       />

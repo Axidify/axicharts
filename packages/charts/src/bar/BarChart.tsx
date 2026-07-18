@@ -4,6 +4,8 @@ import type { ReactElement, ReactNode } from "react";
 import { useMemo } from "react";
 import {
   UPlotBar,
+  UPlotRangeOverview,
+  RANGE_OVERVIEW_HEIGHT,
   preparePlotData,
   type PlotSeries,
   type ReferenceLine,
@@ -17,6 +19,9 @@ import {
 import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
 import { usePlotSync } from "../sync/usePlotSync";
+import { sliceCartesianByBrushRange } from "../sync/brushRange";
+import { useCartesianBrush } from "../sync/useCartesianBrush";
+import type { BrushRange } from "../sync/brushRange";
 import { usePlotSampling } from "../plot/usePlotSampling";
 import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
@@ -37,57 +42,84 @@ export type BarChartProps = {
   renderer?: RendererPreference;
   refreshHz?: number;
   thresholdBands?: ThresholdBand[];
+  brush?: boolean;
+  brushEnd?: number;
 };
 
 type BarPlotProps = {
   categories: string[];
   series: PlotSeries[];
+  fullCategoryCount: number;
   showAxes?: boolean;
   showValues?: boolean;
   valueSuffix?: string;
   referenceLines?: ReferenceLine[];
   stacked?: boolean;
   thresholdBands?: ThresholdBand[];
+  brush?: boolean;
+  brushRange?: BrushRange | null;
+  onBrushRangeChange?: (range: BrushRange) => void;
+  overviewCategories?: string[];
+  overviewSeries?: PlotSeries[];
 };
 
 function BarPlot({
   categories,
   series,
+  fullCategoryCount,
   showAxes,
   showValues,
   valueSuffix,
   referenceLines,
   stacked = false,
   thresholdBands,
+  brush = false,
+  brushRange,
+  onBrushRangeChange,
+  overviewCategories,
+  overviewSeries,
 }: BarPlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
-  const plotSync = usePlotSync();
+  const plotSync = usePlotSync(fullCategoryCount);
   const chrome = getInteractionChrome(mode);
   const showLegend = chrome.showLegend && series.length > 1;
   const legendHeight = getLegendHeight(showLegend, legendVariant);
-  const plotHeight = Math.floor(size.height) - legendHeight;
+  const overviewHeight = brush ? RANGE_OVERVIEW_HEIGHT : 0;
+  const plotHeight = Math.floor(size.height) - legendHeight - overviewHeight;
 
   return (
-    <UPlotBar
-      width={Math.floor(size.width)}
-      height={plotHeight}
-      categories={categories}
-      series={series}
-      theme={theme}
-      showAxes={showAxes}
-      showValues={showValues}
-      valueSuffix={valueSuffix}
-      referenceLines={referenceLines}
-      stacked={stacked}
-      thresholdBands={thresholdBands}
-      showCursor={chrome.showCrosshair}
-      useNativeLegend={false}
-      onCursor={plotSync.onCursor}
-      onSyncIndex={plotSync.onSyncIndex}
-      syncIndex={plotSync.syncIndex}
-      syncSourceId={plotSync.syncSourceId}
-      chartId={plotSync.chartId}
-    />
+    <div style={{ width: Math.floor(size.width), height: Math.floor(size.height) - legendHeight }}>
+      <UPlotBar
+        width={Math.floor(size.width)}
+        height={plotHeight}
+        categories={categories}
+        series={series}
+        theme={theme}
+        showAxes={showAxes}
+        showValues={showValues}
+        valueSuffix={valueSuffix}
+        referenceLines={referenceLines}
+        stacked={stacked}
+        thresholdBands={thresholdBands}
+        showCursor={chrome.showCrosshair}
+        useNativeLegend={false}
+        onCursor={plotSync.onCursor}
+        onSyncIndex={plotSync.onSyncIndex}
+        syncIndex={plotSync.syncIndex}
+        syncSourceId={plotSync.syncSourceId}
+        chartId={plotSync.chartId}
+      />
+      {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
+        <UPlotRangeOverview
+          width={Math.floor(size.width)}
+          categories={overviewCategories}
+          series={overviewSeries}
+          theme={theme}
+          range={brushRange}
+          onRangeChange={onBrushRangeChange}
+        />
+      ) : null}
+    </div>
   );
 }
 
@@ -104,8 +136,14 @@ export function BarChart({
   renderer = "auto",
   refreshHz,
   thresholdBands,
+  brush = false,
+  brushEnd = 100,
 }: BarChartProps): ReactElement | null {
   const { size, ready, theme, config, tagTones } = useChartLayout();
+  const { effectiveRange, onBrushRangeChange } = useCartesianBrush({
+    brush,
+    brushEnd,
+  });
   const { categories, series: resolvedSeries, valueSuffix } = useResolvedCartesianProps(
     {
       categories: categoriesProp,
@@ -121,14 +159,18 @@ export function BarChart({
     const configured = applyChartConfigToSeries(resolvedSeries, config);
     return applyTagTonesToSeries(configured, tagTones ?? {});
   }, [resolvedSeries, config, tagTones]);
+  const brushed = useMemo(
+    () => sliceCartesianByBrushRange(categories, series, effectiveRange),
+    [categories, series, effectiveRange],
+  );
   const maxPoints = usePlotSampling({
-    pointCount: categories.length,
+    pointCount: brushed.categories.length,
     renderer,
     refreshHz,
   });
   const prepared = useMemo(
-    () => preparePlotData(categories, series, maxPoints),
-    [categories, series, maxPoints],
+    () => preparePlotData(brushed.categories, brushed.series, maxPoints),
+    [brushed.categories, brushed.series, maxPoints],
   );
 
   if (!ready || size.width < 1 || size.height < 1 || categories.length === 0 || series.length === 0) {
@@ -157,12 +199,18 @@ export function BarChart({
           <BarPlot
             categories={plotCategories}
             series={plotSeries}
+            fullCategoryCount={categories.length}
             showAxes={axes}
             showValues={showValues}
             valueSuffix={valueSuffix}
             referenceLines={referenceLines}
             stacked={stacked}
             thresholdBands={thresholdBands}
+            brush={brush}
+            brushRange={brush ? effectiveRange : null}
+            onBrushRangeChange={brush ? onBrushRangeChange : undefined}
+            overviewCategories={brush ? categories : undefined}
+            overviewSeries={brush ? series : undefined}
           />
         }
       />
