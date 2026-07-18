@@ -1,5 +1,7 @@
 export { SPEC_VERSION } from "./types";
 export type {
+  ChartConfigEntrySpec,
+  ChartConfigSpec,
   ChartMode,
   ColorEncoding,
   DashboardSpec,
@@ -23,6 +25,7 @@ export {
   compileDashboard,
   compileTemplate,
   listTemplates,
+  type TemplateCompileOptions,
   capacityGridTemplate,
   financePnlTemplate,
   lineOverviewTemplate,

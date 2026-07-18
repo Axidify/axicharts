@@ -108,6 +108,38 @@ describe("share import meta", () => {
     const saved = getActiveDashboard(next);
     expect(saved.name).toBe("Line 3");
     expect(saved.meta).toEqual(exported.meta);
+    expect(saved.meta?.chartConfig?.Errors?.tone).toBe("warning");
+  });
+
+  it("round-trips chartConfig in spec and meta", () => {
+    const chartConfig = {
+      CPU: { label: "CPU util", tone: "info" as const },
+      Errors: { label: "Error rate", tone: "warning" as const },
+    };
+    const json = serializeDashboardExport(
+      "Ops wall",
+      {
+        layout: "embed",
+        dashboard: {
+          title: "Ops",
+          template: "ops-2x2",
+          chartConfig,
+          data: {
+            categories: ["Mon", "Tue"],
+            cells: [{ title: "CPU", data: [22, 28], suffix: "%" }],
+          },
+        },
+      },
+      {
+        layout: "embed",
+        feed: "static",
+        template: "ops-2x2",
+        chartConfig,
+      },
+    );
+    const exported = parseDashboardExport(json);
+    expect(exported.meta?.chartConfig).toEqual(chartConfig);
+    expect(exported.spec.dashboard?.chartConfig).toEqual(chartConfig);
   });
 
   it("importSharedWorkspace preserves per-dashboard meta", () => {

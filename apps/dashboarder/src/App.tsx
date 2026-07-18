@@ -151,10 +151,21 @@ export function App(): ReactElement {
     window.history.replaceState({}, "", window.location.pathname);
   }, [store]);
 
-  const builtSpec = useMemo(
-    () => buildRuntimeSpec({ template, layout, feed, presentation, mosaicPreset }),
-    [template, layout, feed, presentation, mosaicPreset],
-  );
+  const builtSpec = useMemo(() => {
+    const next = buildRuntimeSpec({ template, layout, feed, presentation, mosaicPreset });
+    if (!store || layout !== "embed") return next;
+
+    const saved = parseDashboardSpec(getActiveDashboard(store));
+    if (saved.layout === "mosaic" || !saved.dashboard.chartConfig) return next;
+
+    return {
+      ...next,
+      dashboard: {
+        ...next.dashboard,
+        chartConfig: saved.dashboard.chartConfig,
+      },
+    };
+  }, [store, template, layout, feed, presentation, mosaicPreset]);
 
   const activeSpec = useMemo((): RuntimeDashboardSpec | null => {
     if (!store) return null;
@@ -168,10 +179,11 @@ export function App(): ReactElement {
     persistWorkspaceStore(localStorage, next);
   };
 
-  const builderMeta = useMemo(
-    () => ({ layout, feed, template, presentation, mosaicPreset }),
-    [layout, feed, template, presentation, mosaicPreset],
-  );
+  const builderMeta = useMemo(() => {
+    const chartConfig =
+      activeSpec?.layout === "embed" ? activeSpec.dashboard.chartConfig : undefined;
+    return { layout, feed, template, presentation, mosaicPreset, chartConfig };
+  }, [layout, feed, template, presentation, mosaicPreset, activeSpec]);
 
   const handleSave = (): void => {
     if (!store || !activeSpec) return;

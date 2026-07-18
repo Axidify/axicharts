@@ -56,6 +56,12 @@ function plannerMetaFeedRow(feed: NonNullable<SavedDashboard["meta"]>["feed"] | 
   return feed ? PLANNER_FEED_ROWS.find((row) => row.feed === feed) : undefined;
 }
 
+function chartConfigKeyCount(
+  chartConfig: NonNullable<SavedDashboard["meta"]>["chartConfig"] | undefined,
+): number {
+  return chartConfig ? Object.keys(chartConfig).length : 0;
+}
+
 function PlannerMetaRestoreHint({
   meta,
   dashboardName,
@@ -81,8 +87,8 @@ function PlannerMetaRestoreHint({
         ) : null}
       </div>
       <p style={{ margin: "0 0 10px" }}>
-        Apply import restores builder layout, feed, template, mosaic preset, and presentation mode
-        from exported <code>meta</code>.
+        Apply import restores builder layout, feed, template, mosaic preset, presentation mode, and
+        chartConfig series labels from exported <code>meta</code>.
       </p>
       <dl
         style={{
@@ -112,6 +118,15 @@ function PlannerMetaRestoreHint({
         ) : null}
         <dt>Presentation</dt>
         <dd style={{ margin: 0 }}>{meta.presentation ? "Yes" : "No"}</dd>
+        {chartConfigKeyCount(meta.chartConfig) > 0 ? (
+          <>
+            <dt>chartConfig</dt>
+            <dd style={{ margin: 0 }}>
+              {chartConfigKeyCount(meta.chartConfig)} series label
+              {chartConfigKeyCount(meta.chartConfig) === 1 ? "" : "s"}
+            </dd>
+          </>
+        ) : null}
       </dl>
       {feedRow ? (
         <div style={{ marginBottom: 8 }}>
@@ -208,14 +223,17 @@ export function ImportDialog({
   const importPlannerMeta = useMemo(() => {
     if (!validation.ok || !validation.export) return null;
     if (validation.export.kind === "dashboard") {
-      if (!validation.export.meta?.feed) return null;
+      if (!validation.export.meta) return null;
+      if (!validation.export.meta.feed && !validation.export.meta.chartConfig) return null;
       return {
         kind: "dashboard" as const,
         name: validation.export.name,
         meta: validation.export.meta,
       };
     }
-    const dashboards = validation.export.dashboards.filter((item) => item.meta?.feed);
+    const dashboards = validation.export.dashboards.filter(
+      (item) => item.meta?.feed || item.meta?.chartConfig,
+    );
     if (dashboards.length === 0) return null;
     return {
       kind: "workspace" as const,

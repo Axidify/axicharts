@@ -6,6 +6,7 @@ import {
   ejectCartesianImports,
 } from "./ejectCartesian";
 import { chartPropsWithoutChromeMeta, readPanelChrome } from "./panelChrome";
+import { chartPropsWithoutChartConfig, readPanelChartConfig } from "./panelChartConfig";
 import { chartPropsWithoutStyle, readPanelStyle } from "./panelStyle";
 
 function quote(value: string): string {
@@ -13,7 +14,9 @@ function quote(value: string): string {
 }
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
-  return chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props));
+  return chartPropsWithoutChartConfig(
+    chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props)),
+  );
 }
 
 function serializeProps(props: Record<string, unknown>, indent: string): string {
@@ -63,6 +66,7 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
   const theme = spec.theme ?? "clean";
   const panelStyle = readPanelStyle(spec.props);
   const chrome = readPanelChrome(spec.props);
+  const chartConfig = readPanelChartConfig(spec.props);
   const themeImport = panelStyle
     ? `createTheme, ${theme}Theme`
     : `${theme}Theme`;
@@ -78,6 +82,7 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
   const chromeAttrs = [
     chrome.legendVariant ? `\n  legendVariant="${chrome.legendVariant}"` : "",
     chrome.tooltipVariant ? `\n  tooltipVariant="${chrome.tooltipVariant}"` : "",
+    chartConfig ? `\n  config={${JSON.stringify(chartConfig)}}` : "",
   ].join("");
 
   if (spec.type === "stat" || spec.type === "gauge" || spec.type === "table") {

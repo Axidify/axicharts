@@ -18,6 +18,10 @@ const SEED_SPEC: RuntimeDashboardSpec = {
     title: "Line 3",
     template: "ops-2x2",
     theme: "industrial",
+    chartConfig: {
+      CPU: { label: "CPU util", tone: "info" },
+      Errors: { label: "Error rate", tone: "warning" },
+    },
   },
 };
 
@@ -26,6 +30,10 @@ const PLANNER_META: NonNullable<SavedDashboard["meta"]> = {
   feed: "rest",
   template: "ops-2x2",
   presentation: false,
+  chartConfig: {
+    CPU: { label: "CPU util", tone: "info" },
+    Errors: { label: "Error rate", tone: "warning" },
+  },
 };
 
 function useShareFixtures(meta: SavedDashboard["meta"] = PLANNER_META) {
@@ -87,7 +95,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C43 Dashboarder share export and import dialogs — planner meta preview on export and restore hints on import.",
+          "C43/C76 Dashboarder share export and import dialogs — planner meta and chartConfig preview on export and restore hints on import.",
       },
     },
   },

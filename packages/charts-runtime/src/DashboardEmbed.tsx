@@ -81,6 +81,7 @@ export function DashboardEmbed({
         theme={dashboard.theme}
         mode={mode}
         data={data}
+        chartConfig={dashboard.chartConfig}
       />
     </RuntimeShell>
   );

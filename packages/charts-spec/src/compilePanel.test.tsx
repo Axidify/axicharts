@@ -190,6 +190,34 @@ describe("compilePanel chrome variants", () => {
   });
 });
 
+describe("compilePanel chartConfig", () => {
+  it("passes chartConfig to ChartContainer", () => {
+    const panel = compilePanel(
+      {
+        type: "line",
+        encoding: {
+          x: { field: "week" },
+          y: { field: "revenue", label: "revenue" },
+        },
+        props: {
+          chartConfig: {
+            revenue: { label: "Net revenue", color: "#22c55e" },
+          },
+        },
+        height: 180,
+      },
+      [
+        { week: "W1", revenue: 120 },
+        { week: "W2", revenue: 90 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+    expect(container.innerHTML).not.toContain("chartConfig");
+  });
+});
+
 describe("compilePanel table", () => {
   it("renders tabular rows from spec data", () => {
     const panel = compilePanel(

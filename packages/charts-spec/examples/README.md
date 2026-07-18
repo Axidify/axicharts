@@ -7,6 +7,7 @@ Runnable fixtures for `compilePanel`, `ejectPanel`, and the CLI.
 | File | shadcn / Recharts parity |
 |------|--------------------------|
 | [revenue-line.panel.json](./revenue-line.panel.json) | Basic area line — `encoding.x` / `encoding.y` |
+| [revenue-line-chartconfig.panel.json](./revenue-line-chartconfig.panel.json) | **chartConfig** labels/colors on `ChartContainer` |
 | [throughput-bar-color.panel.json](./throughput-bar-color.panel.json) | **Colored bars** — `encoding.color`, `props.style`, chrome variants |
 | [throughput-bar-size.panel.json](./throughput-bar-size.panel.json) | **Variable bar width** — `encoding.size` by volume field |
 | [latency-line-size.panel.json](./latency-line-size.panel.json) | **Variable point radius** — `encoding.size` on line marks |

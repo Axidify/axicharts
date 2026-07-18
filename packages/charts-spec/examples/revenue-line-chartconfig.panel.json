@@ -1,0 +1,16 @@
+{
+  "type": "line",
+  "title": "Revenue trend",
+  "encoding": {
+    "x": { "field": "week", "label": "Week" },
+    "y": { "field": "revenue", "label": "revenue" }
+  },
+  "props": {
+    "chartConfig": {
+      "revenue": {
+        "label": "Net revenue",
+        "color": "hsl(var(--chart-1))"
+      }
+    }
+  }
+}

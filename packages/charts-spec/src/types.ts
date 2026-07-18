@@ -30,6 +30,15 @@ export type SizeEncoding = {
 };
 
 /** Per-panel style overrides — AI-tunable without forking the global theme. */
+/** shadcn-compatible series labels/colors for ChartContainer.config */
+export type ChartConfigEntrySpec = {
+  label?: string;
+  color?: string;
+  tone?: "default" | "success" | "warning" | "critical" | "info";
+};
+
+export type ChartConfigSpec = Record<string, ChartConfigEntrySpec>;
+
 export type PanelStyleSpec = {
   grid?: {
     opacity?: number;
@@ -128,4 +137,5 @@ export type DashboardSpec = {
   theme?: ThemeName;
   mode?: ChartMode;
   data: Record<string, unknown>;
+  chartConfig?: ChartConfigSpec;
 };

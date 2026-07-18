@@ -1,4 +1,5 @@
 import type { ChartMode, TemplateId, ThemeName } from "@axicharts/charts-spec";
+import type { ChartConfigSpec } from "@axicharts/charts-spec";
 
 export const RUNTIME_VERSION = "0.1";
 
@@ -118,6 +119,7 @@ export type DashboardEmbedSpec = {
   mode?: ChartMode;
   template: TemplateId;
   data?: Record<string, unknown>;
+  chartConfig?: ChartConfigSpec;
   dataSource?: DataSourceSpec;
   dataSources?: BoundDataSourceSpec[];
   dataSourceId?: string;

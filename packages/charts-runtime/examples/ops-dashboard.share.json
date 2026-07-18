@@ -7,7 +7,13 @@
   "meta": {
     "layout": "embed",
     "feed": "static",
-    "template": "ops-2x2"
+    "template": "ops-2x2",
+    "chartConfig": {
+      "CPU": { "label": "CPU util", "tone": "info" },
+      "Memory": { "label": "Memory", "color": "hsl(var(--chart-2))" },
+      "Errors": { "label": "Error rate", "tone": "warning" },
+      "p95": { "label": "p95 latency", "tone": "default" }
+    }
   },
   "spec": {
     "layout": "embed",
@@ -15,6 +21,12 @@
       "title": "Line 3",
       "template": "ops-2x2",
       "theme": "industrial",
+      "chartConfig": {
+        "CPU": { "label": "CPU util", "tone": "info" },
+        "Memory": { "label": "Memory", "color": "hsl(var(--chart-2))" },
+        "Errors": { "label": "Error rate", "tone": "warning" },
+        "p95": { "label": "p95 latency", "tone": "default" }
+      },
       "data": {
         "categories": ["Mon", "Tue", "Wed", "Thu"],
         "cells": [

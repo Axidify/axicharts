@@ -84,6 +84,12 @@ function downloadJson(filename: string, json: string): void {
   URL.revokeObjectURL(url);
 }
 
+function chartConfigKeyCount(
+  chartConfig: NonNullable<SavedDashboard["meta"]>["chartConfig"] | undefined,
+): number {
+  return chartConfig ? Object.keys(chartConfig).length : 0;
+}
+
 export function ShareDialog({
   open,
   initialTab = "dashboard",
@@ -122,7 +128,7 @@ export function ShareDialog({
           feed: meta.feed,
         })
       : [];
-  const workspaceMetaCount = workspace.dashboards.filter((item) => item.meta?.feed).length;
+  const chartConfigCount = chartConfigKeyCount(meta?.chartConfig);
 
   if (!open) return null;
 
@@ -310,6 +316,14 @@ export function ShareDialog({
               ) : null}
               <dt>Presentation</dt>
               <dd style={{ margin: 0 }}>{meta.presentation ? "Yes" : "No"}</dd>
+              {chartConfigCount > 0 ? (
+                <>
+                  <dt>chartConfig</dt>
+                  <dd style={{ margin: 0 }}>
+                    {chartConfigCount} series label{chartConfigCount === 1 ? "" : "s"}
+                  </dd>
+                </>
+              ) : null}
             </dl>
             {feedRow ? (
               <div style={{ marginBottom: 8 }}>
@@ -364,7 +378,7 @@ export function ShareDialog({
           >
             Workspace bundle includes planner <code>meta</code> per dashboard (
             {workspaceMetaCount}/{workspace.dashboards.length} with feed). Import restores layout,
-            feed, template, and mosaic preset in Dashboarder.
+            feed, template, mosaic preset, and chartConfig labels in Dashboarder.
             {" · "}
             <a
               href={plannerFeedGalleryIndexDeepLink()}

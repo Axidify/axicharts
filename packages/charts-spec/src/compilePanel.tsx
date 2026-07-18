@@ -35,13 +35,20 @@ import {
   readPanelChrome,
 } from "./panelChrome";
 import {
+  chartPropsWithoutChartConfig,
+  readPanelChartConfig,
+  toChartConfig,
+} from "./panelChartConfig";
+import {
   chartPropsWithoutStyle,
   readPanelStyle,
   themeWithPanelStyle,
 } from "./panelStyle";
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
-  return chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props));
+  return chartPropsWithoutChartConfig(
+    chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props)),
+  );
 }
 
 export type CompileOptions = {
@@ -83,6 +90,7 @@ function wrapChart(
   const dark = theme.name === "live" || theme.name === "industrial";
 
   const chrome = readPanelChrome(spec.props);
+  const chartConfig = toChartConfig(readPanelChartConfig(spec.props));
 
   const panel = createElement(
     ChartContainer,
@@ -92,6 +100,7 @@ function wrapChart(
       height,
       width,
       tagTones,
+      config: chartConfig,
       legendVariant: chrome.legendVariant,
       tooltipVariant: chrome.tooltipVariant,
     },

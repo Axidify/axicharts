@@ -15,7 +15,8 @@ import {
   type PlotSeries,
   type StatTone,
 } from "@axicharts/charts";
-import type { DashboardSpec, TemplateId, ThemeName, ChartMode, PanelSpec } from "./types";
+import type { DashboardSpec, TemplateId, ThemeName, ChartMode, PanelSpec, ChartConfigSpec } from "./types";
+import { toChartConfig } from "./panelChartConfig";
 import { compilePanel } from "./compilePanel";
 import { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 import {
@@ -78,6 +79,7 @@ function shell(
   height: number,
   chart: ReactElement,
   syncId?: string,
+  chartConfig?: ChartConfigSpec,
 ): ReactElement {
   return createElement(
     ChartContainer,
@@ -87,6 +89,7 @@ function shell(
       height,
       width: "100%",
       syncId,
+      config: toChartConfig(chartConfig),
     },
     chart,
   );
@@ -164,6 +167,8 @@ export function financePnlTemplate(
 export function ops2x2Template(
   data: Record<string, unknown>,
   theme: ThemeName = "industrial",
+  _mode?: ChartMode,
+  chartConfig?: ChartConfigSpec,
 ): ReactElement {
   const categories = (data.categories as string[]) ?? [];
   const cells = (data.cells as OpsCell[]) ?? [];
@@ -220,6 +225,7 @@ export function ops2x2Template(
               showAxes: false,
             }),
             slugifySyncId(cell.title),
+            chartConfig,
           ),
         ),
       ),
@@ -607,10 +613,15 @@ export function programDashboardTemplate(
 
 const TEMPLATE_RENDERERS: Record<
   TemplateId,
-  (data: Record<string, unknown>, theme: ThemeName, mode?: ChartMode) => ReactElement
+  (
+    data: Record<string, unknown>,
+    theme: ThemeName,
+    mode?: ChartMode,
+    chartConfig?: ChartConfigSpec,
+  ) => ReactElement
 > = {
   "finance-pnl": (data, theme) => financePnlTemplate(data, theme),
-  "ops-2x2": (data, theme) => ops2x2Template(data, theme),
+  "ops-2x2": (data, theme, mode, chartConfig) => ops2x2Template(data, theme, mode, chartConfig),
   "line-overview": (data, theme) => lineOverviewTemplate(data, theme),
   "capacity-grid": (data, theme) => capacityGridTemplate(data, theme),
   "trading-blotter": (data, theme) => tradingBlotterTemplate(data, theme),
@@ -619,14 +630,20 @@ const TEMPLATE_RENDERERS: Record<
     programDashboardTemplate(data, theme, mode),
 };
 
+export type TemplateCompileOptions = {
+  theme?: ThemeName;
+  mode?: ChartMode;
+  chartConfig?: ChartConfigSpec;
+};
+
 export function compileTemplate(
   template: TemplateId,
   data: Record<string, unknown>,
-  options: { theme?: ThemeName; mode?: ChartMode } = {},
+  options: TemplateCompileOptions = {},
 ): ReactElement {
   const theme = options.theme ?? (data.theme as ThemeName | undefined) ?? "clean";
   const render = TEMPLATE_RENDERERS[template];
-  return render(data, theme, options.mode);
+  return render(data, theme, options.mode, options.chartConfig);
 }
 
 export function compileDashboard(spec: DashboardSpec): ReactElement {
@@ -652,6 +669,7 @@ export function compileDashboard(spec: DashboardSpec): ReactElement {
     compileTemplate(spec.template, spec.data, {
       theme: spec.theme,
       mode: spec.mode,
+      chartConfig: spec.chartConfig,
     }),
   );
 }
