@@ -1,6 +1,7 @@
 import type { PanelSpec } from "./types";
 import {
   cartesianHasColorEncoding,
+  cartesianUsesComposableMarks,
   ejectCartesianBody,
   ejectCartesianChartName,
   ejectCartesianImports,
@@ -157,7 +158,7 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
 
   const chartProps = chartPropsFromPanel(spec.props ?? {});
   const extraProps =
-    !cartesianHasColorEncoding(spec) && Object.keys(chartProps).length > 0
+    !cartesianUsesComposableMarks(spec) && Object.keys(chartProps).length > 0
       ? `\n    ${serializeProps(chartProps, "    ")}`
       : "";
 
@@ -172,7 +173,7 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
 
   const preambleBlock = preamble ? `${preamble}\n\n` : "";
 
-  if (cartesianHasColorEncoding(spec)) {
+  if (cartesianUsesComposableMarks(spec)) {
     return `${preambleBlock}import { ${[...imports].join(", ")} } from "@axicharts/charts";
 import { ${themeImport} } from "@axicharts/charts-theme";
 

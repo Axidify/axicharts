@@ -1,4 +1,13 @@
 import type { PanelSpec } from "./types";
+import { readPanelStyle } from "./panelStyle";
+import {
+  cartesianHasSizeEncoding,
+  ejectSizeProp,
+  SIZE_SCALE_HELPER,
+  sizeFieldMinMaxBlock,
+} from "./ejectSizeEncoding";
+
+export { cartesianHasSizeEncoding };
 
 const COLOR_FILL_HELPER = `function resolveColorFill(raw: unknown): string {
   if (raw === true || raw === "success") return "#16a34a";
@@ -38,17 +47,77 @@ export function cartesianHasColorEncoding(spec: PanelSpec): boolean {
   );
 }
 
+export function cartesianUsesComposableMarks(spec: PanelSpec): boolean {
+  return cartesianHasColorEncoding(spec) || cartesianHasSizeEncoding(spec);
+}
+
 export function ejectCartesianChartName(spec: PanelSpec): string {
   return resolveChartName(spec.type);
 }
 
 export function ejectCartesianImports(spec: PanelSpec): string[] {
-  if (!cartesianHasColorEncoding(spec)) {
+  if (!cartesianUsesComposableMarks(spec)) {
     return [ejectCartesianChartName(spec)];
   }
 
   const mark = markName(spec.type);
   return [ejectCartesianChartName(spec), mark, "Cell", "XAxis", "YAxis"];
+}
+
+function curveTypeAttr(spec: PanelSpec): string {
+  const curve = readPanelStyle(spec.props)?.line?.curve;
+  if (curve !== "linear" && curve !== "monotone") return "";
+  if (spec.type !== "line" && spec.type !== "area") return "";
+  return `\n      type="${curve}"`;
+}
+
+function chartLevelCurveFlag(spec: PanelSpec): string {
+  const curve = readPanelStyle(spec.props)?.line?.curve;
+  if (curve !== "linear" && curve !== "monotone") return "";
+  if (spec.type !== "line" && spec.type !== "area") return "";
+  if (cartesianUsesComposableMarks(spec)) return "";
+  return `curve="${curve}"`;
+}
+
+function chartLevelFlags(spec: PanelSpec): string[] {
+  return [
+    spec.fill && spec.type !== "bar" ? "fill" : "",
+    spec.stacked ? "stacked" : "",
+    spec.valueSuffix ? `valueSuffix="${spec.valueSuffix}"` : "",
+    spec.props?.showValues === true ? "showValues" : "",
+    chartLevelCurveFlag(spec),
+  ].filter((item): item is string => Boolean(item));
+}
+
+function buildPreamble(spec: PanelSpec, dataVar: string): string | undefined {
+  const parts: string[] = [];
+  if (cartesianHasColorEncoding(spec)) {
+    parts.push(COLOR_FILL_HELPER);
+  }
+  if (cartesianHasSizeEncoding(spec)) {
+    parts.push(SIZE_SCALE_HELPER);
+    const field = spec.encoding!.size!.field;
+    const prefix = field.replace(/[^a-zA-Z0-9]/g, "") || "size";
+    parts.push(sizeFieldMinMaxBlock(dataVar, field, prefix));
+  }
+  return parts.length > 0 ? parts.join("\n\n") : undefined;
+}
+
+function buildCellAttrs(spec: PanelSpec, dataVar: string): string[] {
+  const attrs: string[] = [];
+  const colorField = spec.encoding?.color?.field;
+  if (colorField) {
+    attrs.push(`fill={resolveColorFill(row.${colorField})}`);
+  }
+
+  const sizeField = spec.encoding?.size?.field;
+  if (sizeField) {
+    const prefix = sizeField.replace(/[^a-zA-Z0-9]/g, "") || "size";
+    const sizeProp = ejectSizeProp(spec, dataVar, prefix);
+    if (sizeProp) attrs.push(sizeProp);
+  }
+
+  return attrs;
 }
 
 export function ejectCartesianBody(
@@ -60,30 +129,28 @@ export function ejectCartesianBody(
   const yField = Array.isArray(encoding?.y)
     ? encoding.y[0]?.field
     : encoding?.y?.field ?? "value";
-  const colorField = encoding?.color?.field;
 
-  if (colorField) {
+  if (cartesianUsesComposableMarks(spec)) {
     const mark = markName(spec.type);
     const chart = resolveChartName(spec.type);
-    const flags = [
-      spec.fill && spec.type !== "bar" ? "fill" : "",
-      spec.stacked ? "stacked" : "",
-      spec.valueSuffix ? `valueSuffix="${spec.valueSuffix}"` : "",
-      spec.props?.showValues === true ? "showValues" : "",
-    ].filter(Boolean);
+    const flags = chartLevelFlags(spec);
+    const cellAttrs = buildCellAttrs(spec, dataVar);
+    const cellAttrLines =
+      cellAttrs.length > 0
+        ? `\n          ${cellAttrs.join("\n          ")}`
+        : "";
 
     return {
-      preamble: COLOR_FILL_HELPER,
+      preamble: buildPreamble(spec, dataVar),
       body: `data={${dataVar}}
     ${flags.length > 0 ? `${flags.join("\n    ")}\n    ` : ""}>
     <XAxis dataKey="${xField}" />
     <YAxis />
-    <${mark} dataKey="${yField}">
+    <${mark} dataKey="${yField}"${curveTypeAttr(spec)}>
       {${dataVar}.map((row) => (
         <Cell
           key={String(row.${xField})}
-          dataKey={String(row.${xField})}
-          fill={resolveColorFill(row.${colorField})}
+          dataKey={String(row.${xField})}${cellAttrLines}
         />
       ))}
     </${mark}>
@@ -91,11 +158,7 @@ export function ejectCartesianBody(
     };
   }
 
-  const flags = [
-    spec.fill ? "fill" : "",
-    spec.stacked ? "stacked" : "",
-    spec.valueSuffix ? `valueSuffix="${spec.valueSuffix}"` : "",
-  ].filter(Boolean);
+  const flags = chartLevelFlags(spec);
 
   return {
     body: `categories={${dataVar}.map((row) => String(row.${xField}))}

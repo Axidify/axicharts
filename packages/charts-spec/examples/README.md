@@ -27,6 +27,10 @@ npx @axicharts/charts-spec plan profile.json --intent "throughput color by above
 
 Panels with `encoding.color` eject to composable `<Bar><Cell fill /></Bar>` (or Line/Area) with a `resolveColorFill` helper — same renderer path as `compilePanel`.
 
+Panels with `encoding.size` eject to `<Cell size={…} />` or `<Cell radius={…} />` with a `resolveSizeMark` helper and min/max preamble for quantitative fields.
+
+`props.style.line.curve` ejects to `type="monotone"` or `type="linear"` on composable `<Line>` / `<Area>` (or `curve` on `LineChart` when not using Cell marks).
+
 Panels with `props.style` eject to `createTheme(cleanTheme, { … })`. Chrome variants eject as `legendVariant` / `tooltipVariant` on `ChartContainer`.
 
 ## shadcn Charts port map

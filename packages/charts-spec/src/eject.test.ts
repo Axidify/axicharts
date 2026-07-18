@@ -116,6 +116,37 @@ describe("ejectPanel", () => {
     expect(jsx).not.toContain("encoding.color");
   });
 
+  it("emits Cell size for encoding.size on line panels", () => {
+    const jsx = ejectPanel({
+      type: "line",
+      encoding: {
+        x: { field: "week" },
+        y: { field: "latency" },
+        size: { field: "weight", range: [4, 12] },
+      },
+    });
+
+    expect(jsx).toContain("resolveSizeMark");
+    expect(jsx).toContain("radius={resolveSizeMark");
+    expect(jsx).toContain("<Cell");
+    expect(jsx).not.toContain("encoding.size");
+  });
+
+  it("emits line curve type from props.style.line.curve", () => {
+    const jsx = ejectPanel({
+      type: "line",
+      encoding: {
+        x: { field: "week" },
+        y: { field: "latency" },
+      },
+      props: {
+        style: { line: { curve: "monotone" } },
+      },
+    });
+
+    expect(jsx).toContain('curve="monotone"');
+  });
+
   it("emits chrome variants on ChartContainer", () => {
     const jsx = ejectPanel({
       type: "line",
