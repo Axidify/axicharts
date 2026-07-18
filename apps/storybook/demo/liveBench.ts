@@ -101,6 +101,30 @@ export const FRAME_BUDGET_MS = 16;
 export const ISOLATED_BENCH_WARMUP = 5;
 export const ISOLATED_BENCH_UPDATES = 30;
 export const ISOLATED_BENCH_SETTLE_MS = 250;
+export const ISOLATED_BENCH_MIN_SAMPLES = 5;
+
+export type IsolatedBenchPlan = {
+  warmup: number;
+  updates: number;
+  maxMsPerLibrary: number;
+};
+
+/** Scale calibration cost down as panel × point load grows. */
+export function getIsolatedBenchPlan(
+  panelCount: number,
+  pointCount: number,
+): IsolatedBenchPlan {
+  const load = panelCount * pointCount;
+  const baseline = 6 * 2000;
+  const ratio = Math.max(1, load / baseline);
+  const updates = Math.max(
+    ISOLATED_BENCH_MIN_SAMPLES,
+    Math.min(ISOLATED_BENCH_UPDATES, Math.round(ISOLATED_BENCH_UPDATES / Math.sqrt(ratio))),
+  );
+  const warmup = Math.min(ISOLATED_BENCH_WARMUP, Math.max(2, Math.floor(updates / 5)));
+  const maxMsPerLibrary = ratio >= 6 ? 8_000 : ratio >= 2.5 ? 12_000 : 20_000;
+  return { warmup, updates, maxMsPerLibrary };
+}
 
 export function getPanelGridColumns(panelCount: number): number {
   if (panelCount <= 4) return 2;
@@ -293,7 +317,7 @@ export type CalibrationProgress = {
 export type CalibrationView = "both" | "axicharts" | "recharts";
 
 export type IsolatedBenchResult = {
-  status: "pending" | "running" | "done";
+  status: "pending" | "running" | "done" | "skipped";
   axiP95Ms: number;
   rechartsP95Ms: number;
   updates: number;
@@ -326,6 +350,7 @@ export type LiveBenchState = {
   rechartsSkipRatio: number;
   toggle: () => void;
   rerunIsolatedBench: () => void;
+  skipCalibration: () => void;
 };
 
 function yieldToBrowser(): Promise<void> {
@@ -338,9 +363,15 @@ async function runIsolatedUpdatesAsync(
   warmup: number,
   updates: number,
   update: () => void,
-  onProgress?: (completed: number, total: number) => void,
-  isCancelled?: () => boolean,
+  options?: {
+    onProgress?: (completed: number, total: number) => void;
+    isCancelled?: () => boolean;
+    maxDurationMs?: number;
+  },
 ): Promise<number | null> {
+  const { onProgress, isCancelled, maxDurationMs } = options ?? {};
+  const startedAt = performance.now();
+
   for (let index = 0; index < warmup; index++) {
     if (isCancelled?.()) return null;
     flushSync(update);
@@ -350,12 +381,22 @@ async function runIsolatedUpdatesAsync(
   const times: number[] = [];
   for (let index = 0; index < updates; index++) {
     if (isCancelled?.()) return null;
+    if (
+      maxDurationMs != null &&
+      performance.now() - startedAt > maxDurationMs &&
+      times.length >= ISOLATED_BENCH_MIN_SAMPLES
+    ) {
+      break;
+    }
+
     const start = performance.now();
     flushSync(update);
     times.push(performance.now() - start);
     onProgress?.(index + 1, updates);
     await yieldToBrowser();
   }
+
+  if (times.length < ISOLATED_BENCH_MIN_SAMPLES) return null;
 
   times.sort((a, b) => a - b);
   return percentile(times, 0.95);
@@ -407,6 +448,16 @@ export function useLiveOpsBench({
   const rechartsOverBudgetRef = useRef(0);
   const rechartsSevereRef = useRef(0);
   const [isolatedGeneration, setIsolatedGeneration] = useState(0);
+  const calibrationTokenRef = useRef(0);
+  const mountedRef = useRef(false);
+
+  const benchPlan = useMemo(
+    () => getIsolatedBenchPlan(specs.length, pointCount),
+    [pointCount, specs.length],
+  );
+
+  const calibratingRef = useRef(calibrating);
+  calibratingRef.current = calibrating;
 
   panelsRef.current = panels;
   rechartsPanelsRef.current = rechartsPanels;
@@ -425,11 +476,25 @@ export function useLiveOpsBench({
   }, []);
 
   const rerunIsolatedBench = useCallback(() => {
+    calibrationTokenRef.current += 1;
     setIsolatedGeneration((value) => value + 1);
+  }, []);
+
+  const skipCalibration = useCallback(() => {
+    calibrationTokenRef.current += 1;
+    setCalibrating(false);
+    setCalibrationView("both");
+    setCalibrationProgress(null);
+    setIsolatedBench((current) =>
+      current.status === "done"
+        ? current
+        : { ...current, status: "skipped" },
+    );
   }, []);
 
   useEffect(() => {
     const seeded = specs.map((spec) => createPanelState(spec, pointCount));
+    calibrationTokenRef.current += 1;
     setPanels(seeded);
     setRechartsPanels(
       seeded.map((panel) => ({ ...panel, values: [...panel.values] })),
@@ -443,87 +508,116 @@ export function useLiveOpsBench({
     rechartsSkipRef.current = 1;
     setRechartsSkipRatio(1);
     resetLiveMetrics();
+    setCalibrating(false);
+    setCalibrationView("both");
+    setCalibrationProgress(null);
     setIsolatedBench({
       status: "pending",
       axiP95Ms: 0,
       rechartsP95Ms: 0,
-      updates: ISOLATED_BENCH_UPDATES,
+      updates: benchPlan.updates,
     });
+  }, [benchPlan.updates, pointCount, resetLiveMetrics, specs]);
+
+  useEffect(() => {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
     rerunIsolatedBench();
-  }, [pointCount, resetLiveMetrics, rerunIsolatedBench, specs]);
+  }, [rerunIsolatedBench]);
 
   useEffect(() => {
     let cancelled = false;
-    const isCancelled = () => cancelled;
+    const token = calibrationTokenRef.current;
+    const isCancelled = () => cancelled || calibrationTokenRef.current !== token;
+    const { warmup, updates, maxMsPerLibrary } = benchPlan;
 
     void (async () => {
       await new Promise<void>((resolve) => {
         window.setTimeout(resolve, ISOLATED_BENCH_SETTLE_MS);
       });
-      if (cancelled) return;
+      if (isCancelled()) return;
 
       setCalibrating(true);
       setCalibrationView("axicharts");
       setCalibrationProgress({
         library: "axicharts",
         step: 0,
-        total: ISOLATED_BENCH_UPDATES,
+        total: updates,
       });
       setIsolatedBench({
         status: "running",
         axiP95Ms: 0,
         rechartsP95Ms: 0,
-        updates: ISOLATED_BENCH_UPDATES,
+        updates,
       });
 
       const axiP95Ms = await runIsolatedUpdatesAsync(
-        ISOLATED_BENCH_WARMUP,
-        ISOLATED_BENCH_UPDATES,
+        warmup,
+        updates,
         () => {
           const next = shiftPanels(panelsRef.current);
           panelsRef.current = next;
           setPanels(next);
         },
-        (step, total) => {
-          if (!cancelled) {
-            setCalibrationProgress({ library: "axicharts", step, total });
-          }
+        {
+          onProgress: (step, total) => {
+            if (!isCancelled()) {
+              setCalibrationProgress({ library: "axicharts", step, total });
+            }
+          },
+          isCancelled,
+          maxDurationMs: maxMsPerLibrary,
         },
-        isCancelled,
       );
 
-      if (cancelled || axiP95Ms == null) return;
+      if (isCancelled()) return;
 
       setCalibrationView("recharts");
       setCalibrationProgress({
         library: "recharts",
         step: 0,
-        total: ISOLATED_BENCH_UPDATES,
+        total: updates,
       });
 
       const rechartsP95Ms = await runIsolatedUpdatesAsync(
-        ISOLATED_BENCH_WARMUP,
-        ISOLATED_BENCH_UPDATES,
+        warmup,
+        updates,
         () => {
           const next = shiftPanels(rechartsPanelsRef.current);
           rechartsPanelsRef.current = next;
           setRechartsPanels(next);
         },
-        (step, total) => {
-          if (!cancelled) {
-            setCalibrationProgress({ library: "recharts", step, total });
-          }
+        {
+          onProgress: (step, total) => {
+            if (!isCancelled()) {
+              setCalibrationProgress({ library: "recharts", step, total });
+            }
+          },
+          isCancelled,
+          maxDurationMs: maxMsPerLibrary,
         },
-        isCancelled,
       );
 
-      if (cancelled || rechartsP95Ms == null) return;
+      if (isCancelled()) return;
+
+      if (axiP95Ms == null || rechartsP95Ms == null) {
+        setIsolatedBench({
+          status: "skipped",
+          axiP95Ms: axiP95Ms ?? 0,
+          rechartsP95Ms: rechartsP95Ms ?? 0,
+          updates,
+        });
+        setCalibrationView("both");
+        setCalibrationProgress(null);
+        setCalibrating(false);
+        return;
+      }
 
       setIsolatedBench({
         status: "done",
         axiP95Ms,
         rechartsP95Ms,
-        updates: ISOLATED_BENCH_UPDATES,
+        updates,
       });
 
       const synced = panelsRef.current.map((panel) => ({
@@ -539,16 +633,14 @@ export function useLiveOpsBench({
 
     return () => {
       cancelled = true;
-      setCalibrating(false);
-      setCalibrationView("both");
-      setCalibrationProgress(null);
     };
-  }, [isolatedGeneration]);
+  }, [benchPlan, isolatedGeneration]);
 
   useEffect(() => {
-    if (!running || calibrating) return;
+    if (!running) return;
 
     const id = window.setInterval(() => {
+      if (calibratingRef.current) return;
       tickRef.current += 1;
       const tick = tickRef.current;
       const updateAxi = tick % 2 === 1;
@@ -634,7 +726,7 @@ export function useLiveOpsBench({
     }, 1000 / hz);
 
     return () => window.clearInterval(id);
-  }, [autoThrottleRecharts, calibrating, hz, running]);
+  }, [autoThrottleRecharts, hz, running]);
 
   const effectiveRechartsHz = hz / (2 * rechartsSkipRatio);
 
@@ -658,6 +750,7 @@ export function useLiveOpsBench({
       rechartsSkipRatio,
       toggle: () => setRunning((value) => !value),
       rerunIsolatedBench,
+      skipCalibration,
     }),
     [
       panels,
@@ -676,6 +769,7 @@ export function useLiveOpsBench({
       calibrationProgress,
       rechartsSkipRatio,
       rerunIsolatedBench,
+      skipCalibration,
     ],
   );
 }

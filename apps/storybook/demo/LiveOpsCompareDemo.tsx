@@ -16,9 +16,9 @@ import {
 import {
   BENCH_PRESETS,
   FRAME_BUDGET_MS,
-  ISOLATED_BENCH_UPDATES,
   formatMultiplier,
   formatSeriesValue,
+  getIsolatedBenchPlan,
   getPanelGridColumns,
   getPanelSpecs,
   isStruggling,
@@ -371,6 +371,10 @@ export function LiveOpsCompareDemo({
   const panelSpecs = useMemo(() => getPanelSpecs(panelCount), [panelCount]);
   const gridColumns = getPanelGridColumns(panelCount);
   const ciReference = lookupCiReference(panelCount, pointCount);
+  const benchPlan = useMemo(
+    () => getIsolatedBenchPlan(panelCount, pointCount),
+    [panelCount, pointCount],
+  );
 
   const bench = useLiveOpsBench({
     panelCount,
@@ -444,10 +448,11 @@ export function LiveOpsCompareDemo({
           <p style={{ margin: 0, fontSize: 13, color: "#94a3b8", maxWidth: 760 }}>
             Synthetic load generator drives chart updates — not real CPU/memory telemetry.
             Performance uses the same isolated <code>flushSync</code> methodology as{" "}
-            <code>apps/bench-harness</code>: each library measured alone ({ISOLATED_BENCH_UPDATES}{" "}
-            updates), then live alternating ticks (one library per tick) for ongoing samples.
-            Side-by-side rendering cannot match CI numbers exactly — your device differs from
-            headless Chromium 4×.
+            <code>apps/bench-harness</code> when you run calibration (up to{" "}
+            {benchPlan.updates} updates per library on this preset). Preset changes start the
+            live stream immediately; use <strong>Re-run calibration</strong> for fresh isolated
+            numbers. Side-by-side rendering cannot match CI numbers exactly — your device differs
+            from headless Chromium 4×.
           </p>
           {ciReference ? (
             <p style={{ margin: "8px 0 0", fontSize: 12, color: "#64748b" }}>
@@ -483,6 +488,23 @@ export function LiveOpsCompareDemo({
           >
             {calibrationLabel}
           </button>
+          {bench.calibrating ? (
+            <button
+              type="button"
+              onClick={bench.skipCalibration}
+              style={{
+                padding: "8px 14px",
+                borderRadius: 8,
+                border: "1px solid #b45309",
+                background: "rgba(120, 53, 15, 0.2)",
+                color: "#fde68a",
+                cursor: "pointer",
+                fontSize: 13,
+              }}
+            >
+              Skip calibration
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={bench.toggle}
@@ -543,7 +565,22 @@ export function LiveOpsCompareDemo({
           {bench.calibrationProgress
             ? ` ${bench.calibrationProgress.library === "axicharts" ? "AxiCharts" : "Recharts"}: ${bench.calibrationProgress.step}/${bench.calibrationProgress.total} updates.`
             : " Preparing…"}
-          {" "}Live stream resumes when calibration finishes.
+          {" "}Click <strong>Skip calibration</strong> to jump straight to the live stream.
+        </div>
+      ) : isolated.status === "pending" ? (
+        <div
+          style={{
+            padding: "10px 14px",
+            borderRadius: 8,
+            border: "1px solid #334155",
+            background: "#0f172a",
+            color: "#94a3b8",
+            fontSize: 12,
+          }}
+        >
+          Live stream is running. Isolated numbers use live samples until you click{" "}
+          <strong>Re-run calibration</strong> ({benchPlan.updates} updates per library, capped at{" "}
+          {(benchPlan.maxMsPerLibrary / 1000).toFixed(0)}s each on this preset).
         </div>
       ) : null}
 
@@ -581,7 +618,7 @@ export function LiveOpsCompareDemo({
           sub={
             isolated.status === "done"
               ? "From isolated calibration on this device"
-              : "Live estimate until calibration completes"
+              : "From live alternating ticks on this device"
           }
         />
         <MetricPill
@@ -591,10 +628,16 @@ export function LiveOpsCompareDemo({
               ? `${isolated.axiP95Ms.toFixed(2)} ms`
               : isolated.status === "running"
                 ? "…"
-                : "—"
+                : primaryAxiP95 > 0
+                  ? `${primaryAxiP95.toFixed(2)} ms`
+                  : "—"
           }
           accent="#60a5fa"
-          sub={`Measured on this device · ${ISOLATED_BENCH_UPDATES} updates`}
+          sub={
+            isolated.status === "done"
+              ? `Isolated · ${isolated.updates} updates`
+              : `Live estimate · calibrate for ${benchPlan.updates} updates`
+          }
         />
         <MetricPill
           label="Recharts p95 (isolated)"
@@ -603,11 +646,17 @@ export function LiveOpsCompareDemo({
               ? `${isolated.rechartsP95Ms.toFixed(2)} ms`
               : isolated.status === "running"
                 ? "…"
-                : "—"
+                : primaryRechartsP95 > 0
+                  ? `${primaryRechartsP95.toFixed(2)} ms`
+                  : "—"
           }
           accent="#f87171"
           warn={primaryRechartsP95 > FRAME_BUDGET_MS}
-          sub={`Measured on this device · ${ISOLATED_BENCH_UPDATES} updates`}
+          sub={
+            isolated.status === "done"
+              ? `Isolated · ${isolated.updates} updates`
+              : `Live estimate · calibrate for ${benchPlan.updates} updates`
+          }
         />
         <MetricPill
           label="Active library"
