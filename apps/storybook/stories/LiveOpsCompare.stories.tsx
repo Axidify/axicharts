@@ -10,7 +10,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Live ops wall stress demo — AxiCharts (uPlot canvas) vs Recharts (SVG) vs ECharts (canvas) on a synthetic load generator. Isolated flushSync calibration (bench-harness methodology) plus alternating live ticks for fair per-library timing. CI reference numbers shown separately from device-measured p95.",
+          "Live ops wall stress demo — AxiCharts (uPlot canvas) vs Recharts (SVG) vs ECharts (canvas) on a synthetic load generator (not real ops telemetry). Per-library calibration status with progress bars, error retry, and isolated flushSync methodology plus alternating live ticks for fair per-library timing.",
       },
     },
   },

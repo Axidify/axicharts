@@ -316,7 +316,102 @@ export type CalibrationProgress = {
   total: number;
 };
 
+export type CalibrationLibraryStatus = "pending" | "calibrating" | "ready" | "error";
+
+export type CalibrationStatusMap = Record<BenchLibrary, CalibrationLibraryStatus>;
+
+export type CalibrationErrorInfo = {
+  library: BenchLibrary;
+  message: string;
+};
+
 export type CalibrationView = "all" | BenchLibrary;
+
+export const CALIBRATION_LIBRARY_ORDER: BenchLibrary[] = [
+  "axicharts",
+  "recharts",
+  "echarts",
+];
+
+export function getCalibrationLibraries(threeWay: boolean): BenchLibrary[] {
+  return threeWay
+    ? CALIBRATION_LIBRARY_ORDER
+    : CALIBRATION_LIBRARY_ORDER.filter((library) => library !== "echarts");
+}
+
+export function createInitialCalibrationStatuses(threeWay: boolean): CalibrationStatusMap {
+  return {
+    axicharts: "pending",
+    recharts: "pending",
+    echarts: threeWay ? "pending" : "ready",
+  };
+}
+
+export function startCalibrationRun(
+  statuses: CalibrationStatusMap,
+  libraries: BenchLibrary[],
+): CalibrationStatusMap {
+  const next = { ...statuses };
+  for (const library of libraries) {
+    if (next[library] !== "ready") next[library] = "pending";
+  }
+  if (libraries[0]) next[libraries[0]] = "calibrating";
+  return next;
+}
+
+export function markLibraryReady(
+  statuses: CalibrationStatusMap,
+  library: BenchLibrary,
+  libraries: BenchLibrary[],
+): CalibrationStatusMap {
+  const next = { ...statuses, [library]: "ready" as const };
+  const index = libraries.indexOf(library);
+  const following = libraries[index + 1];
+  if (following && next[following] === "pending") {
+    next[following] = "calibrating";
+  }
+  return next;
+}
+
+export function markLibraryError(
+  statuses: CalibrationStatusMap,
+  library: BenchLibrary,
+): CalibrationStatusMap {
+  return { ...statuses, [library]: "error" };
+}
+
+export function finishCalibrationRun(
+  statuses: CalibrationStatusMap,
+  libraries: BenchLibrary[],
+): CalibrationStatusMap {
+  const next = { ...statuses };
+  for (const library of libraries) {
+    if (next[library] === "calibrating" || next[library] === "pending") {
+      next[library] = "ready";
+    }
+  }
+  return next;
+}
+
+export function getCalibrationProgressPercent(
+  progress: CalibrationProgress | null,
+): number {
+  if (!progress || progress.total <= 0) return 0;
+  return Math.min(100, Math.round((progress.step / progress.total) * 100));
+}
+
+export function calibrationStatusLabel(status: CalibrationLibraryStatus): string {
+  switch (status) {
+    case "pending":
+      return "Pending";
+    case "calibrating":
+      return "Calibrating";
+    case "ready":
+      return "Ready";
+    case "error":
+      return "Failed";
+  }
+}
 
 export type IsolatedBenchResult = {
   status: "pending" | "running" | "done" | "skipped";
@@ -352,6 +447,8 @@ export type LiveBenchState = {
   calibrating: boolean;
   calibrationView: CalibrationView;
   calibrationProgress: CalibrationProgress | null;
+  calibrationStatuses: CalibrationStatusMap;
+  calibrationError: CalibrationErrorInfo | null;
   rechartsThrottled: boolean;
   rechartsSkipRatio: number;
   threeWay: boolean;
@@ -377,7 +474,12 @@ function yieldToBrowser(): Promise<void> {
   });
 }
 
-async function runIsolatedUpdatesAsync(
+export type IsolatedUpdateRunResult =
+  | { status: "ok"; p95Ms: number; sampleCount: number }
+  | { status: "cancelled" }
+  | { status: "error"; message: string; sampleCount: number };
+
+export async function runIsolatedUpdatesAsync(
   warmup: number,
   updates: number,
   update: () => void,
@@ -386,19 +488,19 @@ async function runIsolatedUpdatesAsync(
     isCancelled?: () => boolean;
     maxDurationMs?: number;
   },
-): Promise<number | null> {
+): Promise<IsolatedUpdateRunResult> {
   const { onProgress, isCancelled, maxDurationMs } = options ?? {};
   const startedAt = performance.now();
 
   for (let index = 0; index < warmup; index++) {
-    if (isCancelled?.()) return null;
+    if (isCancelled?.()) return { status: "cancelled" };
     flushSync(update);
     await yieldToBrowser();
   }
 
   const times: number[] = [];
   for (let index = 0; index < updates; index++) {
-    if (isCancelled?.()) return null;
+    if (isCancelled?.()) return { status: "cancelled" };
     if (
       maxDurationMs != null &&
       performance.now() - startedAt > maxDurationMs &&
@@ -414,10 +516,20 @@ async function runIsolatedUpdatesAsync(
     await yieldToBrowser();
   }
 
-  if (times.length < ISOLATED_BENCH_MIN_SAMPLES) return null;
+  if (times.length < ISOLATED_BENCH_MIN_SAMPLES) {
+    return {
+      status: "error",
+      message: `Insufficient samples (${times.length}/${ISOLATED_BENCH_MIN_SAMPLES})`,
+      sampleCount: times.length,
+    };
+  }
 
   times.sort((a, b) => a - b);
-  return percentile(times, 0.95);
+  return {
+    status: "ok",
+    p95Ms: percentile(times, 0.95),
+    sampleCount: times.length,
+  };
 }
 
 function clonePanelStates(panels: LivePanelState[]): LivePanelState[] {
@@ -441,6 +553,10 @@ export function useLiveOpsBench({
   const [calibrationView, setCalibrationView] = useState<CalibrationView>("all");
   const [calibrationProgress, setCalibrationProgress] =
     useState<CalibrationProgress | null>(null);
+  const [calibrationStatuses, setCalibrationStatuses] = useState<CalibrationStatusMap>(
+    () => createInitialCalibrationStatuses(threeWay),
+  );
+  const [calibrationError, setCalibrationError] = useState<CalibrationErrorInfo | null>(null);
   const [panels, setPanels] = useState<LivePanelState[]>(() =>
     specs.map((spec) => createPanelState(spec, pointCount)),
   );
@@ -524,12 +640,14 @@ export function useLiveOpsBench({
     setCalibrating(false);
     setCalibrationView("all");
     setCalibrationProgress(null);
+    setCalibrationError(null);
+    setCalibrationStatuses((current) => finishCalibrationRun(current, getCalibrationLibraries(threeWay)));
     setIsolatedBench((current) =>
       current.status === "done"
         ? current
         : { ...current, status: "skipped" },
     );
-  }, []);
+  }, [threeWay]);
 
   useEffect(() => {
     const seeded = specs.map((spec) => createPanelState(spec, pointCount));
@@ -547,6 +665,8 @@ export function useLiveOpsBench({
     setCalibrating(false);
     setCalibrationView("all");
     setCalibrationProgress(null);
+    setCalibrationError(null);
+    setCalibrationStatuses(createInitialCalibrationStatuses(threeWay));
     setIsolatedBench({
       status: "pending",
       axiP95Ms: 0,
@@ -554,7 +674,7 @@ export function useLiveOpsBench({
       echartsP95Ms: 0,
       updates: benchPlan.updates,
     });
-  }, [benchPlan.updates, pointCount, resetLiveMetrics, specs]);
+  }, [benchPlan.updates, pointCount, resetLiveMetrics, specs, threeWay]);
 
   useEffect(() => {
     if (mountedRef.current) return;
@@ -567,6 +687,7 @@ export function useLiveOpsBench({
     const token = calibrationTokenRef.current;
     const isCancelled = () => cancelled || calibrationTokenRef.current !== token;
     const { warmup, updates, maxMsPerLibrary } = benchPlan;
+    const libraries = getCalibrationLibraries(threeWay);
 
     void (async () => {
       await new Promise<void>((resolve) => {
@@ -575,9 +696,11 @@ export function useLiveOpsBench({
       if (isCancelled()) return;
 
       setCalibrating(true);
-      setCalibrationView("axicharts");
+      setCalibrationError(null);
+      setCalibrationStatuses((current) => startCalibrationRun(current, libraries));
+      setCalibrationView(libraries[0] ?? "axicharts");
       setCalibrationProgress({
-        library: "axicharts",
+        library: libraries[0] ?? "axicharts",
         step: 0,
         total: updates,
       });
@@ -589,105 +712,74 @@ export function useLiveOpsBench({
         updates,
       });
 
-      const axiP95Ms = await runIsolatedUpdatesAsync(
-        warmup,
-        updates,
-        () => {
-          const next = shiftPanels(panelsRef.current);
-          panelsRef.current = next;
-          setPanels(next);
-        },
-        {
+      let axiP95Ms = 0;
+      let rechartsP95Ms = 0;
+      let echartsP95Ms = 0;
+
+      for (const library of libraries) {
+        setCalibrationView(library);
+        setCalibrationProgress({ library, step: 0, total: updates });
+
+        const updatePanels = () => {
+          if (library === "axicharts") {
+            const next = shiftPanels(panelsRef.current);
+            panelsRef.current = next;
+            setPanels(next);
+            return;
+          }
+          if (library === "recharts") {
+            const next = shiftPanels(rechartsPanelsRef.current);
+            rechartsPanelsRef.current = next;
+            setRechartsPanels(next);
+            return;
+          }
+          const next = shiftPanels(echartsPanelsRef.current);
+          echartsPanelsRef.current = next;
+          setEchartsPanels(next);
+        };
+
+        const result = await runIsolatedUpdatesAsync(warmup, updates, updatePanels, {
           onProgress: (step, total) => {
             if (!isCancelled()) {
-              setCalibrationProgress({ library: "axicharts", step, total });
+              setCalibrationProgress({ library, step, total });
             }
           },
           isCancelled,
           maxDurationMs: maxMsPerLibrary,
-        },
-      );
-
-      if (isCancelled()) return;
-
-      setCalibrationView("recharts");
-      setCalibrationProgress({
-        library: "recharts",
-        step: 0,
-        total: updates,
-      });
-
-      const rechartsP95Ms = await runIsolatedUpdatesAsync(
-        warmup,
-        updates,
-        () => {
-          const next = shiftPanels(rechartsPanelsRef.current);
-          rechartsPanelsRef.current = next;
-          setRechartsPanels(next);
-        },
-        {
-          onProgress: (step, total) => {
-            if (!isCancelled()) {
-              setCalibrationProgress({ library: "recharts", step, total });
-            }
-          },
-          isCancelled,
-          maxDurationMs: maxMsPerLibrary,
-        },
-      );
-
-      if (isCancelled()) return;
-
-      let echartsP95Ms: number | null = null;
-      if (threeWay) {
-        setCalibrationView("echarts");
-        setCalibrationProgress({
-          library: "echarts",
-          step: 0,
-          total: updates,
         });
-
-        echartsP95Ms = await runIsolatedUpdatesAsync(
-          warmup,
-          updates,
-          () => {
-            const next = shiftPanels(echartsPanelsRef.current);
-            echartsPanelsRef.current = next;
-            setEchartsPanels(next);
-          },
-          {
-            onProgress: (step, total) => {
-              if (!isCancelled()) {
-                setCalibrationProgress({ library: "echarts", step, total });
-              }
-            },
-            isCancelled,
-            maxDurationMs: maxMsPerLibrary,
-          },
-        );
 
         if (isCancelled()) return;
-      }
 
-      if (axiP95Ms == null || rechartsP95Ms == null || (threeWay && echartsP95Ms == null)) {
-        setIsolatedBench({
-          status: "skipped",
-          axiP95Ms: axiP95Ms ?? 0,
-          rechartsP95Ms: rechartsP95Ms ?? 0,
-          echartsP95Ms: echartsP95Ms ?? 0,
-          updates,
-        });
-        setCalibrationView("all");
-        setCalibrationProgress(null);
-        setCalibrating(false);
-        return;
+        if (result.status === "cancelled") return;
+
+        if (result.status === "error") {
+          setCalibrationStatuses((current) => markLibraryError(current, library));
+          setCalibrationError({ library, message: result.message });
+          setIsolatedBench({
+            status: "skipped",
+            axiP95Ms,
+            rechartsP95Ms,
+            echartsP95Ms,
+            updates,
+          });
+          setCalibrationView("all");
+          setCalibrationProgress(null);
+          setCalibrating(false);
+          return;
+        }
+
+        if (library === "axicharts") axiP95Ms = result.p95Ms;
+        if (library === "recharts") rechartsP95Ms = result.p95Ms;
+        if (library === "echarts") echartsP95Ms = result.p95Ms;
+
+        setCalibrationStatuses((current) => markLibraryReady(current, library, libraries));
       }
 
       setIsolatedBench({
         status: "done",
         axiP95Ms,
         rechartsP95Ms,
-        echartsP95Ms: echartsP95Ms ?? 0,
+        echartsP95Ms,
         updates,
       });
 
@@ -698,6 +790,7 @@ export function useLiveOpsBench({
         echartsPanelsRef.current = synced;
         setEchartsPanels(synced);
       }
+      setCalibrationStatuses((current) => finishCalibrationRun(current, libraries));
       setCalibrationView("all");
       setCalibrationProgress(null);
       setCalibrating(false);
@@ -920,6 +1013,8 @@ export function useLiveOpsBench({
       calibrating,
       calibrationView,
       calibrationProgress,
+      calibrationStatuses,
+      calibrationError,
       rechartsThrottled: rechartsSkipRatio > 1,
       rechartsSkipRatio,
       threeWay,
@@ -944,6 +1039,8 @@ export function useLiveOpsBench({
       calibrating,
       calibrationView,
       calibrationProgress,
+      calibrationStatuses,
+      calibrationError,
       rechartsSkipRatio,
       threeWay,
       rerunIsolatedBench,

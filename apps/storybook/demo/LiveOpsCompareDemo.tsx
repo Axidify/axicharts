@@ -18,8 +18,11 @@ import {
 import {
   BENCH_PRESETS,
   FRAME_BUDGET_MS,
+  calibrationStatusLabel,
   formatMultiplier,
   formatSeriesValue,
+  getCalibrationLibraries,
+  getCalibrationProgressPercent,
   getIsolatedBenchPlan,
   getPanelGridColumns,
   getPanelSpecs,
@@ -28,6 +31,7 @@ import {
   lookupCiReference,
   type BenchLibrary,
   type BenchPresetId,
+  type CalibrationLibraryStatus,
   type LiveBenchState,
   type LivePanelState,
   type TimingMetrics,
@@ -508,11 +512,15 @@ export function LiveOpsCompareDemo({
   const axiStruggling = isStruggling(bench.axiLive) || primaryAxiP95 > FRAME_BUDGET_MS;
 
   const panelWidth = Math.max(120, Math.floor((threeWay ? 1080 : 720) / gridColumns) - 24);
-  const calibrationLabel = bench.calibrationProgress
-    ? `Calibrating ${libraryDisplayName(bench.calibrationProgress.library)} ${bench.calibrationProgress.step}/${bench.calibrationProgress.total}…`
-    : bench.calibrating
-      ? "Calibrating…"
-      : "Re-run calibration";
+  const calibrationLabel = bench.calibrationError
+    ? "Retry calibration"
+    : bench.calibrationProgress
+      ? `Calibrating ${libraryDisplayName(bench.calibrationProgress.library)} ${bench.calibrationProgress.step}/${bench.calibrationProgress.total}…`
+      : bench.calibrating
+        ? "Calibrating…"
+        : "Re-run calibration";
+  const calibrationLibraries = getCalibrationLibraries(threeWay);
+  const calibrationPercent = getCalibrationProgressPercent(bench.calibrationProgress);
   const compareTitle = threeWay
     ? "AxiCharts · Recharts · ECharts"
     : "AxiCharts · Recharts";
@@ -533,10 +541,35 @@ export function LiveOpsCompareDemo({
             Live ops wall — {compareTitle} — {panelCount} panels ×{" "}
             {pointCount.toLocaleString()} pts @ {hz} Hz
           </h2>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              marginBottom: 8,
+              padding: "4px 10px",
+              borderRadius: 999,
+              border: "1px solid #334155",
+              background: "rgba(15, 23, 42, 0.8)",
+              fontSize: 11,
+              color: "#cbd5e1",
+            }}
+          >
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: "50%",
+                background: "#38bdf8",
+                boxShadow: "0 0 8px rgba(56, 189, 248, 0.6)",
+              }}
+            />
+            Synthetic load generator — not real CPU/memory telemetry
+          </div>
           <p style={{ margin: 0, fontSize: 13, color: "#94a3b8", maxWidth: 760 }}>
-            Synthetic load generator drives chart updates — not real CPU/memory telemetry.
-            Performance uses the same isolated <code>flushSync</code> methodology as{" "}
-            <code>apps/bench-harness</code> when you run calibration (up to{" "}
+            Series values are procedurally generated to stress chart rendering — they do not
+            reflect host metrics. Performance uses the same isolated <code>flushSync</code>{" "}
+            methodology as <code>apps/bench-harness</code> when you run calibration (up to{" "}
             {benchPlan.updates} updates per library on this preset). Preset changes start the
             live stream immediately; use <strong>Re-run calibration</strong> for fresh isolated
             numbers. Side-by-side rendering cannot match CI numbers exactly — your device differs
@@ -649,23 +682,12 @@ export function LiveOpsCompareDemo({
         />
       ) : null}
 
-      {bench.calibrating ? (
-        <div
-          style={{
-            padding: "10px 14px",
-            borderRadius: 8,
-            border: "1px solid #334155",
-            background: "#0f172a",
-            color: "#94a3b8",
-            fontSize: 12,
-          }}
-        >
-          Running isolated benchmark — one library at a time so measurements stay fair.
-          {bench.calibrationProgress
-            ? ` ${libraryDisplayName(bench.calibrationProgress.library)}: ${bench.calibrationProgress.step}/${bench.calibrationProgress.total} updates.`
-            : " Preparing…"}
-          {" "}Click <strong>Skip calibration</strong> to jump straight to the live stream.
-        </div>
+      {bench.calibrating || bench.calibrationError ? (
+        <CalibrationStatusPanel
+          bench={bench}
+          libraries={calibrationLibraries}
+          onRetry={bench.rerunIsolatedBench}
+        />
       ) : isolated.status === "pending" ? (
         <div
           style={{
@@ -1101,6 +1123,174 @@ function ControlsBar({
   );
 }
 
+function CalibrationStatusPanel({
+  bench,
+  libraries,
+  onRetry,
+}: {
+  bench: LiveBenchState;
+  libraries: BenchLibrary[];
+  onRetry: () => void;
+}): ReactElement {
+  const activeProgress = bench.calibrationProgress;
+  const percent = getCalibrationProgressPercent(activeProgress);
+
+  return (
+    <div
+      style={{
+        padding: "12px 14px",
+        borderRadius: 8,
+        border: bench.calibrationError ? "1px solid #b91c1c" : "1px solid #334155",
+        background: bench.calibrationError ? "rgba(127, 29, 29, 0.15)" : "#0f172a",
+        display: "grid",
+        gap: 10,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 10,
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div style={{ fontSize: 12, color: bench.calibrationError ? "#fecaca" : "#94a3b8" }}>
+          {bench.calibrationError ? (
+            <>
+              <strong>Calibration failed</strong> — {libraryDisplayName(bench.calibrationError.library)}
+              : {bench.calibrationError.message}. Completed libraries keep their charts visible.
+            </>
+          ) : (
+            <>
+              Running isolated benchmark — one library at a time so measurements stay fair.
+              {activeProgress
+                ? ` ${libraryDisplayName(activeProgress.library)}: ${activeProgress.step}/${activeProgress.total} updates.`
+                : " Preparing…"}
+              {" "}Click <strong>Skip calibration</strong> to jump straight to the live stream.
+            </>
+          )}
+        </div>
+        {bench.calibrationError ? (
+          <button
+            type="button"
+            onClick={onRetry}
+            style={{
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: "1px solid #b91c1c",
+              background: "rgba(127, 29, 29, 0.25)",
+              color: "#fecaca",
+              cursor: "pointer",
+              fontSize: 12,
+            }}
+          >
+            Retry calibration
+          </button>
+        ) : null}
+      </div>
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {libraries.map((library) => (
+          <CalibrationStatusBadge
+            key={library}
+            library={library}
+            status={bench.calibrationStatuses[library]}
+            active={
+              bench.calibrationProgress?.library === library &&
+              bench.calibrationStatuses[library] === "calibrating"
+            }
+            progress={bench.calibrationProgress}
+          />
+        ))}
+      </div>
+
+      {bench.calibrating && activeProgress ? (
+        <CalibrationProgressBar percent={percent} label={`${percent}% · ${activeProgress.step}/${activeProgress.total} updates`} />
+      ) : null}
+    </div>
+  );
+}
+
+function CalibrationStatusBadge({
+  library,
+  status,
+  active,
+  progress,
+}: {
+  library: BenchLibrary;
+  status: CalibrationLibraryStatus;
+  active?: boolean;
+  progress: LiveBenchState["calibrationProgress"];
+}): ReactElement {
+  const colors: Record<CalibrationLibraryStatus, { border: string; bg: string; text: string }> = {
+    pending: { border: "#334155", bg: "#0f172a", text: "#94a3b8" },
+    calibrating: { border: "#2563eb", bg: "rgba(37, 99, 235, 0.15)", text: "#93c5fd" },
+    ready: { border: "#15803d", bg: "rgba(21, 128, 61, 0.15)", text: "#86efac" },
+    error: { border: "#b91c1c", bg: "rgba(185, 28, 28, 0.15)", text: "#fecaca" },
+  };
+  const palette = colors[status];
+  const detail =
+    active && progress?.library === library
+      ? ` ${progress.step}/${progress.total}`
+      : "";
+
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        padding: "4px 10px",
+        borderRadius: 999,
+        border: `1px solid ${palette.border}`,
+        background: palette.bg,
+        color: palette.text,
+        fontSize: 11,
+        fontWeight: 600,
+      }}
+    >
+      {libraryDisplayName(library)}
+      <span style={{ opacity: 0.85 }}>
+        · {calibrationStatusLabel(status)}
+        {detail}
+      </span>
+    </span>
+  );
+}
+
+function CalibrationProgressBar({
+  percent,
+  label,
+}: {
+  percent: number;
+  label: string;
+}): ReactElement {
+  return (
+    <div>
+      <div
+        style={{
+          height: 6,
+          borderRadius: 999,
+          background: "#1e293b",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${percent}%`,
+            borderRadius: 999,
+            background: "linear-gradient(90deg, #2563eb, #38bdf8)",
+            transition: "width 120ms ease-out",
+          }}
+        />
+      </div>
+      <div style={{ marginTop: 4, fontSize: 10, color: "#64748b" }}>{label}</div>
+    </div>
+  );
+}
+
 function LiveOpsCompareColumn({
   library,
   title,
@@ -1128,12 +1318,28 @@ function LiveOpsCompareColumn({
   struggling?: boolean;
   renderPanel: (panel: LivePanelState) => ReactElement;
 }): ReactElement {
-  const isCalibratingColumn =
-    bench.calibrating &&
-    bench.calibrationView !== "all" &&
-    bench.calibrationView === library;
-  const showSkeleton =
-    bench.calibrating && bench.calibrationView !== "all" && bench.calibrationView !== library;
+  const status = bench.calibrationStatuses[library];
+  const showSkeleton = status === "pending" && bench.calibrating;
+  const showError = status === "error";
+  const isCalibrating = status === "calibrating";
+  const columnProgress =
+    isCalibrating && bench.calibrationProgress?.library === library
+      ? bench.calibrationProgress
+      : null;
+
+  if (showError) {
+    return (
+      <CalibrationErrorColumn
+        title={title}
+        subtitle={bench.calibrationError?.message ?? "Calibration failed"}
+        accent={accent}
+        panelCount={panels.length}
+        gridColumns={gridColumns}
+        panelHeight={panelHeight}
+        onRetry={bench.rerunIsolatedBench}
+      />
+    );
+  }
 
   if (showSkeleton) {
     return (
@@ -1141,6 +1347,7 @@ function LiveOpsCompareColumn({
         title={title}
         subtitle="Waiting for calibration…"
         accent={accent}
+        status={status}
         panelCount={panels.length}
         gridColumns={gridColumns}
         panelHeight={panelHeight}
@@ -1151,8 +1358,10 @@ function LiveOpsCompareColumn({
   return (
     <CompareColumn
       title={title}
-      subtitle={isCalibratingColumn ? "Calibrating isolated benchmark…" : subtitle}
+      subtitle={isCalibrating ? "Calibrating isolated benchmark…" : subtitle}
       accent={accent}
+      status={status}
+      struggling={struggling}
       bench={bench}
       panelHeight={panelHeight}
       gridColumns={gridColumns}
@@ -1161,6 +1370,7 @@ function LiveOpsCompareColumn({
       panels={panels}
       struggling={struggling}
       renderPanel={renderPanel}
+      calibrationProgress={columnProgress}
     />
   );
 }
@@ -1169,6 +1379,7 @@ function CalibrationSkeletonColumn({
   title,
   subtitle,
   accent,
+  status,
   panelCount,
   gridColumns,
   panelHeight,
@@ -1176,26 +1387,14 @@ function CalibrationSkeletonColumn({
   title: string;
   subtitle: string;
   accent: string;
+  status: CalibrationLibraryStatus;
   panelCount: number;
   gridColumns: number;
   panelHeight: number;
 }): ReactElement {
   return (
     <section>
-      <div style={{ marginBottom: 10 }}>
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: "0.05em",
-            textTransform: "uppercase",
-            color: accent,
-          }}
-        >
-          {title}
-        </div>
-        <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>{subtitle}</div>
-      </div>
+      <ColumnHeader title={title} subtitle={subtitle} accent={accent} status={status} />
       <div
         style={{
           display: "grid",
@@ -1251,34 +1450,90 @@ function CalibrationSkeletonColumn({
   );
 }
 
-function CompareColumn({
+function CalibrationErrorColumn({
   title,
   subtitle,
   accent,
-  bench,
-  panelHeight,
+  panelCount,
   gridColumns,
-  profilerId,
-  onProfilerRender,
-  panels,
-  struggling,
-  renderPanel,
+  panelHeight,
+  onRetry,
 }: {
   title: string;
   subtitle: string;
   accent: string;
-  bench: LiveBenchState;
-  panelHeight: number;
+  panelCount: number;
   gridColumns: number;
-  profilerId: string;
-  onProfilerRender: React.ProfilerOnRenderCallback;
-  panels: LivePanelState[];
-  struggling?: boolean;
-  renderPanel: (panel: LivePanelState) => ReactElement;
+  panelHeight: number;
+  onRetry: () => void;
 }): ReactElement {
   return (
     <section>
-      <div style={{ marginBottom: 10 }}>
+      <ColumnHeader title={title} subtitle={subtitle} accent={accent} status="error" />
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`,
+          gap: 8,
+          padding: 12,
+          borderRadius: 12,
+          border: "1px solid #b91c1c",
+          background: "rgba(127, 29, 29, 0.12)",
+          minHeight: panelHeight + 24,
+          placeItems: "center",
+        }}
+      >
+        <div style={{ gridColumn: `1 / -1`, textAlign: "center", padding: "12px 8px" }}>
+          <div style={{ fontSize: 13, color: "#fecaca", marginBottom: 10 }}>
+            Calibration failed for this library.
+          </div>
+          <button
+            type="button"
+            onClick={onRetry}
+            style={{
+              padding: "8px 14px",
+              borderRadius: 8,
+              border: "1px solid #b91c1c",
+              background: "rgba(127, 29, 29, 0.25)",
+              color: "#fecaca",
+              cursor: "pointer",
+              fontSize: 12,
+            }}
+          >
+            Retry calibration
+          </button>
+        </div>
+      </div>
+      <p style={{ margin: "8px 0 0", fontSize: 11, color: "#64748b" }}>
+        {gridColumns}-col grid · {panelHeight}px panels · synthetic load
+      </p>
+    </section>
+  );
+}
+
+function ColumnHeader({
+  title,
+  subtitle,
+  accent,
+  status,
+  struggling,
+}: {
+  title: string;
+  subtitle: string;
+  accent: string;
+  status?: CalibrationLibraryStatus;
+  struggling?: boolean;
+}): ReactElement {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 8,
+          alignItems: "center",
+        }}
+      >
         <div
           style={{
             fontSize: 12,
@@ -1293,8 +1548,89 @@ function CompareColumn({
             <span style={{ marginLeft: 6, color: "#fbbf24" }}>⚠</span>
           ) : null}
         </div>
-        <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>{subtitle}</div>
+        {status ? <ColumnStatusPill status={status} /> : null}
       </div>
+      <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>{subtitle}</div>
+    </div>
+  );
+}
+
+function ColumnStatusPill({ status }: { status: CalibrationLibraryStatus }): ReactElement {
+  const colors: Record<CalibrationLibraryStatus, { border: string; bg: string; text: string }> = {
+    pending: { border: "#334155", bg: "#0f172a", text: "#94a3b8" },
+    calibrating: { border: "#2563eb", bg: "rgba(37, 99, 235, 0.15)", text: "#93c5fd" },
+    ready: { border: "#15803d", bg: "rgba(21, 128, 61, 0.15)", text: "#86efac" },
+    error: { border: "#b91c1c", bg: "rgba(185, 28, 28, 0.15)", text: "#fecaca" },
+  };
+  const palette = colors[status];
+
+  return (
+    <span
+      style={{
+        padding: "2px 8px",
+        borderRadius: 999,
+        border: `1px solid ${palette.border}`,
+        background: palette.bg,
+        color: palette.text,
+        fontSize: 10,
+        fontWeight: 600,
+        letterSpacing: "0.02em",
+      }}
+    >
+      {calibrationStatusLabel(status)}
+    </span>
+  );
+}
+
+function CompareColumn({
+  title,
+  subtitle,
+  accent,
+  status,
+  bench,
+  panelHeight,
+  gridColumns,
+  profilerId,
+  onProfilerRender,
+  panels,
+  struggling,
+  renderPanel,
+  calibrationProgress,
+}: {
+  title: string;
+  subtitle: string;
+  accent: string;
+  status?: CalibrationLibraryStatus;
+  struggling?: boolean;
+  bench: LiveBenchState;
+  panelHeight: number;
+  gridColumns: number;
+  profilerId: string;
+  onProfilerRender: React.ProfilerOnRenderCallback;
+  panels: LivePanelState[];
+  struggling?: boolean;
+  renderPanel: (panel: LivePanelState) => ReactElement;
+  calibrationProgress?: LiveBenchState["calibrationProgress"];
+}): ReactElement {
+  const percent = getCalibrationProgressPercent(calibrationProgress ?? null);
+
+  return (
+    <section>
+      <ColumnHeader
+        title={title}
+        subtitle={subtitle}
+        accent={accent}
+        status={status}
+        struggling={struggling}
+      />
+      {calibrationProgress ? (
+        <div style={{ marginBottom: 8 }}>
+          <CalibrationProgressBar
+            percent={percent}
+            label={`Calibrating ${percent}% · ${calibrationProgress.step}/${calibrationProgress.total}`}
+          />
+        </div>
+      ) : null}
       <Profiler id={profilerId} onRender={onProfilerRender}>
         <div
           style={{

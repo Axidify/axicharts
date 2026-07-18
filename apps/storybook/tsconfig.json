@@ -3,5 +3,5 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": [".storybook", "stories", "../dashboarder/src"]
+  "include": [".storybook", "stories", "demo", "../dashboarder/src"]
 }
