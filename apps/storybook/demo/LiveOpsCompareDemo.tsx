@@ -267,22 +267,6 @@ function TimingRow({
   );
 }
 
-function useRechartsRenderHealth(panelCount: number, running: boolean): number {
-  const [rendered, setRendered] = useState(0);
-
-  useEffect(() => {
-    if (!running) return;
-    const poll = () => {
-      setRendered(document.querySelectorAll(".recharts-surface").length);
-    };
-    poll();
-    const id = window.setInterval(poll, 750);
-    return () => window.clearInterval(id);
-  }, [panelCount, running]);
-
-  return rendered;
-}
-
 function formatRatio(
   axiP95: number,
   rechartsP95: number,
@@ -439,12 +423,8 @@ export function LiveOpsCompareDemo({
 
   const ratioLabel = formatRatio(axiMetrics.p95Ms, rechartsMetrics.p95Ms, bench.p95Ms);
 
-  const rechartsRendered = useRechartsRenderHealth(panelCount, bench.running);
-  const rechartsRenderGap = panelCount - rechartsRendered;
   const rechartsStruggling =
-    isStruggling(rechartsMetrics) ||
-    rechartsRenderGap > 0 ||
-    bench.p95Ms > FRAME_BUDGET_MS * 2;
+    isStruggling(rechartsMetrics) || bench.p95Ms > FRAME_BUDGET_MS * 2;
   const axiStruggling = isStruggling(axiMetrics);
   const totalStruggling = bench.p95Ms > FRAME_BUDGET_MS;
 
@@ -630,9 +610,6 @@ export function LiveOpsCompareDemo({
           onProfilerRender={onRechartsProfiler}
           panels={bench.rechartsPanels}
           struggling={rechartsStruggling}
-          renderGap={rechartsRenderGap}
-          renderedCount={rechartsRendered}
-          panelCount={panelCount}
           renderPanel={(panel) => (
             <RechartsPanel
               key={panel.spec.id}
@@ -818,9 +795,6 @@ function CompareColumn({
   onProfilerRender,
   panels,
   struggling,
-  renderGap,
-  renderedCount,
-  panelCount: expectedPanels,
   renderPanel,
 }: {
   title: string;
@@ -833,9 +807,6 @@ function CompareColumn({
   onProfilerRender: React.ProfilerOnRenderCallback;
   panels: LivePanelState[];
   struggling?: boolean;
-  renderGap?: number;
-  renderedCount?: number;
-  panelCount?: number;
   renderPanel: (panel: LivePanelState) => ReactElement;
 }): ReactElement {
   return (
@@ -856,11 +827,6 @@ function CompareColumn({
           ) : null}
         </div>
         <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>{subtitle}</div>
-        {renderGap != null && renderGap > 0 && renderedCount != null && expectedPanels != null ? (
-          <p style={{ margin: "6px 0 0", fontSize: 11, color: "#fbbf24" }}>
-            SVG render falling behind — {renderedCount}/{expectedPanels} panels on screen
-          </p>
-        ) : null}
       </div>
       <Profiler id={profilerId} onRender={onProfilerRender}>
         <div
