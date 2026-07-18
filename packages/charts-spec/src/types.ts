@@ -92,6 +92,8 @@ export type PanelChartType =
   | "sunburst"
   | "boxplot"
   | "violin"
+  | "swarm"
+  | "beeswarm"
   | "histogram"
   | "stat"
   | "gauge"

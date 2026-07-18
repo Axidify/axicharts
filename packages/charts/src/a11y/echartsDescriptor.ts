@@ -16,6 +16,7 @@ import type {
   BumpA11yDescriptor,
   GraphA11yDescriptor,
   ViolinA11yDescriptor,
+  SwarmA11yDescriptor,
   WordCloudA11yDescriptor,
 } from "./types";
 import { singleValueA11ySummary } from "./singleValueDescriptor";
@@ -292,6 +293,47 @@ export function buildViolinA11yDescriptor({
   };
 }
 
+export function buildSwarmA11yDescriptor({
+  items,
+  series,
+  title,
+  description,
+}: {
+  items?: { category: string; values?: number[]; samples?: number[] }[];
+  series?: {
+    name: string;
+    items: { category: string; values?: number[]; samples?: number[] }[];
+  }[];
+  title?: string;
+  description?: string;
+}): SwarmA11yDescriptor {
+  const groups =
+    series && series.length > 0
+      ? series
+      : items && items.length > 0
+        ? [{ name: "Distribution", items }]
+        : [];
+  const categories = groups[0]?.items.map((item) => item.category) ?? [];
+  const pointCount = (entry: { values?: number[]; samples?: number[] }) =>
+    entry.values?.length ?? entry.samples?.length ?? 0;
+
+  return {
+    kind: "swarm",
+    title:
+      title ??
+      groups
+        .map((group) => group.name)
+        .filter(Boolean)
+        .join(", "),
+    description,
+    categories: [...categories],
+    series: groups.map((group) => ({
+      name: group.name,
+      pointCount: group.items.reduce((sum, item) => sum + pointCount(item), 0),
+    })),
+  };
+}
+
 export function buildGraphA11yDescriptor({
   data,
   title,
@@ -394,6 +436,10 @@ export function violinA11ySummary(descriptor: ViolinA11yDescriptor): string {
   return `Violin chart with ${descriptor.categories.length} categories and ${descriptor.series.length} series`;
 }
 
+export function swarmA11ySummary(descriptor: SwarmA11yDescriptor): string {
+  return `Swarm chart with ${descriptor.categories.length} categories and ${descriptor.series.length} series`;
+}
+
 export function wordCloudA11ySummary(descriptor: WordCloudA11yDescriptor): string {
   return `Word cloud with ${descriptor.words.length} terms`;
 }
@@ -431,6 +477,8 @@ export function chartA11ySummary(descriptor: {
       return graphA11ySummary(descriptor as GraphA11yDescriptor);
     case "violin":
       return violinA11ySummary(descriptor as ViolinA11yDescriptor);
+    case "swarm":
+      return swarmA11ySummary(descriptor as SwarmA11yDescriptor);
     case "word-cloud":
       return wordCloudA11ySummary(descriptor as WordCloudA11yDescriptor);
     default:

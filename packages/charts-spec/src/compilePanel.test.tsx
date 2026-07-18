@@ -912,6 +912,52 @@ describe("compilePanel presentation mode", () => {
     registerBuiltinChartTypes();
     expect(getChartType("violin")?.Chart).toBeTypeOf("function");
   });
+
+  it("compiles swarm panels from long-form rows", async () => {
+    const panel = compilePanel(
+      {
+        type: "swarm",
+        title: "Latency swarm",
+        height: 360,
+        encoding: {
+          x: { field: "service", type: "nominal" },
+          y: { field: "latency_ms", type: "quantitative" },
+        },
+      },
+      [
+        { service: "API", latency_ms: 12 },
+        { service: "API", latency_ms: 18 },
+        { service: "DB", latency_ms: 30 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Latency swarm");
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+
+  it("round-trips swarm through ejectPanel", () => {
+    const spec = {
+      type: "swarm" as const,
+      encoding: {
+        x: { field: "service" },
+        y: { field: "latency_ms" },
+      },
+      props: { showMedianLine: true, valueSuffix: " ms" },
+    };
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain("SwarmChart");
+    expect(jsx).toContain("service");
+    expect(jsx).toContain("latency_ms");
+  });
+
+  it("registers swarm builtin chart type", () => {
+    registerBuiltinChartTypes();
+    expect(getChartType("swarm")?.Chart).toBeTypeOf("function");
+    expect(getChartType("beeswarm")?.Chart).toBeTypeOf("function");
+  });
 });
 
 describe("compilePanel echarts escape hatch", () => {

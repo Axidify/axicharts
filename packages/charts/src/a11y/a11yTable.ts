@@ -14,6 +14,7 @@ import {
   bumpA11ySummary,
   graphA11ySummary,
   violinA11ySummary,
+  swarmA11ySummary,
   wordCloudA11ySummary,
 } from "./echartsDescriptor";
 
@@ -245,6 +246,22 @@ export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yT
         samples: item.sampleCount,
       })),
       caption: descriptor.description ?? violinA11ySummary(descriptor),
+    };
+  }
+
+  if (descriptor.kind === "swarm") {
+    return {
+      columns: [
+        { key: "series", label: "Series" },
+        { key: "category", label: "Category" },
+        { key: "points", label: "Points", align: "right" },
+      ],
+      rows: descriptor.series.map((item) => ({
+        series: item.name,
+        category: descriptor.categories.join(", "),
+        points: item.pointCount,
+      })),
+      caption: descriptor.description ?? swarmA11ySummary(descriptor),
     };
   }
 

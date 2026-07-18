@@ -44,6 +44,10 @@ const config: StorybookConfig = {
             root,
             "packages/charts/src/entry/violin.ts",
           ),
+          "@axicharts/charts/swarm": path.resolve(
+            root,
+            "packages/charts/src/entry/swarm.ts",
+          ),
           "@axicharts/charts/network": path.resolve(
             root,
             "packages/charts/src/entry/network.ts",

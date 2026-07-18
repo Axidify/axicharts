@@ -14,7 +14,7 @@
   {
     "name": "@axicharts/charts-echarts",
     "path": "packages/charts-echarts/dist/index.js",
-    "limit": "18 KB",
+    "limit": "20 KB",
     "gzip": true
   },
   {
@@ -120,6 +120,12 @@
     "gzip": true
   },
   {
+    "name": "@axicharts/charts/swarm",
+    "path": "packages/charts/dist/entry/swarm.js",
+    "limit": "6 KB",
+    "gzip": true
+  },
+  {
     "name": "@axicharts/charts/export",
     "path": "packages/charts/dist/entry/export.js",
     "limit": "3 KB",
@@ -134,7 +140,7 @@
   {
     "name": "@axicharts/charts/distribution",
     "path": "packages/charts/dist/entry/distribution.js",
-    "limit": "4 KB",
+    "limit": "5 KB",
     "gzip": true
   },
   {

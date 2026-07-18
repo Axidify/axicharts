@@ -4,6 +4,7 @@ import { BarChart } from "../bar/BarChart";
 import { CandlestickChart } from "../candlestick/CandlestickChart";
 import { BoxplotChart } from "../boxplot/BoxplotChart";
 import { ViolinChart } from "../violin/ViolinChart";
+import { SwarmChart } from "../swarm/SwarmChart";
 import { FunnelChart } from "../funnel/FunnelChart";
 import { PictorialBarChart } from "../pictorialBar/PictorialBarChart";
 import { LiquidFillChart } from "../liquidFill/LiquidFillChart";
@@ -119,6 +120,16 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "violin",
     Chart: ViolinChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "swarm",
+    Chart: SwarmChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "beeswarm",
+    Chart: SwarmChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
   {

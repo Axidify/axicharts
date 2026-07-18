@@ -68,6 +68,13 @@ const ITEMS = [
     target: "components/charts/chart-axi-multi-line.tsx",
   },
   {
+    name: "chart-axi-swarm",
+    title: "AxiCharts Swarm",
+    description: "Beeswarm / jittered strip plot per category — distribution density without KDE.",
+    file: "chart-axi-swarm.tsx",
+    target: "components/charts/chart-axi-swarm.tsx",
+  },
+  {
     name: "chart-axi-chart-config",
     title: "AxiCharts chartConfig helper",
     description: "Shared ChartConfig labels/colors — import into registry chart blocks or your own panels.",

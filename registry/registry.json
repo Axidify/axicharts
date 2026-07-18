@@ -13,8 +13,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.45",
-        "@axicharts/charts-theme@0.3.45"
+        "@axicharts/charts@0.3.46",
+        "@axicharts/charts-theme@0.3.46"
       ],
       "registryDependencies": [],
       "files": [
@@ -34,8 +34,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.45",
-        "@axicharts/charts-theme@0.3.45"
+        "@axicharts/charts@0.3.46",
+        "@axicharts/charts-theme@0.3.46"
       ],
       "registryDependencies": [],
       "files": [
@@ -55,8 +55,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.45",
-        "@axicharts/charts-theme@0.3.45"
+        "@axicharts/charts@0.3.46",
+        "@axicharts/charts-theme@0.3.46"
       ],
       "registryDependencies": [],
       "files": [
@@ -76,8 +76,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.45",
-        "@axicharts/charts-theme@0.3.45"
+        "@axicharts/charts@0.3.46",
+        "@axicharts/charts-theme@0.3.46"
       ],
       "registryDependencies": [],
       "files": [
@@ -97,8 +97,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.45",
-        "@axicharts/charts-theme@0.3.45"
+        "@axicharts/charts@0.3.46",
+        "@axicharts/charts-theme@0.3.46"
       ],
       "registryDependencies": [],
       "files": [
@@ -118,8 +118,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.45",
-        "@axicharts/charts-theme@0.3.45"
+        "@axicharts/charts@0.3.46",
+        "@axicharts/charts-theme@0.3.46"
       ],
       "registryDependencies": [],
       "files": [
@@ -139,13 +139,34 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.45",
-        "@axicharts/charts-theme@0.3.45"
+        "@axicharts/charts@0.3.46",
+        "@axicharts/charts-theme@0.3.46"
       ],
       "registryDependencies": [],
       "files": [
         {
           "path": "components/charts/chart-axi-multi-line.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "chart-axi-swarm",
+      "type": "registry:block",
+      "title": "AxiCharts Swarm",
+      "description": "Beeswarm / jittered strip plot per category — distribution density without KDE.",
+      "categories": [
+        "charts",
+        "dashboard"
+      ],
+      "dependencies": [
+        "@axicharts/charts@0.3.46",
+        "@axicharts/charts-theme@0.3.46"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "components/charts/chart-axi-swarm.tsx",
           "type": "registry:component"
         }
       ]
@@ -160,8 +181,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.45",
-        "@axicharts/charts-theme@0.3.45"
+        "@axicharts/charts@0.3.46",
+        "@axicharts/charts-theme@0.3.46"
       ],
       "registryDependencies": [],
       "files": [

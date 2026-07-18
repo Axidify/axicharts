@@ -24,6 +24,12 @@ export {
   type ViolinSeries,
 } from "../violin/ViolinChart";
 export {
+  SwarmChart,
+  type SwarmChartProps,
+  type SwarmItem,
+  type SwarmSeries,
+} from "../swarm/SwarmChart";
+export {
   HistogramChart,
   type HistogramChartProps,
 } from "../histogram/HistogramChart";

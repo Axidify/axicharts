@@ -40,6 +40,14 @@ export {
   silvermanBandwidth,
   violinCategories,
 } from "./violinTypes";
+export { EChartsSwarm, type EChartsSwarmProps } from "./EChartsSwarm";
+export type { SwarmItem, SwarmSeries, SwarmPoint } from "./swarmTypes";
+export {
+  layoutSwarmPoints,
+  resolveSwarmMedian,
+  resolveSwarmPoints,
+  swarmCategories,
+} from "./swarmTypes";
 export { EChartsHistogram, type EChartsHistogramProps } from "./EChartsHistogram";
 export type { BoxplotItem, BoxplotSeries } from "./boxplotTypes";
 export { EChartsScatter, type EChartsScatterProps } from "./EChartsScatter";

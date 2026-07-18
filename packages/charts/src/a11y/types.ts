@@ -145,6 +145,14 @@ export type ViolinA11yDescriptor = {
   series: { name: string; sampleCount: number }[];
 };
 
+export type SwarmA11yDescriptor = {
+  kind: "swarm";
+  title?: string;
+  description?: string;
+  categories: string[];
+  series: { name: string; pointCount: number }[];
+};
+
 export type WordCloudA11yDescriptor = {
   kind: "word-cloud";
   title?: string;
@@ -167,6 +175,7 @@ export type ChartA11yDescriptor =
   | BumpA11yDescriptor
   | GraphA11yDescriptor
   | ViolinA11yDescriptor
+  | SwarmA11yDescriptor
   | WordCloudA11yDescriptor;
 
 export type ChartA11yTable = {

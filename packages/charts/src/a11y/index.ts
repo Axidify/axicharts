@@ -16,6 +16,7 @@ export type {
   BumpA11yDescriptor,
   GraphA11yDescriptor,
   ViolinA11yDescriptor,
+  SwarmA11yDescriptor,
   WordCloudA11yDescriptor,
 } from "./types";
 export {
@@ -41,6 +42,7 @@ export {
   buildBumpA11yDescriptor,
   buildGraphA11yDescriptor,
   buildViolinA11yDescriptor,
+  buildSwarmA11yDescriptor,
   buildWordCloudA11yDescriptor,
   chartA11ySummary,
   flattenHierarchyNodes,

@@ -6,6 +6,7 @@ import { ChartLayoutContext } from "./container/ChartLayoutContext";
 import { ChartInteractionProvider } from "./interaction/ChartInteractionContext";
 import { BoxplotChart } from "./boxplot/BoxplotChart";
 import { ViolinChart } from "./violin/ViolinChart";
+import { SwarmChart } from "./swarm/SwarmChart";
 import { CandlestickChart } from "./candlestick/CandlestickChart";
 import { FunnelChart } from "./funnel/FunnelChart";
 import { CalendarHeatmapChart } from "./calendar/CalendarHeatmapChart";
@@ -40,6 +41,7 @@ const captured = {
   parallel: null as CapturedProps | null,
   themeRiver: null as CapturedProps | null,
   violin: null as CapturedProps | null,
+  swarm: null as CapturedProps | null,
 };
 
 vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
@@ -108,6 +110,10 @@ vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
     },
     EChartsViolin: (props: CapturedProps) => {
       captured.violin = props;
+      return null;
+    },
+    EChartsSwarm: (props: CapturedProps) => {
+      captured.swarm = props;
       return null;
     },
   };
@@ -322,6 +328,20 @@ describe("live mode merge wiring", () => {
     expectLiveMerge(captured.violin);
   });
 
+  it("passes mergeOption to swarm adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <SwarmChart
+          items={[
+            { category: "API", values: [12, 18, 22, 28] },
+          ]}
+        />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.swarm);
+  });
+
   it("passes mergeOption to histogram adapter when mode is live", () => {
     render(
       <TestShell mode="live">
@@ -514,5 +534,20 @@ describe("presentation mode animation wiring", () => {
 
     expect(captured.violin?.animate).toBe(true);
     expect(captured.violin?.mergeOption).toBe(false);
+  });
+
+  it("enables presentation sweep on swarm", () => {
+    render(
+      <TestShell mode="presentation">
+        <SwarmChart
+          items={[
+            { category: "API", values: [12, 18, 22, 28, 35] },
+          ]}
+        />
+      </TestShell>,
+    );
+
+    expect(captured.swarm?.animate).toBe(true);
+    expect(captured.swarm?.mergeOption).toBe(false);
   });
 });
