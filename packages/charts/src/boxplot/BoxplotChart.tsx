@@ -36,6 +36,7 @@ function BoxplotPlot({
       showAxes={showAxes}
       valueSuffix={valueSuffix}
       animate={mode === "presentation"}
+      mergeOption={mode === "live"}
       onItemHover={interaction.onItemHover}
     />
   );

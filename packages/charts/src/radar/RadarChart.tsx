@@ -39,6 +39,7 @@ function RadarPlot({
       showAxes={showAxes}
       areaFill={areaFill}
       animate={mode === "presentation"}
+      mergeOption={mode === "live"}
       onItemHover={interaction.onItemHover}
     />
   );

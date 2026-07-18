@@ -16,6 +16,7 @@ export type EChartsSunburstProps = {
   theme: ChartTheme;
   showLabels?: boolean;
   animate?: boolean;
+  mergeOption?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -31,6 +32,7 @@ export function EChartsSunburst({
   theme,
   showLabels = true,
   animate = false,
+  mergeOption,
   onItemHover,
 }: EChartsSunburstProps): ReactElement {
   const data = mapTreemapData(nodes, theme);
@@ -86,7 +88,7 @@ export function EChartsSunburst({
     width,
     height,
     onItemHover,
-    mergeOption: !animate,
+    mergeOption: mergeOption ?? !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse || params.name == null) return null;

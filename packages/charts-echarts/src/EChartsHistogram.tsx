@@ -25,6 +25,7 @@ export type EChartsHistogramProps = {
   showAxes?: boolean;
   valueSuffix?: string;
   animate?: boolean;
+  mergeOption?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -43,6 +44,7 @@ export function EChartsHistogram({
   showAxes = true,
   valueSuffix = "",
   animate = false,
+  mergeOption,
   onItemHover,
 }: EChartsHistogramProps): ReactElement {
   const palette = seriesPalette(theme);
@@ -85,7 +87,7 @@ export function EChartsHistogram({
     width,
     height,
     onItemHover,
-    mergeOption: !animate,
+    mergeOption: mergeOption ?? !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse) return null;

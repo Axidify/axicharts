@@ -18,6 +18,7 @@ export type EChartsRadarProps = {
   showAxes?: boolean;
   areaFill?: boolean;
   animate?: boolean;
+  mergeOption?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -31,6 +32,7 @@ export function EChartsRadar({
   showAxes = true,
   areaFill = true,
   animate = false,
+  mergeOption,
   onItemHover,
 }: EChartsRadarProps): ReactElement {
   const palette = seriesPalette(theme);
@@ -103,7 +105,7 @@ export function EChartsRadar({
     width,
     height,
     onItemHover,
-    mergeOption: !animate,
+    mergeOption: mergeOption ?? !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse || params.name == null) return null;

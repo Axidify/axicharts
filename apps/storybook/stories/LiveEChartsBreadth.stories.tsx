@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import {
-  CandlestickChart,
   ChartContainer,
-  FunnelChart,
+  HeatmapChart,
   PieChart,
-  TreemapChart,
-  type OhlcPoint,
-  type TreemapNode,
+  RadarChart,
+  ScatterChart,
+  SunburstChart,
+  WordCloudChart,
+  type HierarchyNode,
 } from "@axicharts/charts";
 import { liveTheme } from "@axicharts/charts-theme";
 
@@ -20,98 +21,96 @@ const INITIAL_SLICES = [
   { name: "Other", value: 10 },
 ];
 
-const INITIAL_STAGES = [
-  { name: "Leads", value: 240, tone: "info" as const },
-  { name: "Qualified", value: 160 },
-  { name: "Proposal", value: 92, tone: "warning" as const },
-  { name: "Won", value: 48, tone: "success" as const },
-];
-
-const INITIAL_TREEMAP: TreemapNode[] = [
+const INITIAL_SUNBURST: HierarchyNode[] = [
   {
-    name: "Compute",
+    name: "Platform",
     children: [
-      { name: "EC2", value: 42_000, tone: "info" as const },
-      { name: "Lambda", value: 12_500 },
-      { name: "EKS", value: 18_200, tone: "success" as const },
-    ],
-  },
-  {
-    name: "Storage",
-    children: [
-      { name: "S3", value: 9_800, tone: "warning" as const },
-      { name: "EBS", value: 6_400 },
-    ],
-  },
-  {
-    name: "Data",
-    children: [
-      { name: "RDS", value: 15_600 },
-      { name: "Redshift", value: 11_300, tone: "critical" as const },
+      {
+        name: "API",
+        children: [
+          { name: "Auth", value: 420 },
+          { name: "Orders", value: 680, tone: "info" as const },
+        ],
+      },
+      {
+        name: "Workers",
+        children: [
+          { name: "ETL", value: 540, tone: "warning" as const },
+          { name: "Alerts", value: 310 },
+        ],
+      },
     ],
   },
 ];
 
-function bumpTreemap(nodes: TreemapNode[], tick: number): TreemapNode[] {
-  const drift = Math.round(Math.sin(tick / 4) * 200);
-  return nodes.map((group, groupIndex) => ({
+const INITIAL_SCATTER = [
+  {
+    name: "Regions",
+    points: [
+      { x: 12, y: 48, name: "US-East" },
+      { x: 28, y: 62, name: "EU-West" },
+      { x: 44, y: 38, name: "APAC" },
+      { x: 58, y: 71, name: "US-West" },
+      { x: 72, y: 55, name: "LATAM" },
+    ],
+  },
+];
+
+const INITIAL_RADAR_INDICATORS = [
+  { name: "Latency" },
+  { name: "Throughput" },
+  { name: "Errors" },
+  { name: "Cost" },
+  { name: "Saturation" },
+];
+
+const INITIAL_RADAR_SERIES = [
+  { name: "Cluster A", values: [72, 84, 18, 46, 63], tone: "info" as const },
+  { name: "Cluster B", values: [58, 76, 24, 52, 71] },
+];
+
+const INITIAL_HEATMAP = {
+  xCategories: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+  yCategories: ["API", "DB", "Cache", "Queue"],
+  values: [
+    [42, 38, 55, 48, 61],
+    [28, 31, 44, 39, 52],
+    [18, 22, 26, 24, 29],
+    [12, 15, 19, 17, 21],
+  ],
+};
+
+const INITIAL_WORDS = [
+  { text: "timeout", value: 42, tone: "critical" as const },
+  { text: "retry", value: 28, tone: "warning" as const },
+  { text: "latency", value: 24 },
+  { text: "cache", value: 18, tone: "success" as const },
+  { text: "queue", value: 14 },
+  { text: "auth", value: 11 },
+];
+
+function bumpSunburst(nodes: HierarchyNode[], tick: number): HierarchyNode[] {
+  const drift = Math.round(Math.sin(tick / 5) * 12);
+  return nodes.map((group) => ({
     ...group,
-    children: group.children?.map((leaf, leafIndex) => ({
-      ...leaf,
-      value: Math.max(
-        1_000,
-        (leaf.value ?? 0) +
-          drift +
-          (groupIndex === 0 && leafIndex === 0
-            ? 800
-            : groupIndex === 2 && leafIndex === 1
-              ? -400
-              : 0),
-      ),
+    children: group.children?.map((branch) => ({
+      ...branch,
+      children: branch.children?.map((leaf, index) => ({
+        ...leaf,
+        value: Math.max(80, (leaf.value ?? 0) + drift + (index % 2 === 0 ? 6 : -3)),
+      })),
     })),
   }));
 }
 
-const BAR_COUNT = 32;
-const SESSIONS = Array.from({ length: BAR_COUNT }, (_, index) => {
-  const totalMinutes = 9 * 60 + 30 + index * 5;
-  const hour = Math.floor(totalMinutes / 60);
-  const minute = totalMinutes % 60;
-  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-});
-
-function buildOhlc(seed: number): { data: OhlcPoint[]; volume: number[] } {
-  let price = 182.4 + Math.sin(seed / 4) * 2;
-  const data = SESSIONS.map((_, index) => {
-    const open = price;
-    const delta = Math.sin((seed + index) / 3) * 0.35 + (Math.random() - 0.5) * 0.4;
-    const close = open + delta;
-    const high = Math.max(open, close) + Math.random() * 0.35;
-    const low = Math.min(open, close) - Math.random() * 0.35;
-    price = close;
-    return {
-      open: Number(open.toFixed(2)),
-      high: Number(high.toFixed(2)),
-      low: Number(low.toFixed(2)),
-      close: Number(close.toFixed(2)),
-    };
-  });
-  const volume = SESSIONS.map(
-    (_, index) =>
-      Number((0.8 + Math.abs(Math.sin((seed + index) / 5)) * 1.8).toFixed(2)) *
-      1_000_000,
-  );
-  return { data, volume };
-}
-
-const INITIAL_OHLC = buildOhlc(0);
-
 function LiveEChartsBreadthDemo(): ReactElement {
   const [tick, setTick] = useState(0);
   const [slices, setSlices] = useState(INITIAL_SLICES);
-  const [stages, setStages] = useState(INITIAL_STAGES);
-  const [nodes, setNodes] = useState(INITIAL_TREEMAP);
-  const [ohlc, setOhlc] = useState(INITIAL_OHLC);
+  const [sunburst, setSunburst] = useState(INITIAL_SUNBURST);
+  const [scatter, setScatter] = useState(INITIAL_SCATTER);
+  const [radarSeries, setRadarSeries] = useState(INITIAL_RADAR_SERIES);
+  const [heatmap, setHeatmap] = useState(INITIAL_HEATMAP);
+  const [words, setWords] = useState(INITIAL_WORDS);
   const lastFrameRef = useRef(performance.now());
   const [frameMs, setFrameMs] = useState(0);
 
@@ -132,17 +131,41 @@ function LiveEChartsBreadthDemo(): ReactElement {
             ),
           })),
         );
-        setStages((currentStages) =>
-          currentStages.map((stage, index) => ({
-            ...stage,
-            value: Math.max(
-              8,
-              stage.value + (index === 0 ? 3 : index === 3 ? 1 : -1),
+        setSunburst((currentNodes) => bumpSunburst(currentNodes, next));
+        setScatter((currentSeries) =>
+          currentSeries.map((item) => ({
+            ...item,
+            points: item.points.map((point, index) => ({
+              ...point,
+              y: Math.max(10, point.y + (index % 2 === 0 ? 2 : -1)),
+            })),
+          })),
+        );
+        setRadarSeries((currentSeries) =>
+          currentSeries.map((item, seriesIndex) => ({
+            ...item,
+            values: item.values.map((value, index) =>
+              Math.max(
+                8,
+                value + (seriesIndex === 0 ? 2 : -1) + (index === 2 ? -2 : 0),
+              ),
             ),
           })),
         );
-        setOhlc(buildOhlc(next));
-        setNodes((currentNodes) => bumpTreemap(currentNodes, next));
+        setHeatmap((current) => ({
+          ...current,
+          values: current.values.map((row, rowIndex) =>
+            row.map((cell, colIndex) =>
+              Math.max(4, cell + (rowIndex + colIndex + next) % 3),
+            ),
+          ),
+        }));
+        setWords((currentWords) =>
+          currentWords.map((word, index) => ({
+            ...word,
+            value: Math.max(4, word.value + (index % 2 === 0 ? 2 : -1)),
+          })),
+        );
         return next;
       });
     }, TICK_MS);
@@ -154,29 +177,34 @@ function LiveEChartsBreadthDemo(): ReactElement {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
           gap: 12,
         }}
       >
-        <ChartContainer theme={liveTheme} mode="live" height={240} width="100%">
+        <ChartContainer theme={liveTheme} mode="live" height={220} width="100%">
           <PieChart slices={slices} innerRadius={38} showLabels />
         </ChartContainer>
-        <ChartContainer theme={liveTheme} mode="live" height={240} width="100%">
-          <CandlestickChart
-            categories={SESSIONS}
-            data={ohlc.data}
-            volume={ohlc.volume}
+        <ChartContainer theme={liveTheme} mode="live" height={220} width="100%">
+          <ScatterChart series={scatter} />
+        </ChartContainer>
+        <ChartContainer theme={liveTheme} mode="live" height={220} width="100%">
+          <RadarChart
+            indicators={INITIAL_RADAR_INDICATORS}
+            series={radarSeries}
           />
         </ChartContainer>
-        <ChartContainer theme={liveTheme} mode="live" height={240} width="100%">
-          <FunnelChart stages={stages} />
+        <ChartContainer theme={liveTheme} mode="live" height={220} width="100%">
+          <SunburstChart nodes={sunburst} />
         </ChartContainer>
-        <ChartContainer theme={liveTheme} mode="live" height={240} width="100%">
-          <TreemapChart nodes={nodes} />
+        <ChartContainer theme={liveTheme} mode="live" height={220} width="100%">
+          <HeatmapChart matrix={heatmap} />
+        </ChartContainer>
+        <ChartContainer theme={liveTheme} mode="live" height={220} width="100%">
+          <WordCloudChart words={words} />
         </ChartContainer>
       </div>
       <p style={{ marginTop: 10, fontSize: 12, color: "#94a3b8" }}>
-        C106 — ECharts exotic <code>mode: live</code> merge path @ 5 Hz · tick{" "}
+        C117 — ECharts breadth <code>mode: live</code> merge path @ 5 Hz · tick{" "}
         {tick} · last frame {frameMs.toFixed(1)} ms (target {TICK_MS} ms)
       </p>
     </div>
@@ -191,7 +219,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C106 — pie, candlestick, funnel, and treemap panels share the Heatmap-style `mergeOption` live update path at 5 Hz without full chart rebuilds.",
+          "C117 — pie, scatter, radar, sunburst, heatmap, and word cloud share the `mergeOption` live update path at 5 Hz without full chart rebuilds.",
       },
     },
   },
@@ -200,6 +228,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+export const LiveBreadthWall: Story = {
+  render: () => <LiveEChartsBreadthDemo />,
+};
+
+/** @deprecated Use `LiveBreadthWall` — kept for bookmarked Storybook URLs. */
 export const ThreePanelWall: Story = {
   render: () => <LiveEChartsBreadthDemo />,
 };

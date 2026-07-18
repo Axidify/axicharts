@@ -50,6 +50,7 @@ function ScatterPlot({
       ySuffix={ySuffix}
       sizeRange={sizeRange}
       animate={mode === "presentation"}
+      mergeOption={mode === "live"}
       onItemHover={interaction.onItemHover}
     />
   );

@@ -49,6 +49,7 @@ function WaterfallPlot({
       showSigns={showSigns}
       connectorStyle={connectorStyle}
       animate={mode === "presentation"}
+      mergeOption={mode === "live"}
       onCursor={interaction.onCursor}
     />
   );

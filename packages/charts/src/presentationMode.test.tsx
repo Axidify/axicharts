@@ -4,15 +4,20 @@ import type { ReactElement, ReactNode } from "react";
 import { cleanTheme } from "@axicharts/charts-theme";
 import { ChartLayoutContext } from "./container/ChartLayoutContext";
 import { ChartInteractionProvider } from "./interaction/ChartInteractionContext";
+import { BoxplotChart } from "./boxplot/BoxplotChart";
 import { CandlestickChart } from "./candlestick/CandlestickChart";
 import { FunnelChart } from "./funnel/FunnelChart";
 import { HeatmapChart } from "./heatmap/HeatmapChart";
 import { HistogramChart } from "./histogram/HistogramChart";
+import { ParallelChart } from "./parallel/ParallelChart";
 import { PieChart } from "./pie/PieChart";
 import { RadarChart } from "./radar/RadarChart";
 import { ScatterChart } from "./scatter/ScatterChart";
+import { SunburstChart } from "./sunburst/SunburstChart";
+import { ThemeRiverChart } from "./themeRiver/ThemeRiverChart";
 import { TreemapChart } from "./treemap/TreemapChart";
 import { WaterfallChart } from "./waterfall/WaterfallChart";
+import { WordCloudChart } from "./wordCloud/WordCloudChart";
 
 type CapturedProps = Record<string, unknown>;
 
@@ -25,7 +30,12 @@ const captured = {
   waterfall: null as CapturedProps | null,
   scatter: null as CapturedProps | null,
   radar: null as CapturedProps | null,
+  sunburst: null as CapturedProps | null,
+  boxplot: null as CapturedProps | null,
   histogram: null as CapturedProps | null,
+  wordCloud: null as CapturedProps | null,
+  parallel: null as CapturedProps | null,
+  themeRiver: null as CapturedProps | null,
 };
 
 vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
@@ -64,8 +74,28 @@ vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
       captured.radar = props;
       return null;
     },
+    EChartsSunburst: (props: CapturedProps) => {
+      captured.sunburst = props;
+      return null;
+    },
+    EChartsBoxplot: (props: CapturedProps) => {
+      captured.boxplot = props;
+      return null;
+    },
     EChartsHistogram: (props: CapturedProps) => {
       captured.histogram = props;
+      return null;
+    },
+    EChartsWordCloud: (props: CapturedProps) => {
+      captured.wordCloud = props;
+      return null;
+    },
+    EChartsParallel: (props: CapturedProps) => {
+      captured.parallel = props;
+      return null;
+    },
+    EChartsThemeRiver: (props: CapturedProps) => {
+      captured.themeRiver = props;
       return null;
     },
   };
@@ -94,6 +124,11 @@ function TestShell({
   );
 }
 
+function expectLiveMerge(adapter: CapturedProps | null): void {
+  expect(adapter?.mergeOption).toBe(true);
+  expect(adapter?.animate).toBe(false);
+}
+
 describe("live mode merge wiring", () => {
   it("passes mergeOption to pie adapter when mode is live", () => {
     render(
@@ -102,8 +137,7 @@ describe("live mode merge wiring", () => {
       </TestShell>,
     );
 
-    expect(captured.pie?.mergeOption).toBe(true);
-    expect(captured.pie?.animate).toBe(false);
+    expectLiveMerge(captured.pie);
   });
 
   it("keeps presentation animation on pie without live merge", () => {
@@ -117,6 +151,17 @@ describe("live mode merge wiring", () => {
     expect(captured.pie?.animate).toBe(true);
   });
 
+  it("does not merge in interactive mode for pie", () => {
+    render(
+      <TestShell mode="interactive">
+        <PieChart slices={[{ name: "A", value: 10 }]} />
+      </TestShell>,
+    );
+
+    expect(captured.pie?.mergeOption).toBe(false);
+    expect(captured.pie?.animate).toBe(false);
+  });
+
   it("passes mergeOption to candlestick adapter when mode is live", () => {
     render(
       <TestShell mode="live">
@@ -127,8 +172,7 @@ describe("live mode merge wiring", () => {
       </TestShell>,
     );
 
-    expect(captured.candlestick?.mergeOption).toBe(true);
-    expect(captured.candlestick?.animate).toBe(false);
+    expectLiveMerge(captured.candlestick);
   });
 
   it("passes mergeOption to funnel adapter when mode is live", () => {
@@ -138,8 +182,7 @@ describe("live mode merge wiring", () => {
       </TestShell>,
     );
 
-    expect(captured.funnel?.mergeOption).toBe(true);
-    expect(captured.funnel?.animate).toBe(false);
+    expectLiveMerge(captured.funnel);
   });
 
   it("passes mergeOption to treemap adapter when mode is live", () => {
@@ -156,8 +199,7 @@ describe("live mode merge wiring", () => {
       </TestShell>,
     );
 
-    expect(captured.treemap?.mergeOption).toBe(true);
-    expect(captured.treemap?.animate).toBe(false);
+    expectLiveMerge(captured.treemap);
   });
 
   it("passes mergeOption to heatmap adapter when mode is live", () => {
@@ -173,8 +215,125 @@ describe("live mode merge wiring", () => {
       </TestShell>,
     );
 
-    expect(captured.heatmap?.mergeOption).toBe(true);
-    expect(captured.heatmap?.animate).toBe(false);
+    expectLiveMerge(captured.heatmap);
+  });
+
+  it("passes mergeOption to scatter adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <ScatterChart
+          series={[{ name: "A", points: [{ x: 1, y: 2 }] }]}
+        />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.scatter);
+  });
+
+  it("passes mergeOption to radar adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <RadarChart
+          indicators={[{ name: "Speed" }]}
+          series={[{ name: "Team", values: [80] }]}
+        />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.radar);
+  });
+
+  it("passes mergeOption to sunburst adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <SunburstChart
+          nodes={[
+            {
+              name: "Platform",
+              children: [{ name: "API", value: 42 }],
+            },
+          ]}
+        />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.sunburst);
+  });
+
+  it("passes mergeOption to boxplot adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <BoxplotChart
+          items={[
+            {
+              name: "Latency",
+              min: 1,
+              q1: 4,
+              median: 8,
+              q3: 12,
+              max: 18,
+            },
+          ]}
+        />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.boxplot);
+  });
+
+  it("passes mergeOption to histogram adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <HistogramChart categories={["0-10"]} values={[4]} />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.histogram);
+  });
+
+  it("passes mergeOption to waterfall adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <WaterfallChart items={[{ name: "Q1", value: 100, isTotal: true }]} />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.waterfall);
+  });
+
+  it("passes mergeOption to word cloud adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <WordCloudChart words={[{ text: "retry", value: 12 }]} />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.wordCloud);
+  });
+
+  it("passes mergeOption to parallel adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <ParallelChart
+          dimensions={[{ name: "CPU", max: 100 }]}
+          series={[{ name: "Host", values: [42] }]}
+        />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.parallel);
+  });
+
+  it("passes mergeOption to theme river adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <ThemeRiverChart
+          points={[{ time: "2026-01-01", value: 12, series: "API" }]}
+        />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.themeRiver);
   });
 });
 
@@ -204,6 +363,7 @@ describe("presentation mode animation wiring", () => {
     );
 
     expect(captured.waterfall?.animate).toBe(true);
+    expect(captured.waterfall?.mergeOption).toBe(false);
   });
 
   it("enables presentation sweep on scatter", () => {
@@ -216,6 +376,7 @@ describe("presentation mode animation wiring", () => {
     );
 
     expect(captured.scatter?.animate).toBe(true);
+    expect(captured.scatter?.mergeOption).toBe(false);
   });
 
   it("enables presentation sweep on radar", () => {
@@ -229,6 +390,47 @@ describe("presentation mode animation wiring", () => {
     );
 
     expect(captured.radar?.animate).toBe(true);
+    expect(captured.radar?.mergeOption).toBe(false);
+  });
+
+  it("enables presentation sweep on sunburst", () => {
+    render(
+      <TestShell mode="presentation">
+        <SunburstChart
+          nodes={[
+            {
+              name: "Platform",
+              children: [{ name: "API", value: 42 }],
+            },
+          ]}
+        />
+      </TestShell>,
+    );
+
+    expect(captured.sunburst?.animate).toBe(true);
+    expect(captured.sunburst?.mergeOption).toBe(false);
+  });
+
+  it("enables presentation sweep on boxplot", () => {
+    render(
+      <TestShell mode="presentation">
+        <BoxplotChart
+          items={[
+            {
+              name: "Latency",
+              min: 1,
+              q1: 4,
+              median: 8,
+              q3: 12,
+              max: 18,
+            },
+          ]}
+        />
+      </TestShell>,
+    );
+
+    expect(captured.boxplot?.animate).toBe(true);
+    expect(captured.boxplot?.mergeOption).toBe(false);
   });
 
   it("enables presentation sweep on histogram", () => {
@@ -239,5 +441,6 @@ describe("presentation mode animation wiring", () => {
     );
 
     expect(captured.histogram?.animate).toBe(true);
+    expect(captured.histogram?.mergeOption).toBe(false);
   });
 });

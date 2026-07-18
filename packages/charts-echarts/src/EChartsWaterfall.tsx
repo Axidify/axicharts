@@ -26,6 +26,7 @@ export type EChartsWaterfallProps = {
   showSigns?: boolean;
   connectorStyle?: "solid" | "dashed";
   animate?: boolean;
+  mergeOption?: boolean;
   onCursor?: (event: EChartCursorEvent) => void;
 };
 
@@ -57,6 +58,7 @@ export function EChartsWaterfall({
   showSigns = true,
   connectorStyle = "dashed",
   animate = false,
+  mergeOption,
   onCursor,
 }: EChartsWaterfallProps): ReactElement {
   const bridge = buildWaterfallBridge(items, theme);
@@ -152,7 +154,7 @@ export function EChartsWaterfall({
     height,
     categories: labels,
     onCursor,
-    mergeOption: !animate,
+    mergeOption: mergeOption ?? !animate,
   });
 
   return (

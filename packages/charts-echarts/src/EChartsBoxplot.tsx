@@ -29,6 +29,7 @@ export type EChartsBoxplotProps = {
   showAxes?: boolean;
   valueSuffix?: string;
   animate?: boolean;
+  mergeOption?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -46,6 +47,7 @@ export function EChartsBoxplot({
   showAxes = true,
   valueSuffix = "",
   animate = false,
+  mergeOption,
   onItemHover,
 }: EChartsBoxplotProps): ReactElement {
   const palette = seriesPalette(theme);
@@ -107,7 +109,7 @@ export function EChartsBoxplot({
     width,
     height,
     onItemHover,
-    mergeOption: !animate,
+    mergeOption: mergeOption ?? !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse) return null;

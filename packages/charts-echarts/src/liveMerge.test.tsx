@@ -20,6 +20,8 @@ import { EChartsCandlestick } from "./EChartsCandlestick";
 import { EChartsFunnel } from "./EChartsFunnel";
 import { EChartsParallel } from "./EChartsParallel";
 import { EChartsPie } from "./EChartsPie";
+import { EChartsRadar } from "./EChartsRadar";
+import { EChartsScatter } from "./EChartsScatter";
 import { EChartsThemeRiver } from "./EChartsThemeRiver";
 import { EChartsWordCloud } from "./EChartsWordCloud";
 import { EChartsTreemap } from "./EChartsTreemap";
@@ -176,6 +178,71 @@ describe("live merge adapters", () => {
     const call = useEChartCalls.at(-1);
     expect(call?.mergeOption).toBe(true);
     expect((call?.option as { animation?: boolean }).animation).toBe(false);
+  });
+
+  it("passes mergeOption to useEChart for scatter in live mode", () => {
+    renderAdapter(
+      <EChartsScatter
+        width={320}
+        height={240}
+        series={[{ name: "A", points: [{ x: 1, y: 2 }] }]}
+        theme={cleanTheme}
+        mergeOption
+      />,
+    );
+
+    const call = useEChartCalls.at(-1);
+    expect(call?.mergeOption).toBe(true);
+    expect((call?.option as { animation?: boolean }).animation).toBe(false);
+  });
+
+  it("passes mergeOption to useEChart for radar in live mode", () => {
+    renderAdapter(
+      <EChartsRadar
+        width={320}
+        height={240}
+        indicators={[{ name: "Speed" }]}
+        series={[{ name: "Team", values: [80] }]}
+        theme={cleanTheme}
+        mergeOption
+      />,
+    );
+
+    const call = useEChartCalls.at(-1);
+    expect(call?.mergeOption).toBe(true);
+    expect((call?.option as { animation?: boolean }).animation).toBe(false);
+  });
+
+  it("skips replaceMerge on word cloud value-only live updates", () => {
+    const { rerender } = render(
+      <EChartsWordCloud
+        width={320}
+        height={240}
+        words={[
+          { text: "timeout", value: 12 },
+          { text: "retry", value: 8 },
+        ]}
+        theme={cleanTheme}
+        mergeOption
+      />,
+    );
+
+    rerender(
+      <EChartsWordCloud
+        width={320}
+        height={240}
+        words={[
+          { text: "timeout", value: 14 },
+          { text: "retry", value: 9 },
+        ]}
+        theme={cleanTheme}
+        mergeOption
+      />,
+    );
+
+    const call = useEChartCalls.at(-1);
+    expect(call?.mergeOption).toBe(true);
+    expect(call?.replaceMerge).toBeNull();
   });
 });
 

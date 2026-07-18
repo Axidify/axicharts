@@ -37,6 +37,8 @@ type UseEChartOptions = {
   onItemHover?: (event: EChartItemHoverEvent) => void;
   onTreemapDrill?: (path: string[]) => void;
   mergeOption?: boolean;
+  /** When merging, replace listed components (default `["series"]`). Pass `null` to skip replaceMerge (value-only updates). */
+  replaceMerge?: string[] | null;
   formatItemHover?: (params: {
     name?: string;
     value?: unknown;
@@ -72,6 +74,7 @@ export function useEChart({
   onItemHover,
   onTreemapDrill,
   mergeOption = false,
+  replaceMerge,
   formatItemHover,
 }: UseEChartOptions) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -241,7 +244,9 @@ export function useEChart({
     chart.setOption(option, {
       notMerge: !mergeOption,
       lazyUpdate: mergeOption,
-      replaceMerge: mergeOption ? ["series"] : undefined,
+      ...(mergeOption && replaceMerge !== null
+        ? { replaceMerge: replaceMerge ?? ["series"] }
+        : {}),
     });
     if (onBrushRangeRef.current && option.dataZoom) {
       const dataZoom = option.dataZoom;
@@ -255,7 +260,7 @@ export function useEChart({
         onBrushRangeRef.current({ start: primary.start, end: primary.end });
       }
     }
-  }, [option, mergeOption, width, height]);
+  }, [option, mergeOption, replaceMerge, width, height]);
 
   useEffect(() => {
     chartRef.current?.resize({ width, height });

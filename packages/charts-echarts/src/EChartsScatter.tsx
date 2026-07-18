@@ -36,6 +36,7 @@ export type EChartsScatterProps = {
   ySuffix?: string;
   sizeRange?: [number, number];
   animate?: boolean;
+  mergeOption?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -65,6 +66,7 @@ export function EChartsScatter({
   ySuffix = "",
   sizeRange = DEFAULT_BUBBLE_SIZE_RANGE,
   animate = false,
+  mergeOption,
   onItemHover,
 }: EChartsScatterProps): ReactElement {
   const showLegend = series.length > 1;
@@ -201,7 +203,7 @@ export function EChartsScatter({
     width,
     height,
     onItemHover,
-    mergeOption: !animate,
+    mergeOption: mergeOption ?? !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse) return null;

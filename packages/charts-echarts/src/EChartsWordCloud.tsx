@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactElement } from "react";
+import { useMemo, useRef, type ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import { hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
@@ -39,6 +39,13 @@ function resolveWordColor(
   return palette[index % palette.length] ?? palette[0] ?? "#3b82f6";
 }
 
+function wordLayoutKey(words: WordCloudWord[]): string {
+  return words
+    .map((word) => word.text)
+    .sort()
+    .join("\0");
+}
+
 function EChartsWordCloudPlot({
   width,
   height,
@@ -53,7 +60,19 @@ function EChartsWordCloudPlot({
   animate = false,
 }: EChartsWordCloudProps): ReactElement {
   const palette = seriesPalette(theme);
-  const total = words.reduce((sum, word) => sum + word.value, 0);
+  const sortedWords = useMemo(
+    () => [...words].sort((left, right) => left.text.localeCompare(right.text)),
+    [words],
+  );
+  const layoutKey = wordLayoutKey(sortedWords);
+  const layoutKeyRef = useRef<string | null>(null);
+  const valueOnlyLiveMerge =
+    mergeOption &&
+    layoutKeyRef.current !== null &&
+    layoutKeyRef.current === layoutKey;
+  layoutKeyRef.current = layoutKey;
+
+  const total = sortedWords.reduce((sum, word) => sum + word.value, 0);
   const resolvedSizeRange =
     sizeRange ??
     ([
@@ -79,6 +98,7 @@ function EChartsWordCloudPlot({
           shrinkToFit: true,
           drawOutOfBound: false,
           layoutAnimation: animate,
+          animationDurationUpdate: mergeOption ? 0 : undefined,
           textStyle: {
             fontFamily: theme.values.monospace
               ? "ui-monospace, SFMono-Regular, Menlo, monospace"
@@ -87,7 +107,7 @@ function EChartsWordCloudPlot({
           emphasis: {
             focus: "self",
           },
-          data: words.map((word, index) => ({
+          data: sortedWords.map((word, index) => ({
             name: word.text,
             value: word.value,
             textStyle: {
@@ -106,6 +126,11 @@ function EChartsWordCloudPlot({
     height,
     onItemHover,
     mergeOption,
+    replaceMerge: valueOnlyLiveMerge
+      ? null
+      : mergeOption
+        ? ["series"]
+        : undefined,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse || params.name == null) return null;
