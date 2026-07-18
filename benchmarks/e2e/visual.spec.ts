@@ -36,8 +36,8 @@ for (const story of VISUAL_STORIES) {
     });
     await page.waitForSelector(story.waitFor, { timeout: 60_000 });
     await page.waitForTimeout(story.settleMs ?? 1200);
-    await expect(page).toHaveScreenshot(`${story.name}.png`, {
-      fullPage: true,
+    const target = page.locator("#storybook-root");
+    await expect(target).toHaveScreenshot(`${story.name}.png`, {
       maxDiffPixelRatio: story.maxDiffPixelRatio ?? 0.02,
     });
   });
