@@ -74,7 +74,7 @@ pnpm docs
 **Round 3 (all verticals):** **G–Q all 5/5** — KPI tiles, callouts, SLO/plan references (`C52–C62`)  
 **Round 4 (presentation):** **E · Presentation 5/5** — hero KPI, deck callout, bold charts (`C65`)
 
-**Granular styling (C68+):** Bar `<Cell fill />` + spec `encoding.color` — same renderer path for JSX and AI. Active plan: [ROADMAP.md](./ROADMAP.md#granular-styling--ai-encoding-plan) (C69–C73).
+**Granular styling (C68–C69):** Bar/Line/Area `<Cell fill />` + spec `encoding.color` — same renderer path for JSX and AI. Active plan: [ROADMAP.md](./ROADMAP.md#granular-styling--ai-encoding-plan) (C70–C73).
 
 Gates: G · SaaS clean · H · Rich ops · I · Detailed bars · J · Dual series · K · KPI + chart · L · Grid cells · M · Finance · N · Trading · O · Resources · P · Plugins wall · Q · Program dashboard · **E · Presentation**
 
