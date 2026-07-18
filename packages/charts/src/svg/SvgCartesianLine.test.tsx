@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render } from "@testing-library/react";
 import { SvgCartesianLine } from "./SvgCartesianLine";
 import { cleanTheme } from "@axicharts/charts-theme";
@@ -18,5 +18,39 @@ describe("SvgCartesianLine", () => {
 
     expect(container.querySelector('[data-engine="svg"]')).toBeTruthy();
     expect(container.querySelector("path")).toBeTruthy();
+  });
+
+  it("calls renderPath when provided on a series", () => {
+    const renderPath = vi.fn(({ defaultPath, color }) => (
+      <path data-testid="custom-path" d={defaultPath} stroke={color} />
+    ));
+
+    const { getByTestId } = render(
+      <SvgCartesianLine
+        width={320}
+        height={160}
+        categories={["Mon", "Tue", "Wed"]}
+        series={[
+          {
+            name: "custom",
+            data: [12, 18, 9],
+            renderPath,
+          },
+        ]}
+        theme={cleanTheme}
+      />,
+    );
+
+    expect(renderPath).toHaveBeenCalledTimes(1);
+    expect(renderPath.mock.calls[0]?.[0]).toMatchObject({
+      categories: ["Mon", "Tue", "Wed"],
+      fill: false,
+      color: expect.any(String),
+      defaultPath: expect.stringMatching(/^M/),
+    });
+    expect(getByTestId("custom-path")).toBeTruthy();
+    expect(
+      document.querySelector('[data-series-custom]'),
+    ).toBeTruthy();
   });
 });

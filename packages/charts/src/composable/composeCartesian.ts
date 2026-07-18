@@ -1,14 +1,14 @@
 import { Children, isValidElement, type ReactNode } from "react";
-import type { PlotSeries } from "@axicharts/charts-canvas";
 import { resolveSeriesColor } from "@axicharts/charts-canvas";
 import type { ChartConfig } from "../container/ChartLayoutContext";
 import type { ComposableMarkKind } from "./marks";
 import { readMarkKind } from "./readMarkKind";
 import { readCartesianCells, resolveCellColor, type CartesianCellStyle } from "./readCartesianCells";
+import type { BarRenderFn, CartesianPlotSeries, PathRenderFn } from "./customMarks";
 
 export type ComposedCartesian = {
   categories: string[];
-  series: PlotSeries[];
+  series: CartesianPlotSeries[];
   valueSuffix?: string;
   curve?: import("@axicharts/charts-theme").LineCurve;
 };
@@ -34,7 +34,7 @@ export function composeCartesianMarks(
   let xKey = "date";
   let valueSuffix: string | undefined;
   let curve: ComposedCartesian["curve"];
-  const series: PlotSeries[] = [];
+  const series: CartesianPlotSeries[] = [];
   const cellBindings: MarkCellBinding[] = [];
 
   Children.forEach(children, (child) => {
@@ -78,7 +78,14 @@ export function composeCartesianMarks(
           key: dataKey,
           name: String(props.name ?? dataKey),
           data: data.map((row) => Number(row[dataKey])),
-          tone: props.tone as PlotSeries["tone"],
+          tone: props.tone as CartesianPlotSeries["tone"],
+          ...(kind === "bar" && typeof props.renderBar === "function"
+            ? { renderBar: props.renderBar as BarRenderFn }
+            : {}),
+          ...((kind === "line" || kind === "area") &&
+          typeof props.renderPath === "function"
+            ? { renderPath: props.renderPath as PathRenderFn }
+            : {}),
         });
         break;
       }

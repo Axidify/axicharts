@@ -125,6 +125,14 @@ export {
   type LineMarkProps,
   type XAxisMarkProps,
   type YAxisMarkProps,
+  type BarRenderContext,
+  type BarRenderFn,
+  type CartesianPlotSeries,
+  type PathRenderContext,
+  type PathRenderFn,
+  buildChartScales,
+  useChartScales,
+  type ChartScales,
 } from "../composable";
 export {
   ChartGraphic,

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { SeriesTone } from "@axicharts/charts-canvas";
 import type { BuiltinTickFormat } from "@axicharts/charts-core";
+import type { BarRenderFn, PathRenderFn } from "./customMarks";
 
 export type LineMarkProps = {
   dataKey: string;
@@ -9,9 +10,20 @@ export type LineMarkProps = {
   yAxisId?: string;
   /** Recharts parity — `monotone` smooth curves, `linear` point-to-point. */
   type?: "linear" | "monotone";
+  /**
+   * Static SVG only — replace the default `<path>` for this series.
+   * Ignored on canvas/uPlot renderers.
+   */
+  renderPath?: PathRenderFn;
 };
 
-export type BarMarkProps = LineMarkProps;
+export type BarMarkProps = Omit<LineMarkProps, "renderPath"> & {
+  /**
+   * Static SVG only — replace the default `<rect>` for each bar in this series.
+   * Ignored on canvas/uPlot renderers.
+   */
+  renderBar?: BarRenderFn;
+};
 
 export type AreaMarkProps = LineMarkProps;
 

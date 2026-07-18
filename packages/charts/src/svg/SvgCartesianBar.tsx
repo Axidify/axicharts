@@ -4,15 +4,19 @@ import type { ReactElement } from "react";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import {
   resolveSeriesColor,
-  type PlotSeries,
 } from "@axicharts/charts-canvas";
 import { chromeGridStroke, resolveChromeColors } from "@axicharts/charts-canvas";
+import type { CartesianPlotSeries } from "../composable/customMarks";
 import {
   computeValueExtents,
   plotRect,
   xAt,
   yAt,
 } from "./scales";
+import {
+  buildChartScales,
+  ChartScalesProvider,
+} from "./ChartScalesContext";
 import { buildCartesianA11yDescriptor } from "../a11y/cartesianDescriptor";
 import { SVG_A11Y_DESC_ID, SVG_A11Y_TITLE_ID, SvgA11yHead } from "../a11y/SvgA11yHead";
 
@@ -20,7 +24,7 @@ export type SvgCartesianBarProps = {
   width: number;
   height: number;
   categories: string[];
-  series: PlotSeries[];
+  series: CartesianPlotSeries[];
   theme: ChartTheme;
   showAxes?: boolean;
   stacked?: boolean;
@@ -37,6 +41,13 @@ export function SvgCartesianBar({
 }: SvgCartesianBarProps): ReactElement {
   const plot = plotRect(width, height);
   const { min, max } = computeValueExtents(series, stacked);
+  const scales = buildChartScales({
+    width,
+    height,
+    categories,
+    yMin: min,
+    yMax: max,
+  });
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme, height < 72);
   const groupWidth = plot.width / Math.max(categories.length, 1);
@@ -50,84 +61,109 @@ export function SvgCartesianBar({
   });
 
   return (
-    <svg
-      data-engine="svg"
-      width={width}
-      height={height}
-      role="graphics-document"
-      aria-labelledby={`${SVG_A11Y_TITLE_ID} ${SVG_A11Y_DESC_ID}`}
-    >
-      <SvgA11yHead descriptor={descriptor} />
-      {[0.25, 0.5, 0.75].map((ratio) => {
-        const y = plot.y + plot.height * ratio;
-        return (
-          <line
-            key={ratio}
-            x1={plot.x}
-            x2={plot.x + plot.width}
-            y1={y}
-            y2={y}
-            stroke={gridStroke}
-            strokeWidth={1}
-          />
-        );
-      })}
-      {categories.map((category, categoryIndex) => {
-        const groupCenter = plot.x + groupWidth * categoryIndex + groupWidth / 2;
-        return series.map((item, seriesIndex) => {
-          const value = item.data[categoryIndex] ?? 0;
-          const color =
-            item.fills?.[categoryIndex] ??
-            item.color ??
-            resolveSeriesColor(item.tone, seriesIndex);
-          const x =
-            groupCenter -
-            seriesWidth / 2 +
-            seriesIndex * barWidth +
-            barWidth * 0.1;
-          const y = yAt(value, min, max, plot);
-          const baseline = yAt(Math.max(min, 0), min, max, plot);
-          const barHeight = Math.max(1, baseline - y);
+    <ChartScalesProvider value={scales}>
+      <svg
+        data-engine="svg"
+        width={width}
+        height={height}
+        role="graphics-document"
+        aria-labelledby={`${SVG_A11Y_TITLE_ID} ${SVG_A11Y_DESC_ID}`}
+      >
+        <SvgA11yHead descriptor={descriptor} />
+        {[0.25, 0.5, 0.75].map((ratio) => {
+          const y = plot.y + plot.height * ratio;
           return (
-            <rect
-              key={`${category}-${item.name}`}
-              x={x}
-              y={y}
-              width={Math.max(1, barWidth * 0.8)}
-              height={barHeight}
-              fill={color}
-              rx={theme.bar.radius}
+            <line
+              key={ratio}
+              x1={plot.x}
+              x2={plot.x + plot.width}
+              y1={y}
+              y2={y}
+              stroke={gridStroke}
+              strokeWidth={1}
             />
           );
-        });
-      })}
-      {showAxes ? (
-        <>
-          <line
-            x1={plot.x}
-            x2={plot.x + plot.width}
-            y1={plot.y + plot.height}
-            y2={plot.y + plot.height}
-            stroke={chrome.axis}
-            strokeWidth={1}
-          />
-          {categories.map((category, index) => {
-            const x = xAt(index, categories.length, plot);
+        })}
+        {categories.map((category, categoryIndex) => {
+          const groupCenter = plot.x + groupWidth * categoryIndex + groupWidth / 2;
+          return series.map((item, seriesIndex) => {
+            const value = item.data[categoryIndex] ?? 0;
+            const color =
+              item.fills?.[categoryIndex] ??
+              item.color ??
+              resolveSeriesColor(item.tone, seriesIndex);
+            const x =
+              groupCenter -
+              seriesWidth / 2 +
+              seriesIndex * barWidth +
+              barWidth * 0.1;
+            const y = yAt(value, min, max, plot);
+            const baseline = yAt(Math.max(min, 0), min, max, plot);
+            const barHeight = Math.max(1, baseline - y);
+            const rectWidth = Math.max(1, barWidth * 0.8);
+            const bar = { x, y, width: rectWidth, height: barHeight };
+
+            if (item.renderBar) {
+              return (
+                <g
+                  key={`${category}-${item.name}`}
+                  data-series-custom=""
+                >
+                  {item.renderBar({
+                    ...scales,
+                    series: item,
+                    seriesIndex,
+                    categoryIndex,
+                    category,
+                    value,
+                    color,
+                    bar,
+                  })}
+                </g>
+              );
+            }
+
             return (
-              <text
-                key={category}
+              <rect
+                key={`${category}-${item.name}`}
                 x={x}
-                y={plot.y + plot.height + 14}
-                textAnchor="middle"
-                fill={chrome.axis}
-                fontSize={10}
-              >
-                {category}
-              </text>
+                y={y}
+                width={rectWidth}
+                height={barHeight}
+                fill={color}
+                rx={theme.bar.radius}
+              />
             );
-          })}
-        </>
-      ) : null}
-    </svg>
+          });
+        })}
+        {showAxes ? (
+          <>
+            <line
+              x1={plot.x}
+              x2={plot.x + plot.width}
+              y1={plot.y + plot.height}
+              y2={plot.y + plot.height}
+              stroke={chrome.axis}
+              strokeWidth={1}
+            />
+            {categories.map((category, index) => {
+              const x = xAt(index, categories.length, plot);
+              return (
+                <text
+                  key={category}
+                  x={x}
+                  y={plot.y + plot.height + 14}
+                  textAnchor="middle"
+                  fill={chrome.axis}
+                  fontSize={10}
+                >
+                  {category}
+                </text>
+              );
+            })}
+          </>
+        ) : null}
+      </svg>
+    </ChartScalesProvider>
   );
 }

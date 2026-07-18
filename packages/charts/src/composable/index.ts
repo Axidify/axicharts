@@ -42,3 +42,16 @@ export {
   useResolvedFunnelProps,
   type FunnelDataProps,
 } from "./resolveFunnelProps";
+export type {
+  BarRenderContext,
+  BarRenderFn,
+  CartesianPlotSeries,
+  PathRenderContext,
+  PathRenderFn,
+} from "./customMarks";
+export {
+  buildChartScales,
+  ChartScalesProvider,
+  useChartScales,
+  type ChartScales,
+} from "../svg/ChartScalesContext";
