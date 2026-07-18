@@ -5,22 +5,22 @@ export type SeriesTone =
   | "warning"
   | "critical";
 
-export const SERIES_COLORS: Record<SeriesTone, string> = {
-  default: "#3b82f6",
-  info: "#06b6d4",
-  success: "#22c55e",
-  warning: "#f59e0b",
-  critical: "#ef4444",
-};
-
 export const SERIES_PALETTE = [
-  "#3b82f6",
-  "#06b6d4",
-  "#22c55e",
-  "#f59e0b",
-  "#a855f7",
-  "#ec4899",
+  "#2563eb",
+  "#0891b2",
+  "#16a34a",
+  "#d97706",
+  "#7c3aed",
+  "#db2777",
 ];
+
+export const SERIES_COLORS: Record<SeriesTone, string> = {
+  default: SERIES_PALETTE[0]!,
+  info: "#0891b2",
+  success: "#16a34a",
+  warning: "#d97706",
+  critical: "#dc2626",
+};
 
 export type PieSlice = {
   name: string;

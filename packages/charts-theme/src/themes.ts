@@ -34,7 +34,7 @@ const baseGrid = {
   show: true,
   horizontal: true,
   vertical: false,
-  opacity: 0.6,
+  opacity: 0.85,
   strokeWidth: 1,
 };
 
@@ -42,42 +42,42 @@ export const cleanTheme: ChartTheme = {
   name: "clean",
   grid: { ...baseGrid },
   axis: { show: true },
-  line: { strokeWidth: 2, curve: "monotone" },
-  area: { show: true, fillOpacity: 0.18 },
-  bar: { radius: 3, gap: 0.2 },
+  line: { strokeWidth: 2.25, curve: "monotone" },
+  area: { show: true, fillOpacity: 0.24 },
+  bar: { radius: 5, gap: 0.28 },
   caption: { show: true },
   values: { monospace: false },
 };
 
 export const liveTheme: ChartTheme = {
   name: "live",
-  grid: { ...baseGrid, vertical: true },
+  grid: { ...baseGrid, vertical: true, opacity: 0.55 },
   axis: { show: true },
   line: { strokeWidth: 2, curve: "monotone" },
-  area: { show: true, fillOpacity: 0.18 },
-  bar: { radius: 3, gap: 0.2 },
+  area: { show: true, fillOpacity: 0.2 },
+  bar: { radius: 4, gap: 0.24 },
   caption: { show: true },
   values: { monospace: true },
 };
 
 export const industrialTheme: ChartTheme = {
   name: "industrial",
-  grid: { ...baseGrid, vertical: true, opacity: 0.7 },
+  grid: { ...baseGrid, vertical: true, opacity: 0.62 },
   axis: { show: true },
   line: { strokeWidth: 2, curve: "monotone" },
-  area: { show: true, fillOpacity: 0.22 },
-  bar: { radius: 3, gap: 0.2 },
+  area: { show: true, fillOpacity: 0.24 },
+  bar: { radius: 4, gap: 0.24 },
   caption: { show: true },
   values: { monospace: true },
 };
 
 export const presentationTheme: ChartTheme = {
   name: "presentation",
-  grid: { ...baseGrid, opacity: 0.3 },
+  grid: { ...baseGrid, opacity: 0.55 },
   axis: { show: true },
   line: { strokeWidth: 3, curve: "monotone" },
-  area: { show: true, fillOpacity: 0.22 },
-  bar: { radius: 6, gap: 0.2 },
+  area: { show: true, fillOpacity: 0.28 },
+  bar: { radius: 8, gap: 0.3 },
   caption: { show: true },
   values: { monospace: false },
 };

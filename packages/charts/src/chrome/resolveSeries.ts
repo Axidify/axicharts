@@ -1,11 +1,12 @@
 import type { PlotSeries } from "@axicharts/charts-canvas";
-import { SERIES_COLORS } from "@axicharts/charts-canvas";
+import { resolveSeriesColor as resolveCanvasSeriesColor } from "@axicharts/charts-canvas";
 import type { ChartConfig } from "../container/ChartLayoutContext";
 import { configLookupKey } from "../config/applyChartConfig";
 
 export function resolveSeriesColor(
   series: PlotSeries,
   config?: ChartConfig,
+  index = 0,
 ): string {
   if (series.color) return series.color;
 
@@ -13,7 +14,7 @@ export function resolveSeriesColor(
   const fromConfig = config?.[key]?.color;
   if (fromConfig) return fromConfig;
 
-  return SERIES_COLORS[series.tone ?? "default"];
+  return resolveCanvasSeriesColor(series.tone, index);
 }
 
 export function resolveSeriesLabel(

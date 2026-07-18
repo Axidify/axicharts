@@ -19,8 +19,9 @@ export function gridOptions(theme: ChartTheme) {
 }
 
 export function axisLabelStyle(theme: ChartTheme) {
+  const dark = theme.name === "live" || theme.name === "industrial";
   return {
-    color: "#64748b",
+    color: dark ? "#94a3b8" : "#64748b",
     fontSize: 11,
     fontFamily: theme.values.monospace
       ? "ui-monospace, SFMono-Regular, Menlo, monospace"
@@ -29,11 +30,11 @@ export function axisLabelStyle(theme: ChartTheme) {
 }
 
 export function splitLineStyle(theme: ChartTheme) {
+  const dark = theme.name === "live" || theme.name === "industrial";
   return {
     show: theme.grid.horizontal,
     lineStyle: {
-      color: "#e2e8f0",
-      opacity: theme.grid.opacity,
+      color: dark ? "rgba(51, 65, 85, 0.62)" : "rgba(226, 232, 240, 0.95)",
       width: theme.grid.strokeWidth,
     },
   };
@@ -42,13 +43,13 @@ export function splitLineStyle(theme: ChartTheme) {
 /** Matches React `Tooltip` chrome — use for item-trigger native tooltips (pie). */
 export function unifiedTooltipStyle() {
   return {
-    backgroundColor: "rgba(255, 255, 255, 0.96)",
-    borderColor: "#e2e8f0",
+    backgroundColor: "rgba(255, 255, 255, 0.94)",
+    borderColor: "rgba(226, 232, 240, 0.95)",
     borderWidth: 1,
-    padding: [8, 10],
-    textStyle: { color: "#0f172a", fontSize: 11 },
+    padding: [10, 12],
+    textStyle: { color: "#0f172a", fontSize: 11, fontWeight: 600 },
     extraCssText:
-      "border-radius: 6px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);",
+      "border-radius: 10px; box-shadow: 0 10px 28px rgba(15, 23, 42, 0.1); backdrop-filter: blur(10px);",
   };
 }
 

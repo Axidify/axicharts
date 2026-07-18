@@ -1,14 +1,14 @@
 :root {
-  --chart-1: 220 70% 50%;
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
-  --chart-grid: hsl(var(--border, 214 32% 91%) / 0.6);
+  --chart-1: 221 83% 53%;
+  --chart-2: 188 94% 35%;
+  --chart-3: 142 71% 36%;
+  --chart-4: 32 95% 44%;
+  --chart-5: 262 83% 58%;
+  --chart-grid: hsl(var(--border, 214 32% 91%) / 0.95);
   --chart-axis: hsl(var(--muted-foreground, 215 16% 47%));
-  --chart-area-fill: hsl(var(--chart-1) / 0.12);
-  --chart-alarm-warning: 38 92% 50%;
-  --chart-alarm-critical: 0 84% 60%;
+  --chart-area-fill: hsl(var(--chart-1) / 0.18);
+  --chart-alarm-warning: 32 95% 44%;
+  --chart-alarm-critical: 0 72% 51%;
   --chart-stale: 215 16% 47%;
 }
 
@@ -16,5 +16,5 @@
   color-scheme: dark;
   --chart-grid: hsl(215 20% 22% / 0.8);
   --chart-axis: hsl(215 20% 65%);
-  --chart-area-fill: hsl(var(--chart-1) / 0.15);
+  --chart-area-fill: hsl(var(--chart-1) / 0.2);
 }

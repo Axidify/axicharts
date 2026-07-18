@@ -11,7 +11,7 @@ describe("mapTreemapData", () => {
     const mapped = mapTreemapData(nodes);
     expect(mapped).toHaveLength(2);
     expect(mapped[0]?.value).toBe(42);
-    expect(mapped[0]?.itemStyle?.color).toBe("#06b6d4");
+    expect(mapped[0]?.itemStyle?.color).toBe("#0891b2");
   });
 
   it("maps nested hierarchy", () => {

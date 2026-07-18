@@ -11,4 +11,5 @@ export type {
   UPlotBarProps,
   UPlotLineProps,
 } from "./types";
-export { SERIES_COLORS } from "./colors";
+export { SERIES_COLORS, SERIES_PALETTE, resolveChromeColors, isDarkChartTheme } from "./colors";
+export { resolveSeriesColor, resolveSeriesTone } from "./seriesColor";

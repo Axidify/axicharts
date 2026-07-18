@@ -23,6 +23,7 @@ import {
   ensurePresentationStyles,
   presentationEnterStyle,
 } from "../presentation/motion";
+import "../chrome/chartChrome.css";
 
 export type { ChartDataState };
 

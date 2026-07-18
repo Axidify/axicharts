@@ -5,10 +5,9 @@ import type { ReactElement } from "react";
 import uPlot from "uplot";
 import "uplot/dist/uPlot.min.css";
 import {
-  AXIS_COLOR,
   CANVAS_BG,
-  GRID_COLOR,
-  withAlpha,
+  chromeGridStroke,
+  resolveChromeColors,
 } from "./colors";
 import type { UPlotBarProps } from "./types";
 import { applySyncedCursor } from "./plotCursor";
@@ -51,8 +50,9 @@ function buildOptions({
 }: UPlotBarProps & {
   barLayoutsRef: React.MutableRefObject<BarLayout[]>;
 }): uPlot.Options {
-  const gridStroke = withAlpha(GRID_COLOR, theme.grid.opacity);
-  const gapPx = Math.max(2, Math.round(theme.bar.gap * 24));
+  const chrome = resolveChromeColors(theme);
+  const gridStroke = chromeGridStroke(theme);
+  const gapPx = Math.max(3, Math.round(theme.bar.gap * 28));
   const stackSeries = shouldStackSeries(stacked, series.length);
   const showBarValues = showValues && !stackSeries;
 
@@ -90,7 +90,7 @@ function buildOptions({
     axes: showAxes
       ? [
           {
-            stroke: AXIS_COLOR,
+            stroke: chrome.axis,
             grid: theme.grid.vertical
               ? { stroke: gridStroke, width: theme.grid.strokeWidth }
               : { show: false },
@@ -98,11 +98,11 @@ function buildOptions({
             values: (_u, ticks) =>
               ticks.map((tick) => categories[tick] ?? ""),
             size: 18,
-            font: "11px ui-sans-serif, system-ui, sans-serif",
+            font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
             gap: 4,
           },
           {
-            stroke: AXIS_COLOR,
+            stroke: chrome.axis,
             grid: theme.grid.horizontal
               ? { stroke: gridStroke, width: theme.grid.strokeWidth }
               : { show: false },
@@ -110,7 +110,7 @@ function buildOptions({
             size: 32,
             font: theme.values.monospace
               ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-              : "11px ui-sans-serif, system-ui, sans-serif",
+              : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
             gap: 4,
           },
         ]
@@ -156,7 +156,7 @@ function buildOptions({
             const ctx = u.ctx;
             const layouts = barLayoutsRef.current;
             ctx.save();
-            ctx.fillStyle = AXIS_COLOR;
+            ctx.fillStyle = chrome.axis;
             ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "bottom";

@@ -5,10 +5,10 @@ import type { ReactElement } from "react";
 import uPlot from "uplot";
 import "uplot/dist/uPlot.min.css";
 import {
-  AXIS_COLOR,
   CANVAS_BG,
-  GRID_COLOR,
-  withAlpha,
+  chromeGridStroke,
+  createAreaGradient,
+  resolveChromeColors,
 } from "./colors";
 import type { UPlotLineProps } from "./types";
 import { applySyncedCursor } from "./plotCursor";
@@ -56,10 +56,8 @@ function buildOptions({
   useNativeLegend = true,
 }: UPlotLineProps): uPlot.Options {
   const compact = height < 72;
-  const gridOpacity = compact
-    ? Math.min(theme.grid.opacity + 0.35, 0.95)
-    : theme.grid.opacity;
-  const gridStroke = withAlpha(GRID_COLOR, gridOpacity);
+  const chrome = resolveChromeColors(theme);
+  const gridStroke = chromeGridStroke(theme, compact);
   const gridWidth = compact ? 1 : theme.grid.strokeWidth;
 
   const compactYGrid = {
@@ -121,7 +119,7 @@ function buildOptions({
     axes: showAxes
       ? [
           {
-            stroke: AXIS_COLOR,
+            stroke: chrome.axis,
             grid: theme.grid.vertical
               ? { stroke: gridStroke, width: gridWidth }
               : { show: false },
@@ -129,32 +127,32 @@ function buildOptions({
             values: (_u, ticks) =>
               ticks.map((tick) => categories[tick] ?? ""),
             size: compact ? 0 : 18,
-            font: "11px ui-sans-serif, system-ui, sans-serif",
+            font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
           },
           {
             scale: "y",
             side: 3,
-            stroke: AXIS_COLOR,
+            stroke: chrome.axis,
             grid: theme.grid.horizontal ? compactYGrid : { show: false },
             splits: compactSplits,
             ticks: { show: false },
             size: compact ? 0 : 32,
             font: theme.values.monospace
               ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-              : "11px ui-sans-serif, system-ui, sans-serif",
+              : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
           },
           ...(useDualAxis
             ? [
                 {
                   scale: "y2",
                   side: 1,
-                  stroke: AXIS_COLOR,
+                  stroke: chrome.axis,
                   grid: { show: false },
                   ticks: { show: false },
                   size: 32,
                   font: theme.values.monospace
                     ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-                    : "11px ui-sans-serif, system-ui, sans-serif",
+                    : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
                 },
               ]
             : []),
@@ -181,7 +179,20 @@ function buildOptions({
           scale: useDualAxis && index > 0 ? "y2" : "y",
           stroke: color,
           width: theme.line.strokeWidth,
-          fill: fill && theme.area.show ? withAlpha(color, fillOpacity) : undefined,
+          fill:
+            fill && theme.area.show
+              ? (u: uPlot) => {
+                  const top = u.bbox.top;
+                  const bottom = u.bbox.top + u.bbox.height;
+                  return createAreaGradient(
+                    u.ctx,
+                    top,
+                    bottom,
+                    color,
+                    fillOpacity,
+                  );
+                }
+              : undefined,
           stack: stackSeries ? STACK_GROUP : undefined,
           points: { show: false },
         };

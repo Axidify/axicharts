@@ -1,5 +1,5 @@
 import type { SeriesTone } from "./types";
-import { SERIES_COLORS } from "./colors";
+import { SERIES_COLORS, SERIES_PALETTE } from "./colors";
 
 const SERIES_TONE_CYCLE: SeriesTone[] = [
   "default",
@@ -20,5 +20,8 @@ export function resolveSeriesColor(
   tone: SeriesTone | undefined,
   index: number,
 ): string {
-  return SERIES_COLORS[resolveSeriesTone(tone, index)];
+  if (tone && tone !== "default") {
+    return SERIES_COLORS[tone];
+  }
+  return SERIES_PALETTE[index % SERIES_PALETTE.length]!;
 }

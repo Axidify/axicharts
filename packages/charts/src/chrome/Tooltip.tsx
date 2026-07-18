@@ -2,6 +2,7 @@
 
 import type { CSSProperties, ReactElement } from "react";
 import type { PlotSeries } from "@axicharts/charts-canvas";
+import { isDarkChartTheme } from "@axicharts/charts-canvas";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { useChartInteraction } from "../interaction/ChartInteractionContext";
 import {
@@ -23,23 +24,35 @@ export type TooltipProps = {
   getRows?: (index: number) => TooltipRow[] | null;
 };
 
-const tooltipSurfaceStyle: CSSProperties = {
-  minWidth: 120,
-  maxWidth: 220,
-  padding: "8px 10px",
-  borderRadius: 6,
-  border: "1px solid #e2e8f0",
-  background: "rgba(255, 255, 255, 0.96)",
-  boxShadow: "0 4px 12px rgba(15, 23, 42, 0.08)",
-  fontSize: 11,
-  color: "#0f172a",
-  pointerEvents: "none",
-  zIndex: 3,
-};
+function tooltipSurfaceStyle(dark: boolean): CSSProperties {
+  return {
+    minWidth: 132,
+    maxWidth: 240,
+    padding: "10px 12px",
+    borderRadius: 10,
+    border: dark ? "1px solid rgba(51, 65, 85, 0.9)" : "1px solid rgba(226, 232, 240, 0.95)",
+    background: dark ? "rgba(15, 23, 42, 0.92)" : "rgba(255, 255, 255, 0.94)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    boxShadow: dark
+      ? "0 12px 28px rgba(0, 0, 0, 0.35)"
+      : "0 10px 28px rgba(15, 23, 42, 0.1)",
+    fontSize: 11,
+    color: dark ? "#f8fafc" : "#0f172a",
+    pointerEvents: "none",
+    zIndex: 3,
+  };
+}
 
-function TooltipRows({ rows }: { rows: TooltipRow[] }): ReactElement {
+function TooltipRows({
+  rows,
+  dark,
+}: {
+  rows: TooltipRow[];
+  dark: boolean;
+}): ReactElement {
   return (
-    <div style={{ display: "grid", gap: 4 }}>
+    <div style={{ display: "grid", gap: 5 }}>
       {rows.map((row) => (
         <div
           key={`${row.label}-${row.value}`}
@@ -47,11 +60,11 @@ function TooltipRows({ rows }: { rows: TooltipRow[] }): ReactElement {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 10,
+            gap: 12,
           }}
         >
           <span
-            style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
+            style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
           >
             {row.color ? (
               <span
@@ -61,12 +74,21 @@ function TooltipRows({ rows }: { rows: TooltipRow[] }): ReactElement {
                   height: 7,
                   borderRadius: 999,
                   background: row.color,
+                  boxShadow: `0 0 0 2px ${dark ? "rgba(15, 23, 42, 0.5)" : "rgba(255, 255, 255, 0.95)"}`,
                 }}
               />
             ) : null}
-            <span style={{ color: "#64748b" }}>{row.label}</span>
+            <span style={{ color: dark ? "#94a3b8" : "#64748b" }}>{row.label}</span>
           </span>
-          <span style={{ fontVariantNumeric: "tabular-nums" }}>{row.value}</span>
+          <span
+            style={{
+              fontVariantNumeric: "tabular-nums",
+              fontWeight: 600,
+              color: dark ? "#f1f5f9" : "#0f172a",
+            }}
+          >
+            {row.value}
+          </span>
         </div>
       ))}
     </div>
@@ -80,7 +102,9 @@ export function Tooltip({
   getRows,
 }: TooltipProps): ReactElement | null {
   const { cursor, itemHover } = useChartInteraction();
-  const { config } = useChartLayout();
+  const { config, theme } = useChartLayout();
+  const dark = isDarkChartTheme(theme.name);
+  const surface = tooltipSurfaceStyle(dark);
 
   if (itemHover) {
     const left = Math.min(
@@ -97,19 +121,20 @@ export function Tooltip({
           position: "absolute",
           top,
           left,
-          ...tooltipSurfaceStyle,
+          ...surface,
         }}
       >
         <div
           style={{
             fontWeight: 600,
-            marginBottom: 6,
-            color: "#334155",
+            marginBottom: 7,
+            color: dark ? "#e2e8f0" : "#334155",
+            fontSize: 11,
           }}
         >
           {itemHover.title}
         </div>
-        <TooltipRows rows={itemHover.rows} />
+        <TooltipRows rows={itemHover.rows} dark={dark} />
       </div>
     );
   }
@@ -120,13 +145,13 @@ export function Tooltip({
   const suffix = valueSuffix ?? "";
   const derivedRows: TooltipRow[] = [];
   if (!getRows) {
-    for (const item of series) {
+    for (const [index, item] of series.entries()) {
       const value = item.data[cursor.index];
       if (value == null) continue;
       derivedRows.push({
         label: resolveSeriesLabel(item, config),
         value: formatSeriesValue(value, suffix),
-        color: resolveSeriesColor(item, config),
+        color: resolveSeriesColor(item, config, index),
       });
     }
   }
@@ -147,21 +172,22 @@ export function Tooltip({
         position: "absolute",
         top: 8,
         left,
-        ...tooltipSurfaceStyle,
+        ...surface,
       }}
     >
       {category ? (
         <div
           style={{
             fontWeight: 600,
-            marginBottom: 6,
-            color: "#334155",
+            marginBottom: 7,
+            color: dark ? "#e2e8f0" : "#334155",
+            fontSize: 11,
           }}
         >
           {category}
         </div>
       ) : null}
-      <TooltipRows rows={rows} />
+      <TooltipRows rows={rows} dark={dark} />
     </div>
   );
 }
