@@ -6,6 +6,7 @@ import {
   ejectCartesianChartName,
   ejectCartesianImports,
 } from "./ejectCartesian";
+import { ejectComboBody } from "./ejectCombo";
 import { chartPropsWithoutChromeMeta, readPanelChrome } from "./panelChrome";
 import { chartPropsWithoutChartConfig, readPanelChartConfig } from "./panelChartConfig";
 import { chartPropsWithoutStyle, readPanelStyle } from "./panelStyle";
@@ -40,27 +41,29 @@ function resolveChartName(spec: PanelSpec): string {
     return ejectCartesianChartName(spec);
   }
 
-  return spec.type === "pie"
-    ? "PieChart"
-    : spec.type === "donut"
+  return spec.type === "combo"
+    ? "ComboChart"
+    : spec.type === "pie"
       ? "PieChart"
-      : spec.type === "funnel"
-        ? "FunnelChart"
-        : spec.type === "waterfall"
-          ? "WaterfallChart"
-          : spec.type === "candlestick"
-            ? "CandlestickChart"
-            : spec.type === "heatmap"
-              ? "HeatmapChart"
-              : spec.type === "scatter"
-                ? "ScatterChart"
-                : spec.type === "treemap"
-                  ? "TreemapChart"
-                  : spec.type === "stat"
-                    ? "Stat"
-                    : spec.type === "table"
-                      ? "DataTable"
-                      : "Gauge";
+      : spec.type === "donut"
+        ? "PieChart"
+        : spec.type === "funnel"
+          ? "FunnelChart"
+          : spec.type === "waterfall"
+            ? "WaterfallChart"
+            : spec.type === "candlestick"
+              ? "CandlestickChart"
+              : spec.type === "heatmap"
+                ? "HeatmapChart"
+                : spec.type === "scatter"
+                  ? "ScatterChart"
+                  : spec.type === "treemap"
+                    ? "TreemapChart"
+                    : spec.type === "stat"
+                      ? "Stat"
+                      : spec.type === "table"
+                        ? "DataTable"
+                        : "Gauge";
 }
 
 export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
@@ -154,11 +157,15 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     chartBody = `matrix={${dataVar}.matrix}
     min={${dataVar}.min}
     max={${dataVar}.max}`;
+  } else if (spec.type === "combo") {
+    chartBody = ejectComboBody(spec, dataVar);
   }
 
   const chartProps = chartPropsFromPanel(spec.props ?? {});
   const extraProps =
-    !cartesianUsesComposableMarks(spec) && Object.keys(chartProps).length > 0
+  spec.type !== "combo" &&
+    !cartesianUsesComposableMarks(spec) &&
+    Object.keys(chartProps).length > 0
       ? `\n    ${serializeProps(chartProps, "    ")}`
       : "";
 

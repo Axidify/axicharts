@@ -163,4 +163,29 @@ describe("ejectPanel", () => {
     expect(jsx).toContain('legendVariant="inline"');
     expect(jsx).toContain('tooltipVariant="dense"');
   });
+
+  it("emits ComboChart with dualAxis and mixed series kinds", () => {
+    const jsx = ejectPanel(
+      {
+        type: "combo",
+        encoding: {
+          x: { field: "week" },
+          y: [
+            { field: "volume", label: "Volume", kind: "bar" },
+            { field: "avg", label: "Daily avg", kind: "line" },
+          ],
+        },
+        props: { dualAxis: "auto", showValues: true },
+      },
+      "rows",
+    );
+
+    expect(jsx).toContain("ComboChart");
+    expect(jsx).toContain('kind: "bar"');
+    expect(jsx).toContain('kind: "line"');
+    expect(jsx).toContain('dualAxis="auto"');
+    expect(jsx).toContain("showValues");
+    expect(jsx).toContain("row.volume");
+    expect(jsx).toContain("row.avg");
+  });
 });
