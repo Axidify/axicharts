@@ -71,9 +71,10 @@ pnpm docs
 ## Storybook gates
 
 **Round 2 (universal + ops):** G, H, I, J, K, L + Industrial Primitives — baseline **4/5**  
-**Round 3 (all verticals):** **G–Q all 5/5** — KPI tiles, callouts, SLO/plan references (`C52–C62`)
+**Round 3 (all verticals):** **G–Q all 5/5** — KPI tiles, callouts, SLO/plan references (`C52–C62`)  
+**Round 4 (presentation):** **E · Presentation 5/5** — hero KPI, deck callout, bold charts (`C65`)
 
-Gates: G · SaaS clean · H · Rich ops · I · Detailed bars · J · Dual series · K · KPI + chart · L · Grid cells · M · Finance · N · Trading · O · Resources · P · Plugins wall · Q · Program dashboard
+Gates: G · SaaS clean · H · Rich ops · I · Detailed bars · J · Dual series · K · KPI + chart · L · Grid cells · M · Finance · N · Trading · O · Resources · P · Plugins wall · Q · Program dashboard · **E · Presentation**
 
 ## License
 

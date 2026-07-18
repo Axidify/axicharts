@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import type { ReactElement } from "react";
+import { docColors, docRadii, docShadow } from "../styles/docTokens";
 
 const topLinks = [
   { to: "/", label: "Home" },
@@ -38,12 +39,14 @@ function NavItem({
         display: "block",
         padding: "8px 10px",
         marginBottom: 4,
-        borderRadius: 6,
+        borderRadius: docRadii.sm,
         fontSize: 13,
         textDecoration: "none",
-        color: isActive ? "#0f172a" : "#475569",
+        color: isActive ? docColors.text : docColors.muted,
         background: isActive ? "#e2e8f0" : "transparent",
         fontWeight: isActive ? 600 : 400,
+        borderLeft: isActive ? `2px solid ${docColors.accent}` : "2px solid transparent",
+        paddingLeft: 8,
       })}
     >
       {label}
@@ -53,35 +56,57 @@ function NavItem({
 
 export function DocLayout(): ReactElement {
   return (
-    <div style={{ minHeight: "100vh", background: "#f8fafc", color: "#0f172a" }}>
+    <div style={{ minHeight: "100vh", background: docColors.bg, color: docColors.text }}>
       <header
         style={{
-          borderBottom: "1px solid #e2e8f0",
-          background: "#ffffff",
+          borderBottom: `1px solid ${docColors.border}`,
+          background: docColors.surface,
           padding: "14px 24px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          boxShadow: docShadow.header,
         }}
       >
         <div>
-          <div style={{ fontSize: 18, fontWeight: 700 }}>AxiCharts</div>
-          <div style={{ fontSize: 12, color: "#64748b" }}>MIT · React dashboard charts</div>
+          <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em" }}>
+            AxiCharts
+          </div>
+          <div style={{ fontSize: 12, color: docColors.subtle }}>
+            MIT · React dashboard charts
+          </div>
         </div>
-        <a
-          href="https://github.com/Axidify/axicharts"
-          style={{ fontSize: 12, color: "#2563eb" }}
-          target="_blank"
-          rel="noreferrer"
-        >
-          GitHub
-        </a>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 600,
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              color: "#15803d",
+              background: "#ecfdf5",
+              border: "1px solid #bbf7d0",
+              borderRadius: docRadii.pill,
+              padding: "3px 8px",
+            }}
+          >
+            G–Q 5/5
+          </span>
+          <a
+            href="https://github.com/Axidify/axicharts"
+            style={{ fontSize: 12, color: docColors.accent, fontWeight: 500 }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
+        </div>
       </header>
       <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 0 }}>
         <nav
           style={{
-            borderRight: "1px solid #e2e8f0",
-            background: "#ffffff",
+            borderRight: `1px solid ${docColors.border}`,
+            background: docColors.surface,
             padding: "20px 16px",
             minHeight: "calc(100vh - 65px)",
           }}
