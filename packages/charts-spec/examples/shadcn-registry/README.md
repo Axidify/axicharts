@@ -49,7 +49,7 @@ Peer / app-level (documented in item `docs` field and install page):
 Registry consumers get composable JSX — not an option blob:
 
 ```tsx
-import { ChartContainer, BarChart } from "@axicharts/charts";
+import { ChartContainer, BarChart } from "@axicharts/charts/cartesian";
 import { cleanTheme } from "@axicharts/charts-theme";
 
 export function ChartAxiBar() {

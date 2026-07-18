@@ -80,7 +80,7 @@ createRoot(document.getElementById("root")!).render(
   </StrictMode>,
 );
 `,
-  "src/App.tsx": `import { ChartContainer, LineChart } from "@axicharts/charts";
+  "src/App.tsx": `import { ChartContainer, LineChart } from "@axicharts/charts/cartesian";
 import { cleanTheme } from "@axicharts/charts-theme";
 
 export function App() {

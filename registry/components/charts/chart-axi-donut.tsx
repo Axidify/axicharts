@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartContainer, PieChart, type ChartConfig } from "@axicharts/charts";
+import { ChartContainer, PieChart, type ChartConfig } from "@axicharts/charts/distribution";
 import { cleanTheme } from "@axicharts/charts-theme";
 
 export const chartConfig = {

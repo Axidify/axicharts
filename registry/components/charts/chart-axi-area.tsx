@@ -1,6 +1,6 @@
 "use client";
 
-import { AreaChart, ChartContainer, type ChartConfig } from "@axicharts/charts";
+import { AreaChart, ChartContainer, type ChartConfig } from "@axicharts/charts/cartesian";
 import { cleanTheme } from "@axicharts/charts-theme";
 
 export const chartConfig = {

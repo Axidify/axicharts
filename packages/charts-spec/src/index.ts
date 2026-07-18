@@ -94,6 +94,16 @@ export {
 } from "./templateRegistry";
 export { registerPluginChartTypes } from "./registerPluginChartTypes";
 export {
+  assertPanelCategoryEnabled,
+  clearCategoryRegistration,
+  isCategoryRegistered,
+  listRegisteredCategories,
+  PANEL_TYPE_CATEGORY,
+  registerCategory,
+  resolvePanelCategory,
+  type PanelCategory,
+} from "./panelCategories";
+export {
   compileFinancePnlDeckSlide,
   compileLineOverviewDeckSlide,
   compileOps2x2DeckCell,

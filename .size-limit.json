@@ -90,6 +90,48 @@
     "gzip": true
   },
   {
+    "name": "@axicharts/charts/cartesian",
+    "path": "packages/charts/dist/entry/cartesian.js",
+    "limit": "6 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/distribution",
+    "path": "packages/charts/dist/entry/distribution.js",
+    "limit": "4 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/financial",
+    "path": "packages/charts/dist/entry/financial.js",
+    "limit": "4 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/matrix",
+    "path": "packages/charts/dist/entry/matrix.js",
+    "limit": "4 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/industrial",
+    "path": "packages/charts/dist/entry/industrial.js",
+    "limit": "3 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/kpi",
+    "path": "packages/charts/dist/entry/kpi.js",
+    "limit": "3 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/full",
+    "path": "packages/charts/dist/entry/full.js",
+    "limit": "14 KB",
+    "gzip": true
+  },
+  {
     "name": "@axicharts/charts-runtime/workspace",
     "path": "packages/charts-runtime/dist/workspace/index.js",
     "limit": "2 KB",

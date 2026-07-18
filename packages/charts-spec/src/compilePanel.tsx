@@ -63,6 +63,7 @@ import {
   themeWithPanelStyle,
 } from "./panelStyle";
 import { registerPluginChartTypes } from "./registerPluginChartTypes";
+import { assertPanelCategoryEnabled } from "./panelCategories";
 import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
 import { resolveMapDrillProps } from "./mapEncoding";
 import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
@@ -215,6 +216,7 @@ export function compilePanel(
   registerPluginChartTypes();
 
   const resolved = applySpecCompilers(spec, data);
+  assertPanelCategoryEnabled(resolved.type);
   const rows = asRows(data);
   const props = chartPropsFromPanel(resolved.props ?? {});
   const objectData = objectDataFromSpec(data);
