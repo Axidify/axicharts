@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-planner",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Phase 3 server-side dashboard planner — intent parsing, LLM provider hooks, validation with rules fallback.",
   "license": "MIT",
   "repository": {
