@@ -1,4 +1,9 @@
 import type { ColorEncoding, MetricProfile, PanelSpec } from "./types";
+import {
+  colorFieldPriorityForVertical,
+  intentWantsVerticalColor,
+  resolveVerticalId,
+} from "./rulePacks";
 
 const COLOR_FIELD_PRIORITY = [
   "aboveTarget",
@@ -24,13 +29,22 @@ function normalizeFieldName(field: string): string {
   return field.toLowerCase().replace(/_/g, "");
 }
 
-export function findProfileColorField(fields: string[]): string | undefined {
+export function findProfileColorField(
+  fields: string[],
+  extraPriority: readonly string[] = [],
+): string | undefined {
   const byNormalized = new Map(
     fields.map((field) => [normalizeFieldName(field), field]),
   );
 
-  for (const candidate of COLOR_FIELD_PRIORITY) {
-    const match = byNormalized.get(normalizeFieldName(candidate));
+  const priority = [...extraPriority, ...COLOR_FIELD_PRIORITY];
+  const seen = new Set<string>();
+
+  for (const candidate of priority) {
+    const normalized = normalizeFieldName(candidate);
+    if (seen.has(normalized)) continue;
+    seen.add(normalized);
+    const match = byNormalized.get(normalized);
     if (match) return match;
   }
 
@@ -72,11 +86,21 @@ export function inferColorEncodingForPanel(args: {
     return { field: explicitField, type: encodingTypeForField(explicitField) };
   }
 
+  const vertical = resolveVerticalId({
+    metric: args.metric,
+    intent: args.intent,
+    profileFields: args.profileFields,
+  });
   const fields = args.profileFields ?? [];
-  const matched = findProfileColorField(fields);
+  const matched = findProfileColorField(
+    fields,
+    colorFieldPriorityForVertical(vertical),
+  );
   if (!matched) return undefined;
 
-  const intentMatch = intentWantsColorEncoding(args.intent);
+  const intentMatch =
+    intentWantsColorEncoding(args.intent) ||
+    intentWantsVerticalColor(args.intent, vertical);
   const profileMatch =
     metricSuggestsConditionalColor(args.metric) || args.type === "bar";
 

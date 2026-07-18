@@ -1,0 +1,15 @@
+{
+  "metrics": [
+    {
+      "name": "revenue_variance",
+      "unit": "USD",
+      "tags": { "vertical": "finance" }
+    },
+    {
+      "name": "gross_margin",
+      "unit": "%",
+      "tags": { "vertical": "finance" }
+    }
+  ],
+  "fields": ["period", "revenue", "margin", "vsPlan", "value"]
+}

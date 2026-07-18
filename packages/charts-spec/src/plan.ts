@@ -2,10 +2,12 @@ import type { DataProfile, MetricProfile, PanelSpec } from "./types";
 import { applySpecCompilers } from "./specCompiler";
 import { inferColorEncodingForPanel } from "./colorEncodingPlan";
 import { inferLineCurveForPanel } from "./curveEncodingPlan";
+import { applyVerticalRules } from "./rulePacks/applyVerticalRules";
 import { inferSizeEncodingForPanel } from "./sizeEncodingPlan";
 
 export type PlanPanelsOptions = {
   intent?: string;
+  allMetrics?: MetricProfile[];
 };
 
 function inferChartType(metric: MetricProfile): PanelSpec["type"] {
@@ -145,7 +147,12 @@ export function planPanelFromMetric(
     };
   }
 
-  return panel;
+  return applyVerticalRules(panel, {
+    metric,
+    intent: options.intent,
+    profileFields: options.profileFields,
+    allMetrics: options.allMetrics,
+  });
 }
 
 export function planPanelsFromProfile(
@@ -158,6 +165,7 @@ export function planPanelsFromProfile(
       planPanelFromMetric(metric, {
         intent: options.intent,
         profileFields,
+        allMetrics: profile.metrics,
       }),
       [],
       profile,

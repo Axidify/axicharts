@@ -1,4 +1,9 @@
 import type { MetricProfile, PanelSpec, SizeEncoding } from "./types";
+import {
+  intentWantsVerticalSize,
+  resolveVerticalId,
+  sizeFieldPriorityForVertical,
+} from "./rulePacks";
 
 const SIZE_FIELD_PRIORITY = [
   "volume",
@@ -22,6 +27,7 @@ function normalizeFieldName(field: string): string {
 export function findProfileSizeField(
   fields: string[],
   excludeField?: string,
+  extraPriority: readonly string[] = [],
 ): string | undefined {
   const exclude = excludeField
     ? normalizeFieldName(excludeField)
@@ -30,8 +36,13 @@ export function findProfileSizeField(
     fields.map((field) => [normalizeFieldName(field), field]),
   );
 
-  for (const candidate of SIZE_FIELD_PRIORITY) {
+  const priority = [...extraPriority, ...SIZE_FIELD_PRIORITY];
+  const seen = new Set<string>();
+
+  for (const candidate of priority) {
     const normalized = normalizeFieldName(candidate);
+    if (seen.has(normalized)) continue;
+    seen.add(normalized);
     if (exclude && normalized === exclude) continue;
     const match = byNormalized.get(normalized);
     if (match) return match;
@@ -71,11 +82,22 @@ export function inferSizeEncodingForPanel(args: {
     return { field: explicitField, type: "quantitative" };
   }
 
+  const vertical = resolveVerticalId({
+    metric: args.metric,
+    intent: args.intent,
+    profileFields: args.profileFields,
+  });
   const fields = args.profileFields ?? [];
-  const matched = findProfileSizeField(fields, args.metric.name);
+  const matched = findProfileSizeField(
+    fields,
+    args.metric.name,
+    sizeFieldPriorityForVertical(vertical),
+  );
   if (!matched) return undefined;
 
-  const intentMatch = intentWantsSizeEncoding(args.intent);
+  const intentMatch =
+    intentWantsSizeEncoding(args.intent) ||
+    intentWantsVerticalSize(args.intent, vertical);
   const profileMatch =
     args.type === "bar" && metricSuggestsSizeEncoding(args.metric);
 

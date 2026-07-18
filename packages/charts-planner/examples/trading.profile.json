@@ -1,0 +1,14 @@
+{
+  "metrics": [
+    {
+      "name": "AAPL",
+      "kind": "ohlc",
+      "tags": { "vertical": "trading", "refresh": "live" }
+    },
+    {
+      "name": "rsi",
+      "tags": { "vertical": "trading", "refresh": "live" }
+    }
+  ],
+  "fields": ["time", "open", "high", "low", "close", "volume", "rsi"]
+}

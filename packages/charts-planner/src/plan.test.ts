@@ -108,6 +108,47 @@ describe("planFromIntent", () => {
 
     expect(plan.panels[0]?.props?.style).toEqual({ line: { curve: "linear" } });
   });
+
+  it("finance vertical: infers waterfall from variance intent", () => {
+    const plan = planFromIntent(
+      {
+        metrics: [{ name: "revenue_variance", unit: "USD" }],
+        fields: ["period", "value", "vsPlan"],
+      },
+      "Finance P&L variance waterfall bridge",
+    );
+
+    expect(plan.template).toBe("finance-pnl");
+    expect(plan.panels[0]?.type).toBe("waterfall");
+  });
+
+  it("trading vertical: infers candlestick brush hints from blotter intent", () => {
+    const plan = planFromIntent(
+      {
+        metrics: [{ name: "AAPL", kind: "ohlc" }],
+        fields: ["time", "open", "high", "low", "close", "volume"],
+      },
+      "Trading blotter candlestick with volume",
+    );
+
+    expect(plan.template).toBe("trading-blotter");
+    expect(plan.panels[0]?.type).toBe("candlestick");
+    expect(plan.panels[0]?.props?.brush).toBe(true);
+    expect(plan.panels[0]?.props?.syncId).toBe("ohlc");
+  });
+
+  it("ops vertical: infers alert panel from alarm intent", () => {
+    const plan = planFromIntent(
+      {
+        metrics: [{ name: "alarms" }],
+        fields: ["id", "message", "severity"],
+      },
+      "Ops alarm panel for line 3 active alarms",
+    );
+
+    expect(plan.template).toBe("ops-2x2");
+    expect(plan.panels[0]?.type).toBe("alert");
+  });
 });
 
 describe("planFromProfile", () => {

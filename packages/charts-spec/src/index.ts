@@ -58,6 +58,16 @@ export {
   intentWantsMonotoneCurve,
 } from "./curveEncodingPlan";
 export {
+  applyVerticalRules,
+  colorFieldPriorityForVertical,
+  financeRulePack,
+  opsRulePack,
+  resolveVerticalId,
+  tradingRulePack,
+  type VerticalId,
+  type VerticalRulePack,
+} from "./rulePacks";
+export {
   applySpecCompilers,
   clearSpecCompilers,
   listSpecCompilers,

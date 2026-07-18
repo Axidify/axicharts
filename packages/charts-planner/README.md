@@ -17,6 +17,23 @@ const plan = planFromIntent(DEFAULT_OPS_PROFILE, "Line 3 night shift overview");
 // → { template: "ops-2x2", layout: "embed", feed: "historian", panels: [...] }
 ```
 
+### Vertical rule packs (C90)
+
+Beyond C71/C78 color/size/curve inference, vertical packs enrich `PanelSpec` from intent + `DataProfile.fields`:
+
+| Vertical | Examples inferred |
+|----------|-------------------|
+| **finance** | waterfall for variance/bridge; dual-axis `combo` for revenue vs margin; `stat` KPI tones; `vsPlan` color fields |
+| **trading** | candlestick + `volumeField` + brush/sync hints; RSI follower line; `side`/`pnl` color fields |
+| **ops** | `alert` panel for alarms; `gauge` thresholds; SLO `thresholdBands` on latency; severity color fields |
+
+```bash
+charts-planner plan examples/finance.profile.json --intent "P&L variance waterfall"
+charts-planner plan examples/trading.profile.json --intent "Trading blotter candlestick with volume"
+```
+
+Profile examples: `examples/finance.profile.json`, `examples/trading.profile.json`, `examples/ops.profile.json`.
+
 ## Planner feeds
 
 `inferFeed()` maps intent keywords to `DashboardPlan.feed`. Each feed binds to a shipped import

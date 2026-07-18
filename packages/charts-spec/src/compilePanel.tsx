@@ -101,6 +101,8 @@ function wrapChart(
 
   const chrome = readPanelChrome(spec.props);
   const chartConfig = toChartConfig(readPanelChartConfig(spec.props));
+  const syncId =
+    typeof spec.props?.syncId === "string" ? spec.props.syncId : undefined;
 
   const panel = createElement(
     ChartContainer,
@@ -113,6 +115,7 @@ function wrapChart(
       config: chartConfig,
       legendVariant: chrome.legendVariant,
       tooltipVariant: chrome.tooltipVariant,
+      syncId,
     },
     chart,
   );
@@ -397,11 +400,17 @@ export function compilePanel(
         low: Number(row[resolved.encoding?.low?.field ?? "low"]),
         close: Number(row[resolved.encoding?.close?.field ?? "close"]),
       }));
+      const volumeField = props.volumeField as string | undefined;
+      const volume =
+        (props.volume as number[] | undefined) ??
+        (volumeField
+          ? (pluckField(rows, { field: volumeField, type: "quantitative" }) as number[])
+          : undefined);
       return wrap(
         createElement(CandlestickChart, {
           categories,
           data: candleData,
-          volume: props.volume as number[] | undefined,
+          volume,
           brush: props.brush as boolean | undefined,
           brushEnd: props.brushEnd as number | undefined,
         }),
