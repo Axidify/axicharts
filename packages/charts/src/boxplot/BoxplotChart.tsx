@@ -23,7 +23,7 @@ function BoxplotPlot({
   showAxes,
   valueSuffix,
 }: BoxplotChartProps): ReactElement {
-  const { size, theme } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
 
   return (
@@ -35,6 +35,7 @@ function BoxplotPlot({
       series={series}
       showAxes={showAxes}
       valueSuffix={valueSuffix}
+      animate={mode === "presentation"}
       onItemHover={interaction.onItemHover}
     />
   );

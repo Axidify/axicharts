@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import { axisLabelStyle, hiddenTooltip, seriesPalette, splitLineStyle, toneColor } from "./themeBridge";
+import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { RadarIndicator, RadarSeries } from "./radarTypes";
 
@@ -16,6 +17,7 @@ export type EChartsRadarProps = {
   showLabels?: boolean;
   showAxes?: boolean;
   areaFill?: boolean;
+  animate?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -28,6 +30,7 @@ export function EChartsRadar({
   showLabels = true,
   showAxes = true,
   areaFill = true,
+  animate = false,
   onItemHover,
 }: EChartsRadarProps): ReactElement {
   const palette = seriesPalette(theme);
@@ -39,7 +42,8 @@ export function EChartsRadar({
     return indicator.max ?? Math.max(fromSeries, 1);
   });
 
-  const option: EChartsOption = {
+  const option: EChartsOption = withPresentationAnimation(
+    {
     tooltip: hiddenTooltip(),
     radar: {
       indicator: indicators.map((indicator, index) => ({
@@ -90,13 +94,16 @@ export function EChartsRadar({
         })),
       },
     ],
-  };
+  },
+    animate,
+  );
 
   const rootRef = useEChart({
     option,
     width,
     height,
     onItemHover,
+    mergeOption: !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse || params.name == null) return null;

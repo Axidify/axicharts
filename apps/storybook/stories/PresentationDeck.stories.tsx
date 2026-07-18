@@ -35,7 +35,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C89 — fullscreen deck sequencing with enter fade and KPI count-up choreography. Arrow keys / space advance slides; Escape exits.",
+          "C89/C116 — fullscreen deck sequencing with enter fade, progress bar, keyboard hints, and KPI count-up choreography. Arrow keys / space advance slides; Escape exits.",
       },
     },
   },
@@ -49,6 +49,35 @@ export const FinanceBoardDeck: Story = {
     <PresentationDeckRuntime
       spec={financeDeckSpec}
       title="Q4 business review"
+      onExit={() => undefined}
+    />
+  ),
+};
+
+const opsDeckSpec = {
+  layout: "embed" as const,
+  dashboard: {
+    template: "ops-2x2" as const,
+    title: "Ops review",
+    subtitle: "SRE wall · latency & error budget",
+    theme: "presentation" as const,
+    mode: "presentation" as const,
+    data: {
+      cells: [
+        { title: "p95 latency", data: [120, 98, 110, 88], suffix: " ms" },
+        { title: "Error rate", data: [0.8, 0.6, 0.5, 0.4], suffix: "%" },
+        { title: "Throughput", data: [4200, 4600, 5100, 5300] },
+        { title: "Saturation", data: [72, 68, 65, 61], suffix: "%" },
+      ],
+    },
+  },
+};
+
+export const OpsWallDeck: Story = {
+  render: () => (
+    <PresentationDeckRuntime
+      spec={opsDeckSpec}
+      title="Ops review"
       onExit={() => undefined}
     />
   ),

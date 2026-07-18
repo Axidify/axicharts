@@ -10,6 +10,7 @@ import {
   reactAxisPointer,
   splitLineStyle,
 } from "./themeBridge";
+import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartCursorEvent } from "./useEChart";
 import type { WaterfallItem } from "./types";
 import { buildWaterfallBridge } from "./waterfallBridge";
@@ -24,6 +25,7 @@ export type EChartsWaterfallProps = {
   /** Prefix +/- on delta bar labels (IBCS). */
   showSigns?: boolean;
   connectorStyle?: "solid" | "dashed";
+  animate?: boolean;
   onCursor?: (event: EChartCursorEvent) => void;
 };
 
@@ -54,13 +56,15 @@ export function EChartsWaterfall({
   showLabels = true,
   showSigns = true,
   connectorStyle = "dashed",
+  animate = false,
   onCursor,
 }: EChartsWaterfallProps): ReactElement {
   const bridge = buildWaterfallBridge(items, theme);
   const { placeholders, values, colors, labels, connectors, displayValues, isTotals } =
     bridge;
 
-  const option: EChartsOption = {
+  const option: EChartsOption = withPresentationAnimation(
+    {
     grid: gridOptions(theme),
     tooltip: hiddenTooltip(),
     axisPointer: reactAxisPointer(),
@@ -138,7 +142,9 @@ export function EChartsWaterfall({
         }),
       },
     ],
-  };
+  },
+    animate,
+  );
 
   const rootRef = useEChart({
     option,
@@ -146,6 +152,7 @@ export function EChartsWaterfall({
     height,
     categories: labels,
     onCursor,
+    mergeOption: !animate,
   });
 
   return (

@@ -11,6 +11,7 @@ import {
   seriesPalette,
   toneColor,
 } from "./themeBridge";
+import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { resolveScatterAxisLayout } from "./scatterLabels";
 import {
@@ -34,6 +35,7 @@ export type EChartsScatterProps = {
   xSuffix?: string;
   ySuffix?: string;
   sizeRange?: [number, number];
+  animate?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -62,6 +64,7 @@ export function EChartsScatter({
   xSuffix = "",
   ySuffix = "",
   sizeRange = DEFAULT_BUBBLE_SIZE_RANGE,
+  animate = false,
   onItemHover,
 }: EChartsScatterProps): ReactElement {
   const showLegend = series.length > 1;
@@ -95,7 +98,8 @@ export function EChartsScatter({
   const palette = seriesPalette(theme);
   const bubbleExtent = bubbleSizeExtent(series);
 
-  const option: EChartsOption = {
+  const option: EChartsOption = withPresentationAnimation(
+    {
     grid,
     legend: showLegend
       ? {
@@ -188,13 +192,16 @@ export function EChartsScatter({
           }
         : undefined,
     })),
-  };
+  },
+    animate,
+  );
 
   const rootRef = useEChart({
     option,
     width,
     height,
     onItemHover,
+    mergeOption: !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse) return null;

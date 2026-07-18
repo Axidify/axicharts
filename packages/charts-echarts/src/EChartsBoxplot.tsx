@@ -11,6 +11,7 @@ import {
   seriesPalette,
   toneColor,
 } from "./themeBridge";
+import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import {
   boxplotCategories,
@@ -27,6 +28,7 @@ export type EChartsBoxplotProps = {
   series?: BoxplotSeries[];
   showAxes?: boolean;
   valueSuffix?: string;
+  animate?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -43,6 +45,7 @@ export function EChartsBoxplot({
   series = [],
   showAxes = true,
   valueSuffix = "",
+  animate = false,
   onItemHover,
 }: EChartsBoxplotProps): ReactElement {
   const palette = seriesPalette(theme);
@@ -56,7 +59,8 @@ export function EChartsBoxplot({
     groups.length > 0 ? groups : items,
   );
 
-  const option: EChartsOption = {
+  const option: EChartsOption = withPresentationAnimation(
+    {
     grid: {
       ...gridOptions(theme),
       top: groups.length > 1 ? 28 : gridOptions(theme).top,
@@ -94,13 +98,16 @@ export function EChartsBoxplot({
           toneColor(group.tone, theme) ?? palette[index % palette.length],
       },
     })),
-  };
+  },
+    animate,
+  );
 
   const rootRef = useEChart({
     option,
     width,
     height,
     onItemHover,
+    mergeOption: !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse) return null;

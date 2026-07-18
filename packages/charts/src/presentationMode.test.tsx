@@ -6,8 +6,13 @@ import { ChartLayoutContext } from "./container/ChartLayoutContext";
 import { ChartInteractionProvider } from "./interaction/ChartInteractionContext";
 import { CandlestickChart } from "./candlestick/CandlestickChart";
 import { FunnelChart } from "./funnel/FunnelChart";
+import { HeatmapChart } from "./heatmap/HeatmapChart";
+import { HistogramChart } from "./histogram/HistogramChart";
 import { PieChart } from "./pie/PieChart";
+import { RadarChart } from "./radar/RadarChart";
+import { ScatterChart } from "./scatter/ScatterChart";
 import { TreemapChart } from "./treemap/TreemapChart";
+import { WaterfallChart } from "./waterfall/WaterfallChart";
 
 type CapturedProps = Record<string, unknown>;
 
@@ -16,6 +21,11 @@ const captured = {
   candlestick: null as CapturedProps | null,
   funnel: null as CapturedProps | null,
   treemap: null as CapturedProps | null,
+  heatmap: null as CapturedProps | null,
+  waterfall: null as CapturedProps | null,
+  scatter: null as CapturedProps | null,
+  radar: null as CapturedProps | null,
+  histogram: null as CapturedProps | null,
 };
 
 vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
@@ -36,6 +46,26 @@ vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
     },
     EChartsTreemap: (props: CapturedProps) => {
       captured.treemap = props;
+      return null;
+    },
+    EChartsHeatmap: (props: CapturedProps) => {
+      captured.heatmap = props;
+      return null;
+    },
+    EChartsWaterfall: (props: CapturedProps) => {
+      captured.waterfall = props;
+      return null;
+    },
+    EChartsScatter: (props: CapturedProps) => {
+      captured.scatter = props;
+      return null;
+    },
+    EChartsRadar: (props: CapturedProps) => {
+      captured.radar = props;
+      return null;
+    },
+    EChartsHistogram: (props: CapturedProps) => {
+      captured.histogram = props;
       return null;
     },
   };
@@ -128,5 +158,86 @@ describe("live mode merge wiring", () => {
 
     expect(captured.treemap?.mergeOption).toBe(true);
     expect(captured.treemap?.animate).toBe(false);
+  });
+
+  it("passes mergeOption to heatmap adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <HeatmapChart
+          matrix={{
+            xCategories: ["Mon"],
+            yCategories: ["A"],
+            values: [[12]],
+          }}
+        />
+      </TestShell>,
+    );
+
+    expect(captured.heatmap?.mergeOption).toBe(true);
+    expect(captured.heatmap?.animate).toBe(false);
+  });
+});
+
+describe("presentation mode animation wiring", () => {
+  it("enables presentation sweep on heatmap", () => {
+    render(
+      <TestShell mode="presentation">
+        <HeatmapChart
+          matrix={{
+            xCategories: ["Mon"],
+            yCategories: ["A"],
+            values: [[12]],
+          }}
+        />
+      </TestShell>,
+    );
+
+    expect(captured.heatmap?.animate).toBe(true);
+    expect(captured.heatmap?.mergeOption).toBe(false);
+  });
+
+  it("enables presentation sweep on waterfall", () => {
+    render(
+      <TestShell mode="presentation">
+        <WaterfallChart items={[{ name: "Q1", value: 100, isTotal: true }]} />
+      </TestShell>,
+    );
+
+    expect(captured.waterfall?.animate).toBe(true);
+  });
+
+  it("enables presentation sweep on scatter", () => {
+    render(
+      <TestShell mode="presentation">
+        <ScatterChart
+          series={[{ name: "A", points: [{ x: 1, y: 2 }] }]}
+        />
+      </TestShell>,
+    );
+
+    expect(captured.scatter?.animate).toBe(true);
+  });
+
+  it("enables presentation sweep on radar", () => {
+    render(
+      <TestShell mode="presentation">
+        <RadarChart
+          indicators={[{ name: "Speed" }]}
+          series={[{ name: "Team", values: [80] }]}
+        />
+      </TestShell>,
+    );
+
+    expect(captured.radar?.animate).toBe(true);
+  });
+
+  it("enables presentation sweep on histogram", () => {
+    render(
+      <TestShell mode="presentation">
+        <HistogramChart categories={["0-10"]} values={[4]} />
+      </TestShell>,
+    );
+
+    expect(captured.histogram?.animate).toBe(true);
   });
 });

@@ -421,4 +421,19 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("minRangePercent={5}");
     expect(jsx).toContain('presets={["1D","1W","1M","ALL"]}');
   });
+
+  it("emits mode=presentation on ChartContainer", () => {
+    const jsx = ejectPanel({
+      type: "bar",
+      mode: "presentation",
+      theme: "presentation",
+      encoding: {
+        x: { field: "quarter" },
+        y: { field: "revenue" },
+      },
+    });
+
+    expect(jsx).toContain('mode="presentation"');
+    expect(jsx).toContain("presentationTheme");
+  });
 });

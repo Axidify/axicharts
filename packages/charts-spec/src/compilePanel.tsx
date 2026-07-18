@@ -600,7 +600,7 @@ export function compilePanel(
         props.value ?? rows[0]?.[resolved.encoding?.value?.field ?? "value"] ?? "",
       );
       const label = String(props.label ?? resolved.title ?? "");
-      return createElement(Stat, {
+      const statElement = createElement(Stat, {
         value,
         label,
         tone:
@@ -609,6 +609,8 @@ export function compilePanel(
         surface: props.surface as "light" | "dark" | undefined,
         monospace: props.monospace as boolean | undefined,
       });
+      const panelMode = options.mode ?? spec.mode;
+      return panelMode === "presentation" ? wrap(statElement) : statElement;
     }
 
     case "gauge": {

@@ -25,7 +25,7 @@ function RadarPlot({
   showAxes,
   areaFill,
 }: RadarChartProps): ReactElement {
-  const { size, theme } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
 
   return (
@@ -38,6 +38,7 @@ function RadarPlot({
       showLabels={showLabels}
       showAxes={showAxes}
       areaFill={areaFill}
+      animate={mode === "presentation"}
       onItemHover={interaction.onItemHover}
     />
   );

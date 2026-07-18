@@ -44,6 +44,7 @@ function HeatmapPlot({
       showAxes={showAxes}
       cellFormatter={cellFormatter}
       mergeOption={mode === "live"}
+      animate={mode === "presentation"}
       brushRange={interaction.followerBrushRange}
       chartId={interaction.chartId}
       onSyncIndex={interaction.onSyncIndex}

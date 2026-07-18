@@ -583,3 +583,85 @@ describe("compilePanel analytics breadth", () => {
     });
   });
 });
+
+describe("compilePanel presentation mode", () => {
+  it("passes mode=presentation to ChartContainer for line panels", async () => {
+    const panel = compilePanel(
+      {
+        type: "line",
+        mode: "presentation",
+        theme: "presentation",
+        encoding: {
+          x: { field: "quarter" },
+          y: { field: "revenue" },
+        },
+      },
+      [
+        { quarter: "Q1", revenue: 100 },
+        { quarter: "Q2", revenue: 120 },
+      ],
+    );
+
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.innerHTML.length).toBeGreaterThan(100);
+    });
+  });
+
+  it("wraps stat panels with ChartContainer when mode is presentation", async () => {
+    const panel = compilePanel(
+      {
+        type: "stat",
+        mode: "presentation",
+        theme: "presentation",
+        props: { value: "62.4%", label: "Gross margin", tone: "success" },
+      },
+      [],
+    );
+
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.textContent).toContain("Gross margin");
+    });
+  });
+
+  it("compiles gauge panels with presentation mode", async () => {
+    const panel = compilePanel(
+      {
+        type: "gauge",
+        mode: "presentation",
+        theme: "presentation",
+        props: { value: 72, label: "CPU", unit: "%" },
+      },
+      [],
+    );
+
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.textContent).toContain("CPU");
+    });
+  });
+
+  it("compiles heatmap panels with presentation mode", async () => {
+    const panel = compilePanel(
+      {
+        type: "heatmap",
+        mode: "presentation",
+        theme: "presentation",
+        props: {
+          matrix: {
+            xCategories: ["Mon"],
+            yCategories: ["A"],
+            values: [[12]],
+          },
+        },
+      },
+      [],
+    );
+
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+});

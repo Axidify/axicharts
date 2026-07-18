@@ -61,6 +61,7 @@ const slideFrameStyle: CSSProperties = {
   boxShadow: "0 24px 64px rgba(15, 23, 42, 0.35)",
   padding: 28,
   minHeight: 360,
+  transition: "opacity 320ms cubic-bezier(0.22, 1, 0.36, 1), transform 320ms cubic-bezier(0.22, 1, 0.36, 1)",
 };
 
 const footerStyle: CSSProperties = {
@@ -70,6 +71,7 @@ const footerStyle: CSSProperties = {
   padding: "12px 20px",
   borderTop: "1px solid #334155",
   fontSize: 12,
+  gap: 12,
 };
 
 const buttonStyle: CSSProperties = {
@@ -127,9 +129,28 @@ export function PresentationDeck({
 
   const slide = slides[activeIndex];
   const hasSlides = slides.length > 0;
+  const progress = hasSlides ? ((activeIndex + 1) / slides.length) * 100 : 0;
 
   return (
     <div className={className} style={shellStyle} data-testid="presentation-deck">
+      <div
+        aria-hidden="true"
+        data-testid="presentation-deck-progress"
+        style={{
+          height: 3,
+          background: "#334155",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${progress}%`,
+            background: "linear-gradient(90deg, #60a5fa 0%, #93c5fd 100%)",
+            transition: "width 320ms cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        />
+      </div>
+
       <header style={headerStyle}>
         <div>
           <div style={{ fontSize: 14, fontWeight: 600 }}>{title ?? slide?.title ?? "Presentation"}</div>
@@ -153,7 +174,10 @@ export function PresentationDeck({
         {slide ? (
           <div
             key={`${slide.id}-${activeIndex}`}
-            style={{ ...slideFrameStyle, ...presentationEnterStyle(true) }}
+            style={{
+              ...slideFrameStyle,
+              ...presentationEnterStyle(true),
+            }}
           >
             {slide.title ? (
               <div style={{ marginBottom: 16 }}>
@@ -190,21 +214,26 @@ export function PresentationDeck({
         <button type="button" onClick={goPrev} disabled={activeIndex <= 0} style={buttonStyle}>
           Previous
         </button>
-        <div style={{ display: "flex", gap: 6 }}>
+        <div style={{ flex: 1, textAlign: "center", color: "#94a3b8", fontSize: 11 }}>
+          <span aria-hidden="true">← → Space advance · Esc exit</span>
+        </div>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           {slides.map((item, index) => (
             <button
               key={item.id}
               type="button"
               aria-label={`Go to slide ${index + 1}`}
+              aria-current={index === activeIndex ? "step" : undefined}
               onClick={() => setActiveIndex(index)}
               style={{
-                width: 8,
+                width: index === activeIndex ? 18 : 8,
                 height: 8,
                 borderRadius: 999,
                 border: "none",
                 padding: 0,
                 cursor: "pointer",
                 background: index === activeIndex ? "#93c5fd" : "#475569",
+                transition: "width 200ms ease, background 200ms ease",
               }}
             />
           ))}

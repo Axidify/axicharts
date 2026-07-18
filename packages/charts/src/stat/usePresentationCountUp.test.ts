@@ -16,3 +16,9 @@ describe("presentation count-up", () => {
     expect(formatCountUpValue(665, parsed)).toBe("$665");
   });
 });
+
+describe("presentation numeric count-up", () => {
+  it("parses currency values with commas", () => {
+    expect(parseCountUpValue("$1,330")?.target).toBe(1330);
+  });
+});

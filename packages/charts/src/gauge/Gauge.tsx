@@ -4,6 +4,7 @@ import { buildSingleValueA11yDescriptor } from "../a11y/singleValueDescriptor";
 import { SingleValueChartA11yRoot } from "../a11y/SingleValueChartA11yRoot";
 import { useOptionalChartLayout } from "../container/useOptionalChartLayout";
 import { resolveTagStatTone } from "../alarm/tagTones";
+import { usePresentationNumericCountUp } from "../stat/usePresentationCountUp";
 
 const TONE_STROKE: Record<StatTone, string> = {
   neutral: "#3b82f6",
@@ -66,6 +67,8 @@ export function Gauge({
   criticalAt,
 }: GaugeProps): ReactElement {
   const layout = useOptionalChartLayout();
+  const presentation = layout?.mode === "presentation";
+  const animatedValue = usePresentationNumericCountUp(value, presentation);
   const resolvedTone =
     tone ??
     resolveTagStatTone(layout?.tagTones, label) ??
@@ -79,7 +82,7 @@ export function Gauge({
   const start = Math.PI;
   const end = 0;
   const span = max - min || 1;
-  const clamped = Math.min(max, Math.max(min, value));
+  const clamped = Math.min(max, Math.max(min, animatedValue));
   const fraction = (clamped - min) / span;
   const valueEnd = start - fraction * Math.PI;
   const stroke = TONE_STROKE[resolvedTone];

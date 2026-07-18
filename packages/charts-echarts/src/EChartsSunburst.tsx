@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import { hiddenTooltip } from "./themeBridge";
+import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { flattenTreemapValues, mapTreemapData } from "./treemapData";
 import type { HierarchyNode } from "./hierarchyTypes";
@@ -14,6 +15,7 @@ export type EChartsSunburstProps = {
   nodes: HierarchyNode[];
   theme: ChartTheme;
   showLabels?: boolean;
+  animate?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -28,13 +30,15 @@ export function EChartsSunburst({
   nodes,
   theme,
   showLabels = true,
+  animate = false,
   onItemHover,
 }: EChartsSunburstProps): ReactElement {
   const data = mapTreemapData(nodes, theme);
   const leafValues = flattenTreemapValues(nodes);
   const total = leafValues.reduce((sum, value) => sum + value, 0);
 
-  const option: EChartsOption = {
+  const option: EChartsOption = withPresentationAnimation(
+    {
     tooltip: hiddenTooltip(),
     series: [
       {
@@ -73,13 +77,16 @@ export function EChartsSunburst({
         data,
       },
     ],
-  };
+  },
+    animate,
+  );
 
   const rootRef = useEChart({
     option,
     width,
     height,
     onItemHover,
+    mergeOption: !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse || params.name == null) return null;

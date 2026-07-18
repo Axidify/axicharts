@@ -11,6 +11,7 @@ import {
   seriesPalette,
   toneColor,
 } from "./themeBridge";
+import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { SeriesTone } from "./types";
 
@@ -23,6 +24,7 @@ export type EChartsHistogramProps = {
   tone?: SeriesTone;
   showAxes?: boolean;
   valueSuffix?: string;
+  animate?: boolean;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -40,12 +42,14 @@ export function EChartsHistogram({
   tone,
   showAxes = true,
   valueSuffix = "",
+  animate = false,
   onItemHover,
 }: EChartsHistogramProps): ReactElement {
   const palette = seriesPalette(theme);
   const color = toneColor(tone, theme) ?? palette[0]!;
 
-  const option: EChartsOption = {
+  const option: EChartsOption = withPresentationAnimation(
+    {
     grid: gridOptions(theme),
     tooltip: hiddenTooltip(),
     xAxis: {
@@ -72,13 +76,16 @@ export function EChartsHistogram({
         },
       },
     ],
-  };
+  },
+    animate,
+  );
 
   const rootRef = useEChart({
     option,
     width,
     height,
     onItemHover,
+    mergeOption: !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse) return null;

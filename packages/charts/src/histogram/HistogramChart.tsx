@@ -22,7 +22,7 @@ function HistogramPlot({
   showAxes,
   valueSuffix,
 }: HistogramChartProps): ReactElement {
-  const { size, theme } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
 
   return (
@@ -35,6 +35,7 @@ function HistogramPlot({
       tone={tone}
       showAxes={showAxes}
       valueSuffix={valueSuffix}
+      animate={mode === "presentation"}
       onItemHover={interaction.onItemHover}
     />
   );

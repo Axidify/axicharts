@@ -32,7 +32,7 @@ function ScatterPlot({
   ySuffix,
   sizeRange,
 }: ScatterChartProps): ReactElement {
-  const { size, theme } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
 
   return (
@@ -49,6 +49,7 @@ function ScatterPlot({
       xSuffix={xSuffix}
       ySuffix={ySuffix}
       sizeRange={sizeRange}
+      animate={mode === "presentation"}
       onItemHover={interaction.onItemHover}
     />
   );

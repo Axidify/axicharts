@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import { axisLabelStyle, gridOptions, hiddenTooltip, seriesPalette, splitLineStyle } from "./themeBridge";
+import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { HeatmapMatrix } from "./types";
 
@@ -24,6 +25,7 @@ export type EChartsHeatmapProps = {
   showAxes?: boolean;
   cellFormatter?: (value: number) => string;
   mergeOption?: boolean;
+  animate?: boolean;
   brushRange?: HeatmapBrushRange | null;
   syncIndex?: number | null;
   chartId?: string;
@@ -102,6 +104,7 @@ export function EChartsHeatmap({
   showAxes = true,
   cellFormatter,
   mergeOption = false,
+  animate = false,
   brushRange,
   syncIndex,
   chartId,
@@ -132,7 +135,8 @@ export function EChartsHeatmap({
     matrix.xCategories.length,
   );
 
-  const option: EChartsOption = {
+  const option: EChartsOption = withPresentationAnimation(
+    {
     grid: {
       ...gridOptions(theme),
       bottom: 40,
@@ -204,7 +208,9 @@ export function EChartsHeatmap({
             : undefined,
       },
     ],
-  };
+  },
+    animate,
+  );
 
   const rootRef = useEChart({
     option,
@@ -216,7 +222,7 @@ export function EChartsHeatmap({
     syncIndex: highlightColumn,
     syncSourceId,
     onItemHover,
-    mergeOption,
+    mergeOption: mergeOption ?? !animate,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse || !Array.isArray(params.data)) return null;

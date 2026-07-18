@@ -34,7 +34,7 @@ function WaterfallPlot({
   showSigns?: boolean;
   connectorStyle?: "solid" | "dashed";
 }): ReactElement {
-  const { size, theme } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
   const formatValue = (value: number) => formatTick(value, valueFormat ?? "currency");
 
@@ -48,6 +48,7 @@ function WaterfallPlot({
       showLabels={showLabels}
       showSigns={showSigns}
       connectorStyle={connectorStyle}
+      animate={mode === "presentation"}
       onCursor={interaction.onCursor}
     />
   );

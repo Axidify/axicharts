@@ -21,7 +21,7 @@ function SunburstPlot({
   nodes,
   showLabels,
 }: SunburstChartProps): ReactElement {
-  const { size, theme } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
 
   return (
@@ -31,6 +31,7 @@ function SunburstPlot({
       nodes={nodes}
       theme={theme}
       showLabels={showLabels}
+      animate={mode === "presentation"}
       onItemHover={interaction.onItemHover}
     />
   );

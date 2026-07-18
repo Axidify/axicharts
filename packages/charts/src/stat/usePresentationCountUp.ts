@@ -62,3 +62,35 @@ export function usePresentationCountUp(
 
   return display;
 }
+
+export function usePresentationNumericCountUp(
+  value: number,
+  enabled: boolean,
+  durationMs = 900,
+): number {
+  const [display, setDisplay] = useState(value);
+
+  useEffect(() => {
+    if (!enabled) {
+      setDisplay(value);
+      return;
+    }
+
+    let frame = 0;
+    const start = performance.now();
+
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - start) / durationMs);
+      const eased = 1 - (1 - progress) ** 3;
+      setDisplay(value * eased);
+      if (progress < 1) {
+        frame = requestAnimationFrame(tick);
+      }
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [durationMs, enabled, value]);
+
+  return display;
+}
