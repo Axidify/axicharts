@@ -10,6 +10,7 @@ import {
   type ThresholdBand,
 } from "@axicharts/charts-canvas";
 import type { RendererPreference } from "@axicharts/charts-core";
+import type { LineCurve } from "@axicharts/charts-theme";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import {
   CartesianChartShell,
@@ -36,6 +37,7 @@ export type LineChartProps = {
   stacked?: boolean;
   renderer?: RendererPreference;
   refreshHz?: number;
+  curve?: LineCurve;
   thresholdBands?: ThresholdBand[];
   referenceLines?: ReferenceLine[];
 };
@@ -48,6 +50,7 @@ type LinePlotProps = {
   valueSuffix?: string;
   dualAxis?: boolean | "auto";
   stacked?: boolean;
+  curve?: LineCurve;
   thresholdBands?: ThresholdBand[];
   referenceLines?: ReferenceLine[];
   compact: boolean;
@@ -62,6 +65,7 @@ function LinePlot({
   dualAxis,
   compact,
   stacked,
+  curve,
   thresholdBands,
   referenceLines,
 }: LinePlotProps): ReactElement {
@@ -80,6 +84,7 @@ function LinePlot({
       categories={categories}
       series={series}
       theme={theme}
+      curve={curve}
       fill={fill}
       showAxes={showAxes}
       valueSuffix={valueSuffix}
@@ -110,17 +115,19 @@ export function LineChart({
   stacked = false,
   renderer = "auto",
   refreshHz,
+  curve: curveProp,
   thresholdBands,
   referenceLines,
 }: LineChartProps): ReactElement | null {
   const { size, ready, theme, mode, config, tagTones } = useChartLayout();
-  const { categories, series: resolvedSeries, valueSuffix } = useResolvedCartesianProps(
+  const { categories, series: resolvedSeries, valueSuffix, curve } = useResolvedCartesianProps(
     {
       categories: categoriesProp,
       series: seriesProp,
       data,
       children,
       valueSuffix: valueSuffixProp,
+      curve: curveProp,
     },
     config,
     [...LINE_SERIES_KINDS],
@@ -173,6 +180,7 @@ export function LineChart({
             valueSuffix={valueSuffix}
             dualAxis={dualAxis}
             stacked={stacked}
+            curve={curve}
             thresholdBands={thresholdBands}
             referenceLines={referenceLines}
             compact={compact}

@@ -20,7 +20,7 @@ export function resolveSeriesColor(
   tone: SeriesTone | undefined,
   index: number,
 ): string {
-  if (tone && tone !== "default") {
+  if (tone && tone !== "default" && tone in SERIES_COLORS) {
     return SERIES_COLORS[tone];
   }
   return SERIES_PALETTE[index % SERIES_PALETTE.length]!;

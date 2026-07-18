@@ -39,6 +39,7 @@ export type PanelStyleSpec = {
   };
   line?: {
     strokeWidth?: number;
+    curve?: "linear" | "monotone";
   };
   area?: {
     fillOpacity?: number;

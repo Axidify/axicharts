@@ -10,6 +10,11 @@ describe("chart colors", () => {
     expect(resolveSeriesColor("warning", 0)).toBe("#d97706");
   });
 
+  it("falls back to palette for unknown tones", () => {
+    expect(resolveSeriesColor("neutral" as "default", 0)).toBe("#2563eb");
+    expect(resolveSeriesColor("neutral" as "default", 2)).toBe("#16a34a");
+  });
+
   it("uses light grid strokes on clean theme", () => {
     expect(chromeGridStroke(cleanTheme)).toBe("rgba(226, 232, 240, 0.85)");
   });

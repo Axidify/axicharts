@@ -27,10 +27,10 @@ function KpiTile({ children }: { children: ReactElement }): ReactElement {
 
 function Sparkline({
   data,
-  tone = "neutral",
+  tone = "default",
 }: {
   data: number[];
-  tone?: "neutral" | "success" | "warning";
+  tone?: "default" | "success" | "warning";
 }): ReactElement {
   return (
     <ChartContainer theme={cleanTheme} height={36} width="100%">
@@ -99,7 +99,7 @@ function CleanDefaultMockup(): ReactElement {
           </KpiTile>
           <KpiTile>
             <Stat value="+4.1%" label="vs last week" tone="warning" surface="light" />
-            <Sparkline data={ERROR_RATE} tone="neutral" />
+            <Sparkline data={ERROR_RATE} tone="default" />
           </KpiTile>
         </div>
 

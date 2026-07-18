@@ -10,6 +10,7 @@ export type ComposedCartesian = {
   categories: string[];
   series: PlotSeries[];
   valueSuffix?: string;
+  curve?: import("@axicharts/charts-theme").LineCurve;
 };
 
 const Y_AXIS_SUFFIX: Partial<Record<string, string>> = {
@@ -32,6 +33,7 @@ export function composeCartesianMarks(
 ): ComposedCartesian {
   let xKey = "date";
   let valueSuffix: string | undefined;
+  let curve: ComposedCartesian["curve"];
   const series: PlotSeries[] = [];
   const cellBindings: MarkCellBinding[] = [];
 
@@ -59,6 +61,12 @@ export function composeCartesianMarks(
       case "bar": {
         if (!seriesKinds.includes(kind)) break;
         const dataKey = String(props.dataKey);
+        if (kind === "line" || kind === "area") {
+          const markType = props.type;
+          if (markType === "linear" || markType === "monotone") {
+            curve = markType;
+          }
+        }
         if (kind === "bar" || kind === "line" || kind === "area") {
           cellBindings.push({
             dataKey,
@@ -110,5 +118,5 @@ export function composeCartesianMarks(
     };
   });
 
-  return { categories, series: withCellStyles, valueSuffix };
+  return { categories, series: withCellStyles, valueSuffix, curve };
 }

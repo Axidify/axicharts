@@ -25,6 +25,7 @@ import {
   hasSegmentedFills,
   segmentedSeriesPaths,
 } from "./segmentedLineDraw";
+import { lineSeriesPaths, resolveLineCurve } from "./linePaths";
 
 function seriesSpan(data: number[]): number {
   if (data.length === 0) return 1;
@@ -53,6 +54,7 @@ function buildOptions({
   categories,
   series,
   theme,
+  curve: curveOverride,
   fill,
   showAxes = true,
   dualAxis = "auto",
@@ -83,6 +85,9 @@ function buildOptions({
   const fillOpacity = compact
     ? Math.min(theme.area.fillOpacity + 0.12, 0.35)
     : theme.area.fillOpacity;
+  const curve = resolveLineCurve(theme.line.curve, curveOverride);
+  const smoothPaths =
+    !shouldStackSeries(stacked, series.length) ? lineSeriesPaths(curve) : undefined;
 
   const useSegmentedFills =
     hasSegmentedFills(series) && !shouldStackSeries(stacked, series.length);
@@ -207,7 +212,9 @@ function buildOptions({
           scale: useDualAxis && index > 0 ? "y2" : "y",
           stroke: hideNativeSeries ? "transparent" : color,
           width: theme.line.strokeWidth,
-          paths: hideNativeSeries ? segmentedSeriesPaths() : undefined,
+          paths: hideNativeSeries
+            ? segmentedSeriesPaths()
+            : smoothPaths,
           fill:
             !hideNativeSeries && fill && theme.area.show
               ? (u: uPlot) => {
@@ -331,6 +338,7 @@ export function UPlotLine(props: UPlotLineProps): ReactElement {
     onSyncIndex,
     props.thresholdBands,
     props.referenceLines,
+    props.curve,
   ]);
 
   const data = useMemo(

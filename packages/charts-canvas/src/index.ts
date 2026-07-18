@@ -13,3 +13,4 @@ export type {
 } from "./types";
 export { SERIES_COLORS, SERIES_PALETTE, resolveChromeColors, isDarkChartTheme } from "./colors";
 export { resolveSeriesColor, resolveSeriesTone } from "./seriesColor";
+export { lineSeriesPaths, resolveLineCurve, type LineCurve } from "./linePaths";

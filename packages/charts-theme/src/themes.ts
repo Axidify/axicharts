@@ -30,6 +30,8 @@ export type ChartTheme = {
   };
 };
 
+export type LineCurve = ChartTheme["line"]["curve"];
+
 const baseGrid = {
   show: true,
   horizontal: true,

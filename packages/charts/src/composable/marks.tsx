@@ -7,6 +7,8 @@ export type LineMarkProps = {
   name?: string;
   tone?: SeriesTone;
   yAxisId?: string;
+  /** Recharts parity — `monotone` smooth curves, `linear` point-to-point. */
+  type?: "linear" | "monotone";
 };
 
 export type BarMarkProps = LineMarkProps;

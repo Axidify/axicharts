@@ -72,10 +72,10 @@ function KpiTile({ children }: { children: ReactElement }): ReactElement {
 
 function AxiSparkline({
   data,
-  tone = "neutral",
+  tone = "default",
 }: {
   data: number[];
-  tone?: "neutral" | "success" | "warning";
+  tone?: "default" | "success" | "warning";
 }): ReactElement {
   return (
     <ChartContainer theme={cleanTheme} height={36} width="100%">
@@ -126,7 +126,7 @@ function AxiCleanDefaultPanel(): ReactElement {
           </KpiTile>
           <KpiTile>
             <Stat value="+4.1%" label="vs last week" tone="warning" surface="light" />
-            <AxiSparkline data={ERROR_RATE} tone="neutral" />
+            <AxiSparkline data={ERROR_RATE} tone="default" />
           </KpiTile>
         </div>
         <div style={{ marginTop: 16 }}>

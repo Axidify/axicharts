@@ -98,4 +98,18 @@ describe("composeCartesianMarks bar cells", () => {
 
     expect(composed.series[0]?.sizes).toEqual([0.5, 1, 1, 1, 1]);
   });
+
+  it("reads curve type from Line mark children", () => {
+    const composed = composeCartesianMarks(
+      [
+        createElement(XAxis, { dataKey: "week" }),
+        createElement(Line, { dataKey: "throughput", type: "linear" }),
+      ],
+      DATA,
+      undefined,
+      ["line"],
+    );
+
+    expect(composed.curve).toBe("linear");
+  });
 });

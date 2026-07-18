@@ -1,4 +1,5 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
+import type { LineCurve } from "@axicharts/charts-theme";
 
 export type SeriesTone =
   | "default"
@@ -46,6 +47,7 @@ export type UPlotLineProps = {
   categories: string[];
   series: PlotSeries[];
   theme: ChartTheme;
+  curve?: LineCurve;
   fill?: boolean;
   showAxes?: boolean;
   valueSuffix?: string;
