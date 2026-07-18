@@ -5,3 +5,4 @@ export {
   presentationTheme,
   type ChartTheme,
 } from "./themes";
+export { createTheme } from "./createTheme";

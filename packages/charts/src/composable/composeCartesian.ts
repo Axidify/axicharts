@@ -1,8 +1,10 @@
 import { Children, isValidElement, type ReactNode } from "react";
 import type { PlotSeries } from "@axicharts/charts-canvas";
+import { resolveSeriesColor } from "@axicharts/charts-canvas";
 import type { ChartConfig } from "../container/ChartLayoutContext";
 import type { ComposableMarkKind } from "./marks";
 import { readMarkKind } from "./readMarkKind";
+import { readCartesianCells, resolveCellColor } from "./readCartesianCells";
 
 export type ComposedCartesian = {
   categories: string[];
@@ -16,6 +18,11 @@ const Y_AXIS_SUFFIX: Partial<Record<string, string>> = {
   bps: " bps",
 };
 
+type BarCellBinding = {
+  dataKey: string;
+  cells: Map<string, { color?: string; tone?: import("@axicharts/charts-canvas").SeriesTone }>;
+};
+
 export function composeCartesianMarks(
   children: ReactNode,
   data: Record<string, unknown>[],
@@ -25,6 +32,7 @@ export function composeCartesianMarks(
   let xKey = "date";
   let valueSuffix: string | undefined;
   const series: PlotSeries[] = [];
+  const barCellBindings: BarCellBinding[] = [];
 
   Children.forEach(children, (child) => {
     if (!isValidElement(child)) return;
@@ -50,6 +58,12 @@ export function composeCartesianMarks(
       case "bar": {
         if (!seriesKinds.includes(kind)) break;
         const dataKey = String(props.dataKey);
+        if (kind === "bar") {
+          barCellBindings.push({
+            dataKey,
+            cells: readCartesianCells(child),
+          });
+        }
         series.push({
           key: dataKey,
           name: String(props.name ?? dataKey),
@@ -61,6 +75,7 @@ export function composeCartesianMarks(
       case "grid":
       case "tooltip":
       case "legend":
+      case "cell":
         break;
       default:
         break;
@@ -69,5 +84,18 @@ export function composeCartesianMarks(
 
   const categories = data.map((row) => String(row[xKey] ?? ""));
 
-  return { categories, series, valueSuffix };
+  const withBarFills = series.map((item) => {
+    const binding = barCellBindings.find((entry) => entry.dataKey === item.key);
+    if (!binding || binding.cells.size === 0) return item;
+
+    const baseColor = item.color ?? resolveSeriesColor(item.tone, 0);
+    const fills = categories.map((category, index) => {
+      const style = binding.cells.get(category);
+      return style ? (resolveCellColor(style) ?? baseColor) : baseColor;
+    });
+
+    return { ...item, fills };
+  });
+
+  return { categories, series: withBarFills, valueSuffix };
 }

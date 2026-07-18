@@ -1,6 +1,7 @@
 import { Children, isValidElement, type ReactNode } from "react";
 import type { PieSlice } from "@axicharts/charts-echarts";
 import type { SeriesTone } from "@axicharts/charts-canvas";
+import { SERIES_COLORS } from "@axicharts/charts-canvas";
 import type { ChartConfig } from "../container/ChartLayoutContext";
 import { readMarkKind } from "./readMarkKind";
 
@@ -10,22 +11,29 @@ export type ComposedPie = {
   showLabels?: boolean;
 };
 
-function readCellTones(pieChild: ReactNode): Map<string, SeriesTone> {
-  const tones = new Map<string, SeriesTone>();
+function readCellStyles(pieChild: ReactNode): Map<string, { tone?: SeriesTone; color?: string }> {
+  const styles = new Map<string, { tone?: SeriesTone; color?: string }>();
 
-  if (!isValidElement(pieChild)) return tones;
+  if (!isValidElement(pieChild)) return styles;
 
   const pieProps = pieChild.props as { children?: ReactNode };
   Children.forEach(pieProps.children, (cell) => {
     if (!isValidElement(cell) || readMarkKind(cell.type) !== "cell") return;
-    const props = cell.props as { dataKey?: string; tone?: SeriesTone };
+    const props = cell.props as {
+      dataKey?: string;
+      tone?: SeriesTone;
+      color?: string;
+      fill?: string;
+    };
     const key = props.dataKey;
-    if (key && props.tone) {
-      tones.set(key, props.tone);
-    }
+    if (!key) return;
+    styles.set(key, {
+      tone: props.tone,
+      color: props.color ?? props.fill,
+    });
   });
 
-  return tones;
+  return styles;
 }
 
 export function composePieMarks(
@@ -37,7 +45,7 @@ export function composePieMarks(
   let valueKey = "value";
   let innerRadius: number | undefined;
   let showLabels: boolean | undefined;
-  let cellTones = new Map<string, SeriesTone>();
+  let cellStyles = new Map<string, { tone?: SeriesTone; color?: string }>();
 
   Children.forEach(children, (child) => {
     if (!isValidElement(child)) return;
@@ -55,19 +63,23 @@ export function composePieMarks(
     valueKey = String(props.dataKey ?? valueKey);
     innerRadius = props.innerRadius;
     showLabels = props.showLabels;
-    cellTones = readCellTones(child);
+    cellStyles = readCellStyles(child);
   });
 
   const slices: PieSlice[] = data.map((row) => {
     const rawName = String(row[nameKey] ?? "");
     const value = Number(row[valueKey] ?? 0);
-    const tone = cellTones.get(rawName);
+    const style = cellStyles.get(rawName);
+    const tone = style?.tone;
+    const color =
+      style?.color ?? (tone ? SERIES_COLORS[tone] : undefined);
 
     return {
       key: rawName,
       name: rawName,
       value,
       tone,
+      color,
     };
   });
 

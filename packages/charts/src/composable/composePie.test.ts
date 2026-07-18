@@ -54,4 +54,20 @@ describe("composePieMarks", () => {
       tone: "warning",
     });
   });
+
+  it("applies explicit cell colors", () => {
+    const composed = composePieMarks(
+      [
+        createElement(
+          Pie,
+          { dataKey: "value", nameKey: "name" },
+          createElement(Cell, { dataKey: "Support", fill: "#db2777" }),
+        ),
+      ],
+      DATA,
+      undefined,
+    );
+
+    expect(composed.slices[2]?.color).toBe("#db2777");
+  });
 });

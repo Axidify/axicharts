@@ -42,6 +42,9 @@ export type PieMarkProps = {
 export type CellMarkProps = {
   dataKey: string;
   tone?: SeriesTone;
+  /** Explicit stroke/fill color (Recharts `fill` alias supported). */
+  color?: string;
+  fill?: string;
 };
 
 export type FunnelMarkProps = {

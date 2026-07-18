@@ -47,6 +47,9 @@ export function preparePlotData(
     series: series.map((item) => ({
       ...item,
       data: indices.map((index) => item.data[index] ?? 0),
+      fills: item.fills
+        ? indices.map((index) => item.fills![index] ?? item.fills![0] ?? "")
+        : undefined,
     })),
     sampled: true,
     originalLength,

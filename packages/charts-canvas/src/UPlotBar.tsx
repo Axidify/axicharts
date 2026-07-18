@@ -17,6 +17,7 @@ import {
 } from "./plotAnnotations";
 import { shouldStackSeries, STACK_GROUP } from "./stack";
 import { resolveSeriesColor } from "./seriesColor";
+import type { PlotSeries } from "./types";
 
 type BarLayout = {
   left: number;
@@ -24,7 +25,39 @@ type BarLayout = {
   width: number;
   height: number;
   value: number;
+  fill: string;
 };
+
+function hasCustomFills(series: PlotSeries[]): boolean {
+  return series.some((item) => item.fills && item.fills.length > 0);
+}
+
+function drawRoundedBar(
+  ctx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+  radius: number,
+  fill: string,
+): void {
+  if (height <= 0 || width <= 0) return;
+
+  const bottom = top + height;
+  const right = left + width;
+  const r = Math.min(radius, width / 2, height);
+
+  ctx.beginPath();
+  ctx.moveTo(left, bottom);
+  ctx.lineTo(left, top + r);
+  ctx.quadraticCurveTo(left, top, left + r, top);
+  ctx.lineTo(right - r, top);
+  ctx.quadraticCurveTo(right, top, right, top + r);
+  ctx.lineTo(right, bottom);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+}
 
 function formatValue(value: number, suffix = ""): string {
   const rounded =
@@ -55,6 +88,7 @@ function buildOptions({
   const gapPx = Math.max(3, Math.round(theme.bar.gap * 28));
   const stackSeries = shouldStackSeries(stacked, series.length);
   const showBarValues = showValues && !stackSeries;
+  const customFills = hasCustomFills(series) && !stackSeries;
 
   return {
     width,
@@ -119,27 +153,39 @@ function buildOptions({
       {},
       ...series.map((item, index) => {
         const color = item.color ?? resolveSeriesColor(item.tone, index);
+        const paintCustom = customFills && Boolean(item.fills?.length);
         return {
           label: item.name,
-          stroke: color,
-          fill: color,
+          stroke: paintCustom ? "transparent" : color,
+          fill: paintCustom ? "transparent" : color,
           width: 0,
           stack: stackSeries ? STACK_GROUP : undefined,
           paths: uPlot.paths.bars!({
             gap: gapPx,
             size: [0.6, 100],
             each: (u, seriesIdx, idx, left, top, barWidth, barHeight) => {
-              if (!showBarValues) return;
-              if (seriesIdx === 1 && idx === 0) barLayoutsRef.current = [];
+              const seriesIndex = seriesIdx - 1;
               const value =
                 (u.data[seriesIdx] as number[] | undefined)?.[idx] ?? 0;
-              barLayoutsRef.current.push({
-                left,
-                top,
-                width: barWidth,
-                height: barHeight,
-                value,
-              });
+              const fill =
+                item.fills?.[idx] ??
+                item.color ??
+                resolveSeriesColor(item.tone, seriesIndex);
+
+              if (seriesIdx === 1 && idx === 0) {
+                barLayoutsRef.current = [];
+              }
+
+              if (paintCustom || showBarValues) {
+                barLayoutsRef.current.push({
+                  left,
+                  top,
+                  width: barWidth,
+                  height: barHeight,
+                  value,
+                  fill,
+                });
+              }
             },
           }),
           points: { show: false },
@@ -152,9 +198,26 @@ function buildOptions({
           bands: thresholdBands,
           referenceLines,
           onDraw: (u) => {
-            if (!showBarValues) return;
             const ctx = u.ctx;
             const layouts = barLayoutsRef.current;
+
+            if (customFills) {
+              const radius = theme.bar.radius;
+              for (const layout of layouts) {
+                drawRoundedBar(
+                  ctx,
+                  layout.left,
+                  layout.top,
+                  layout.width,
+                  layout.height,
+                  radius,
+                  layout.fill,
+                );
+              }
+            }
+
+            if (!showBarValues) return;
+
             ctx.save();
             ctx.fillStyle = chrome.axis;
             ctx.font = "10px ui-sans-serif, system-ui, sans-serif";

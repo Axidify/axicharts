@@ -28,6 +28,7 @@ import type { FieldEncoding, PanelSpec, SpecData, ThemeName, ChartMode } from ".
 import { asRows, pluckField } from "./data";
 import { applySpecCompilers } from "./specCompiler";
 import { resolveTheme } from "./themes";
+import { fillsFromColorField } from "./colorEncoding";
 
 export type CompileOptions = {
   theme?: ThemeName;
@@ -157,10 +158,21 @@ export function compilePanel(
         seriesFromEncoding(rows, resolved.encoding?.y).length > 0
           ? seriesFromEncoding(rows, resolved.encoding?.y)
           : ((props.series as PlotSeries[] | undefined) ?? []);
+
+      let seriesWithColor = baseSeries;
+      if (resolved.type === "bar" && resolved.encoding?.color && baseSeries[0]) {
+        const fills = fillsFromColorField(
+          rows,
+          resolved.encoding.color.field,
+          baseSeries[0].color,
+        );
+        seriesWithColor = [{ ...baseSeries[0], fills }, ...baseSeries.slice(1)];
+      }
+
       const chartProps = {
         ...props,
         categories,
-        series: applyTagTonesToSeries(baseSeries, tagTones),
+        series: applyTagTonesToSeries(seriesWithColor, tagTones),
         fill: resolved.fill,
         stacked: resolved.stacked,
         valueSuffix: resolved.valueSuffix,

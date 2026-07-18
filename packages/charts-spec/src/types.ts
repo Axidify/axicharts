@@ -15,6 +15,12 @@ export type FieldEncoding = {
   label?: string;
 };
 
+/** Color channel for per-mark styling (AI / spec compiler). */
+export type ColorEncoding = {
+  field: string;
+  type?: "nominal" | "quantitative" | "semantic";
+};
+
 export type PanelChartType =
   | "line"
   | "area"
@@ -39,6 +45,7 @@ export type PanelSpec = {
   encoding?: {
     x?: FieldEncoding;
     y?: FieldEncoding | FieldEncoding[];
+    color?: ColorEncoding;
     name?: FieldEncoding;
     value?: FieldEncoding;
     open?: FieldEncoding;

@@ -13,6 +13,8 @@ export type PlotSeries = {
   key?: string;
   color?: string;
   tone?: SeriesTone;
+  /** Per-category fill colors (bar marks) — length matches `data`. */
+  fills?: string[];
 };
 
 export type ReferenceLine = {

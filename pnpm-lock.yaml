@@ -221,6 +221,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.7(react@19.2.7)
+      recharts:
+        specifier: ^2.15.1
+        version: 2.15.4(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       uplot:
         specifier: ^1.6.31
         version: 1.6.32

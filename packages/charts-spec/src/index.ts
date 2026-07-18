@@ -1,6 +1,7 @@
 export { SPEC_VERSION } from "./types";
 export type {
   ChartMode,
+  ColorEncoding,
   DashboardSpec,
   DataProfile,
   FieldEncoding,
