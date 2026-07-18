@@ -81,6 +81,9 @@ export type PanelChartType =
   | "table"
   | "markdown"
   | "text"
+  | "sankey"
+  | "geo"
+  | "gantt"
   | string;
 
 export type PanelSpec = {

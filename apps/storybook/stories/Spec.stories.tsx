@@ -10,8 +10,6 @@ import {
   clearSpecCompilers,
 } from "@axicharts/charts-spec";
 import "@axicharts/charts-andon/register";
-import "@axicharts/charts-geo/register";
-import "@axicharts/charts-sankey/register";
 import "@axicharts/charts-tank/register";
 
 const REVENUE_ROWS = [

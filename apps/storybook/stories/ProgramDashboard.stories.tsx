@@ -1,7 +1,6 @@
 import type { ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { compileTemplate } from "@axicharts/charts-spec";
-import "@axicharts/charts-gantt/register";
 
 const REMAINING = 34;
 const IDEAL_REMAINING = 12;

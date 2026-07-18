@@ -593,13 +593,19 @@ importers:
       '@axicharts/charts':
         specifier: workspace:*
         version: link:../charts
+      '@axicharts/charts-gantt':
+        specifier: workspace:*
+        version: link:../charts-gantt
+      '@axicharts/charts-geo':
+        specifier: workspace:*
+        version: link:../charts-geo
+      '@axicharts/charts-sankey':
+        specifier: workspace:*
+        version: link:../charts-sankey
       '@axicharts/charts-theme':
         specifier: workspace:*
         version: link:../charts-theme
     devDependencies:
-      '@axicharts/charts-gantt':
-        specifier: workspace:*
-        version: link:../charts-gantt
       '@axicharts/charts-tank':
         specifier: workspace:*
         version: link:../charts-tank

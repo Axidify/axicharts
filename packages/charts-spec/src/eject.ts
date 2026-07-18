@@ -65,7 +65,13 @@ function resolveChartName(spec: PanelSpec): string {
                       ? "DataTable"
                       : spec.type === "markdown" || spec.type === "text"
                         ? "MarkdownPanel"
-                        : "Gauge";
+                        : spec.type === "sankey"
+                          ? "SankeyChart"
+                          : spec.type === "geo"
+                            ? "GeoMapChart"
+                            : spec.type === "gantt"
+                              ? "GanttChart"
+                              : "Gauge";
 }
 
 export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
@@ -175,6 +181,16 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     max={${dataVar}.max}`;
   } else if (spec.type === "combo") {
     chartBody = ejectComboBody(spec, dataVar);
+  } else if (spec.type === "sankey") {
+    chartBody = `nodes={${dataVar}.nodes ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).nodes ?? [])}}
+    links={${dataVar}.links ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).links ?? [])}}`;
+  } else if (spec.type === "geo") {
+    chartBody = `regions={${dataVar}.regions ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).regions ?? [])}}
+    showScale={${dataVar}.showScale ?? ${String(chartPropsFromPanel(spec.props ?? {}).showScale ?? true)}}`;
+  } else if (spec.type === "gantt") {
+    chartBody = `tasks={${dataVar}.tasks ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).tasks ?? [])}}
+    milestones={${dataVar}.milestones ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).milestones ?? [])}}
+    today={${dataVar}.today ?? ${String(chartPropsFromPanel(spec.props ?? {}).today ?? "undefined")}}`;
   }
 
   const chartProps = chartPropsFromPanel(spec.props ?? {});
@@ -190,16 +206,33 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     for (const item of ejectCartesianImports(spec)) {
       imports.add(item);
     }
-  } else {
+  } else if (
+    spec.type !== "sankey" &&
+    spec.type !== "geo" &&
+    spec.type !== "gantt"
+  ) {
     imports.add(chartName);
   }
+
+  const pluginImport =
+    spec.type === "sankey"
+      ? "@axicharts/charts-sankey"
+      : spec.type === "geo"
+        ? "@axicharts/charts-geo"
+        : spec.type === "gantt"
+          ? "@axicharts/charts-gantt"
+          : null;
+
+  const chartsImport = pluginImport
+    ? `import { ${chartName} } from "${pluginImport}";`
+    : "";
 
   const preambleBlock = preamble ? `${preamble}\n\n` : "";
 
   if (cartesianUsesComposableMarks(spec)) {
     return `${preambleBlock}import { ${[...imports].join(", ")} } from "@axicharts/charts";
 import { ${themeImport} } from "@axicharts/charts-theme";
-
+${chartsImport ? `${chartsImport}\n` : ""}
 <ChartContainer theme={${themeExpr}}${mode}${chromeAttrs} height={${height}} width="100%">
   <${chartName}
     ${chartBody}
@@ -208,7 +241,7 @@ import { ${themeImport} } from "@axicharts/charts-theme";
 
   return `${preambleBlock}import { ${[...imports].join(", ")} } from "@axicharts/charts";
 import { ${themeImport} } from "@axicharts/charts-theme";
-
+${chartsImport ? `${chartsImport}\n` : ""}
 <ChartContainer theme={${themeExpr}}${mode}${chromeAttrs} height={${height}} width="100%">
   <${chartName}
     ${chartBody}${extraProps}

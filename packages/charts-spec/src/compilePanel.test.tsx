@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import { registerBuiltinChartTypes } from "@axicharts/charts/registry";
 import { registerTankChart } from "@axicharts/charts-tank";
+import { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 import { compilePanel } from "./compilePanel";
 
 describe("compilePanel registered types", () => {
@@ -25,6 +26,55 @@ describe("compilePanel registered types", () => {
     expect(container.textContent).toContain("Storage");
     expect(container.textContent).toContain("Tank 7");
     expect(container.textContent).toContain("72%");
+  });
+});
+
+describe("compilePanel community breadth", () => {
+  it("compiles sankey panels without manual register import", async () => {
+    const geoPanel = DEFAULT_PLUGINS_WALL_PANELS.find((panel) => panel.type === "geo")!;
+    const sankeyPanel = DEFAULT_PLUGINS_WALL_PANELS.find((panel) => panel.type === "sankey")!;
+
+    const geo = compilePanel(geoPanel, {});
+    const sankey = compilePanel(sankeyPanel, {});
+
+    const geoView = render(geo);
+    await waitFor(() => {
+      expect(geoView.container.textContent).toContain("West");
+    });
+
+    const sankeyView = render(sankey);
+    await waitFor(() => {
+      expect(
+        sankeyView.container.querySelector('[aria-label="Sankey flow diagram"]'),
+      ).toBeTruthy();
+    });
+  });
+
+  it("compiles gantt panels from spec props", async () => {
+    const panel = compilePanel(
+      {
+        type: "gantt",
+        title: "Sprint timeline",
+        height: 220,
+        width: 480,
+        props: {
+          tasks: [
+            { name: "Discovery", start: 0, end: 4, progress: 1, tone: "success" },
+            { name: "Build", start: 7, end: 16, progress: 0.55, tone: "info" },
+          ],
+          milestones: [{ label: "Beta", at: 12, tone: "warning" }],
+          today: 11,
+        },
+      },
+      {},
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Sprint timeline");
+    await waitFor(() => {
+      expect(container.textContent).toContain("Build");
+      expect(container.textContent).toContain("Beta");
+    });
   });
 });
 

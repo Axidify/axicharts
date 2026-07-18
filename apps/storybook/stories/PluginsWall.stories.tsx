@@ -3,11 +3,9 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Stat } from "@axicharts/charts";
 import { compileTemplate } from "@axicharts/charts-spec";
 import "@axicharts/charts-andon/register";
-import "@axicharts/charts-geo/register";
-import "@axicharts/charts-sankey/register";
 import "@axicharts/charts-tank/register";
 
-const PLUGIN_CHIPS = ["tank", "geo", "andon", "sankey"] as const;
+const PLUGIN_CHIPS = ["tank", "geo", "andon", "sankey", "gantt"] as const;
 
 function KpiTile({ children }: { children: ReactElement }): ReactElement {
   return (
@@ -149,7 +147,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Round 3 acceptance target (5/5) — plugin registry chips, fault callout, KPI strip, plugins-wall template mosaic with compilePanel + registerChartType.",
+          "Round 3 acceptance target (5/5) — plugin registry chips, fault callout, KPI strip, plugins-wall template mosaic. C88: geo/sankey/gantt compile without manual register imports; tank/andon still use register side effects.",
       },
     },
   },

@@ -67,6 +67,7 @@ export {
 } from "./specCompiler";
 export { normalizePanelSpec, parseDashboardSpecFile, parseDataProfileFile, parsePanelSpecFile } from "./parseSpec";
 export { resolveTheme } from "./themes";
+export { registerPluginChartTypes } from "./registerPluginChartTypes";
 export {
   chartPropsWithoutStyle,
   readPanelStyle,

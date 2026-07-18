@@ -203,4 +203,52 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("row.volume");
     expect(jsx).toContain("row.avg");
   });
+
+  it("emits SankeyChart from plugin package", () => {
+    const jsx = ejectPanel(
+      {
+        type: "sankey",
+        props: {
+          nodes: [{ name: "Solar" }, { name: "Grid" }],
+          links: [{ source: "Solar", target: "Grid", value: 12 }],
+        },
+      },
+      "flow",
+    );
+
+    expect(jsx).toContain('import { SankeyChart } from "@axicharts/charts-sankey"');
+    expect(jsx).toContain("<SankeyChart");
+    expect(jsx).toContain("flow.nodes");
+  });
+
+  it("emits GeoMapChart from plugin package", () => {
+    const jsx = ejectPanel({
+      type: "geo",
+      props: {
+        regions: [{ id: "west", label: "West", value: 72, x: 8, y: 28, width: 72, height: 54 }],
+        showScale: true,
+      },
+    });
+
+    expect(jsx).toContain('import { GeoMapChart } from "@axicharts/charts-geo"');
+    expect(jsx).toContain("<GeoMapChart");
+    expect(jsx).toContain("West");
+  });
+
+  it("emits GanttChart from plugin package", () => {
+    const jsx = ejectPanel(
+      {
+        type: "gantt",
+        props: {
+          tasks: [{ name: "Build", start: 7, end: 16, progress: 0.55 }],
+          today: 11,
+        },
+      },
+      "timeline",
+    );
+
+    expect(jsx).toContain('import { GanttChart } from "@axicharts/charts-gantt"');
+    expect(jsx).toContain("<GanttChart");
+    expect(jsx).toContain("timeline.tasks");
+  });
 });

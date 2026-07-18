@@ -27,24 +27,29 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-theme --clean",
-    "dev": "tsup src/index.ts src/cli.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-theme --watch",
+    "build": "tsup src/index.ts src/cli.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-gantt --clean",
+    "dev": "tsup src/index.ts src/cli.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-gantt --watch",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
     "@axicharts/charts": "workspace:*",
+    "@axicharts/charts-gantt": "workspace:*",
+    "@axicharts/charts-geo": "workspace:*",
+    "@axicharts/charts-sankey": "workspace:*",
     "@axicharts/charts-theme": "workspace:*",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "dependencies": {
     "@axicharts/charts": "workspace:*",
+    "@axicharts/charts-gantt": "workspace:*",
+    "@axicharts/charts-geo": "workspace:*",
+    "@axicharts/charts-sankey": "workspace:*",
     "@axicharts/charts-theme": "workspace:*"
   },
   "devDependencies": {
     "@axicharts/charts-tank": "workspace:*",
-    "@axicharts/charts-gantt": "workspace:*",
     "@testing-library/react": "^16.2.0",
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",

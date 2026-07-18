@@ -28,6 +28,9 @@ import {
   applyTagTonesToSeries,
   resolveTagStatTone,
 } from "@axicharts/charts";
+import { GanttChart } from "@axicharts/charts-gantt";
+import { GeoMapChart } from "@axicharts/charts-geo";
+import { SankeyChart } from "@axicharts/charts-sankey";
 import { getChartType } from "@axicharts/charts/registry";
 import type { FieldEncoding, PanelSpec, SpecData, ThemeName, ChartMode } from "./types";
 import { asRows, pluckField } from "./data";
@@ -50,6 +53,7 @@ import {
   readPanelStyle,
   themeWithPanelStyle,
 } from "./panelStyle";
+import { registerPluginChartTypes } from "./registerPluginChartTypes";
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
   return chartPropsWithoutChartConfig(
@@ -181,6 +185,8 @@ export function compilePanel(
   data: SpecData,
   options: CompileOptions = {},
 ): ReactElement {
+  registerPluginChartTypes();
+
   const resolved = applySpecCompilers(spec, data);
   const rows = asRows(data);
   const props = chartPropsFromPanel(resolved.props ?? {});
@@ -514,6 +520,58 @@ export function compilePanel(
         surface: props.surface as "light" | "dark" | undefined,
         title: String(props.title ?? resolved.title ?? ""),
       });
+    }
+
+    case "sankey": {
+      const nodes =
+        (props.nodes as Parameters<typeof SankeyChart>[0]["nodes"]) ??
+        (objectData.nodes as Parameters<typeof SankeyChart>[0]["nodes"]);
+      const links =
+        (props.links as Parameters<typeof SankeyChart>[0]["links"]) ??
+        (objectData.links as Parameters<typeof SankeyChart>[0]["links"]);
+      return wrap(
+        createElement(SankeyChart, {
+          nodes: nodes ?? [],
+          links: links ?? [],
+          surface: props.surface as "light" | "dark" | undefined,
+        }),
+      );
+    }
+
+    case "geo": {
+      const regions =
+        (props.regions as Parameters<typeof GeoMapChart>[0]["regions"]) ??
+        (objectData.regions as Parameters<typeof GeoMapChart>[0]["regions"]);
+      return wrap(
+        createElement(GeoMapChart, {
+          regions: regions ?? [],
+          min: props.min as number | undefined,
+          max: props.max as number | undefined,
+          showLabels: props.showLabels as boolean | undefined,
+          showScale: props.showScale as boolean | undefined,
+          surface: props.surface as "light" | "dark" | undefined,
+        }),
+      );
+    }
+
+    case "gantt": {
+      const tasks =
+        (props.tasks as Parameters<typeof GanttChart>[0]["tasks"]) ??
+        (objectData.tasks as Parameters<typeof GanttChart>[0]["tasks"]);
+      const milestones =
+        (props.milestones as Parameters<typeof GanttChart>[0]["milestones"]) ??
+        (objectData.milestones as Parameters<typeof GanttChart>[0]["milestones"]);
+      return wrap(
+        createElement(GanttChart, {
+          tasks: tasks ?? [],
+          milestones,
+          unit: props.unit as string | undefined,
+          rangeStart: props.rangeStart as number | undefined,
+          rangeEnd: props.rangeEnd as number | undefined,
+          today: props.today as number | undefined,
+          surface: props.surface as "light" | "dark" | undefined,
+        }),
+      );
     }
 
     default:
