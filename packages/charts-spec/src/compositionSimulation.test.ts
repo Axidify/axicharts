@@ -64,13 +64,13 @@ describe("composition simulation (RFC-002 feasibility)", () => {
 | ignored | ${summary.ignored} |
 | throws | ${summary.throws} |
 
-**Engine under test:** C135 \`type: "blocks"\` → \`blockMarksToChartProps\` → \`compilePanel\` → \`ComboChart\`.
+**Engine under test:** \`type: "cartesian"\` → \`validateCartesianSpec\` → \`blockMarksToChartProps\` → \`compilePanel\` → \`CartesianChart\`.
 
 ## Full results
 
 ${toMarkdownTable(results)}
 
-## Gaps (need C136 validator)
+## Remaining RFC deltas (warn / resolve / error scenarios)
 
 ${summary.gaps
   .map((r) => `- **${r.id}** (${r.description}): today \`${r.outcome}\` → RFC \`${r.rfcRecommendation}\``)
