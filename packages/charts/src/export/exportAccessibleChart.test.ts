@@ -2,6 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 import { buildCartesianA11yDescriptor } from "../a11y/cartesianDescriptor";
+import { buildPieA11yDescriptor } from "../a11y/echartsDescriptor";
 import { serializeA11yDescriptor, CHART_A11Y_ATTR } from "../a11y/serialize";
 import { exportAccessibleChart } from "./exportAccessibleChart";
 
@@ -56,5 +57,28 @@ describe("exportAccessibleChart", () => {
     expect(markup).toContain("Count");
 
     container.remove();
+  });
+
+  it("resolves pie a11y metadata from nested ECharts root", async () => {
+    const container = document.createElement("div");
+    const descriptor = buildPieA11yDescriptor({
+      slices: [
+        { name: "Alpha", value: 30 },
+        { name: "Beta", value: 70 },
+      ],
+    });
+    const root = document.createElement("div");
+    root.setAttribute(CHART_A11Y_ATTR, serializeA11yDescriptor(descriptor));
+    const canvas = document.createElement("canvas");
+    canvas.width = 120;
+    canvas.height = 80;
+    root.appendChild(canvas);
+    container.appendChild(root);
+
+    const result = await exportAccessibleChart(container, { format: "png" });
+    expect(result.a11y?.table.rows).toEqual([
+      { segment: "Alpha", value: 30, share: "30.0%" },
+      { segment: "Beta", value: 70, share: "70.0%" },
+    ]);
   });
 });

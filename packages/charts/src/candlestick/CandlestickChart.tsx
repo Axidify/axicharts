@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement } from "react";
+import { useMemo } from "react";
 import {
   EChartsCandlestick,
   type OhlcPoint,
@@ -12,6 +13,8 @@ import {
 import type { TooltipRow } from "../chrome/Tooltip";
 import { formatSeriesValue } from "../chrome/resolveSeries";
 import { useEChartsInteraction } from "../sync/useEChartsInteraction";
+import { buildCandlestickA11yDescriptor } from "../a11y/echartsDescriptor";
+import { EChartsChartA11yRoot } from "../a11y/EChartsChartA11yRoot";
 
 export type CandlestickChartProps = {
   categories: string[];
@@ -77,13 +80,18 @@ export function CandlestickChart({
   brushEnd,
 }: CandlestickChartProps): ReactElement | null {
   const { size, ready } = useChartLayout();
+  const a11yDescriptor = useMemo(
+    () => buildCandlestickA11yDescriptor({ categories, data, volume }),
+    [categories, data, volume],
+  );
 
   if (!ready || size.width < 1 || size.height < 1) {
     return null;
   }
 
   return (
-    <div
+    <EChartsChartA11yRoot
+      descriptor={a11yDescriptor}
       style={{
         width: size.width,
         height: size.height,
@@ -104,7 +112,7 @@ export function CandlestickChart({
           />
         }
       />
-    </div>
+    </EChartsChartA11yRoot>
   );
 }
 

@@ -4,20 +4,54 @@ import {
   ChartContainer,
   LineChart,
   BarChart,
+  PieChart,
+  CandlestickChart,
+  HeatmapChart,
+  FunnelChart,
   downloadAccessibleTable,
   downloadExport,
   exportAccessibleChart,
   resolveChartA11y,
   buildChartA11yTable,
+  type HeatmapMatrix,
 } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
 
 const CATEGORIES = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 const VALUES = [42, 58, 51, 73, 66];
 
+const PIE_SLICES = [
+  { name: "Desktop", value: 48 },
+  { name: "Mobile", value: 32 },
+  { name: "Tablet", value: 20 },
+];
+
+const CANDLE_CATEGORIES = ["Mon", "Tue", "Wed"];
+const CANDLE_DATA = [
+  { open: 100, high: 108, low: 98, close: 105 },
+  { open: 105, high: 110, low: 102, close: 103 },
+  { open: 103, high: 106, low: 99, close: 101 },
+];
+
+const HEATMAP_MATRIX: HeatmapMatrix = {
+  xCategories: ["9:00", "12:00", "15:00"],
+  yCategories: ["A", "B"],
+  values: [
+    [0.2, 0.5, 0.8],
+    [0.4, 0.6, 0.3],
+  ],
+};
+
+const FUNNEL_STAGES = [
+  { name: "Visit", value: 1000 },
+  { name: "Signup", value: 420 },
+  { name: "Purchase", value: 95 },
+];
+
 function AccessibilityExportDemo(): ReactElement {
   const canvasRef = useRef<HTMLDivElement>(null);
   const staticRef = useRef<HTMLDivElement>(null);
+  const echartsRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState(
     "Export accessible SVG or download the screen-reader data table fallback.",
   );
@@ -43,7 +77,7 @@ function AccessibilityExportDemo(): ReactElement {
     if (!target) return;
     const result = await exportAccessibleChart(target, { format: "png" });
     if (!result.a11y) return;
-    downloadAccessibleTable(result.a11y, "line-chart-data.html");
+    downloadAccessibleTable(result.a11y, "chart-data.html");
     setStatus("Downloaded accessible data table HTML fallback.");
     setTablePreview(result.a11y.tableHtml);
   }
@@ -66,6 +100,15 @@ function AccessibilityExportDemo(): ReactElement {
         >
           Export static SVG chart
         </button>
+        <button
+          type="button"
+          onClick={() => exportAccessible(echartsRef.current, "png", "pie-accessible.png")}
+        >
+          Export ECharts pie (PNG + a11y)
+        </button>
+        <button type="button" onClick={() => void downloadTable(echartsRef.current)}>
+          Download ECharts data table
+        </button>
       </div>
       <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>{status}</p>
       <div ref={canvasRef}>
@@ -83,6 +126,20 @@ function AccessibilityExportDemo(): ReactElement {
             series={[{ name: "Revenue", data: VALUES }]}
             renderer="svg"
           />
+        </ChartContainer>
+      </div>
+      <div ref={echartsRef} style={{ display: "grid", gap: 12 }}>
+        <ChartContainer theme={cleanTheme} height={200} width="100%">
+          <PieChart slices={PIE_SLICES} innerRadius={45} />
+        </ChartContainer>
+        <ChartContainer theme={cleanTheme} height={180} width="100%">
+          <CandlestickChart categories={CANDLE_CATEGORIES} data={CANDLE_DATA} />
+        </ChartContainer>
+        <ChartContainer theme={cleanTheme} height={160} width="100%">
+          <HeatmapChart matrix={HEATMAP_MATRIX} min={0} max={1} showLabels />
+        </ChartContainer>
+        <ChartContainer theme={cleanTheme} height={200} width="100%">
+          <FunnelChart stages={FUNNEL_STAGES} />
         </ChartContainer>
       </div>
       {tablePreview ? (
@@ -108,7 +165,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C102 accessibility export — SVG a11y tree on export, screen-reader data table fallback for canvas charts.",
+          "C102–C103 accessibility export — SVG a11y tree on export, screen-reader data table fallback for canvas charts (cartesian + ECharts breadth).",
       },
     },
   },

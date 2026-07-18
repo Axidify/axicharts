@@ -1,8 +1,13 @@
 export type {
   CartesianA11yDescriptor,
   CartesianA11ySeries,
+  CandlestickA11yDescriptor,
   ChartA11yDescriptor,
   ChartA11yTable,
+  FunnelA11yDescriptor,
+  HeatmapA11yDescriptor,
+  HierarchyA11yDescriptor,
+  PieA11yDescriptor,
   SingleValueA11yDescriptor,
 } from "./types";
 export {
@@ -10,6 +15,15 @@ export {
   cartesianA11ySummary,
   type BuildCartesianA11yInput,
 } from "./cartesianDescriptor";
+export {
+  buildCandlestickA11yDescriptor,
+  buildFunnelA11yDescriptor,
+  buildHeatmapA11yDescriptor,
+  buildHierarchyA11yDescriptor,
+  buildPieA11yDescriptor,
+  chartA11ySummary,
+  flattenHierarchyNodes,
+} from "./echartsDescriptor";
 export { buildChartA11yTable, chartA11yTableToHtml } from "./a11yTable";
 export {
   CHART_A11Y_ATTR,
@@ -23,4 +37,8 @@ export {
   CartesianChartA11yRoot,
   type CartesianChartA11yRootProps,
 } from "./CartesianChartA11yRoot";
+export {
+  EChartsChartA11yRoot,
+  type EChartsChartA11yRootProps,
+} from "./EChartsChartA11yRoot";
 export { SvgA11yHead, SVG_A11Y_DESC_ID, SVG_A11Y_TITLE_ID, type SvgA11yHeadProps } from "./SvgA11yHead";

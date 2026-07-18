@@ -2,6 +2,13 @@
 
 import { describe, expect, it } from "vitest";
 import { buildCartesianA11yDescriptor } from "./cartesianDescriptor";
+import {
+  buildCandlestickA11yDescriptor,
+  buildFunnelA11yDescriptor,
+  buildHeatmapA11yDescriptor,
+  buildHierarchyA11yDescriptor,
+  buildPieA11yDescriptor,
+} from "./echartsDescriptor";
 import { buildChartA11yTable, chartA11yTableToHtml } from "./a11yTable";
 import { parseA11yDescriptor, serializeA11yDescriptor } from "./serialize";
 import { enhanceSvgMarkup } from "./enhanceSvgA11y";
@@ -46,5 +53,85 @@ describe("chart a11y", () => {
     expect(html).toContain("<caption>");
     expect(html).toContain("Signups</th>");
     expect(html).toContain(">58</td>");
+  });
+
+  it("builds pie a11y table with share column", () => {
+    const pie = buildPieA11yDescriptor({
+      slices: [
+        { name: "A", value: 25 },
+        { name: "B", value: 75 },
+      ],
+      innerRadius: 40,
+    });
+    const table = buildChartA11yTable(pie);
+    expect(pie.chartType).toBe("donut");
+    expect(table.rows).toEqual([
+      { segment: "A", value: 25, share: "25.0%" },
+      { segment: "B", value: 75, share: "75.0%" },
+    ]);
+    expect(parseA11yDescriptor(serializeA11yDescriptor(pie))).toEqual(pie);
+  });
+
+  it("builds candlestick a11y table with OHLC columns", () => {
+    const candlestick = buildCandlestickA11yDescriptor({
+      categories: ["Mon"],
+      data: [{ open: 10, high: 12, low: 9, close: 11 }],
+      volume: [1000],
+    });
+    const table = buildChartA11yTable(candlestick);
+    expect(table.rows[0]).toEqual({
+      category: "Mon",
+      open: 10,
+      high: 12,
+      low: 9,
+      close: 11,
+      volume: 1000,
+    });
+  });
+
+  it("builds heatmap a11y table as flat x/y/value rows", () => {
+    const heatmap = buildHeatmapA11yDescriptor({
+      matrix: {
+        xCategories: ["A", "B"],
+        yCategories: ["Y1"],
+        values: [[1, 2]],
+      },
+    });
+    const table = buildChartA11yTable(heatmap);
+    expect(table.rows).toEqual([
+      { x: "A", y: "Y1", value: 1 },
+      { x: "B", y: "Y1", value: 2 },
+    ]);
+  });
+
+  it("builds funnel a11y table with share column", () => {
+    const funnel = buildFunnelA11yDescriptor({
+      stages: [
+        { name: "Visit", value: 100 },
+        { name: "Buy", value: 20 },
+      ],
+    });
+    const table = buildChartA11yTable(funnel);
+    expect(table.rows[1]).toEqual({
+      stage: "Buy",
+      value: 20,
+      share: "16.7%",
+    });
+  });
+
+  it("builds hierarchy a11y table from nested nodes", () => {
+    const hierarchy = buildHierarchyA11yDescriptor({
+      chartType: "treemap",
+      nodes: [
+        {
+          name: "Root",
+          children: [
+            { name: "Leaf", value: 5 },
+          ],
+        },
+      ],
+    });
+    const table = buildChartA11yTable(hierarchy);
+    expect(table.rows).toEqual([{ path: "Root > Leaf", value: 5 }]);
   });
 });

@@ -37,7 +37,7 @@ function HeatmapGaDemo(): ReactElement {
     const timer = window.setInterval(() => {
       tick += 1;
       setMatrix(buildMatrix(tick));
-    }, 1000);
+    }, 200);
     return () => window.clearInterval(timer);
   }, []);
 
@@ -53,7 +53,7 @@ function HeatmapGaDemo(): ReactElement {
         />
       </ChartContainer>
       <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
-        C93 heatmap GA — axis labels, cell labels, theme visual map, and live cell updates @ 1 Hz
+        C93 heatmap GA — axis labels, cell labels, theme visual map, and live cell updates @ 5 Hz
       </p>
     </div>
   );

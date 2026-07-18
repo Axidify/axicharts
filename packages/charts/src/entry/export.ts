@@ -15,9 +15,15 @@ export {
 } from "../export/exportAccessibleChart";
 export {
   buildCartesianA11yDescriptor,
+  buildCandlestickA11yDescriptor,
+  buildFunnelA11yDescriptor,
+  buildHeatmapA11yDescriptor,
+  buildHierarchyA11yDescriptor,
+  buildPieA11yDescriptor,
   buildChartA11yTable,
   ChartA11yFallback,
   CartesianChartA11yRoot,
+  EChartsChartA11yRoot,
   CHART_A11Y_ATTR,
   enhanceSvgMarkup,
   resolveChartA11y,

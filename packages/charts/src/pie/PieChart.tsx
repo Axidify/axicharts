@@ -8,6 +8,8 @@ import { EChartsInteractionShell } from "../chrome/EChartsInteractionShell";
 import { useEChartsInteraction } from "../sync/useEChartsInteraction";
 import { useResolvedPieProps } from "../composable/resolvePieProps";
 import { applyChartConfigToPieSlices } from "../config/applyChartConfig";
+import { buildPieA11yDescriptor } from "../a11y/echartsDescriptor";
+import { EChartsChartA11yRoot } from "../a11y/EChartsChartA11yRoot";
 
 export type PieChartProps = {
   slices?: PieSlice[];
@@ -66,21 +68,30 @@ export function PieChart({
     () => applyChartConfigToPieSlices(resolvedSlices, config),
     [resolvedSlices, config],
   );
+  const a11yDescriptor = useMemo(
+    () => buildPieA11yDescriptor({ slices, innerRadius }),
+    [slices, innerRadius],
+  );
 
   if (!ready || size.width < 1 || size.height < 1) {
     return null;
   }
 
   return (
-    <EChartsInteractionShell
-      plot={
-        <PiePlot
-          slices={slices}
-          innerRadius={innerRadius}
-          showLabels={showLabels}
-        />
-      }
-    />
+    <EChartsChartA11yRoot
+      descriptor={a11yDescriptor}
+      style={{ width: size.width, height: size.height, position: "relative" }}
+    >
+      <EChartsInteractionShell
+        plot={
+          <PiePlot
+            slices={slices}
+            innerRadius={innerRadius}
+            showLabels={showLabels}
+          />
+        }
+      />
+    </EChartsChartA11yRoot>
   );
 }
 

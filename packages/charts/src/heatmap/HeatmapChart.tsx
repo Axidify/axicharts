@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement } from "react";
+import { useMemo } from "react";
 import {
   EChartsHeatmap,
   type HeatmapMatrix,
@@ -8,6 +9,8 @@ import {
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { EChartsInteractionShell } from "../chrome/EChartsInteractionShell";
 import { useEChartsInteraction } from "../sync/useEChartsInteraction";
+import { buildHeatmapA11yDescriptor } from "../a11y/echartsDescriptor";
+import { EChartsChartA11yRoot } from "../a11y/EChartsChartA11yRoot";
 
 export type HeatmapChartProps = {
   matrix: HeatmapMatrix;
@@ -66,20 +69,29 @@ export function HeatmapChart({
   }
 
   const axes = showAxes ?? theme.axis.show;
+  const a11yDescriptor = useMemo(
+    () => buildHeatmapA11yDescriptor({ matrix }),
+    [matrix],
+  );
 
   return (
-    <EChartsInteractionShell
-      plot={
-        <HeatmapPlot
-          matrix={matrix}
-          min={min}
-          max={max}
-          showLabels={showLabels}
-          showAxes={axes}
-          cellFormatter={cellFormatter}
-        />
-      }
-    />
+    <EChartsChartA11yRoot
+      descriptor={a11yDescriptor}
+      style={{ width: size.width, height: size.height, position: "relative" }}
+    >
+      <EChartsInteractionShell
+        plot={
+          <HeatmapPlot
+            matrix={matrix}
+            min={min}
+            max={max}
+            showLabels={showLabels}
+            showAxes={axes}
+            cellFormatter={cellFormatter}
+          />
+        }
+      />
+    </EChartsChartA11yRoot>
   );
 }
 

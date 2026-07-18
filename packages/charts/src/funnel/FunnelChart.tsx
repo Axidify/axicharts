@@ -11,6 +11,8 @@ import { EChartsInteractionShell } from "../chrome/EChartsInteractionShell";
 import { useEChartsInteraction } from "../sync/useEChartsInteraction";
 import { useResolvedFunnelProps } from "../composable/resolveFunnelProps";
 import { applyChartConfigToFunnelStages } from "../config/applyChartConfig";
+import { buildFunnelA11yDescriptor } from "../a11y/echartsDescriptor";
+import { EChartsChartA11yRoot } from "../a11y/EChartsChartA11yRoot";
 
 export type FunnelChartProps = {
   stages?: FunnelStage[];
@@ -63,15 +65,24 @@ export function FunnelChart({
     () => applyChartConfigToFunnelStages(resolvedStages, config),
     [resolvedStages, config],
   );
+  const a11yDescriptor = useMemo(
+    () => buildFunnelA11yDescriptor({ stages }),
+    [stages],
+  );
 
   if (!ready || size.width < 1 || size.height < 1) {
     return null;
   }
 
   return (
-    <EChartsInteractionShell
-      plot={<FunnelPlot stages={stages} sort={sort ?? sortProp} />}
-    />
+    <EChartsChartA11yRoot
+      descriptor={a11yDescriptor}
+      style={{ width: size.width, height: size.height, position: "relative" }}
+    >
+      <EChartsInteractionShell
+        plot={<FunnelPlot stages={stages} sort={sort ?? sortProp} />}
+      />
+    </EChartsChartA11yRoot>
   );
 }
 

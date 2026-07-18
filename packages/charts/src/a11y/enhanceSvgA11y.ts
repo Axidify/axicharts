@@ -1,5 +1,6 @@
 import { buildChartA11yTable, chartA11yTableToHtml } from "./a11yTable";
 import { cartesianA11ySummary } from "./cartesianDescriptor";
+import { chartA11ySummary } from "./echartsDescriptor";
 import type { CartesianA11yDescriptor, ChartA11yDescriptor } from "./types";
 
 const TITLE_ID = "axicharts-a11y-title";
@@ -94,11 +95,13 @@ export function enhanceSvgElement(
   const title =
     descriptor.kind === "cartesian" ?
       descriptor.title ?? cartesianA11ySummary(descriptor)
-    : descriptor.title;
+    : descriptor.title ?? chartA11ySummary(descriptor);
   const description =
     descriptor.kind === "cartesian" ?
       descriptor.description ?? cartesianA11ySummary(descriptor)
-    : descriptor.description ?? `${descriptor.title}: ${descriptor.value}`;
+    : descriptor.kind === "single-value" ?
+      descriptor.description ?? `${descriptor.title}: ${descriptor.value}`
+    : descriptor.description ?? chartA11ySummary(descriptor);
 
   clone.setAttribute("role", "graphics-document");
   clone.setAttribute("aria-labelledby", `${TITLE_ID} ${DESC_ID}`);

@@ -24,6 +24,40 @@ export function parseA11yDescriptor(raw: string): ChartA11yDescriptor | null {
       }
       return parsed;
     }
+    if (parsed.kind === "pie") {
+      if (!Array.isArray(parsed.slices)) {
+        return null;
+      }
+      return parsed;
+    }
+    if (parsed.kind === "candlestick") {
+      if (!Array.isArray(parsed.categories) || !Array.isArray(parsed.data)) {
+        return null;
+      }
+      return parsed;
+    }
+    if (parsed.kind === "heatmap") {
+      if (
+        !Array.isArray(parsed.xCategories) ||
+        !Array.isArray(parsed.yCategories) ||
+        !Array.isArray(parsed.values)
+      ) {
+        return null;
+      }
+      return parsed;
+    }
+    if (parsed.kind === "funnel") {
+      if (!Array.isArray(parsed.stages)) {
+        return null;
+      }
+      return parsed;
+    }
+    if (parsed.kind === "hierarchy") {
+      if (!Array.isArray(parsed.items)) {
+        return null;
+      }
+      return parsed;
+    }
     return null;
   } catch {
     return null;
