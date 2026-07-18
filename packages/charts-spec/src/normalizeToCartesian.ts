@@ -1,5 +1,6 @@
-import type { ChartBlockMarkSpec, FieldEncoding, PanelSpec } from "./types";
+import type { ChartBlockMarkSpec, FieldEncoding, PanelSpec, AnnotationSpec } from "./types";
 import { normalizeBlockMark, normalizeMarksArray } from "./cartesianMarks";
+import { readPanelAnnotations } from "./panelAnnotations";
 
 export type NormalizedCartesianSpec = PanelSpec & {
   type: "cartesian";
@@ -64,6 +65,36 @@ function legacyBandsToMarks(
   return marks;
 }
 
+function annotationsToMarks(annotations: AnnotationSpec[]): ChartBlockMarkSpec[] {
+  const marks: ChartBlockMarkSpec[] = [];
+  for (const annotation of annotations) {
+    if (annotation.type === "line") {
+      marks.push({
+        type: "rule",
+        value: annotation.value,
+        ...(annotation.label ? { label: annotation.label } : {}),
+        ...(annotation.tone ? { tone: annotation.tone } : {}),
+        ...(annotation.orientation ? { orientation: annotation.orientation } : {}),
+      });
+    } else if (annotation.type === "band") {
+      marks.push({
+        type: "band",
+        min: annotation.min,
+        max: annotation.max,
+        ...(annotation.label ? { label: annotation.label } : {}),
+        ...(annotation.tone ? { tone: annotation.tone } : {}),
+      });
+    }
+  }
+  return marks;
+}
+
+function remainingAnnotations(annotations: AnnotationSpec[]): AnnotationSpec[] {
+  return annotations.filter(
+    (annotation) => annotation.type === "label" || annotation.type === "marker",
+  );
+}
+
 /**
  * Normalize legacy panel types and mark aliases to `type: "cartesian"`.
  * Does not validate — call `validateCartesianSpec` after.
@@ -110,12 +141,26 @@ export function normalizeToCartesian(spec: PanelSpec): NormalizedCartesianSpec {
     ...marks,
     ...legacyReferenceLinesToMarks(spec.props),
     ...legacyBandsToMarks(spec.props),
+    ...annotationsToMarks(readPanelAnnotations(spec) ?? []),
   ];
+
+  const sourceAnnotations = readPanelAnnotations(spec) ?? [];
+  const annotations = remainingAnnotations(sourceAnnotations);
 
   return {
     ...base,
     type: "cartesian",
     marks,
+    ...(annotations.length > 0 ? { annotations } : { annotations: undefined }),
+    props: spec.props
+      ? {
+          ...spec.props,
+          annotations:
+            annotations.length > 0 ? annotations : undefined,
+          referenceLines: undefined,
+          thresholdBands: undefined,
+        }
+      : undefined,
   };
 }
 

@@ -52,6 +52,13 @@ export {
   type BlocksPlaygroundPreset,
   type PlaygroundEvaluation,
 } from "./blocksPlayground";
+export {
+  createCartesianPanel,
+  listCartesianMarks,
+  CARTESIAN_MARK_CATALOG,
+  type CreateCartesianPanelInput,
+  type CartesianMarkCatalogEntry,
+} from "./createCartesianPanel";
 export { compilePanel, type CompileOptions } from "./compilePanel";
 export {
   compileDashboard,

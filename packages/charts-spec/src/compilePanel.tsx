@@ -412,6 +412,15 @@ export function compilePanel(
         series: applyTagTonesToSeries(fromMarks.series, tagTones) as ComboSeries[],
         fill: cartesian.fill ?? fromMarks.fill,
         valueSuffix: cartesian.valueSuffix,
+        ...(fromMarks.showValues || cartesian.showValues
+          ? { showValues: true }
+          : {}),
+        ...(fromMarks.stacked || cartesian.stacked ? { stacked: true } : {}),
+        ...(fromMarks.dualAxis != null
+          ? { dualAxis: fromMarks.dualAxis }
+          : props.dualAxis != null
+            ? { dualAxis: props.dualAxis as boolean }
+            : {}),
         referenceLines: [
           ...fromMarks.referenceLines,
           ...((props.referenceLines as typeof fromMarks.referenceLines | undefined) ??

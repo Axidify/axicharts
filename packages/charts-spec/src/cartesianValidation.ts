@@ -3,6 +3,7 @@ import type { ChartBlockMarkSpec } from "./types";
 import { asRows } from "./data";
 import { normalizeBlockMark, isDataMark, isOverlayMark } from "./cartesianMarks";
 import { suggestField } from "./fieldSuggest";
+import { readPanelAnnotations } from "./panelAnnotations";
 
 export type ValidationSeverity = "error" | "warning";
 
@@ -225,9 +226,16 @@ export function validateCartesianSpec(
   const props = spec.props ?? {};
   const legacyRules = Array.isArray(props.referenceLines) ? props.referenceLines.length : 0;
   const legacyBands = Array.isArray(props.thresholdBands) ? props.thresholdBands.length : 0;
+  const annotationOverlays = (readPanelAnnotations(spec) ?? []).filter(
+    (annotation) => annotation.type === "line" || annotation.type === "band",
+  ).length;
   const markRules = normalizedMarks.filter((m) => m.type === "rule").length;
   const markBands = normalizedMarks.filter((m) => m.type === "band").length;
-  if ((legacyRules > 0 && markRules > 0) || (legacyBands > 0 && markBands > 0)) {
+  if (
+    (legacyRules > 0 && markRules > 0) ||
+    (legacyBands > 0 && markBands > 0) ||
+    (annotationOverlays > 0 && (markRules > 0 || markBands > 0))
+  ) {
     warnings.push({
       code: "DUPLICATE_OVERLAY_CHANNEL",
       path: "props",

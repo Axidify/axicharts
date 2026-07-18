@@ -66,4 +66,33 @@ describe("blockMarksToChartProps", () => {
     expect(result.series[0]?.curve).toBe("linear");
     expect(result.series[1]?.curve).toBe("monotone");
   });
+
+  it("maps yAxisId right to dualAxis", () => {
+    const result = blockMarksToChartProps(ROWS, [
+      { type: "bar", field: "revenue", yAxisId: "left" },
+      { type: "line", field: "target", yAxisId: "right" },
+    ]);
+    expect(result.dualAxis).toBe(true);
+  });
+
+  it("maps bar labels to showValues", () => {
+    const result = blockMarksToChartProps(ROWS, [
+      { type: "bar", field: "revenue", labels: true },
+    ]);
+    expect(result.showValues).toBe(true);
+  });
+
+  it("maps shared stack id to stacked", () => {
+    const result = blockMarksToChartProps(
+      [
+        { week: "W1", a: 10, b: 12 },
+        { week: "W2", a: 14, b: 9 },
+      ],
+      [
+        { type: "bar", field: "a", stack: "s1" },
+        { type: "bar", field: "b", stack: "s1" },
+      ],
+    );
+    expect(result.stacked).toBe(true);
+  });
 });

@@ -70,6 +70,10 @@ export type ChartBlockSeriesMark = {
   label?: string;
   tone?: "default" | "info" | "success" | "warning" | "critical";
   yAxisId?: "left" | "right";
+  /** Shared stack id — bars with the same id stack (panel `stacked` when 2+ bars share id). */
+  stack?: string;
+  /** Bar value labels (maps to chart `showValues` when any bar mark sets true). */
+  labels?: boolean;
   curve?: "linear" | "monotone";
 };
 

@@ -1,5 +1,6 @@
 import type {
   ComboSeries,
+  DualAxisMode,
   ReferenceLine,
   SeriesTone,
   ThresholdBand,
@@ -14,7 +15,38 @@ export type BlockMarksChartProps = {
   thresholdBands: ThresholdBand[];
   /** Chart-level fill — only when all data marks are area (no bars). */
   fill: boolean;
+  showValues?: boolean;
+  stacked?: boolean;
+  dualAxis?: DualAxisMode;
 };
+
+function resolveStacked(marks: ChartBlockMarkSpec[]): boolean {
+  const barMarks = marks.filter(
+    (mark): mark is Extract<ChartBlockMarkSpec, { type: "bar" }> =>
+      isSeriesBlockMark(mark) && mark.type === "bar",
+  );
+  const stackIds = barMarks
+    .map((mark) => mark.stack)
+    .filter((id): id is string => typeof id === "string" && id.length > 0);
+  if (stackIds.length < 2) return false;
+  return new Set(stackIds).size === 1;
+}
+
+function resolveShowValues(marks: ChartBlockMarkSpec[]): boolean {
+  return marks.some(
+    (mark) => isSeriesBlockMark(mark) && mark.type === "bar" && mark.labels === true,
+  );
+}
+
+function resolveDualAxis(marks: ChartBlockMarkSpec[]): DualAxisMode | undefined {
+  const axes = marks
+    .filter(isSeriesBlockMark)
+    .map((mark) => mark.yAxisId)
+    .filter((id): id is "left" | "right" => id === "left" || id === "right");
+  if (axes.includes("right")) return true;
+  if (axes.includes("left") && axes.includes("right")) return true;
+  return undefined;
+}
 
 const SERIES_KINDS = new Set(["line", "bar", "area"]);
 
@@ -78,6 +110,9 @@ export function blockMarksToChartProps(
     referenceLines,
     thresholdBands,
     fill: !hasBar && allArea,
+    showValues: resolveShowValues(marks),
+    stacked: resolveStacked(marks),
+    dualAxis: resolveDualAxis(marks),
   };
 }
 

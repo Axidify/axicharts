@@ -57,6 +57,12 @@ export function normalizeBlockMark(raw: unknown): ChartBlockMarkSpec | null {
     if (raw.curve === "linear" || raw.curve === "monotone") {
       mark.curve = raw.curve;
     }
+    if (typeof raw.stack === "string" && raw.stack.length > 0) {
+      mark.stack = raw.stack;
+    }
+    if (raw.labels === true) {
+      mark.labels = true;
+    }
     return mark;
   }
 

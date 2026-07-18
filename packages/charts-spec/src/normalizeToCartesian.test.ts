@@ -68,4 +68,20 @@ describe("normalizeToCartesian", () => {
       true,
     );
   });
+
+  it("merges annotations line/band into marks and keeps label/marker", () => {
+    const spec = normalizeToCartesian({
+      type: "cartesian",
+      encoding: { x: { field: "week" } },
+      marks: [{ type: "line", field: "revenue" }],
+      annotations: [
+        { type: "line", value: 90, label: "SLO" },
+        { type: "band", min: 0, max: 50, label: "Healthy" },
+        { type: "label", text: "Peak", y: 55 },
+      ],
+    });
+    expect(spec.marks.some((m) => m.type === "rule" && m.value === 90)).toBe(true);
+    expect(spec.marks.some((m) => m.type === "band" && m.min === 0)).toBe(true);
+    expect(spec.annotations).toEqual([{ type: "label", text: "Peak", y: 55 }]);
+  });
 });

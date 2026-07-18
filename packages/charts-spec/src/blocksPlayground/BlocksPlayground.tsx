@@ -9,6 +9,7 @@ import {
   type BlocksPlaygroundPreset,
 } from "./presets";
 import { evaluatePlaygroundSpec } from "./evaluate";
+import { createCartesianPanel } from "../createCartesianPanel";
 
 export type BlocksPlaygroundProps = {
   initialPresetId?: string;
@@ -105,6 +106,7 @@ export function BlocksPlayground({
   const [specText, setSpecText] = useState(() => presetSpecJson(initial));
   const [dataText, setDataText] = useState(() => JSON.stringify(initial.rows, null, 2));
   const [showDataEditor, setShowDataEditor] = useState(false);
+  const [intent, setIntent] = useState(initial.intent ?? "");
 
   const loadPreset = useCallback((preset: BlocksPlaygroundPreset) => {
     setPresetId(preset.id);
@@ -174,6 +176,35 @@ export function BlocksPlayground({
             ) : null}
           </p>
         ) : null}
+        <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+          <input
+            type="text"
+            value={intent}
+            onChange={(e) => setIntent(e.target.value)}
+            placeholder="Intent → createCartesianPanel (C139 rules)"
+            style={{
+              flex: "1 1 280px",
+              padding: "8px 10px",
+              borderRadius: 6,
+              border: "1px solid #cbd5e1",
+              fontSize: 13,
+            }}
+          />
+          <button
+            type="button"
+            style={chipStyle}
+            onClick={() => {
+              const fields =
+                parsedRows.length > 0
+                  ? Object.keys(parsedRows[0] ?? {})
+                  : Object.keys(initial.rows[0] ?? {});
+              const panel = createCartesianPanel({ intent, fields });
+              setSpecText(JSON.stringify(panel, null, 2));
+            }}
+          >
+            Generate spec
+          </button>
+        </div>
       </div>
 
       {showDataEditor ? (
