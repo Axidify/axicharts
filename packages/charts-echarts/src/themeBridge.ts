@@ -1,5 +1,6 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
 import { resolveChartChrome, resolveToneColors } from "@axicharts/charts-theme";
+import { echartsColor } from "./echartsColor";
 
 export { toneColor, seriesPalette } from "./palette";
 export type { SeriesTone } from "./types";
@@ -20,7 +21,7 @@ export function gridOptions(theme: ChartTheme) {
 export function axisLabelStyle(theme: ChartTheme) {
   const chrome = resolveChartChrome(theme);
   return {
-    color: chrome.axis,
+    color: echartsColor(chrome.axis),
     fontSize: 11,
     fontFamily: theme.values.monospace
       ? "ui-monospace, SFMono-Regular, Menlo, monospace"
@@ -33,7 +34,7 @@ export function splitLineStyle(theme: ChartTheme) {
   return {
     show: theme.grid.horizontal,
     lineStyle: {
-      color: chrome.grid,
+      color: echartsColor(chrome.grid),
       width: theme.grid.strokeWidth,
     },
   };
@@ -78,5 +79,5 @@ export function reactAxisPointer() {
 
 export function upDownColors(theme?: Pick<ChartTheme, "tokens">) {
   const tones = resolveToneColors(theme);
-  return { up: tones.success, down: tones.critical };
+  return { up: echartsColor(tones.success), down: echartsColor(tones.critical) };
 }

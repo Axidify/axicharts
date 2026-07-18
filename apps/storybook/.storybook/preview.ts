@@ -1,4 +1,5 @@
 import type { Preview } from "@storybook/react";
+import "@axicharts/charts-echarts";
 import "../../../packages/charts-theme/tokens.css";
 import "uplot/dist/uPlot.min.css";
 import "./preview.css";

@@ -154,6 +154,27 @@ const WORDS = [
   { text: "cache", value: 15 },
 ];
 
+/** Compact catalog fixtures — strip panel chrome that duplicates card labels. */
+function catalogPanel(spec: PanelSpec): PanelSpec {
+  const { title: _title, valueSuffix: _suffix, ...rest } = spec;
+  const compact: PanelSpec = { ...rest, height: 120 };
+  if (compact.type === "donut" || compact.type === "pie") {
+    return {
+      ...compact,
+      props: { ...compact.props, showLabels: false },
+    };
+  }
+  if (compact.type === "bar") {
+    return {
+      ...compact,
+      props: { ...compact.props, showValues: false },
+    };
+  }
+  return compact;
+}
+
+const CATALOG_CHART_HEIGHT = 120;
+
 const FUNNEL = [
   { name: "Leads", value: 240, tone: "info" as const },
   { name: "Qualified", value: 160 },
@@ -239,10 +260,18 @@ function ChartCatalogWall(): ReactElement {
             </ChartContainer>
           </CatalogCard>
           <CatalogCard label="Bar">
-            <Chart panel={throughputSpec as PanelSpec} data={THROUGHPUT_ROWS} />
+            <Chart
+              panel={catalogPanel(throughputSpec as PanelSpec)}
+              data={THROUGHPUT_ROWS}
+              height={CATALOG_CHART_HEIGHT}
+            />
           </CatalogCard>
           <CatalogCard label="Area">
-            <Chart panel={areaSloSpec as PanelSpec} data={LATENCY_ROWS} />
+            <Chart
+              panel={catalogPanel(areaSloSpec as PanelSpec)}
+              data={LATENCY_ROWS}
+              height={CATALOG_CHART_HEIGHT}
+            />
           </CatalogCard>
           <CatalogCard label="Combo">
             <ChartContainer theme={cleanTheme} height={120} width="100%">
@@ -250,7 +279,11 @@ function ChartCatalogWall(): ReactElement {
             </ChartContainer>
           </CatalogCard>
           <CatalogCard label="Stacked bar">
-            <Chart panel={stackedBarSpec as PanelSpec} data={[]} />
+            <Chart
+              panel={catalogPanel(stackedBarSpec as PanelSpec)}
+              data={[]}
+              height={CATALOG_CHART_HEIGHT}
+            />
           </CatalogCard>
           <CatalogCard label="Scatter">
             <ChartContainer theme={cleanTheme} height={120} width="100%">
@@ -266,6 +299,7 @@ function ChartCatalogWall(): ReactElement {
                   },
                 ]}
                 showAxes={false}
+                showPointLabels
               />
             </ChartContainer>
           </CatalogCard>
@@ -276,7 +310,11 @@ function ChartCatalogWall(): ReactElement {
         <h3 style={sectionTitle}>Distribution</h3>
         <div style={grid}>
           <CatalogCard label="Pie / donut">
-            <Chart panel={donutSpec as PanelSpec} data={BROWSER_SHARE_ROWS} />
+            <Chart
+              panel={catalogPanel(donutSpec as PanelSpec)}
+              data={BROWSER_SHARE_ROWS}
+              height={CATALOG_CHART_HEIGHT}
+            />
           </CatalogCard>
           <CatalogCard label="Funnel">
             <ChartContainer theme={cleanTheme} height={140} width="100%">

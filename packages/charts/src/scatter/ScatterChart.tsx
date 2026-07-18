@@ -12,6 +12,7 @@ import { useEChartsInteraction } from "../sync/useEChartsInteraction";
 export type ScatterChartProps = {
   series: ScatterSeries[];
   showAxes?: boolean;
+  showPointLabels?: boolean;
   xLabel?: string;
   yLabel?: string;
   xSuffix?: string;
@@ -21,6 +22,7 @@ export type ScatterChartProps = {
 function ScatterPlot({
   series,
   showAxes,
+  showPointLabels,
   xLabel,
   yLabel,
   xSuffix,
@@ -36,6 +38,7 @@ function ScatterPlot({
       series={series}
       theme={theme}
       showAxes={showAxes}
+      showPointLabels={showPointLabels}
       xLabel={xLabel}
       yLabel={yLabel}
       xSuffix={xSuffix}
@@ -48,6 +51,7 @@ function ScatterPlot({
 export function ScatterChart({
   series,
   showAxes,
+  showPointLabels,
   xLabel,
   yLabel,
   xSuffix,
@@ -67,6 +71,7 @@ export function ScatterChart({
         <ScatterPlot
           series={series}
           showAxes={axes}
+          showPointLabels={showPointLabels}
           xLabel={xLabel}
           yLabel={yLabel}
           xSuffix={xSuffix}

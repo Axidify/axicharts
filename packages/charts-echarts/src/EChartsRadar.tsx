@@ -3,7 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
-import { axisLabelStyle, gridOptions, hiddenTooltip, seriesPalette, splitLineStyle, toneColor } from "./themeBridge";
+import { axisLabelStyle, hiddenTooltip, seriesPalette, splitLineStyle, toneColor } from "./themeBridge";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { RadarIndicator, RadarSeries } from "./radarTypes";
 
@@ -40,7 +40,6 @@ export function EChartsRadar({
   });
 
   const option: EChartsOption = {
-    grid: gridOptions(theme),
     tooltip: hiddenTooltip(),
     radar: {
       indicator: indicators.map((indicator, index) => ({

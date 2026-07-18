@@ -7,6 +7,13 @@ const VISUAL_STORIES = [
     waitFor: "canvas",
   },
   {
+    id: "charts-catalog--all-types",
+    name: "catalog-all-types",
+    waitFor: "text=Shipped chart types",
+    settleMs: 3500,
+    maxDiffPixelRatio: 0.04,
+  },
+  {
     id: "charts-wordcloud--incident-and-feedback",
     name: "wordcloud-incident",
     waitFor: "canvas",

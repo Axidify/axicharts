@@ -20,6 +20,7 @@ export type EChartsScatterProps = {
   series: ScatterSeries[];
   theme: ChartTheme;
   showAxes?: boolean;
+  showPointLabels?: boolean;
   xLabel?: string;
   yLabel?: string;
   xSuffix?: string;
@@ -39,6 +40,7 @@ export function EChartsScatter({
   series,
   theme,
   showAxes = true,
+  showPointLabels = false,
   xLabel,
   yLabel,
   xSuffix = "",
@@ -49,7 +51,7 @@ export function EChartsScatter({
   const baseGrid = gridOptions(theme);
   const grid = {
     ...baseGrid,
-    top: showLegend ? 28 : baseGrid.top,
+    top: showLegend ? 28 : showPointLabels ? 22 : baseGrid.top,
     bottom: xLabel ? 36 : baseGrid.bottom,
     left: yLabel ? 48 : baseGrid.left,
   };
@@ -104,6 +106,15 @@ export function EChartsScatter({
       emphasis: {
         scale: 1.2,
       },
+      label: showPointLabels
+        ? {
+            show: true,
+            position: "top",
+            fontSize: 10,
+            color: axisNameStyle.color,
+            formatter: (params: { name?: string }) => params.name ?? "",
+          }
+        : { show: false },
     })),
   };
 

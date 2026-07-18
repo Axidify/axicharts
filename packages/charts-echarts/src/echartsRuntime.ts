@@ -14,10 +14,12 @@ import {
   TreemapChart,
 } from "echarts/charts";
 import {
+  AxisPointerComponent,
   DataZoomComponent,
   DatasetComponent,
   GridComponent,
   LegendComponent,
+  MarkLineComponent,
   ParallelComponent,
   SingleAxisComponent,
   TooltipComponent,
@@ -44,6 +46,8 @@ echarts.use([
   GridComponent,
   DataZoomComponent,
   LegendComponent,
+  AxisPointerComponent,
+  MarkLineComponent,
   ParallelComponent,
   SingleAxisComponent,
   TooltipComponent,
