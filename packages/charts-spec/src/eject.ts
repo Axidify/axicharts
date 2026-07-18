@@ -94,7 +94,9 @@ function resolveChartName(spec: PanelSpec): string {
                               ? "MapChart"
                               : spec.type === "gantt"
                                 ? "GanttChart"
-                                : spec.type === "navigator"
+                                : spec.type === "echarts"
+                                  ? "EChartsOptionChart"
+                                  : spec.type === "navigator"
                                   ? "ChartNavigator"
                                   : "Gauge";
 }
@@ -335,6 +337,13 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     chartBody = `tasks={${dataVar}.tasks ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).tasks ?? [])}}
     milestones={${dataVar}.milestones ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).milestones ?? [])}}
     today={${dataVar}.today ?? ${String(chartPropsFromPanel(spec.props ?? {}).today ?? "undefined")}}`;
+  } else if (spec.type === "echarts") {
+    const echartsProps = chartPropsFromPanel(spec.props ?? {});
+    const option =
+      echartsProps.option ??
+      (spec as PanelSpec & { option?: unknown }).option ??
+      {};
+    chartBody = `option={${dataVar}.option ?? ${JSON.stringify(option)}}`;
   } else if (spec.type === "navigator") {
     const xField = encoding?.x?.field ?? "date";
     const yField = Array.isArray(encoding?.y)

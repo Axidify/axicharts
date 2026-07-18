@@ -47,5 +47,6 @@ describe("panel category registration", () => {
     expect(resolvePanelCategory("theme-river")).toBe("matrix");
     expect(resolvePanelCategory("gauge")).toBe("industrial");
     expect(resolvePanelCategory("stat")).toBe("kpi");
+    expect(resolvePanelCategory("echarts")).toBe("platform");
   });
 });

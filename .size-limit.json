@@ -138,6 +138,12 @@
     "gzip": true
   },
   {
+    "name": "@axicharts/charts/echarts-option",
+    "path": "packages/charts/dist/entry/echarts-option.js",
+    "limit": "6 KB",
+    "gzip": true
+  },
+  {
     "name": "@axicharts/charts/full",
     "path": "packages/charts/dist/entry/full.js",
     "limit": "14 KB",

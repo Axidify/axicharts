@@ -36,6 +36,7 @@ export const PANEL_TYPE_CATEGORY: Record<string, PanelCategory> = {
   alert: "platform",
   markdown: "platform",
   text: "platform",
+  echarts: "platform",
 };
 
 const registered = new Set<PanelCategory>();

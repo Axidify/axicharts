@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-map",
-  "version": "0.3.37",
+  "version": "0.3.38",
   "description": "Community TopoJSON choropleth map plugin for AxiCharts — registerChartType extension.",
   "license": "MIT",
   "repository": {

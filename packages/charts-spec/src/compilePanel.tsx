@@ -26,6 +26,7 @@ import {
   AlertPanel,
   DataTable,
   MarkdownPanel,
+  EChartsOptionChart,
   type AlertItem,
   type PlotSeries,
   type StatTone,
@@ -810,6 +811,27 @@ export function compilePanel(
           rangeEnd: props.rangeEnd as number | undefined,
           today: props.today as number | undefined,
           surface: props.surface as "light" | "dark" | undefined,
+        }),
+      );
+    }
+
+    case "echarts": {
+      const option =
+        (props.option as Parameters<typeof EChartsOptionChart>[0]["option"]) ??
+        (objectData.option as Parameters<typeof EChartsOptionChart>[0]["option"]) ??
+        (resolved as PanelSpec & { option?: unknown }).option;
+      const categories =
+        (props.categories as string[] | undefined) ??
+        (objectData.categories as string[] | undefined);
+      if (!option || typeof option !== "object") {
+        throw new Error(
+          '[AxiCharts] Panel type "echarts" requires an ECharts option object in props.option, data.option, or top-level option.',
+        );
+      }
+      return wrap(
+        createElement(EChartsOptionChart, {
+          option: option as Parameters<typeof EChartsOptionChart>[0]["option"],
+          categories,
         }),
       );
     }

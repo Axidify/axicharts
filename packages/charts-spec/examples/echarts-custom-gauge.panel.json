@@ -1,0 +1,31 @@
+{
+  "specVersion": 1,
+  "type": "echarts",
+  "title": "Custom gauge",
+  "theme": "clean",
+  "height": 280,
+  "props": {
+    "option": {
+      "series": [
+        {
+          "type": "gauge",
+          "startAngle": 200,
+          "endAngle": -20,
+          "progress": { "show": true, "width": 14 },
+          "axisLine": { "lineStyle": { "width": 14 } },
+          "pointer": { "show": false },
+          "axisTick": { "show": false },
+          "splitLine": { "show": false },
+          "axisLabel": { "show": false },
+          "detail": {
+            "valueAnimation": true,
+            "fontSize": 28,
+            "offsetCenter": [0, "10%"],
+            "formatter": "{value}%"
+          },
+          "data": [{ "value": 72, "name": "Utilization" }]
+        }
+      ]
+    }
+  }
+}

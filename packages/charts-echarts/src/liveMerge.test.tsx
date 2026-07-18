@@ -21,6 +21,7 @@ import { EChartsFunnel } from "./EChartsFunnel";
 import { EChartsParallel } from "./EChartsParallel";
 import { EChartsPie } from "./EChartsPie";
 import { EChartsRadar } from "./EChartsRadar";
+import { EChartsOptionChart } from "./EChartsOptionChart";
 import { EChartsScatter } from "./EChartsScatter";
 import { EChartsThemeRiver } from "./EChartsThemeRiver";
 import { EChartsWordCloud } from "./EChartsWordCloud";
@@ -204,6 +205,24 @@ describe("live merge adapters", () => {
         indicators={[{ name: "Speed" }]}
         series={[{ name: "Team", values: [80] }]}
         theme={cleanTheme}
+        mergeOption
+      />,
+    );
+
+    const call = useEChartCalls.at(-1);
+    expect(call?.mergeOption).toBe(true);
+    expect((call?.option as { animation?: boolean }).animation).toBe(false);
+  });
+
+  it("passes mergeOption to useEChart for raw option chart in live mode", () => {
+    renderAdapter(
+      <EChartsOptionChart
+        width={320}
+        height={240}
+        theme={cleanTheme}
+        option={{
+          series: [{ type: "bar", data: [4, 8, 2] }],
+        }}
         mergeOption
       />,
     );

@@ -29,6 +29,10 @@ export {
   type EChartsHeatmapProps,
   type HeatmapBrushRange,
 } from "./EChartsHeatmap";
+export {
+  EChartsOptionChart,
+  type EChartsOptionChartProps,
+} from "./EChartsOptionChart";
 export { EChartsRadar, type EChartsRadarProps } from "./EChartsRadar";
 export type { RadarIndicator, RadarSeries } from "./radarTypes";
 export { EChartsParallel, type EChartsParallelProps } from "./EChartsParallel";

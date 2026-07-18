@@ -92,6 +92,7 @@ export type PanelChartType =
   | "geo"
   | "map"
   | "gantt"
+  | "echarts"
   | string;
 
 export type PanelSpec = {

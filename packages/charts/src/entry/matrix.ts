@@ -38,6 +38,11 @@ export {
   type HierarchyNode,
 } from "../sunburst/SunburstChart";
 export {
+  EChartsOptionChart,
+  type EChartsOptionChartProps,
+} from "../echartsOption/EChartsOptionChart";
+export { registerEChartsOptionChart } from "../echartsOption/registerCore";
+export {
   ChartSyncGroup,
   useChartSync,
   useOptionalChartSync,

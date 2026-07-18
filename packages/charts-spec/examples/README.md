@@ -24,6 +24,12 @@ Runnable fixtures for `compilePanel`, `ejectPanel`, and the CLI.
 
 Registry prep (shadcn custom registry): [shadcn-registry/](./shadcn-registry/) · source in repo `registry/`.
 
+## Escape hatch (C121)
+
+| File | Notes |
+|------|-------|
+| [echarts-custom-gauge.panel.json](./echarts-custom-gauge.panel.json) | Raw ECharts `option` via `type: "echarts"` — power-user / trusted input |
+
 ## CLI
 
 ```bash

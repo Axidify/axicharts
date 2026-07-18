@@ -70,6 +70,11 @@ export {
   type WordCloudWord,
 } from "../wordCloud/WordCloudChart";
 export {
+  EChartsOptionChart,
+  type EChartsOptionChartProps,
+} from "../echartsOption/EChartsOptionChart";
+export { registerEChartsOptionChart } from "../echartsOption/registerCore";
+export {
   BoxplotChart,
   type BoxplotChartProps,
   type BoxplotItem,

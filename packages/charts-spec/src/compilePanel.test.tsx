@@ -11,6 +11,7 @@ import {
 } from "@axicharts/charts-map";
 import { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 import { compilePanel } from "./compilePanel";
+import { ejectPanel } from "./eject";
 
 describe("compilePanel registered types", () => {
   it("compiles community plugin panels via registerChartType", () => {
@@ -663,5 +664,62 @@ describe("compilePanel presentation mode", () => {
     await waitFor(() => {
       expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
     });
+  });
+});
+
+describe("compilePanel echarts escape hatch", () => {
+  const gaugeOption = {
+    series: [
+      {
+        type: "gauge",
+        data: [{ value: 72, name: "Utilization" }],
+      },
+    ],
+  };
+
+  it("compiles echarts panels from props.option", async () => {
+    const panel = compilePanel(
+      {
+        type: "echarts",
+        title: "Custom gauge",
+        height: 240,
+        props: { option: gaugeOption },
+      },
+      {},
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Custom gauge");
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+
+  it("compiles echarts panels from data.option", async () => {
+    const panel = compilePanel(
+      {
+        type: "echarts",
+        height: 200,
+      },
+      { option: gaugeOption },
+    );
+
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+
+  it("round-trips through ejectPanel", () => {
+    const spec = {
+      type: "echarts" as const,
+      props: { option: gaugeOption },
+      height: 240,
+    };
+
+    const jsx = ejectPanel(spec, "panelData");
+    expect(jsx).toContain("EChartsOptionChart");
+    expect(jsx).toContain("panelData.option");
+    expect(jsx).toContain('"type":"gauge"');
   });
 });

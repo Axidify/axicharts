@@ -225,6 +225,24 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("row.avg");
   });
 
+  it("emits EChartsOptionChart for raw option panels", () => {
+    const jsx = ejectPanel(
+      {
+        type: "echarts",
+        props: {
+          option: {
+            series: [{ type: "bar", data: [4, 8, 2] }],
+          },
+        },
+      },
+      "panelData",
+    );
+
+    expect(jsx).toContain("EChartsOptionChart");
+    expect(jsx).toContain("panelData.option");
+    expect(jsx).toContain('"type":"bar"');
+  });
+
   it("emits SankeyChart from plugin package", () => {
     const jsx = ejectPanel(
       {
