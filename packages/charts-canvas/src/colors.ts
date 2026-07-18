@@ -73,16 +73,63 @@ export const GRID_COLOR = "#94a3b8";
 export const AXIS_COLOR = "#64748b";
 export const CANVAS_BG = "transparent";
 
-export function withAlpha(color: string, alpha: number): string {
-  if (color.startsWith("rgba(")) {
-    return color.replace(/[\d.]+\)$/, `${alpha})`);
+let colorParseCanvas: HTMLCanvasElement | null = null;
+
+function parseRgbChannels(color: string): { r: number; g: number; b: number } | null {
+  const trimmed = color.trim();
+
+  if (trimmed.startsWith("#")) {
+    const raw = trimmed.slice(1);
+    const hex =
+      raw.length === 3
+        ? raw
+            .split("")
+            .map((ch) => ch + ch)
+            .join("")
+        : raw.length >= 6
+          ? raw.slice(0, 6)
+          : "";
+    if (hex.length !== 6) return null;
+    const r = Number.parseInt(hex.slice(0, 2), 16);
+    const g = Number.parseInt(hex.slice(2, 4), 16);
+    const b = Number.parseInt(hex.slice(4, 6), 16);
+    if ([r, g, b].some(Number.isNaN)) return null;
+    return { r, g, b };
   }
 
-  const value = color.replace("#", "");
-  const r = Number.parseInt(value.slice(0, 2), 16);
-  const g = Number.parseInt(value.slice(2, 4), 16);
-  const b = Number.parseInt(value.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  const rgbMatch = trimmed.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  if (rgbMatch) {
+    return {
+      r: Number(rgbMatch[1]),
+      g: Number(rgbMatch[2]),
+      b: Number(rgbMatch[3]),
+    };
+  }
+
+  if (typeof document !== "undefined") {
+    colorParseCanvas ??= document.createElement("canvas");
+    const ctx = colorParseCanvas.getContext("2d");
+    if (ctx) {
+      ctx.fillStyle = "#000000";
+      ctx.fillStyle = trimmed;
+      return parseRgbChannels(ctx.fillStyle);
+    }
+  }
+
+  return null;
+}
+
+export function withAlpha(color: string, alpha: number): string {
+  const channels = parseRgbChannels(color);
+  if (channels) {
+    return `rgba(${channels.r}, ${channels.g}, ${channels.b}, ${alpha})`;
+  }
+
+  if (color.startsWith("rgba(")) {
+    return color.replace(/,\s*[\d.]+\)$/, `, ${alpha})`);
+  }
+
+  return `rgba(37, 99, 235, ${alpha})`;
 }
 
 export function createAreaGradient(

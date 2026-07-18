@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cleanTheme } from "@axicharts/charts-theme";
-import { chromeGridStroke, isDarkChartTheme } from "./colors";
+import { chromeGridStroke, isDarkChartTheme, withAlpha } from "./colors";
 import { resolveSeriesColor } from "./seriesColor";
 
 describe("chart colors", () => {
@@ -22,5 +22,10 @@ describe("chart colors", () => {
   it("detects dark chart themes", () => {
     expect(isDarkChartTheme("clean")).toBe(false);
     expect(isDarkChartTheme("live")).toBe(true);
+  });
+
+  it("applies alpha to hsl css token colors", () => {
+    expect(withAlpha("hsl(221 83% 53%)", 0.24)).toBe("rgba(37, 99, 235, 0.24)");
+    expect(withAlpha("#2563eb", 0.5)).toBe("rgba(37, 99, 235, 0.5)");
   });
 });

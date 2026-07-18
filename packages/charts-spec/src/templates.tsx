@@ -322,7 +322,10 @@ export function capacityGridTemplate(
     criticalAt?: number;
   }>) ?? [];
   const slices = data.slices as Parameters<typeof PieChart>[0]["slices"];
-  const bar = data.bar as { categories: string[]; values: number[] };
+  const bar = (data.bar as { categories: string[]; values: number[] } | undefined) ?? {
+    categories: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+    values: [72, 78, 81, 76, 79],
+  };
 
   return createElement(
     "div",
