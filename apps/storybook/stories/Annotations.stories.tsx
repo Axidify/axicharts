@@ -25,75 +25,89 @@ const PNL_ITEMS = [
   { name: "Net", value: 145, isTotal: true, tone: "success" as const },
 ];
 
-function OpsThresholdMarkerDemo(): ReactElement {
-  return (
-    <div style={{ maxWidth: 560 }}>
-      <ChartContainer theme={liveTheme} mode="live" height={260} width="100%">
-        <LineChart
-          categories={HOURS}
-          series={[{ name: "Reactor temp", data: TEMP_C, tone: "info" }]}
-          valueSuffix=" °C"
-          fill
-          annotations={[
-            { type: "band", min: 75, max: 85, label: "Warning", tone: "warning" },
-            { type: "line", value: 75, label: "High limit", tone: "warning" },
-            {
-              type: "marker",
-              x: "14:00",
-              y: 88,
-              label: "Peak",
-              tone: "critical",
-              draggable: true,
-            },
-          ]}
-        />
-      </ChartContainer>
-      <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
-        Ops runbook — SLO band, threshold line, draggable incident marker
-      </p>
-    </div>
-  );
-}
+const OPS_ANNOTATIONS = [
+  { type: "band" as const, min: 75, max: 85, label: "Warning band", tone: "warning" as const },
+  { type: "line" as const, value: 75, label: "High limit", tone: "warning" as const },
+  {
+    type: "marker" as const,
+    x: "14:00",
+    y: 88,
+    label: "Peak incident",
+    tone: "critical" as const,
+    draggable: true,
+    id: "peak",
+  },
+];
 
-function FinanceWaterfallAnnotationDemo(): ReactElement {
+function OpsFinanceWallDemo(): ReactElement {
   return (
-    <div style={{ maxWidth: 560 }}>
-      <ChartContainer theme={cleanTheme} height={260} width="100%">
-        <WaterfallChart items={PNL_ITEMS} valueFormat="currency" />
-      </ChartContainer>
-      <ChartContainer theme={cleanTheme} height={220} width="100%">
-        <LineChart
-          categories={PNL_ITEMS.map((item) => item.name)}
-          series={[
-            {
-              name: "Bridge",
-              data: PNL_ITEMS.map((item) => Math.abs(item.value)),
-              tone: "info",
-            },
-          ]}
-          annotations={[
-            {
-              type: "label",
-              text: "Net margin",
-              x: "Net",
-              y: 145,
-              tone: "success",
-              position: "top",
-            },
-            {
-              type: "line",
-              orientation: "vertical",
-              value: 0,
-              x: "COGS",
-              label: "Cost review",
-              tone: "warning",
-            },
-          ]}
-        />
-      </ChartContainer>
-      <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
-        Finance — waterfall plus declarative bridge labels from spec annotations
-      </p>
+    <div
+      style={{
+        display: "grid",
+        gap: 20,
+        maxWidth: 920,
+        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+      }}
+    >
+      <section>
+        <header style={{ marginBottom: 8 }}>
+          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>Ops — SLO band + incident marker</h3>
+          <p style={{ margin: "4px 0 0", fontSize: 12, color: "#64748b" }}>
+            Drag the peak marker vertically; release to snap to the nearest hour.
+          </p>
+        </header>
+        <ChartContainer theme={liveTheme} mode="live" height={260} width="100%">
+          <LineChart
+            categories={HOURS}
+            series={[{ name: "Reactor temp", data: TEMP_C, tone: "info" }]}
+            valueSuffix=" °C"
+            fill
+            annotations={OPS_ANNOTATIONS}
+          />
+        </ChartContainer>
+      </section>
+
+      <section>
+        <header style={{ marginBottom: 8 }}>
+          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>Finance — bridge labels</h3>
+          <p style={{ margin: "4px 0 0", fontSize: 12, color: "#64748b" }}>
+            Waterfall plus declarative bridge annotations from spec.
+          </p>
+        </header>
+        <ChartContainer theme={cleanTheme} height={220} width="100%">
+          <WaterfallChart items={PNL_ITEMS} valueFormat="currency" />
+        </ChartContainer>
+        <ChartContainer theme={cleanTheme} height={200} width="100%">
+          <LineChart
+            categories={PNL_ITEMS.map((item) => item.name)}
+            series={[
+              {
+                name: "Bridge",
+                data: PNL_ITEMS.map((item) => Math.abs(item.value)),
+                tone: "info",
+              },
+            ]}
+            annotations={[
+              {
+                type: "label",
+                text: "Net margin",
+                x: "Net",
+                y: 145,
+                tone: "success",
+                position: "top",
+              },
+              {
+                type: "line",
+                orientation: "vertical",
+                value: 0,
+                x: "COGS",
+                label: "Cost review",
+                tone: "warning",
+              },
+            ]}
+          />
+        </ChartContainer>
+      </section>
     </div>
   );
 }
@@ -106,7 +120,8 @@ function ComposableAnnotationsDemo(): ReactElement {
         <Line dataKey="temp" name="Reactor temp" />
         <AnnotationBand min={75} max={85} label="Warn band" tone="warning" />
         <AnnotationLine value={75} label="Limit" tone="warning" />
-        <AnnotationMarker x="12:00" y={79} draggable tone="info" />
+        <AnnotationMarker x="12:00" y={79} draggable tone="info" label="Inspect" />
+        <AnnotationLabel text="Nominal" x="08:00" y={68} position="top" tone="success" />
       </LineChart>
     </ChartContainer>
   );
@@ -123,16 +138,7 @@ function SpecCompileDemo(): ReactElement {
         x: { field: "hour" },
         y: { field: "temp" },
       },
-      annotations: [
-        { type: "band", min: 75, max: 85, label: "Warning", tone: "warning" },
-        {
-          type: "marker",
-          x: "14:00",
-          y: 88,
-          draggable: true,
-          tone: "critical",
-        },
-      ],
+      annotations: OPS_ANNOTATIONS,
     },
     ROWS,
   );
@@ -140,27 +146,24 @@ function SpecCompileDemo(): ReactElement {
 
 const meta = {
   title: "Charts/Annotations",
-  component: OpsThresholdMarkerDemo,
+  component: OpsFinanceWallDemo,
   parameters: {
     layout: "padded",
     docs: {
       description: {
         component:
-          "C96 annotation layer — declarative labels, bands, lines, and draggable markers on cartesian panels.",
+          "C114 annotation polish — contrast band labels, draggable markers with plot-area constraints, and declarative spec round-trip.",
       },
     },
   },
-} satisfies Meta<typeof OpsThresholdMarkerDemo>;
+} satisfies Meta<typeof OpsFinanceWallDemo>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const OpsThresholdAndMarker: Story = {
-  render: () => <OpsThresholdMarkerDemo />,
-};
-
-export const FinanceWaterfallLabels: Story = {
-  render: () => <FinanceWaterfallAnnotationDemo />,
+/** Primary visual-regression target — ops SLO band + draggable marker. */
+export const OpsFinanceWall: Story = {
+  render: () => <OpsFinanceWallDemo />,
 };
 
 export const ComposableMarks: Story = {

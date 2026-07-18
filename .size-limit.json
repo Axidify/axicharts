@@ -8,7 +8,7 @@
   {
     "name": "@axicharts/charts-canvas",
     "path": "packages/charts-canvas/dist/index.js",
-    "limit": "11.25 KB",
+    "limit": "12 KB",
     "gzip": true
   },
   {

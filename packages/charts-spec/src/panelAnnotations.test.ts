@@ -10,6 +10,15 @@ describe("readPanelAnnotations", () => {
     expect(annotations).toEqual([{ type: "line", value: 90, label: "SLO" }]);
   });
 
+  it("returns empty array for explicit empty annotations", () => {
+    expect(
+      readPanelAnnotations({
+        type: "line",
+        annotations: [],
+      }),
+    ).toEqual([]);
+  });
+
   it("reads props.annotations when top-level is absent", () => {
     const annotations = readPanelAnnotations({
       type: "bar",

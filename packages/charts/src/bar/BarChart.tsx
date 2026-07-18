@@ -30,7 +30,7 @@ import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
 import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
-import { DraggableMarkerOverlay } from "../annotations/DraggableMarkerOverlay";
+import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
 
 const BAR_SERIES_KINDS = ["bar"] as const;
@@ -51,6 +51,7 @@ export type BarChartProps = {
   annotations?: ChartAnnotation[];
   brush?: boolean;
   brushEnd?: number;
+  onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
 };
 
 type BarPlotProps = {
@@ -71,6 +72,7 @@ type BarPlotProps = {
   overviewCategories?: string[];
   overviewSeries?: PlotSeries[];
   engine: "canvas" | "svg";
+  onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
 };
 
 function BarPlot({
@@ -91,6 +93,7 @@ function BarPlot({
   overviewCategories,
   overviewSeries,
   engine,
+  onMarkerDragEnd,
 }: BarPlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
@@ -145,6 +148,7 @@ function BarPlot({
         markers={draggableMarkers}
         thresholdBands={thresholdBands}
         referenceLines={referenceLines}
+        onDragEnd={onMarkerDragEnd}
       />
       {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
         <UPlotRangeOverview
@@ -176,6 +180,7 @@ export function BarChart({
   annotations,
   brush = false,
   brushEnd = 100,
+  onMarkerDragEnd,
 }: BarChartProps): ReactElement | null {
   const { size, ready, theme, config, tagTones } = useChartLayout();
   const annotationProps = useCartesianAnnotations({
@@ -262,6 +267,7 @@ export function BarChart({
             overviewCategories={brush ? categories : undefined}
             overviewSeries={brush ? series : undefined}
             engine={engine}
+            onMarkerDragEnd={onMarkerDragEnd}
           />
         }
       />

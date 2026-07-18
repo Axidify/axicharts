@@ -75,7 +75,7 @@ export const CANVAS_BG = "transparent";
 
 let colorParseCanvas: HTMLCanvasElement | null = null;
 
-function parseRgbChannels(color: string): { r: number; g: number; b: number } | null {
+export function parseRgbChannels(color: string): { r: number; g: number; b: number } | null {
   const trimmed = color.trim();
 
   if (trimmed.startsWith("#")) {

@@ -1,5 +1,5 @@
 import type uPlot from "uplot";
-import { SERIES_COLORS, withAlpha } from "./colors";
+import { parseRgbChannels, SERIES_COLORS, withAlpha } from "./colors";
 import type {
   PlotLabelAnnotation,
   PlotMarkerAnnotation,
@@ -7,6 +7,45 @@ import type {
 } from "./annotations";
 import { categoryToIndex } from "./annotations";
 import type { ReferenceLine, ThresholdBand } from "./types";
+
+function contrastingTextColor(color: string): string {
+  const channels = parseRgbChannels(color);
+  if (!channels) return "#ffffff";
+  const luminance =
+    (0.299 * channels.r + 0.587 * channels.g + 0.114 * channels.b) / 255;
+  return luminance > 0.62 ? "#0f172a" : "#ffffff";
+}
+
+function drawBandLabel(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  toneColor: string,
+): void {
+  ctx.font = "600 10px ui-sans-serif, system-ui, sans-serif";
+  const metrics = ctx.measureText(text);
+  const padX = 5;
+  const padY = 3;
+  const labelWidth = metrics.width + padX * 2;
+  const labelHeight = 14;
+  const labelX = x;
+  const labelY = y - labelHeight + padY;
+
+  ctx.fillStyle = withAlpha(toneColor, 0.92);
+  if (typeof ctx.roundRect === "function") {
+    ctx.beginPath();
+    ctx.roundRect(labelX, labelY, labelWidth, labelHeight, 3);
+    ctx.fill();
+  } else {
+    ctx.fillRect(labelX, labelY, labelWidth, labelHeight);
+  }
+
+  ctx.fillStyle = contrastingTextColor(toneColor);
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, labelX + padX, labelY + labelHeight / 2);
+  ctx.textBaseline = "alphabetic";
+}
 
 export function expandYRange(
   dataMin: number,
@@ -59,9 +98,12 @@ export function drawThresholdBands(u: uPlot, bands: ThresholdBand[]): void {
     ctx.strokeRect(left, yTop, width, yBottom - yTop);
 
     if (band.label) {
-      ctx.fillStyle = color;
-      ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
-      ctx.fillText(band.label, left + 6, yTop + 14);
+      const bandHeight = yBottom - yTop;
+      const labelY =
+        bandHeight >= 22
+          ? yTop + bandHeight / 2
+          : Math.min(yBottom - 4, yTop + 14);
+      drawBandLabel(ctx, band.label, left + 6, labelY, color);
     }
     ctx.restore();
   }

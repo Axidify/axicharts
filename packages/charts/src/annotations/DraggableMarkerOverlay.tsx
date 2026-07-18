@@ -1,12 +1,32 @@
 "use client";
 
-import { useCallback, useMemo, useState, type ReactElement } from "react";
 import {
-  categoryToIndex,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactElement,
+} from "react";
+import {
   expandYRange,
   type PlotMarkerAnnotation,
 } from "@axicharts/charts-canvas";
 import { SERIES_COLORS } from "@axicharts/charts-canvas";
+import {
+  resolveCartesianPlotInsets,
+  plotInnerSize,
+} from "./cartesianPlotInsets";
+import {
+  normalizeDragMarkerPosition,
+  markerPixelPosition,
+} from "./dragMarker";
+
+export type MarkerDragEndEvent = {
+  marker: PlotMarkerAnnotation;
+  x?: number | string;
+  y: number;
+  categoryIndex: number | null;
+};
 
 type DraggableMarkerOverlayProps = {
   width: number;
@@ -17,6 +37,9 @@ type DraggableMarkerOverlayProps = {
   markers: PlotMarkerAnnotation[];
   thresholdBands?: { min: number; max: number }[];
   referenceLines?: { value: number }[];
+  dualAxis?: boolean;
+  snapToCategories?: boolean;
+  onDragEnd?: (event: MarkerDragEndEvent) => void;
 };
 
 type MarkerState = PlotMarkerAnnotation & { key: string };
@@ -34,9 +57,28 @@ export function DraggableMarkerOverlay({
   markers,
   thresholdBands = [],
   referenceLines = [],
+  dualAxis = false,
+  snapToCategories = true,
+  onDragEnd,
 }: DraggableMarkerOverlayProps): ReactElement | null {
   const [markerState, setMarkerState] = useState<MarkerState[]>(() =>
     markers.map((marker, index) => ({ ...marker, key: markerKey(marker, index) })),
+  );
+  const [draggingKey, setDraggingKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMarkerState(
+      markers.map((marker, index) => ({ ...marker, key: markerKey(marker, index) })),
+    );
+  }, [markers]);
+
+  const insets = useMemo(
+    () => resolveCartesianPlotInsets({ height, dualAxis }),
+    [height, dualAxis],
+  );
+  const { height: plotHeight } = useMemo(
+    () => plotInnerSize(width, height, insets),
+    [width, height, insets],
   );
 
   const [yMin, yMax] = useMemo(() => {
@@ -50,40 +92,24 @@ export function DraggableMarkerOverlay({
     );
   }, [seriesMin, seriesMax, thresholdBands, referenceLines, markerState]);
 
-  const plotPadding = useMemo(
-    () => ({
-      top: 8,
-      right: 10,
-      bottom: 8,
-      left: 10,
-    }),
-    [],
-  );
-
-  const plotWidth = Math.max(1, width - plotPadding.left - plotPadding.right);
-  const plotHeight = Math.max(1, height - plotPadding.top - plotPadding.bottom);
-
   const positionForMarker = useCallback(
-    (marker: MarkerState) => {
-      const index = categoryToIndex(marker.x, categories);
-      const xRatio =
-        index != null && categories.length > 1
-          ? index / (categories.length - 1)
-          : index != null
-            ? 0.5
-            : 0.5;
-      const yRatio = (marker.y - yMin) / (yMax - yMin || 1);
-      return {
-        left: plotPadding.left + xRatio * plotWidth,
-        top: plotPadding.top + (1 - yRatio) * plotHeight,
-      };
-    },
-    [categories, plotHeight, plotPadding.left, plotPadding.top, plotWidth, yMax, yMin],
+    (marker: MarkerState) =>
+      markerPixelPosition({
+        marker,
+        categories,
+        width,
+        height,
+        insets,
+        yMin,
+        yMax,
+      }),
+    [categories, height, insets, width, yMax, yMin],
   );
 
   const onPointerDown = useCallback(
     (key: string) => (event: React.PointerEvent<HTMLButtonElement>) => {
       event.currentTarget.setPointerCapture(event.pointerId);
+      setDraggingKey(key);
       const startY = event.clientY;
 
       const marker = markerState.find((item) => item.key === key);
@@ -93,11 +119,19 @@ export function DraggableMarkerOverlay({
 
       const onMove = (moveEvent: PointerEvent) => {
         const deltaY = moveEvent.clientY - startY;
-        const valueDelta = -(deltaY / plotHeight) * (yMax - yMin);
-        const nextY = Math.min(yMax, Math.max(yMin, startMarkerY + valueDelta));
+        const next = normalizeDragMarkerPosition({
+          startY: startMarkerY,
+          deltaY,
+          plotHeight,
+          yMin,
+          yMax,
+          marker,
+          categories,
+          snapToCategories: false,
+        });
         setMarkerState((current) =>
           current.map((item) =>
-            item.key === key ? { ...item, y: nextY } : item,
+            item.key === key ? { ...item, y: next.y } : item,
           ),
         );
       };
@@ -105,12 +139,59 @@ export function DraggableMarkerOverlay({
       const onUp = () => {
         window.removeEventListener("pointermove", onMove);
         window.removeEventListener("pointerup", onUp);
+        setDraggingKey(null);
+
+        setMarkerState((current) => {
+          const dragged = current.find((item) => item.key === key);
+          if (!dragged) return current;
+
+          const snapped = normalizeDragMarkerPosition({
+            startY: dragged.y,
+            deltaY: 0,
+            plotHeight,
+            yMin,
+            yMax,
+            marker: dragged,
+            categories,
+            snapToCategories,
+          });
+
+          const nextState = current.map((item) =>
+            item.key === key
+              ? { ...item, x: snapped.x, y: snapped.y }
+              : item,
+          );
+
+          onDragEnd?.({
+            marker: {
+              x: snapped.x,
+              y: snapped.y,
+              label: dragged.label,
+              tone: dragged.tone,
+              draggable: dragged.draggable,
+              id: dragged.id,
+            },
+            x: snapped.x,
+            y: snapped.y,
+            categoryIndex: snapped.categoryIndex,
+          });
+
+          return nextState;
+        });
       };
 
       window.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
     },
-    [markerState, plotHeight, yMax, yMin],
+    [
+      categories,
+      markerState,
+      onDragEnd,
+      plotHeight,
+      snapToCategories,
+      yMax,
+      yMin,
+    ],
   );
 
   if (markerState.length === 0) return null;
@@ -127,6 +208,7 @@ export function DraggableMarkerOverlay({
       {markerState.map((marker) => {
         const { left, top } = positionForMarker(marker);
         const color = SERIES_COLORS[marker.tone ?? "warning"];
+        const isDragging = draggingKey === marker.key;
 
         return (
           <button
@@ -139,14 +221,18 @@ export function DraggableMarkerOverlay({
               left,
               top,
               transform: "translate(-50%, -50%)",
-              width: 12,
-              height: 12,
+              width: 14,
+              height: 14,
               borderRadius: 999,
               border: `2px solid ${color}`,
               background: color,
-              cursor: "grab",
+              boxShadow: isDragging
+                ? `0 0 0 3px ${color}33`
+                : "0 1px 2px rgba(15, 23, 42, 0.2)",
+              cursor: isDragging ? "grabbing" : "grab",
               pointerEvents: "auto",
               padding: 0,
+              touchAction: "none",
             }}
           />
         );

@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import {
   UPlotCombo,
   preparePlotData,
+  shouldUseDualAxis,
   type ChartAnnotation,
   type ComboSeries,
   type DualAxisMode,
@@ -23,7 +24,7 @@ import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
 import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
-import { DraggableMarkerOverlay } from "../annotations/DraggableMarkerOverlay";
+import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
 
 export type ComboChartProps = {
@@ -40,6 +41,7 @@ export type ComboChartProps = {
   annotations?: ChartAnnotation[];
   renderer?: RendererPreference;
   refreshHz?: number;
+  onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
 };
 
 type ComboPlotProps = ComboChartProps;
@@ -57,8 +59,10 @@ function ComboPlot({
   thresholdBands,
   annotations,
   draggableMarkers,
+  onMarkerDragEnd,
 }: ComboPlotProps & {
   draggableMarkers: ReturnType<typeof useCartesianAnnotations>["draggableMarkers"];
+  onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
 }): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync();
@@ -67,6 +71,10 @@ function ComboPlot({
   const legendHeight = getLegendHeight(showLegend, legendVariant);
   const plotHeight = Math.floor(size.height) - legendHeight;
   const valueBounds = useMemo(() => seriesValueBounds(series), [series]);
+  const overlayDualAxis = useMemo(
+    () => shouldUseDualAxis(series, dualAxis),
+    [dualAxis, series],
+  );
 
   return (
     <div style={{ position: "relative", width: Math.floor(size.width), height: plotHeight }}>
@@ -102,6 +110,8 @@ function ComboPlot({
         markers={draggableMarkers}
         thresholdBands={thresholdBands}
         referenceLines={referenceLines}
+        dualAxis={overlayDualAxis}
+        onDragEnd={onMarkerDragEnd}
       />
     </div>
   );
@@ -121,6 +131,7 @@ export function ComboChart({
   annotations,
   renderer = "auto",
   refreshHz,
+  onMarkerDragEnd,
 }: ComboChartProps): ReactElement | null {
   const { size, ready, theme, config, tagTones } = useChartLayout();
   const annotationProps = useCartesianAnnotations({
@@ -187,6 +198,7 @@ export function ComboChart({
             thresholdBands={annotationProps.thresholdBands}
             annotations={annotationProps.annotations}
             draggableMarkers={annotationProps.draggableMarkers}
+            onMarkerDragEnd={onMarkerDragEnd}
           />
         }
       />

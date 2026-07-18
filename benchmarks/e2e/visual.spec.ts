@@ -32,6 +32,12 @@ const VISUAL_STORIES = [
     waitFor: ".axicharts-uplot",
   },
   {
+    id: "charts-annotations--ops-finance-wall",
+    name: "annotations-ops-finance",
+    waitFor: ".axicharts-uplot",
+    settleMs: 2000,
+  },
+  {
     id: "mockups-g-·-clean-default--api-latency",
     name: "mockup-g-api-latency",
     waitFor: ".axicharts-uplot",

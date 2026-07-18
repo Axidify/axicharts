@@ -7,6 +7,7 @@ import {
   UPlotRangeOverview,
   RANGE_OVERVIEW_HEIGHT,
   preparePlotData,
+  shouldUseDualAxis,
   type ChartAnnotation,
   type PlotSeries,
   type ReferenceLine,
@@ -31,7 +32,7 @@ import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
 import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
-import { DraggableMarkerOverlay } from "../annotations/DraggableMarkerOverlay";
+import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
 
@@ -55,6 +56,7 @@ export type LineChartProps = {
   annotations?: ChartAnnotation[];
   brush?: boolean;
   brushEnd?: number;
+  onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
 };
 
 type LinePlotProps = {
@@ -78,6 +80,7 @@ type LinePlotProps = {
   overviewCategories?: string[];
   overviewSeries?: PlotSeries[];
   engine: "canvas" | "svg";
+  onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
 };
 
 function LinePlot({
@@ -101,6 +104,7 @@ function LinePlot({
   overviewCategories,
   overviewSeries,
   engine,
+  onMarkerDragEnd,
 }: LinePlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
@@ -111,6 +115,10 @@ function LinePlot({
   const overviewHeight = brush ? RANGE_OVERVIEW_HEIGHT : 0;
   const plotHeight = Math.floor(size.height) - legendHeight - overviewHeight;
   const valueBounds = useMemo(() => seriesValueBounds(series), [series]);
+  const overlayDualAxis = useMemo(
+    () => (stacked ? false : shouldUseDualAxis(series, dualAxis)),
+    [dualAxis, series, stacked],
+  );
 
   return (
     <div style={{ width: Math.floor(size.width), height: Math.floor(size.height) - legendHeight, position: "relative" }}>
@@ -159,6 +167,8 @@ function LinePlot({
         markers={draggableMarkers}
         thresholdBands={thresholdBands}
         referenceLines={referenceLines}
+        dualAxis={overlayDualAxis}
+        onDragEnd={onMarkerDragEnd}
       />
       {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
         <UPlotRangeOverview
@@ -192,6 +202,7 @@ export function LineChart({
   annotations,
   brush = false,
   brushEnd = 100,
+  onMarkerDragEnd,
 }: LineChartProps): ReactElement | null {
   const { size, ready, theme, mode, config, tagTones } = useChartLayout();
   const annotationProps = useCartesianAnnotations({
@@ -285,6 +296,7 @@ export function LineChart({
             overviewCategories={brush ? categories : undefined}
             overviewSeries={brush ? series : undefined}
             engine={engine}
+            onMarkerDragEnd={onMarkerDragEnd}
           />
         }
       />
