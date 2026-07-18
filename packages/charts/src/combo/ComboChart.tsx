@@ -22,6 +22,7 @@ import { usePlotSampling } from "../plot/usePlotSampling";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
 import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
+import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
 import { DraggableMarkerOverlay } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
 
@@ -155,8 +156,11 @@ export function ComboChart({
   const axes = showAxes ?? (theme.axis.show && !compact);
 
   return (
-    <div
-      aria-label={series.map((item) => item.name).join(", ")}
+    <CartesianChartA11yRoot
+      chartType="combo"
+      categories={categories}
+      series={series}
+      engine="canvas"
       style={{
         width: size.width,
         height: size.height,
@@ -186,6 +190,6 @@ export function ComboChart({
           />
         }
       />
-    </div>
+    </CartesianChartA11yRoot>
   );
 }

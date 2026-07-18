@@ -15,6 +15,8 @@ import {
   xAt,
   yAt,
 } from "./scales";
+import { buildCartesianA11yDescriptor } from "../a11y/cartesianDescriptor";
+import { SVG_A11Y_DESC_ID, SVG_A11Y_TITLE_ID, SvgA11yHead } from "../a11y/SvgA11yHead";
 
 export type SvgCartesianLineProps = {
   width: number;
@@ -42,15 +44,21 @@ export function SvgCartesianLine({
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme, height < 72);
   const tickCount = Math.min(4, categories.length);
+  const descriptor = buildCartesianA11yDescriptor({
+    chartType: fill ? "area" : "line",
+    categories,
+    series,
+  });
 
   return (
     <svg
       data-engine="svg"
       width={width}
       height={height}
-      role="img"
-      aria-label={series.map((item) => item.name).join(", ")}
+      role="graphics-document"
+      aria-labelledby={`${SVG_A11Y_TITLE_ID} ${SVG_A11Y_DESC_ID}`}
     >
+      <SvgA11yHead descriptor={descriptor} />
       {[0.25, 0.5, 0.75].map((ratio) => {
         const y = plot.y + plot.height * ratio;
         return (

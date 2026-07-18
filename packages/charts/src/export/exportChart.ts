@@ -73,10 +73,11 @@ async function canvasToPng(
 
 function svgMarkup(svg: SVGSVGElement): string {
   const clone = svg.cloneNode(true) as SVGSVGElement;
-  if (!clone.getAttribute("xmlns")) {
-    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  let markup = new XMLSerializer().serializeToString(clone);
+  if (!markup.includes("xmlns=")) {
+    markup = markup.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
   }
-  return new XMLSerializer().serializeToString(clone);
+  return markup;
 }
 
 async function svgToPng(

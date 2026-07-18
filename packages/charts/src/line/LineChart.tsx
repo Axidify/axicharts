@@ -33,6 +33,7 @@ import { applyChartConfigToSeries } from "../config/applyChartConfig";
 import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
 import { DraggableMarkerOverlay } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
+import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
 
 const LINE_SERIES_KINDS = ["line", "area"] as const;
 
@@ -245,8 +246,11 @@ export function LineChart({
   const plotSeries = prepared.series;
 
   return (
-    <div
-      aria-label={series.map((item) => item.name).join(", ")}
+    <CartesianChartA11yRoot
+      chartType={fill ? "area" : "line"}
+      categories={categories}
+      series={series}
+      engine={engine}
       style={{
         width: size.width,
         height: size.height,
@@ -310,6 +314,6 @@ export function LineChart({
           Live chart
         </span>
       ) : null}
-    </div>
+    </CartesianChartA11yRoot>
   );
 }
