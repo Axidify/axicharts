@@ -95,6 +95,8 @@ export type MetricProfile = {
 
 export type DataProfile = {
   metrics: MetricProfile[];
+  /** Known row fields from data profiling — used to infer encoding.color. */
+  fields?: string[];
 };
 
 export type SpecData = Record<string, unknown>[] | Record<string, unknown>;

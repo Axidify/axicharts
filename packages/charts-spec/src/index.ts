@@ -36,7 +36,13 @@ export {
   planPanelFromMetric,
   planPanelsFromProfile,
   suggestTemplate,
+  type PlanPanelsOptions,
 } from "./plan";
+export {
+  findProfileColorField,
+  inferColorEncodingForPanel,
+  intentWantsColorEncoding,
+} from "./colorEncodingPlan";
 export {
   applySpecCompilers,
   clearSpecCompilers,

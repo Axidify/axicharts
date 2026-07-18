@@ -73,4 +73,31 @@ describe("plan", () => {
     expect(panels).toHaveLength(2);
     expect(panels[0]?.type).toBe("line");
   });
+
+  it("infers encoding.color from profile fields for throughput metrics", () => {
+    const panel = planPanelFromMetric(
+      { name: "throughput", unit: "req/min" },
+      {
+        profileFields: ["week", "throughput", "aboveTarget"],
+      },
+    );
+
+    expect(panel.type).toBe("line");
+    expect(panel.encoding?.color).toEqual({
+      field: "aboveTarget",
+      type: "semantic",
+    });
+  });
+
+  it("infers encoding.color across profile planning with intent", () => {
+    const panels = planPanelsFromProfile(
+      {
+        metrics: [{ name: "p95_latency", unit: "ms" }],
+        fields: ["time", "p95_latency", "meets_slo"],
+      },
+      { intent: "Latency vs SLO — color by target" },
+    );
+
+    expect(panels[0]?.encoding?.color?.field).toBe("meets_slo");
+  });
 });

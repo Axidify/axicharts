@@ -18,5 +18,5 @@ export function enrichProfileFromIntent(profile: DataProfile, intent: string): D
     return { ...metric, tags };
   });
 
-  return { metrics };
+  return { metrics, fields: profile.fields };
 }

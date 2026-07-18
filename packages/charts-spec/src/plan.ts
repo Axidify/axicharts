@@ -1,5 +1,10 @@
 import type { DataProfile, MetricProfile, PanelSpec } from "./types";
 import { applySpecCompilers } from "./specCompiler";
+import { inferColorEncodingForPanel } from "./colorEncodingPlan";
+
+export type PlanPanelsOptions = {
+  intent?: string;
+};
 
 function inferChartType(metric: MetricProfile): PanelSpec["type"] {
   const name = metric.name.toLowerCase();
@@ -59,7 +64,10 @@ function inferMode(metric: MetricProfile): PanelSpec["mode"] {
   return "interactive";
 }
 
-export function planPanelFromMetric(metric: MetricProfile): PanelSpec {
+export function planPanelFromMetric(
+  metric: MetricProfile,
+  options: PlanPanelsOptions & { profileFields?: string[] } = {},
+): PanelSpec {
   const type = inferChartType(metric);
   const theme = inferTheme(metric);
   const mode = inferMode(metric);
@@ -96,12 +104,33 @@ export function planPanelFromMetric(metric: MetricProfile): PanelSpec {
     };
   }
 
+  const colorEncoding = inferColorEncodingForPanel({
+    type,
+    metric,
+    intent: options.intent,
+    profileFields: options.profileFields,
+  });
+  if (colorEncoding && panel.encoding) {
+    panel.encoding = { ...panel.encoding, color: colorEncoding };
+  }
+
   return panel;
 }
 
-export function planPanelsFromProfile(profile: DataProfile): PanelSpec[] {
+export function planPanelsFromProfile(
+  profile: DataProfile,
+  options: PlanPanelsOptions = {},
+): PanelSpec[] {
+  const profileFields = profile.fields ?? [];
   return profile.metrics.map((metric) =>
-    applySpecCompilers(planPanelFromMetric(metric), [], profile),
+    applySpecCompilers(
+      planPanelFromMetric(metric, {
+        intent: options.intent,
+        profileFields,
+      }),
+      [],
+      profile,
+    ),
   );
 }
 

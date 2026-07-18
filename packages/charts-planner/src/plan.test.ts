@@ -66,6 +66,21 @@ describe("planFromIntent", () => {
     const plan = planFromIntent(profile, "Mock-live synthetic demo drift sandbox");
     expect(plan.feed).toBe("mock-live");
   });
+
+  it("infers encoding.color on panels when intent requests target coloring", () => {
+    const plan = planFromIntent(
+      {
+        metrics: [{ name: "throughput", unit: "req/min" }],
+        fields: ["week", "throughput", "aboveTarget"],
+      },
+      "Weekly throughput color by above target",
+    );
+
+    expect(plan.panels[0]?.encoding?.color).toEqual({
+      field: "aboveTarget",
+      type: "semantic",
+    });
+  });
 });
 
 describe("planFromProfile", () => {

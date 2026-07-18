@@ -117,7 +117,7 @@ export function planFromProfile(
     feed: inferFeed(intent),
     presentation,
     mosaicPreset: resolveMosaicPreset(intent, layout),
-    panels: planPanelsFromProfile(enriched),
+    panels: planPanelsFromProfile(enriched, { intent }),
   };
 }
 
@@ -139,7 +139,7 @@ export function planFromIntent(profile: DataProfile, intent: string): DashboardP
     feed: inferFeed(intent),
     presentation,
     mosaicPreset: resolveMosaicPreset(intent, layout),
-    panels: planPanelsFromProfile(enriched),
+    panels: planPanelsFromProfile(enriched, { intent }),
   };
 }
 
@@ -156,7 +156,7 @@ export function buildPlannerPrompt(profile: DataProfile, intent: string): string
     '  "feed": "static|historian|websocket|mqtt|rest|mock-live",',
     '  "mosaicPreset": "ops-finance|ops-overview|trading-program|command-center",',
     '  "presentation": boolean,',
-    '  "panels": [ { "specVersion": 1, "type": "line|bar|gauge|table|...", "title": "...", "encoding": {...} } ]',
+    '  "panels": [ { "specVersion": 1, "type": "line|bar|gauge|table|...", "title": "...", "encoding": { "x": {...}, "y": {...}, "color": { "field": "aboveTarget", "type": "semantic" } } } ]',
     "}",
     "",
     `Intent: ${intent}`,
