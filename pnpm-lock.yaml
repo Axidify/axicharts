@@ -451,6 +451,52 @@ importers:
         specifier: ^3.0.8
         version: 3.2.7(@types/node@22.20.1)(happy-dom@20.10.6)(jiti@2.7.0)(jsdom@26.1.0(canvas@3.2.3))
 
+  packages/charts-full:
+    dependencies:
+      '@axicharts/charts':
+        specifier: workspace:*
+        version: link:../charts
+      '@axicharts/charts-canvas':
+        specifier: workspace:*
+        version: link:../charts-canvas
+      '@axicharts/charts-core':
+        specifier: workspace:*
+        version: link:../charts-core
+      '@axicharts/charts-echarts':
+        specifier: workspace:*
+        version: link:../charts-echarts
+      '@axicharts/charts-runtime':
+        specifier: workspace:*
+        version: link:../charts-runtime
+      '@axicharts/charts-spec':
+        specifier: workspace:*
+        version: link:../charts-spec
+      '@axicharts/charts-theme':
+        specifier: workspace:*
+        version: link:../charts-theme
+      react:
+        specifier: ^18.0.0 || ^19.0.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^18.0.0 || ^19.0.0
+        version: 19.2.7(react@19.2.7)
+    devDependencies:
+      echarts:
+        specifier: ^5.6.0
+        version: 5.6.0
+      tsup:
+        specifier: ^8.4.0
+        version: 8.5.1(jiti@2.7.0)(postcss@8.5.19)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      uplot:
+        specifier: ^1.6.31
+        version: 1.6.32
+      vitest:
+        specifier: ^3.0.8
+        version: 3.2.7(@types/node@22.20.1)(happy-dom@20.10.6)(jiti@2.7.0)(jsdom@26.1.0(canvas@3.2.3))
+
   packages/charts-gantt:
     devDependencies:
       '@axicharts/charts':

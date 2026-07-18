@@ -11,6 +11,8 @@ const CATEGORIES = [
   "kpi",
 ];
 
+const PRESETS = ["full"];
+
 const TOKENS_CSS = `:root {
   --chart-1: 221 83% 53%;
   --chart-2: 188 94% 35%;
@@ -166,16 +168,26 @@ function categorySample(category) {
   }
 }
 
-function packageJson(targetDir, category) {
-  const needsEcharts = ["distribution", "financial", "matrix"].includes(category);
-  const dependencies = {
-    "@axicharts/charts": "latest",
-    "@axicharts/charts-theme": "latest",
-    react: "^19.0.0",
-    "react-dom": "^19.0.0",
-    uplot: "^1.6.31",
-  };
-  if (needsEcharts) {
+function packageJson(targetDir, category, preset = null) {
+  const needsEcharts =
+    preset === "full" || ["distribution", "financial", "matrix"].includes(category);
+  const dependencies =
+    preset === "full"
+      ? {
+          "@axicharts/charts-full": "latest",
+          react: "^19.0.0",
+          "react-dom": "^19.0.0",
+          uplot: "^1.6.31",
+          echarts: "^5.6.0",
+        }
+      : {
+          "@axicharts/charts": "latest",
+          "@axicharts/charts-theme": "latest",
+          react: "^19.0.0",
+          "react-dom": "^19.0.0",
+          uplot: "^1.6.31",
+        };
+  if (needsEcharts && preset !== "full") {
     dependencies.echarts = "^5.6.0";
   }
 
@@ -203,8 +215,23 @@ function packageJson(targetDir, category) {
   );
 }
 
-function appTsx(category) {
-  const sample = categorySample(category);
+function fullSample() {
+  return {
+    imports: `import { ChartContainer, LineChart } from "@axicharts/charts-full";
+import { cleanTheme } from "@axicharts/charts-full/theme";`,
+    chart: `      <ChartContainer theme={cleanTheme} mode="static" height={280} width="100%">
+        <LineChart
+          categories={["Mon", "Tue", "Wed", "Thu", "Fri"]}
+          series={[{ name: "p95", data: [42, 38, 55, 49, 62] }]}
+          fill
+        />
+      </ChartContainer>`,
+    peerNote: "full",
+  };
+}
+
+function appTsx(category, preset = null) {
+  const sample = preset === "full" ? fullSample() : categorySample(category);
   return `${sample.imports}
 import "./tokens.css";
 
@@ -213,7 +240,7 @@ export function App() {
     <main>
       <h1>My dashboard</h1>
       <p className="lead">
-        Scaffolded with AxiCharts — category <code>${category}</code>.
+        Scaffolded with AxiCharts — ${preset === "full" ? "preset" : "category"} <code>${preset === "full" ? "full" : category}</code>.
       </p>
       <section className="card" style={{ width: "100%" }}>
 ${sample.chart}
@@ -226,10 +253,32 @@ ${sample.chart}
 
 export function parseCreateDashboardArgs(argv = process.argv.slice(2)) {
   let category = "cartesian";
+  let preset = null;
   const positional = [];
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
+    if (arg === "--preset" || arg === "-p") {
+      const value = argv[index + 1];
+      if (!value || !PRESETS.includes(value)) {
+        throw new Error(
+          `Invalid --preset. Expected one of: ${PRESETS.join(", ")}`,
+        );
+      }
+      preset = value;
+      index += 1;
+      continue;
+    }
+    if (arg.startsWith("--preset=")) {
+      const value = arg.slice("--preset=".length);
+      if (!PRESETS.includes(value)) {
+        throw new Error(
+          `Invalid --preset. Expected one of: ${PRESETS.join(", ")}`,
+        );
+      }
+      preset = value;
+      continue;
+    }
     if (arg === "--category" || arg === "-c") {
       const value = argv[index + 1];
       if (!value || !CATEGORIES.includes(value)) {
@@ -256,14 +305,14 @@ export function parseCreateDashboardArgs(argv = process.argv.slice(2)) {
 
   return {
     targetDir: positional[0] ?? "axicharts-dashboard",
-    category,
+    category: preset === "full" ? "full" : category,
+    preset,
   };
 }
 
-export function buildDashboardFiles(targetDir, category = "cartesian") {
-  const sample = categorySample(category);
+export function buildDashboardFiles(targetDir, category = "cartesian", preset = null) {
   return {
-    "package.json": packageJson(targetDir, category),
+    "package.json": packageJson(targetDir, category, preset),
     "index.html": `<!doctype html>
 <html lang="en">
   <head>
@@ -311,12 +360,12 @@ createRoot(document.getElementById("root")!).render(
   </StrictMode>,
 );
 `,
-    "src/App.tsx": appTsx(category),
+    "src/App.tsx": appTsx(category, preset),
     "src/tokens.css": TOKENS_CSS,
     "src/global.css": GLOBAL_CSS,
     "README.md": `# ${path.basename(targetDir)}
 
-Scaffolded with \`npx @axicharts/charts create-dashboard\` (category: **${category}**).
+Scaffolded with \`npx @axicharts/charts create-dashboard\` (${preset === "full" ? "preset: **full**" : `category: **${category}**`}).
 
 \`\`\`bash
 pnpm install
@@ -325,16 +374,20 @@ pnpm dev
 
 ## Next steps
 
-- Import from \`@axicharts/charts/${category}\` for tree-shaken category APIs
+${preset === "full"
+  ? `- Import charts from \`@axicharts/charts-full\` and themes from \`@axicharts/charts-full/theme\`
+- Add spec/runtime via \`@axicharts/charts-full/spec\` and \`@axicharts/charts-full/runtime\`
+- For smaller bundles, switch to category subpaths (\`@axicharts/charts/cartesian\`, etc.)`
+  : `- Import from \`@axicharts/charts/${category}\` for tree-shaken category APIs
 - Use \`@axicharts/charts/quick\` for a one-component line chart hello-world
 - Wire \`src/tokens.css\` \`--chart-*\` vars to match your design system
-- Add more panels with \`ChartContainer\` + chart components from the same category subpath
+- Add more panels with \`ChartContainer\` + chart components from the same category subpath`}
 `,
   };
 }
 
-export async function scaffoldDashboard(targetDir, category = "cartesian") {
-  const files = buildDashboardFiles(targetDir, category);
+export async function scaffoldDashboard(targetDir, category = "cartesian", preset = null) {
+  const files = buildDashboardFiles(targetDir, category, preset);
   const resolvedDir = path.resolve(targetDir);
 
   await mkdir(resolvedDir, { recursive: true });
@@ -346,10 +399,26 @@ export async function scaffoldDashboard(targetDir, category = "cartesian") {
     await writeFile(filePath, content);
   }
 
-  return { targetDir, category };
+  return { targetDir, category, preset };
 }
 
-export function formatNextSteps(targetDir, category) {
+export function formatNextSteps(targetDir, category, preset = null) {
+  if (preset === "full") {
+    return [
+      `Created ${targetDir} (preset: full)`,
+      "Next:",
+      `  cd ${targetDir}`,
+      "  pnpm install",
+      "  pnpm dev",
+      "",
+      "Imports:",
+      "  @axicharts/charts-full         — all chart components",
+      "  @axicharts/charts-full/theme   — cleanTheme, tokens",
+      "  @axicharts/charts-full/spec    — compilePanel, ejectPanel",
+      "  @axicharts/charts-full/runtime — mosaic presets, embed SDK",
+    ].join("\n");
+  }
+
   return [
     `Created ${targetDir} (${category})`,
     "Next:",
@@ -360,6 +429,9 @@ export function formatNextSteps(targetDir, category) {
     "Imports:",
     `  @axicharts/charts/${category}  — category bundle`,
     "  @axicharts/charts/quick       — one-line line chart (cartesian)",
+    "",
+    "Batteries-included install:",
+    "  npx @axicharts/charts create-dashboard my-app --preset full",
     "",
     "Rescaffold another category:",
     `  npx @axicharts/charts create-dashboard ops-board --category distribution`,
@@ -373,9 +445,9 @@ const isMain =
 
 if (isMain) {
   try {
-    const { targetDir, category } = parseCreateDashboardArgs();
-    await scaffoldDashboard(targetDir, category);
-    console.log(formatNextSteps(targetDir, category));
+    const { targetDir, category, preset } = parseCreateDashboardArgs();
+    await scaffoldDashboard(targetDir, category, preset);
+    console.log(formatNextSteps(targetDir, category, preset));
   } catch (error) {
     console.error(error instanceof Error ? error.message : error);
     process.exitCode = 1;

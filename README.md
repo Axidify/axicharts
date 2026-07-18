@@ -19,6 +19,14 @@ Line/bar/area via uPlot; pie, candlestick, waterfall, and heatmap via ECharts; i
 
 ## Install
 
+**Batteries included (recommended):**
+
+```bash
+pnpm add @axicharts/charts-full echarts uplot
+```
+
+**Modular (smallest bundle):**
+
 ```bash
 pnpm add @axicharts/charts @axicharts/charts-theme echarts uplot
 ```
@@ -75,10 +83,11 @@ pnpm install
 pnpm dev
 ```
 
-Pick a taxonomy category (`cartesian`, `distribution`, `financial`, `matrix`, `industrial`, `kpi`):
+Pick a taxonomy category (`cartesian`, `distribution`, `financial`, `matrix`, `industrial`, `kpi`) or the full platform stack:
 
 ```bash
 npx @axicharts/charts create-dashboard ops-board --category distribution
+npx @axicharts/charts create-dashboard my-app --preset full
 ```
 
 From the axicharts repo:
@@ -103,6 +112,8 @@ Tree-shaken category subpaths — install only the chart families you need:
 | `@axicharts/charts/industrial` | Gauge, digital, status lamp | — |
 | `@axicharts/charts/kpi` | Stat + presentation motion | — |
 | `@axicharts/charts/quick` | `QuickLineChart` hello-world | `uplot` |
+| `@axicharts/charts/full` | Full barrel (same as root `.`) | 4 KB shim |
+| `@axicharts/charts-full` | Meta-package — charts + spec + runtime + theme | 3 KB shim |
 
 Per-chart subpaths: `@axicharts/charts/line`, `/bar`, `/area`, `/pie`, `/candlestick`, `/waterfall`, `/heatmap`.
 
@@ -129,6 +140,7 @@ Chart catalog: Storybook **Charts/Catalog → AllTypes**.
 
 | Package | Description |
 |---------|-------------|
+| `@axicharts/charts-full` | **Recommended** — meta-package: full charts + spec + runtime + theme |
 | `@axicharts/charts` | React API — all chart types, primitives, registry, formatters |
 | `@axicharts/charts-theme` | `cleanTheme`, `liveTheme`, `industrialTheme`, CSS tokens |
 | `@axicharts/charts-canvas` | uPlot — line, bar, area (live path) |

@@ -4,6 +4,14 @@
 
 Layer 1 React chart API for AxiCharts — `ChartContainer`, line/bar/area charts, industrial primitives, and `registerChartType` extension registry.
 
+**Recommended batteries-included install:**
+
+```bash
+npm install @axicharts/charts-full echarts uplot
+```
+
+**Modular (category subpaths for smallest bundle):**
+
 ```bash
 npm install @axicharts/charts @axicharts/charts-theme echarts uplot
 ```

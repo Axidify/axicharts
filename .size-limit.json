@@ -2,7 +2,13 @@
   {
     "name": "@axicharts/charts",
     "path": "packages/charts/dist/index.js",
-    "limit": "14 KB",
+    "limit": "4 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts-full",
+    "path": "packages/charts-full/dist/index.js",
+    "limit": "3 KB",
     "gzip": true
   },
   {
@@ -194,7 +200,7 @@
   {
     "name": "@axicharts/charts/full",
     "path": "packages/charts/dist/entry/full.js",
-    "limit": "14 KB",
+    "limit": "4 KB",
     "gzip": true
   },
   {

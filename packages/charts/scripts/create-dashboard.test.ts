@@ -25,6 +25,7 @@ describe("create-dashboard scaffold", () => {
     expect(parseCreateDashboardArgs(["my-app"])).toEqual({
       targetDir: "my-app",
       category: "cartesian",
+      preset: null,
     });
   });
 
@@ -32,11 +33,47 @@ describe("create-dashboard scaffold", () => {
     expect(parseCreateDashboardArgs(["my-app", "--category", "distribution"])).toEqual({
       targetDir: "my-app",
       category: "distribution",
+      preset: null,
     });
     expect(parseCreateDashboardArgs(["--category=matrix"])).toEqual({
       targetDir: "axicharts-dashboard",
       category: "matrix",
+      preset: null,
     });
+  });
+
+  it("parses --preset full", () => {
+    expect(parseCreateDashboardArgs(["my-app", "--preset", "full"])).toEqual({
+      targetDir: "my-app",
+      category: "full",
+      preset: "full",
+    });
+    expect(parseCreateDashboardArgs(["--preset=full"])).toEqual({
+      targetDir: "axicharts-dashboard",
+      category: "full",
+      preset: "full",
+    });
+  });
+
+  it("rejects unknown presets", () => {
+    expect(() => parseCreateDashboardArgs(["--preset", "lite"])).toThrow(
+      /Invalid --preset/,
+    );
+  });
+
+  it("scaffolds full meta-package preset", async () => {
+    const dir = await makeTempDir();
+    await scaffoldDashboard(dir, "full", "full");
+
+    const app = await readFile(path.join(dir, "src/App.tsx"), "utf8");
+    const pkg = JSON.parse(await readFile(path.join(dir, "package.json"), "utf8"));
+
+    expect(app).toContain("@axicharts/charts-full");
+    expect(app).toContain("@axicharts/charts-full/theme");
+    expect(app).toContain("LineChart");
+    expect(pkg.dependencies["@axicharts/charts-full"]).toBe("latest");
+    expect(pkg.dependencies.echarts).toBe("^5.6.0");
+    expect(pkg.dependencies.uplot).toBe("^1.6.31");
   });
 
   it("rejects unknown categories", () => {

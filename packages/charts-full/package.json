@@ -1,0 +1,70 @@
+{
+  "name": "@axicharts/charts-full",
+  "version": "0.3.47",
+  "description": "Batteries-included AxiCharts meta-package — full chart surface plus spec, runtime, and theme.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Axidify/axicharts.git",
+    "directory": "packages/charts-full"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./spec": {
+      "types": "./dist/spec.d.ts",
+      "import": "./dist/spec.js"
+    },
+    "./runtime": {
+      "types": "./dist/runtime.d.ts",
+      "import": "./dist/runtime.js"
+    },
+    "./theme": {
+      "types": "./dist/theme.d.ts",
+      "import": "./dist/theme.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/spec.ts src/runtime.ts src/theme.ts --format esm --dts --external react --external react-dom --external echarts --external uplot --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-runtime --external @axicharts/charts-theme --external @axicharts/charts-core --external @axicharts/charts-canvas --external @axicharts/charts-echarts --clean",
+    "dev": "tsup src/index.ts src/spec.ts src/runtime.ts src/theme.ts --format esm --dts --external react --external react-dom --external echarts --external uplot --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-runtime --external @axicharts/charts-theme --external @axicharts/charts-core --external @axicharts/charts-canvas --external @axicharts/charts-echarts --watch",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "echarts": "^5.5.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "uplot": "^1.6.31"
+  },
+  "dependencies": {
+    "@axicharts/charts": "workspace:*",
+    "@axicharts/charts-canvas": "workspace:*",
+    "@axicharts/charts-core": "workspace:*",
+    "@axicharts/charts-echarts": "workspace:*",
+    "@axicharts/charts-runtime": "workspace:*",
+    "@axicharts/charts-spec": "workspace:*",
+    "@axicharts/charts-theme": "workspace:*"
+  },
+  "devDependencies": {
+    "@axicharts/charts": "workspace:*",
+    "@axicharts/charts-runtime": "workspace:*",
+    "@axicharts/charts-spec": "workspace:*",
+    "@axicharts/charts-theme": "workspace:*",
+    "echarts": "^5.6.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2",
+    "uplot": "^1.6.31",
+    "vitest": "^3.0.8"
+  }
+}
