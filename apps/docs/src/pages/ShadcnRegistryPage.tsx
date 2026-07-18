@@ -25,6 +25,16 @@ const ITEMS = [
     title: "Area chart",
     description: "AreaChart — SLO / latency trend with chartConfig labels.",
   },
+  {
+    name: "chart-axi-stacked-bar",
+    title: "Stacked bar chart",
+    description: "BarChart stacked — sprint velocity / multi-series totals.",
+  },
+  {
+    name: "chart-axi-chart-config",
+    title: "chartConfig helper (lib)",
+    description: "Shared ChartConfig labels/colors — import into your chart blocks.",
+  },
 ] as const;
 
 const codeBlock = {

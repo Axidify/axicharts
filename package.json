@@ -16,16 +16,18 @@
     "bench:browser": "node benchmarks/browser/run.mjs",
     "bench:stability": "node benchmarks/browser/stability.mjs",
     "test:e2e:share-import": "node benchmarks/e2e/share-import.mjs",
+    "test:registry": "node scripts/test-registry-e2e.mjs",
     "bench:all": "node scripts/collect-benchmarks.mjs --browser",
     "size": "size-limit",
     "validate:runtime": "pnpm --filter @axicharts/charts-runtime validate:examples",
     "typecheck": "turbo run typecheck",
-    "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm size && pnpm validate:runtime",
+    "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm size && pnpm validate:runtime && pnpm test:registry",
     "create:dashboard": "node packages/charts/scripts/create-dashboard.mjs"
   },
   "devDependencies": {
     "@size-limit/file": "^11.1.6",
     "playwright": "^1.51.1",
+    "shadcn": "^4.13.1",
     "size-limit": "^11.1.6",
     "turbo": "^2.4.4",
     "typescript": "^5.8.2"

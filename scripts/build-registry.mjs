@@ -46,14 +46,32 @@ const ITEMS = [
     file: "chart-axi-area.tsx",
     target: "components/charts/chart-axi-area.tsx",
   },
+  {
+    name: "chart-axi-stacked-bar",
+    title: "AxiCharts Stacked Bar",
+    description: "Stacked bar chart — sprint velocity / multi-series totals via stacked prop.",
+    file: "chart-axi-stacked-bar.tsx",
+    target: "components/charts/chart-axi-stacked-bar.tsx",
+  },
+  {
+    name: "chart-axi-chart-config",
+    title: "AxiCharts chartConfig helper",
+    description: "Shared ChartConfig labels/colors — import into registry chart blocks or your own panels.",
+    type: "registry:lib",
+    file: "axicharts-chart-config.ts",
+    target: "lib/axicharts-chart-config.ts",
+    libDir: join(registryRoot, "lib"),
+  },
 ];
 
 function buildItem(item) {
-  const content = readFileSync(join(componentsDir, item.file), "utf8");
+  const sourceDir = item.libDir ?? componentsDir;
+  const content = readFileSync(join(sourceDir, item.file), "utf8");
+  const type = item.type ?? "registry:block";
   return {
     $schema: "https://ui.shadcn.com/schema/registry-item.json",
     name: item.name,
-    type: "registry:block",
+    type,
     title: item.title,
     description: item.description,
     categories: ["charts", "dashboard"],
@@ -65,7 +83,7 @@ function buildItem(item) {
     files: [
       {
         path: item.target,
-        type: "registry:component",
+        type: type === "registry:lib" ? "registry:lib" : "registry:component",
         content,
       },
     ],

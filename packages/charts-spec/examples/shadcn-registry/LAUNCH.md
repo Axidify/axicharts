@@ -1,4 +1,4 @@
-# AxiCharts launch assets (GTM-3)
+# AxiCharts launch assets (GTM-3 / GTM-4)
 
 ## Positioning
 
@@ -14,6 +14,7 @@ Or via shadcn custom registry:
 
 ```bash
 npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-bar.json
+npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-stacked-bar.json
 ```
 
 ## Links
@@ -26,18 +27,18 @@ npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-bar
 | Registry catalog | https://axidify.github.io/axicharts/registry/registry.json |
 | Benchmarks | `benchmarks/BENCHMARKS.md` in axicharts repo |
 | Community templates | https://axidify.github.io/axicharts/templates/community |
+| Upstream PR checklist | `registry/UPSTREAM.md` |
+
+## Ready to post (GTM-4)
+
+- **GitHub Discussion** — full draft in [LAUNCH_DISCUSSION.md](./LAUNCH_DISCUSSION.md) (v0.3.17, registry CI, stacked bar)
+- **npm** — README badges + keywords updated; publish on release tag
 
 ## Draft — GitHub Discussion
 
-**Title:** AxiCharts v0.3.16 — shadcn custom registry + migration gallery
+**Title:** AxiCharts v0.3.17 — shadcn registry CI + stacked bar block
 
-**Body bullets:**
-- MIT React chart library for dashboards — composable JSX, not an option blob
-- shadcn-compatible `chartConfig` + `tokens.css` — drop into existing Tailwind/shadcn apps
-- Custom registry: `npx shadcn add https://axidify.github.io/axicharts/registry/chart-axi-bar.json`
-- Live canvas path (uPlot) for 5–10 Hz ops walls; ECharts for pie/specialty
-- Panel spec JSON + `ejectPanel` — same render path for AI planners and hand-built dashboards
-- Compare demo vs Recharts: /compare
+**Body:** See [LAUNCH_DISCUSSION.md](./LAUNCH_DISCUSSION.md) for copy-paste markdown.
 
 ## Draft — Hacker News
 
@@ -45,15 +46,21 @@ npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-bar
 
 **Comment bullets:**
 - Built for dashboard density: `ChartContainer`, chartConfig, spec JSON, embed runtime
-- shadcn custom registry (not upstream PR yet) — bar/line/donut/area blocks
+- shadcn custom registry (6 items) — CI validates `shadcn add` on every release
 - uPlot for cartesian live; ECharts adapters for pie/waterfall/etc.
 - MIT, monorepo on GitHub (Axidify/axicharts)
 - Would love feedback from folks who've hit Recharts flex/perf limits
 
 ## Draft — Twitter / X thread
 
-1. Shipped @axicharts v0.3.16 — shadcn custom registry for bar/line/donut/area 📊
+1. Shipped @axicharts v0.3.17 — registry E2E in CI + stacked bar / chartConfig lib blocks 📊
 2. `npx shadcn add https://axidify.github.io/axicharts/registry/chart-axi-bar.json` — thin wrappers, real chart logic in @axicharts/charts
 3. Migration gallery for Recharts/shadcn Charts ports → https://axidify.github.io/axicharts/shadcn
 4. Live ops wall vs Recharts: https://axidify.github.io/axicharts/compare
 5. Same renderer for JSX and AI panel spec JSON — `compilePanel` / `ejectPanel`
+
+## Defer (GTM-5)
+
+- Actually post Discussion / HN / Twitter
+- Upstream shadcn/ui registry PR (`registry/UPSTREAM.md`)
+- Paid template marketplace

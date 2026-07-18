@@ -159,7 +159,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "GTM-3 shadcn Charts migration gallery — chartConfig, donut/stacked/multi-series fixtures, custom registry install at /shadcn/registry. Docs: /shadcn · /shadcn/registry",
+          "GTM-4 shadcn Charts migration gallery — chartConfig, donut/stacked/multi-series fixtures, custom registry (6 items) + CI E2E. Docs: /shadcn · /shadcn/registry",
       },
     },
   },

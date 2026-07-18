@@ -1,12 +1,19 @@
 # AxiCharts
 
+[![npm version](https://img.shields.io/npm/v/@axicharts/charts.svg)](https://www.npmjs.com/package/@axicharts/charts)
+[![CI](https://github.com/Axidify/axicharts/actions/workflows/ci.yml/badge.svg)](https://github.com/Axidify/axicharts/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 **The best free, open-source chart platform for React dashboards** — layout DX, live performance, and vertical breadth (finance, trading, resources, SaaS, ops) on one MIT-licensed stack.
 
 Line/bar/area via uPlot; pie, candlestick, waterfall, and heatmap via ECharts; industrial SVG primitives; `ChartContainer` that sizes correctly in flex/grid layouts.
 
 - **GitHub:** https://github.com/Axidify/axicharts
+- **npm:** [@axicharts/charts](https://www.npmjs.com/package/@axicharts/charts) · [@axicharts/charts-theme](https://www.npmjs.com/package/@axicharts/charts-theme)
 - **Storybook:** `pnpm storybook` → http://localhost:6006
 - **Docs:** `pnpm docs` → http://localhost:3001 ([GitHub Pages](https://axidify.github.io/axicharts/))
+- **Compare vs Recharts:** [live demo](https://axidify.github.io/axicharts/compare) · [benchmarks](benchmarks/BENCHMARKS.md)
+- **shadcn registry:** [install guide](https://axidify.github.io/axicharts/shadcn/registry) · [catalog](https://axidify.github.io/axicharts/registry/registry.json)
 - **Dashboarder:** `pnpm dashboarder` → http://localhost:3000
 - **License:** MIT
 
@@ -59,9 +66,11 @@ Tree-shaken subpaths: `@axicharts/charts/line`, `/bar`, `/area`, `/pie`, `/candl
 Gallery: [docs `/shadcn`](https://axidify.github.io/axicharts/shadcn) · [shadcn registry install](https://axidify.github.io/axicharts/shadcn/registry) · [community templates](https://axidify.github.io/axicharts/templates/community) · Storybook **Charts/ShadcnParity** · Examples in `packages/charts-spec/examples/`
 
 ```bash
-# shadcn custom registry (bar/line/donut/area blocks)
+# shadcn custom registry (bar/line/donut/area/stacked-bar + chartConfig lib)
 npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-bar.json
 ```
+
+Registry CI: `pnpm test:registry` (validates source + dry-runs `shadcn add`).
 
 ## Packages
 
@@ -90,6 +99,7 @@ pnpm test:perf   # uPlot update gates (500 / 5k / 10k + 6-panel)
 pnpm bench       # collect published numbers → benchmarks/BENCHMARKS.md
 pnpm bench:browser  # Chromium competitive vs Recharts/ECharts
 pnpm size        # bundle gzip budgets
+pnpm test:registry  # shadcn registry validate + add dry-run E2E
 pnpm storybook
 pnpm docs
 ```

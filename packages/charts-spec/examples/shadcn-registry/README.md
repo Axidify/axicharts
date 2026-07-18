@@ -11,6 +11,8 @@ Hosted **custom registry** for AxiCharts chart blocks — install via `npx shadc
 | Line | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-line.json` |
 | Donut | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-donut.json` |
 | Area | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-area.json` |
+| Stacked bar | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-stacked-bar.json` |
+| chartConfig lib | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-chart-config.json` |
 
 Docs install guide: https://axidify.github.io/axicharts/shadcn/registry
 
@@ -66,8 +68,14 @@ export function ChartAxiBar() {
 - Community templates: `/templates/community`
 - Launch copy: [LAUNCH.md](./LAUNCH.md)
 
-## GTM-4 (defer)
+## GTM-4 (shipped)
 
-- Upstream shadcn/ui registry submission
+- Registry E2E CI — `pnpm test:registry`
+- Stacked bar + chartConfig lib registry items
+- README npm badges, LAUNCH_DISCUSSION.md, `registry/UPSTREAM.md`
+
+## GTM-5 (defer)
+
+- Upstream shadcn/ui registry submission (`registry/UPSTREAM.md`)
 - Paid template marketplace
-- Actual social posting (draft bullets in LAUNCH.md only)
+- Actual social posting (draft bullets in LAUNCH.md / LAUNCH_DISCUSSION.md)
