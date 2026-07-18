@@ -7,6 +7,11 @@ export {
   type ExportChartResult,
 } from "../export/exportChart";
 export {
+  pngResultToPdf,
+  pngResultsToMultiPagePdf,
+  type PdfPageSnapshot,
+} from "../export/exportChartPdf";
+export {
   downloadAccessibleTable,
   exportAccessibleChart,
   type AccessibleChartExport,

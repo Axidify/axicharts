@@ -1,4 +1,5 @@
-import { pngResultToPdf } from "./exportChartPdf";
+import { pngResultsToMultiPagePdf, pngResultToPdf } from "./exportChartPdf";
+import { resolveChartA11y } from "../a11y/serialize";
 
 export type ExportChartFormat = "png" | "svg" | "pdf";
 
@@ -12,6 +13,11 @@ export type ExportChartOptions = {
   title?: string;
   /** PDF document subject metadata (format: pdf). */
   subject?: string;
+  /**
+   * Batch PDF only — combine panels into one multi-page PDF (one panel per page).
+   * Defaults to false; set true for mosaic wall / deck exports.
+   */
+  multiPage?: boolean;
 };
 
 export type ExportChartResult = {
@@ -19,6 +25,8 @@ export type ExportChartResult = {
   dataUrl: string;
   width: number;
   height: number;
+  /** Number of PDF pages when format is pdf. */
+  pageCount?: number;
 };
 
 type ExportSurface =
@@ -194,8 +202,33 @@ export async function exportChart(
 /** Export multiple mosaic panels in document order. */
 export async function exportChartBatch(
   targets: HTMLElement[],
+  options: ExportChartOptions & { format: "pdf"; multiPage: true },
+): Promise<ExportChartResult>;
+export async function exportChartBatch(
+  targets: HTMLElement[],
   options: ExportChartOptions,
-): Promise<ExportChartResult[]> {
+): Promise<ExportChartResult[]>;
+export async function exportChartBatch(
+  targets: HTMLElement[],
+  options: ExportChartOptions,
+): Promise<ExportChartResult | ExportChartResult[]> {
+  if (options.format === "pdf" && options.multiPage) {
+    const rasterOptions: ExportChartOptions = { ...options, format: "png" };
+    const pages = await Promise.all(
+      targets.map(async (target) => {
+        const png = await exportChart(target, rasterOptions);
+        const descriptor = resolveChartA11y(target);
+        return { png, title: descriptor?.title };
+      }),
+    );
+    return pngResultsToMultiPagePdf(pages, {
+      title: options.title,
+      subject:
+        options.subject ??
+        (pages.length > 1 ? `Multi-panel chart export (${pages.length} pages)` : undefined),
+    });
+  }
+
   const results: ExportChartResult[] = [];
   for (const target of targets) {
     results.push(await exportChart(target, options));

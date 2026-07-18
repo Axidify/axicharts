@@ -30,11 +30,19 @@ function ExportChartDemo(): ReactElement {
     setStatus(`Exported ${filename} (${result.width}×${result.height} ${format.toUpperCase()}).`);
   }
 
-  async function exportWall(format: "png" | "pdf") {
+  async function exportWall(format: "png" | "pdf", multiPage = false) {
     if (!wallRef.current) return;
     const panels = [
       ...wallRef.current.querySelectorAll<HTMLDivElement>("[data-export-panel]"),
     ];
+    if (format === "pdf" && multiPage) {
+      const result = await exportChartBatch(panels, { format: "pdf", multiPage: true });
+      downloadExport(result, "mosaic-wall.pdf");
+      setStatus(
+        `Multi-page PDF exported (${result.pageCount ?? panels.length} pages, ${result.width}×${result.height}).`,
+      );
+      return;
+    }
     const results = await exportChartBatch(panels, { format });
     results.forEach((result, index) => {
       downloadExport(result, `mosaic-panel-${index + 1}.${format}`);
@@ -65,6 +73,9 @@ function ExportChartDemo(): ReactElement {
         </button>
         <button type="button" onClick={() => void exportWall("pdf")}>
           Batch export mosaic PDF
+        </button>
+        <button type="button" onClick={() => void exportWall("pdf", true)}>
+          Multi-page mosaic PDF
         </button>
       </div>
       <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>{status}</p>
@@ -115,7 +126,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C95 exportChart — PNG/SVG/PDF export for canvas (uPlot/ECharts) and SVG KPI panels, plus batch mosaic export. PDF uses a lazy-loaded jspdf raster embed (v1).",
+          "C95 exportChart — PNG/SVG/PDF export for canvas (uPlot/ECharts) and SVG KPI panels, plus batch mosaic export. PDF uses a lazy-loaded jspdf raster embed. Multi-page PDF (`multiPage: true`) combines mosaic panels into one document with per-page a11y titles.",
       },
     },
   },
