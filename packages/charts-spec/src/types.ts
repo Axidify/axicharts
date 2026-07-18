@@ -79,6 +79,8 @@ export type PanelChartType =
   | "stat"
   | "gauge"
   | "table"
+  | "markdown"
+  | "text"
   | string;
 
 export type PanelSpec = {

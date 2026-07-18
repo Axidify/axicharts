@@ -62,7 +62,9 @@ function resolveChartName(spec: PanelSpec): string {
                     : spec.type === "stat"
                       ? "Stat"
                       : spec.type === "table"
-                        ? "DataTable"
+                      ? "DataTable"
+                      : spec.type === "markdown" || spec.type === "text"
+                        ? "MarkdownPanel"
                         : "Gauge";
 }
 
@@ -89,12 +91,24 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     chartConfig ? `\n  config={${JSON.stringify(chartConfig)}}` : "",
   ].join("");
 
-  if (spec.type === "stat" || spec.type === "gauge" || spec.type === "table") {
+  if (
+    spec.type === "stat" ||
+    spec.type === "gauge" ||
+    spec.type === "table" ||
+    spec.type === "markdown" ||
+    spec.type === "text"
+  ) {
     const props = chartPropsFromPanel(spec.props ?? {});
     const merged =
       spec.type === "stat" || spec.type === "gauge"
         ? { ...props, label: props.label ?? spec.title }
-        : props;
+        : spec.type === "markdown" || spec.type === "text"
+          ? {
+              ...props,
+              content: props.content ?? props.markdown,
+              title: props.title ?? spec.title,
+            }
+          : props;
     return `<${chartName}\n  ${serializeProps(merged, "  ")}\n/>`;
   }
 

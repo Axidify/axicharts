@@ -76,6 +76,21 @@ describe("ejectPanel", () => {
     expect(jsx).not.toContain("ChartContainer");
   });
 
+  it("emits markdown without ChartContainer", () => {
+    const jsx = ejectPanel({
+      type: "markdown",
+      title: "Shift notes",
+      props: {
+        content: "# Handoff\n\nLine 3 is stable.",
+      },
+    });
+
+    expect(jsx).toContain("<MarkdownPanel");
+    expect(jsx).toContain('content={"# Handoff');
+    expect(jsx).toContain('title={"Shift notes"}');
+    expect(jsx).not.toContain("ChartContainer");
+  });
+
   it("emits createTheme when props.style overrides are present", () => {
     const jsx = ejectPanel({
       type: "bar",

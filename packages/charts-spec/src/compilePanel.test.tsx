@@ -266,3 +266,39 @@ describe("compilePanel table", () => {
     expect(container.textContent).toContain("100");
   });
 });
+
+describe("compilePanel markdown", () => {
+  it("renders markdown content from props", () => {
+    const panel = compilePanel(
+      {
+        type: "markdown",
+        title: "Shift notes",
+        props: {
+          content: "# Handoff\n\nLine 3 is **stable**.",
+        },
+      },
+      {},
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Shift notes");
+    expect(container.textContent).toContain("Handoff");
+    expect(container.textContent).toContain("stable");
+  });
+
+  it("accepts type text alias and runtime data content", () => {
+    const panel = compilePanel(
+      {
+        type: "text",
+        props: {},
+      },
+      { content: "Escalation path: [runbook](https://example.com/runbook)" },
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Escalation path");
+    expect(container.querySelector("a")?.getAttribute("href")).toBe(
+      "https://example.com/runbook",
+    );
+  });
+});

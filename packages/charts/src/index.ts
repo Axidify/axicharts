@@ -68,6 +68,10 @@ export {
 export { AlertPanel, type AlertPanelProps } from "./alert/AlertPanel";
 export type { AlertItem, AlertSeverity, AlertSurface } from "./alert/types";
 export {
+  MarkdownPanel,
+  type MarkdownPanelProps,
+} from "./markdown/MarkdownPanel";
+export {
   ChartStateOverlay,
   StaleBadge,
   useIsStale,

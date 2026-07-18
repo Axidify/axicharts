@@ -18,6 +18,7 @@ import {
   WaterfallChart,
   AlertPanel,
   DataTable,
+  MarkdownPanel,
   type AlertItem,
   type PlotSeries,
   type StatTone,
@@ -494,6 +495,24 @@ export function compilePanel(
         alarms: alarmRows,
         surface: props.surface as "light" | "dark" | undefined,
         title: String(props.title ?? resolved.title ?? "Active alarms"),
+      });
+    }
+
+    case "markdown":
+    case "text": {
+      const objectData = objectDataFromSpec(data);
+      const content = String(
+        props.content ??
+          props.markdown ??
+          objectData.content ??
+          objectData.markdown ??
+          rows[0]?.[resolved.encoding?.value?.field ?? "content"] ??
+          "",
+      );
+      return createElement(MarkdownPanel, {
+        content,
+        surface: props.surface as "light" | "dark" | undefined,
+        title: String(props.title ?? resolved.title ?? ""),
       });
     }
 
