@@ -96,8 +96,40 @@ export function SpecPage(): ReactElement {
       <h1 style={{ marginTop: 0 }}>Charts spec</h1>
       <p style={{ color: "#475569", maxWidth: 640 }}>
         Layer 2 — JSON panel specs, vertical templates, metric profiles → panels, and eject-to-JSX
-        for full control.
+        for full control. <strong>Direction:</strong> cartesian building blocks —{" "}
+        <code>type: &quot;cartesian&quot;</code> + <code>marks[]</code> with validation before render
+        (see <code>packages/charts-spec/CARTESIAN.md</code> in the repo).
       </p>
+
+      <Section title="Cartesian building blocks" subtitle="RFC-002 — agent-safe marks[]">
+        <pre
+          style={{
+            margin: 0,
+            padding: 14,
+            background: "#f8fafc",
+            fontSize: 11,
+            overflow: "auto",
+            borderRadius: 8,
+          }}
+        >
+          {`import { Chart, validateCartesianSpec } from "@axicharts/charts-spec";
+
+<Chart
+  panel={{
+    type: "cartesian",
+    encoding: { x: { field: "week" } },
+    marks: [
+      { mark: "bar", field: "revenue", label: "Revenue" },
+      { mark: "line", field: "target", label: "Target" },
+      { mark: "rule", value: 50, label: "Quota" },
+    ],
+  }}
+  data={rows}
+/>
+
+validateCartesianSpec(panel, { rows }); // throws before render if invalid`}
+        </pre>
+      </Section>
 
       <Section title="Panel compiler" subtitle="JSON spec → React">
         <div style={{ maxWidth: 640, marginBottom: 16 }}>

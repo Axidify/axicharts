@@ -63,10 +63,44 @@ export type PanelStyleSpec = {
   };
 };
 
+export type ChartBlockSeriesMark = {
+  type: "line" | "bar" | "area";
+  /** Quantitative field on each row. */
+  field: string;
+  label?: string;
+  tone?: "default" | "info" | "success" | "warning" | "critical";
+  yAxisId?: "left" | "right";
+  curve?: "linear" | "monotone";
+};
+
+export type ChartBlockRuleMark = {
+  type: "rule";
+  value: number;
+  label?: string;
+  tone?: "default" | "info" | "success" | "warning" | "critical";
+  orientation?: "horizontal" | "vertical";
+};
+
+export type ChartBlockBandMark = {
+  type: "band";
+  min: number;
+  max: number;
+  label?: string;
+  tone?: "default" | "info" | "success" | "warning" | "critical";
+};
+
+/** Mix-and-match cartesian building blocks — compiles to ComboChart + overlays. */
+export type ChartBlockMarkSpec =
+  | ChartBlockSeriesMark
+  | ChartBlockRuleMark
+  | ChartBlockBandMark;
+
 export type PanelChartType =
   | "line"
   | "area"
   | "bar"
+  | "blocks"
+  | "cartesian"
   | "combo"
   | "pie"
   | "donut"
@@ -142,6 +176,11 @@ export type PanelSpec = {
   fill?: boolean;
   stacked?: boolean;
   innerRadius?: number;
+  /**
+   * Cartesian building blocks — line/bar/area series plus rule/band overlays.
+   * Requires `type: "cartesian"` (or legacy `"blocks"`) and `encoding.x`.
+   */
+  marks?: ChartBlockMarkSpec[];
   /** Declarative cartesian annotations — labels, bands, lines, markers. */
   annotations?: AnnotationSpec[];
   /** ECharts-style graphic overlay elements (separate from annotations). */

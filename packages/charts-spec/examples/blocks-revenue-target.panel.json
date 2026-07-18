@@ -1,0 +1,21 @@
+{
+  "specVersion": 1,
+  "type": "blocks",
+  "title": "Revenue vs target",
+  "theme": "studio",
+  "mode": "static",
+  "height": 260,
+  "encoding": {
+    "x": { "field": "week", "label": "Week" }
+  },
+  "marks": [
+    { "type": "bar", "field": "revenue", "label": "Revenue", "tone": "default" },
+    { "type": "line", "field": "target", "label": "Target", "tone": "info", "curve": "monotone" },
+    { "type": "rule", "value": 50, "label": "Quota", "tone": "warning" },
+    { "type": "band", "min": 44, "max": 52, "label": "Healthy band", "tone": "success" }
+  ],
+  "props": {
+    "showValues": true,
+    "legendVariant": "inline"
+  }
+}

@@ -1,6 +1,10 @@
 # @axicharts/charts-planner
 
-Server-side dashboard planner for AxiCharts Phase 3. Converts metric profiles and natural-language intent into validated `charts-spec` plans, with rules fallback when LLM output is invalid.
+Server-side dashboard planner for AxiCharts. Converts metric profiles and natural-language intent into validated `charts-spec` plans, with rules fallback when LLM output is invalid.
+
+**Direction (RFC-002):** Migrate cartesian panels to **`createCartesianPanel`** — one tool that emits `type: "cartesian"` + `marks[]` only (C139). Today rule packs still emit legacy `combo` / `line`; normalization layer in charts-spec accepts both until planner migration lands.
+
+See [charts-spec/CARTESIAN.md](../charts-spec/CARTESIAN.md).
 
 ## Install
 

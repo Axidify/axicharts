@@ -7,6 +7,7 @@ import {
   ejectCartesianImports,
 } from "./ejectCartesian";
 import { ejectComboBody } from "./ejectCombo";
+import { ejectBlocksBody } from "./ejectBlocks";
 import { chartPropsWithoutChromeMeta, readPanelChrome } from "./panelChrome";
 import { chartPropsWithoutChartConfig, readPanelChartConfig } from "./panelChartConfig";
 import { chartPropsWithoutStyle, readPanelStyle } from "./panelStyle";
@@ -55,7 +56,9 @@ function resolveChartName(spec: PanelSpec): string {
 
   return spec.type === "combo"
     ? "ComboChart"
-    : spec.type === "pie"
+    : spec.type === "blocks"
+      ? "ComboChart"
+      : spec.type === "pie"
       ? "PieChart"
       : spec.type === "donut"
         ? "PieChart"
@@ -485,6 +488,8 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     }))}`;
   } else if (spec.type === "combo") {
     chartBody = ejectComboBody(spec, dataVar);
+  } else if (spec.type === "blocks") {
+    chartBody = ejectBlocksBody(spec, dataVar);
   } else if (spec.type === "sankey") {
     chartBody = `nodes={${dataVar}.nodes ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).nodes ?? [])}}
     links={${dataVar}.links ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).links ?? [])}}`;
@@ -541,7 +546,8 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     spec.type !== "line" &&
     spec.type !== "area" &&
     spec.type !== "bar" &&
-    spec.type !== "combo"
+    spec.type !== "combo" &&
+    spec.type !== "blocks"
   ) {
     chartBody += `\n    ${graphicsEject}`;
   }
@@ -549,6 +555,7 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
   const chartProps = chartPropsFromPanel(spec.props ?? {});
   const extraProps =
   spec.type !== "combo" &&
+  spec.type !== "blocks" &&
     !cartesianUsesComposableMarks(spec) &&
     Object.keys(chartProps).length > 0
       ? `\n    ${serializeProps(chartProps, "    ")}`

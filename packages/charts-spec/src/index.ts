@@ -11,6 +11,10 @@ export type {
   FieldType,
   MetricKind,
   MetricProfile,
+  ChartBlockBandMark,
+  ChartBlockMarkSpec,
+  ChartBlockRuleMark,
+  ChartBlockSeriesMark,
   PanelChartType,
   PanelSpec,
   PanelStyleSpec,
@@ -21,6 +25,23 @@ export type {
   ThemeName,
 } from "./types";
 
+export { blockMarksToChartProps, type BlockMarksChartProps } from "./blockMarks";
+export {
+  normalizeBlockMark,
+  normalizeMarksArray,
+  isDataMark,
+  isOverlayMark,
+} from "./cartesianMarks";
+export {
+  validateCartesianSpec,
+  assertValidCartesianSpec,
+  CartesianSpecValidationError,
+  type CartesianValidationError,
+  type CartesianValidationIssue,
+  type ValidateCartesianOptions,
+} from "./cartesianValidation";
+export { normalizeToCartesian, normalizeRawCartesianPanel, type NormalizedCartesianSpec } from "./normalizeToCartesian";
+export { suggestField, levenshtein } from "./fieldSuggest";
 export { compilePanel, type CompileOptions } from "./compilePanel";
 export {
   compileDashboard,

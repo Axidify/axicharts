@@ -1,6 +1,25 @@
 # Panel spec examples
 
-Runnable fixtures for `compilePanel`, `ejectPanel`, and the CLI.
+Runnable fixtures for `compilePanel`, `ejectPanel`, validation, and the CLI.
+
+## Cartesian building blocks (RFC-002 — primary direction)
+
+Agents and planners compose charts with **`type: "cartesian"`** + **`marks[]`** — not separate `combo` / `line` dialects.
+
+| File | Description |
+|------|-------------|
+| [cartesian-revenue-target.panel.json](./cartesian-revenue-target.panel.json) | **Canonical** — `mark` key; bar + line + rule + band; studio theme |
+| [blocks-revenue-target.panel.json](./blocks-revenue-target.panel.json) | Legacy `type: "blocks"` alias (deprecated; normalizes to `cartesian`) |
+
+```bash
+# Validate + compile (invalid specs throw CartesianSpecValidationError)
+npx @axicharts/charts-spec eject examples/cartesian-revenue-target.panel.json
+
+# Composition regression (24 scenarios)
+pnpm --filter @axicharts/charts-spec test compositionSimulation
+```
+
+Guide: [../CARTESIAN.md](../CARTESIAN.md) · Planning: [RFC-002](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/rfcs/RFC-002-cartesian-building-blocks.md)
 
 ## Granular styling (C68–C74)
 
@@ -20,7 +39,7 @@ Runnable fixtures for `compilePanel`, `ejectPanel`, and the CLI.
 | [browser-share-donut.panel.json](./browser-share-donut.panel.json) | **Donut** — `type: donut`, `innerRadius`, row-driven slices |
 | [velocity-stacked-bar.panel.json](./velocity-stacked-bar.panel.json) | **Stacked bar** — `stacked: true`, multi-series `props.series` |
 | [burndown-multi-line.panel.json](./burndown-multi-line.panel.json) | **Multi-series line** — burndown ideal vs remaining |
-| [combo-revenue-bar-line.panel.json](./combo-revenue-bar-line.panel.json) | **Combo** — bar + line mixed chart (shadcn ComposedChart migration) |
+| [combo-revenue-bar-line.panel.json](./combo-revenue-bar-line.panel.json) | **Combo** (legacy) — normalizes to `cartesian` + `marks[]` |
 
 Registry prep (shadcn custom registry): [shadcn-registry/](./shadcn-registry/) · source in repo `registry/`.
 
@@ -61,7 +80,8 @@ Donut panels eject to `<PieChart innerRadius={…} />`. Stacked cartesian panels
 | `chartConfig` labels/colors | `chartConfig` on container | `ChartContainer config={…}` |
 | Donut / pie with hole | `type: donut`, `innerRadius` | `<PieChart innerRadius={…} />` |
 | Stacked bar | `stacked: true` + `props.series` | `<BarChart stacked series={…} />` |
-| Multi-series line | `props.series` | `<LineChart series={…} />` |
+| Multi-series line | `props.series` or `cartesian` + multiple marks | `<LineChart series={…} />` or `marks[]` |
+| Combo bar + line | `type: "cartesian"` + `marks[]` | bar + line + optional `rule`/`band` marks |
 | Theme tokens | `props.style` | `createTheme(base, overrides)` |
 | Tooltip / legend chrome | `props.tooltipVariant` / `legendVariant` | `ChartContainer` props |
 

@@ -2,6 +2,8 @@
 
 Batteries-included meta-package for the AxiCharts platform — one install for the full chart catalog, spec compiler, dashboard runtime, and themes.
 
+**Direction:** Cartesian building blocks — `type: "cartesian"` + `marks[]` with `validateCartesianSpec` for agent-safe specs. See [charts-spec/CARTESIAN.md](../charts-spec/CARTESIAN.md).
+
 ```bash
 npm install @axicharts/charts-full echarts uplot
 ```
