@@ -36,6 +36,10 @@ const config: StorybookConfig = {
             root,
             "packages/charts/src/entry/liquid-fill.ts",
           ),
+          "@axicharts/charts/bump": path.resolve(
+            root,
+            "packages/charts/src/entry/bump.ts",
+          ),
           "@axicharts/charts": path.resolve(root, "packages/charts/src"),
           "@axicharts/charts-canvas": path.resolve(
             root,

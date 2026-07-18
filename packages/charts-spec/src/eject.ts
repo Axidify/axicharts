@@ -65,6 +65,8 @@ function resolveChartName(spec: PanelSpec): string {
             ? "PictorialBarChart"
           : spec.type === "liquid-fill" || spec.type === "liquidFill"
             ? "LiquidFillChart"
+          : spec.type === "bump" || spec.type === "bump-chart"
+            ? "BumpChart"
           : spec.type === "waterfall"
             ? "WaterfallChart"
             : spec.type === "candlestick"
@@ -367,6 +369,26 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       value: Number(row.${valueField}),
       series: String(row.${seriesField}),
     }))}`;
+  } else if (spec.type === "bump" || spec.type === "bump-chart") {
+    const periodField = encoding?.x?.field ?? "period";
+    const rankField = Array.isArray(encoding?.y)
+      ? encoding.y[0]?.field
+      : encoding?.y?.field ?? "rank";
+    const entityField = encoding?.series?.field ?? "entity";
+    chartBody = `data={${dataVar}.categories && ${dataVar}.series ? ${dataVar} : (() => {
+  const categories = [...new Set(${dataVar}.map((row) => String(row.${periodField})))];
+  const entities = [...new Set(${dataVar}.map((row) => String(row.${entityField})))];
+  return {
+    categories,
+    series: entities.map((name) => ({
+      name,
+      ranks: categories.map((period) => {
+        const match = ${dataVar}.find((row) => String(row.${periodField}) === period && String(row.${entityField}) === name);
+        return match ? Number(match.${rankField}) : entities.length;
+      }),
+    })),
+  };
+})()}`;
   } else if (spec.type === "wordcloud" || spec.type === "word-cloud") {
     const textField = encoding?.name?.field ?? "text";
     const valueField = encoding?.value?.field ?? "value";

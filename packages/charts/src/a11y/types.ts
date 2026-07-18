@@ -121,6 +121,14 @@ export type ThemeRiverA11yDescriptor = {
   points: { time: string | number; value: number; series: string }[];
 };
 
+export type BumpA11yDescriptor = {
+  kind: "bump";
+  title?: string;
+  description?: string;
+  categories: string[];
+  series: { name: string; ranks: number[] }[];
+};
+
 export type WordCloudA11yDescriptor = {
   kind: "word-cloud";
   title?: string;
@@ -140,6 +148,7 @@ export type ChartA11yDescriptor =
   | HierarchyA11yDescriptor
   | ParallelA11yDescriptor
   | ThemeRiverA11yDescriptor
+  | BumpA11yDescriptor
   | WordCloudA11yDescriptor;
 
 export type ChartA11yTable = {

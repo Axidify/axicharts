@@ -14,6 +14,7 @@ import { PieChart } from "../pie/PieChart";
 import { RadarChart } from "../radar/RadarChart";
 import { ParallelChart } from "../parallel/ParallelChart";
 import { ThemeRiverChart } from "../themeRiver/ThemeRiverChart";
+import { BumpChart } from "../bump/BumpChart";
 import { WordCloudChart } from "../wordCloud/WordCloudChart";
 import { ScatterChart } from "../scatter/ScatterChart";
 import { TreemapChart } from "../treemap/TreemapChart";
@@ -91,6 +92,11 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "theme-river",
     Chart: ThemeRiverChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "bump",
+    Chart: BumpChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
   {

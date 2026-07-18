@@ -13,6 +13,7 @@ import type {
   PieA11yDescriptor,
   SingleValueA11yDescriptor,
   ThemeRiverA11yDescriptor,
+  BumpA11yDescriptor,
   WordCloudA11yDescriptor,
 } from "./types";
 import { singleValueA11ySummary } from "./singleValueDescriptor";
@@ -229,6 +230,27 @@ export function buildThemeRiverA11yDescriptor({
   };
 }
 
+export function buildBumpA11yDescriptor({
+  data,
+  title,
+  description,
+}: {
+  data: { categories: string[]; series: { name: string; ranks: number[] }[] };
+  title?: string;
+  description?: string;
+}): BumpA11yDescriptor {
+  return {
+    kind: "bump",
+    title: title ?? data.series.map((item) => item.name).join(", "),
+    description,
+    categories: [...data.categories],
+    series: data.series.map((item) => ({
+      name: item.name,
+      ranks: [...item.ranks],
+    })),
+  };
+}
+
 export function buildWordCloudA11yDescriptor({
   words,
   title,
@@ -290,6 +312,10 @@ export function themeRiverA11ySummary(descriptor: ThemeRiverA11yDescriptor): str
   return `Theme river with ${seriesCount} streams and ${descriptor.points.length} points`;
 }
 
+export function bumpA11ySummary(descriptor: BumpA11yDescriptor): string {
+  return `Bump chart with ${descriptor.series.length} entities across ${descriptor.categories.length} periods`;
+}
+
 export function wordCloudA11ySummary(descriptor: WordCloudA11yDescriptor): string {
   return `Word cloud with ${descriptor.words.length} terms`;
 }
@@ -321,6 +347,8 @@ export function chartA11ySummary(descriptor: {
       return parallelA11ySummary(descriptor as ParallelA11yDescriptor);
     case "theme-river":
       return themeRiverA11ySummary(descriptor as ThemeRiverA11yDescriptor);
+    case "bump":
+      return bumpA11ySummary(descriptor as BumpA11yDescriptor);
     case "word-cloud":
       return wordCloudA11ySummary(descriptor as WordCloudA11yDescriptor);
     default:

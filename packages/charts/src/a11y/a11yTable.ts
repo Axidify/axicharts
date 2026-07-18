@@ -11,6 +11,7 @@ import {
   parallelA11ySummary,
   pieA11ySummary,
   themeRiverA11ySummary,
+  bumpA11ySummary,
   wordCloudA11ySummary,
 } from "./echartsDescriptor";
 
@@ -192,6 +193,24 @@ export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yT
         value: point.value,
       })),
       caption: descriptor.description ?? themeRiverA11ySummary(descriptor),
+    };
+  }
+
+  if (descriptor.kind === "bump") {
+    return {
+      columns: [
+        { key: "entity", label: "Entity" },
+        { key: "period", label: "Period" },
+        { key: "rank", label: "Rank", align: "right" },
+      ],
+      rows: descriptor.series.flatMap((item) =>
+        descriptor.categories.map((period, index) => ({
+          entity: item.name,
+          period,
+          rank: item.ranks[index] ?? "",
+        })),
+      ),
+      caption: descriptor.description ?? bumpA11ySummary(descriptor),
     };
   }
 

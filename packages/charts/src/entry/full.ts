@@ -82,6 +82,12 @@ export {
   type ThemeRiverPoint,
 } from "../themeRiver/ThemeRiverChart";
 export {
+  BumpChart,
+  type BumpChartProps,
+  type BumpChartData,
+  type BumpSeries,
+} from "../bump/BumpChart";
+export {
   WordCloudChart,
   type WordCloudChartProps,
   type WordCloudWord,

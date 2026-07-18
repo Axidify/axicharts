@@ -1,0 +1,15 @@
+{
+  "type": "bump",
+  "title": "GDP ranking by country",
+  "height": 360,
+  "width": 640,
+  "encoding": {
+    "x": { "field": "year", "type": "temporal" },
+    "y": { "field": "rank", "type": "quantitative" },
+    "series": { "field": "country", "type": "nominal" }
+  },
+  "props": {
+    "showLabels": true,
+    "smooth": true
+  }
+}

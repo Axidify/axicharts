@@ -20,6 +20,7 @@ import {
   RadarChart,
   ParallelChart,
   ThemeRiverChart,
+  BumpChart,
   WordCloudChart,
   ScatterChart,
   Stat,
@@ -82,6 +83,7 @@ import { resolvePictorialBarData } from "./pictorialBarEncoding";
 import { resolveLiquidFillValue } from "./liquidFillEncoding";
 import { resolveMapDrillProps } from "./mapEncoding";
 import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
+import { bumpFromRows } from "./bumpEncoding";
 import { wordCloudFromRows } from "./wordCloudEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
 import { panelPropsWithGraphics } from "./panelGraphics";
@@ -617,6 +619,28 @@ export function compilePanel(
         createElement(ThemeRiverChart, {
           points,
           showAxes: chartProps.showAxes as boolean | undefined,
+        }),
+      );
+    }
+
+    case "bump":
+    case "bump-chart": {
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
+      const yEncoding = Array.isArray(resolved.encoding?.y)
+        ? resolved.encoding.y[0]
+        : resolved.encoding?.y;
+      const data = bumpFromRows(rows, chartProps, {
+        x: resolved.encoding?.x,
+        y: yEncoding,
+        series: resolved.encoding?.series,
+      });
+      return wrap(
+        createElement(BumpChart, {
+          data,
+          maxRank: chartProps.maxRank as number | undefined,
+          showLabels: chartProps.showLabels as boolean | undefined,
+          showAxes: chartProps.showAxes as boolean | undefined,
+          smooth: chartProps.smooth as boolean | undefined,
         }),
       );
     }

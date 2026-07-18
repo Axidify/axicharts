@@ -771,6 +771,56 @@ describe("compilePanel presentation mode", () => {
     registerBuiltinChartTypes();
     expect(getChartType("liquid-fill")?.Chart).toBeTypeOf("function");
   });
+
+  it("compiles bump panels from long-form rows", async () => {
+    const panel = compilePanel(
+      {
+        type: "bump",
+        title: "Country rankings",
+        height: 360,
+        width: 640,
+        encoding: {
+          x: { field: "year", type: "temporal" },
+          y: { field: "rank", type: "quantitative" },
+          series: { field: "country", type: "nominal" },
+        },
+      },
+      [
+        { year: "2018", country: "USA", rank: 1 },
+        { year: "2019", country: "USA", rank: 2 },
+        { year: "2018", country: "China", rank: 2 },
+        { year: "2019", country: "China", rank: 1 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Country rankings");
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+
+  it("round-trips bump through ejectPanel", () => {
+    const spec = {
+      type: "bump" as const,
+      encoding: {
+        x: { field: "year" },
+        y: { field: "rank" },
+        series: { field: "country" },
+      },
+      props: { smooth: true, showLabels: true },
+    };
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain("BumpChart");
+    expect(jsx).toContain("year");
+    expect(jsx).toContain("rank");
+    expect(jsx).toContain("country");
+  });
+
+  it("registers bump builtin chart type", () => {
+    registerBuiltinChartTypes();
+    expect(getChartType("bump")?.Chart).toBeTypeOf("function");
+  });
 });
 
 describe("compilePanel echarts escape hatch", () => {

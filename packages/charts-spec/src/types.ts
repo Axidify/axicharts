@@ -81,6 +81,8 @@ export type PanelChartType =
   | "radar"
   | "parallel"
   | "theme-river"
+  | "bump"
+  | "bump-chart"
   | "wordcloud"
   | "word-cloud"
   | "scatter"

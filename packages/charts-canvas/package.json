@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-canvas",
-  "version": "0.3.42",
+  "version": "0.3.43",
   "description": "uPlot canvas adapters for AxiCharts line and bar charts.",
   "license": "MIT",
   "repository": {
