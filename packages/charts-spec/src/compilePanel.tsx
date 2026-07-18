@@ -160,7 +160,13 @@ export function compilePanel(
           : ((props.series as PlotSeries[] | undefined) ?? []);
 
       let seriesWithColor = baseSeries;
-      if (resolved.type === "bar" && resolved.encoding?.color && baseSeries[0]) {
+      if (
+        (resolved.type === "bar" ||
+          resolved.type === "line" ||
+          resolved.type === "area") &&
+        resolved.encoding?.color &&
+        baseSeries[0]
+      ) {
         const fills = fillsFromColorField(
           rows,
           resolved.encoding.color.field,

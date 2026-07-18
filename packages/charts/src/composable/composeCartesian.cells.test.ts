@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { describe, expect, it } from "vitest";
 import { composeCartesianMarks } from "./composeCartesian";
-import { Bar, Cell, XAxis } from "./marks";
+import { Area, Bar, Cell, Line, XAxis } from "./marks";
 
 const DATA = [
   { week: "W1", throughput: 120 },
@@ -35,5 +35,48 @@ describe("composeCartesianMarks bar cells", () => {
       "#2563eb",
       "#d97706",
     ]);
+  });
+
+  it("applies per-category fills from Cell children on line marks", () => {
+    const composed = composeCartesianMarks(
+      [
+        createElement(XAxis, { dataKey: "week" }),
+        createElement(
+          Line,
+          { dataKey: "throughput" },
+          createElement(Cell, { dataKey: "W2", tone: "critical" }),
+          createElement(Cell, { dataKey: "W4", fill: "#7c3aed" }),
+        ),
+      ],
+      DATA,
+      undefined,
+      ["line"],
+    );
+
+    expect(composed.series[0]?.fills).toEqual([
+      "#2563eb",
+      "#dc2626",
+      "#2563eb",
+      "#7c3aed",
+      "#2563eb",
+    ]);
+  });
+
+  it("applies per-category fills from Cell children on area marks", () => {
+    const composed = composeCartesianMarks(
+      [
+        createElement(XAxis, { dataKey: "week" }),
+        createElement(
+          Area,
+          { dataKey: "throughput" },
+          createElement(Cell, { dataKey: "W1", tone: "success" }),
+        ),
+      ],
+      DATA,
+      undefined,
+      ["area"],
+    );
+
+    expect(composed.series[0]?.fills?.[0]).toBe("#16a34a");
   });
 });

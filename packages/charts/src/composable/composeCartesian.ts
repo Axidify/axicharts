@@ -18,7 +18,7 @@ const Y_AXIS_SUFFIX: Partial<Record<string, string>> = {
   bps: " bps",
 };
 
-type BarCellBinding = {
+type MarkCellBinding = {
   dataKey: string;
   cells: Map<string, { color?: string; tone?: import("@axicharts/charts-canvas").SeriesTone }>;
 };
@@ -32,7 +32,7 @@ export function composeCartesianMarks(
   let xKey = "date";
   let valueSuffix: string | undefined;
   const series: PlotSeries[] = [];
-  const barCellBindings: BarCellBinding[] = [];
+  const cellBindings: MarkCellBinding[] = [];
 
   Children.forEach(children, (child) => {
     if (!isValidElement(child)) return;
@@ -58,8 +58,8 @@ export function composeCartesianMarks(
       case "bar": {
         if (!seriesKinds.includes(kind)) break;
         const dataKey = String(props.dataKey);
-        if (kind === "bar") {
-          barCellBindings.push({
+        if (kind === "bar" || kind === "line" || kind === "area") {
+          cellBindings.push({
             dataKey,
             cells: readCartesianCells(child),
           });
@@ -84,8 +84,8 @@ export function composeCartesianMarks(
 
   const categories = data.map((row) => String(row[xKey] ?? ""));
 
-  const withBarFills = series.map((item) => {
-    const binding = barCellBindings.find((entry) => entry.dataKey === item.key);
+  const withCellFills = series.map((item) => {
+    const binding = cellBindings.find((entry) => entry.dataKey === item.key);
     if (!binding || binding.cells.size === 0) return item;
 
     const baseColor = item.color ?? resolveSeriesColor(item.tone, 0);
@@ -97,5 +97,5 @@ export function composeCartesianMarks(
     return { ...item, fills };
   });
 
-  return { categories, series: withBarFills, valueSuffix };
+  return { categories, series: withCellFills, valueSuffix };
 }

@@ -18,6 +18,11 @@ import {
 } from "./plotAnnotations";
 import { shouldStackSeries, STACK_GROUP } from "./stack";
 import { resolveSeriesColor } from "./seriesColor";
+import {
+  createSegmentedLineDrawHook,
+  hasSegmentedFills,
+  segmentedSeriesPaths,
+} from "./segmentedLineDraw";
 
 function seriesSpan(data: number[]): number {
   if (data.length === 0) return 1;
@@ -76,6 +81,17 @@ function buildOptions({
   const fillOpacity = compact
     ? Math.min(theme.area.fillOpacity + 0.12, 0.35)
     : theme.area.fillOpacity;
+
+  const useSegmentedFills =
+    hasSegmentedFills(series) && !shouldStackSeries(stacked, series.length);
+  const segmentedDraw = useSegmentedFills
+    ? createSegmentedLineDrawHook(series, {
+        strokeWidth: theme.line.strokeWidth,
+        areaFill: Boolean(fill && theme.area.show),
+        fillOpacity,
+        pointRadius: compact ? 3 : 4,
+      })
+    : undefined;
 
   const useDualAxis = shouldStackSeries(stacked, series.length)
     ? false
@@ -174,13 +190,16 @@ function buildOptions({
       ...series.map((item, index) => {
         const color = item.color ?? resolveSeriesColor(item.tone, index);
         const stackSeries = shouldStackSeries(stacked, series.length);
+        const hasPointFills =
+          useSegmentedFills && Boolean(item.fills && item.fills.length > 0);
         return {
           label: item.name,
           scale: useDualAxis && index > 0 ? "y2" : "y",
-          stroke: color,
+          stroke: hasPointFills ? "transparent" : color,
           width: theme.line.strokeWidth,
+          paths: hasPointFills ? segmentedSeriesPaths() : undefined,
           fill:
-            fill && theme.area.show
+            !hasPointFills && fill && theme.area.show
               ? (u: uPlot) => {
                   const top = u.bbox.top;
                   const bottom = u.bbox.top + u.bbox.height;
@@ -199,12 +218,19 @@ function buildOptions({
       }),
     ],
     hooks:
-      thresholdBands.length > 0 || referenceLines.length > 0
+      thresholdBands.length > 0 ||
+      referenceLines.length > 0 ||
+      segmentedDraw
         ? {
             draw: [
               createAnnotationDrawHook({
                 bands: thresholdBands,
                 referenceLines,
+                onDraw: segmentedDraw
+                  ? (u) => {
+                      segmentedDraw(u);
+                    }
+                  : undefined,
               }) as (u: uPlot) => void,
             ],
           }

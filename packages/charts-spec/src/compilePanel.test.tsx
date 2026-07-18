@@ -90,6 +90,50 @@ describe("compilePanel alert", () => {
   });
 });
 
+describe("compilePanel color encoding", () => {
+  it("applies encoding.color fills to line panels", () => {
+    const panel = compilePanel(
+      {
+        type: "line",
+        encoding: {
+          x: { field: "week" },
+          y: { field: "throughput" },
+          color: { field: "aboveTarget" },
+        },
+        height: 180,
+      },
+      [
+        { week: "W1", throughput: 120, aboveTarget: true },
+        { week: "W2", throughput: 90, aboveTarget: false },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+  });
+
+  it("applies encoding.color fills to area panels", () => {
+    const panel = compilePanel(
+      {
+        type: "area",
+        encoding: {
+          x: { field: "week" },
+          y: { field: "throughput" },
+          color: { field: "aboveTarget" },
+        },
+        height: 180,
+      },
+      [
+        { week: "W1", throughput: 120, aboveTarget: true },
+        { week: "W2", throughput: 90, aboveTarget: false },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+  });
+});
+
 describe("compilePanel table", () => {
   it("renders tabular rows from spec data", () => {
     const panel = compilePanel(

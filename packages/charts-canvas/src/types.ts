@@ -13,7 +13,7 @@ export type PlotSeries = {
   key?: string;
   color?: string;
   tone?: SeriesTone;
-  /** Per-category fill colors (bar marks) — length matches `data`. */
+  /** Per-category colors (bar fills, line/area segment + point stroke) — length matches `data`. */
   fills?: string[];
 };
 
