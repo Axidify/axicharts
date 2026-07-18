@@ -1,5 +1,7 @@
 import type uPlot from "uplot";
+import type { LineCurve } from "@axicharts/charts-theme";
 import { createAreaGradient } from "./colors";
+import { fillAreaUnderSegment, monotoneTangents, strokeSegment } from "./monotoneSegment";
 import { resolveSeriesColor } from "./seriesColor";
 import type { PlotSeries } from "./types";
 
@@ -22,7 +24,33 @@ type SegmentedDrawConfig = {
   areaFill: boolean;
   fillOpacity: number;
   pointRadius: number;
+  curve: LineCurve;
 };
+
+function collectPixelPoints(
+  u: uPlot,
+  xData: number[],
+  yData: (number | null)[],
+): { points: { x: number; y: number }[]; valid: boolean[] } {
+  const points: { x: number; y: number }[] = [];
+  const valid: boolean[] = [];
+
+  for (let index = 0; index < xData.length; index++) {
+    const y = yData[index];
+    if (y == null) {
+      valid.push(false);
+      points.push({ x: 0, y: 0 });
+      continue;
+    }
+    valid.push(true);
+    points.push({
+      x: u.valToPos(xData[index]!, "x", true),
+      y: u.valToPos(y, "y", true),
+    });
+  }
+
+  return { points, valid };
+}
 
 function drawSegmentedSeries(
   u: uPlot,
@@ -36,17 +64,18 @@ function drawSegmentedSeries(
   const yData = u.data[seriesIdx] as (number | null)[];
   const baseline = u.bbox.top + u.bbox.height;
   const fills = seriesItem.fills;
+  const { points, valid } = collectPixelPoints(u, xData, yData);
+  const tangents =
+    config.curve === "monotone" ? monotoneTangents(points) : undefined;
 
   for (let index = 0; index < xData.length - 1; index++) {
-    const y0 = yData[index];
-    const y1 = yData[index + 1];
-    if (y0 == null || y1 == null) continue;
+    if (!valid[index] || !valid[index + 1]) continue;
 
-    const x0 = u.valToPos(xData[index]!, "x", true);
-    const y0p = u.valToPos(y0, "y", true);
-    const x1 = u.valToPos(xData[index + 1]!, "x", true);
-    const y1p = u.valToPos(y1, "y", true);
+    const p0 = points[index]!;
+    const p1 = points[index + 1]!;
     const color = fills?.[index] ?? fills?.[0] ?? seriesColor;
+    const m0 = tangents?.[index];
+    const m1 = tangents?.[index + 1];
 
     ctx.save();
     ctx.strokeStyle = color;
@@ -55,15 +84,20 @@ function drawSegmentedSeries(
     ctx.lineCap = "round";
 
     if (config.areaFill) {
-      ctx.beginPath();
-      ctx.moveTo(x0, baseline);
-      ctx.lineTo(x0, y0p);
-      ctx.lineTo(x1, y1p);
-      ctx.lineTo(x1, baseline);
-      ctx.closePath();
+      fillAreaUnderSegment(
+        ctx,
+        p0.x,
+        p0.y,
+        p1.x,
+        p1.y,
+        baseline,
+        config.curve,
+        m0,
+        m1,
+      );
       ctx.fillStyle = createAreaGradient(
         ctx,
-        Math.min(y0p, y1p),
+        Math.min(p0.y, p1.y),
         baseline,
         color,
         config.fillOpacity,
@@ -71,28 +105,23 @@ function drawSegmentedSeries(
       ctx.fill();
     }
 
-    ctx.beginPath();
-    ctx.moveTo(x0, y0p);
-    ctx.lineTo(x1, y1p);
-    ctx.stroke();
+    strokeSegment(ctx, p0.x, p0.y, p1.x, p1.y, config.curve, m0, m1);
     ctx.restore();
   }
 
   for (let index = 0; index < xData.length; index++) {
-    const y = yData[index];
-    if (y == null) continue;
+    if (!valid[index]) continue;
 
     const color = fills?.[index] ?? fills?.[0] ?? seriesColor;
     const radius = seriesItem.sizes?.[index] ?? config.pointRadius;
-    const x = u.valToPos(xData[index]!, "x", true);
-    const yp = u.valToPos(y, "y", true);
+    const { x, y } = points[index]!;
 
     ctx.save();
     ctx.fillStyle = color;
     ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(x, yp, radius, 0, Math.PI * 2);
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
     ctx.restore();

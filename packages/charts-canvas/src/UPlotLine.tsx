@@ -100,6 +100,7 @@ function buildOptions({
         areaFill: Boolean(fill && theme.area.show),
         fillOpacity,
         pointRadius: defaultPointRadius,
+        curve,
       })
     : undefined;
   const variablePointDraw =

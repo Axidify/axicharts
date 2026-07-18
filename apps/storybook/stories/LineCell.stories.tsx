@@ -51,6 +51,29 @@ function LineCellDemo(): ReactElement {
 
       <div>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: "#64748b" }}>
+          Line — segmented color + monotone curve (Recharts parity)
+        </div>
+        <ChartContainer theme={cleanTheme} height={220} width="100%">
+          <LineChart data={DATA}>
+            <XAxis dataKey="week" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line dataKey="latency" type="monotone">
+              {DATA.map((row) => (
+                <Cell
+                  key={row.week}
+                  dataKey={row.week}
+                  fill={row.latency <= SLO ? "#16a34a" : "#dc2626"}
+                />
+              ))}
+            </Line>
+          </LineChart>
+        </ChartContainer>
+      </div>
+
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: "#64748b" }}>
           Area — segmented fill under curve
         </div>
         <ChartContainer theme={cleanTheme} height={220} width="100%">
@@ -58,7 +81,7 @@ function LineCellDemo(): ReactElement {
             <XAxis dataKey="week" />
             <YAxis />
             <Tooltip />
-            <Area dataKey="latency">
+            <Area dataKey="latency" type="monotone">
               {DATA.map((row) => (
                 <Cell
                   key={row.week}
@@ -82,7 +105,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Granular line/area styling — per-category Cell colors for segments and points. Spec compiler: encoding.color on line/area panels.",
+          "Granular line/area styling — per-category Cell colors for segments and points, including monotone curves with segmented stroke (C79). Spec compiler: encoding.color on line/area panels.",
       },
     },
   },
