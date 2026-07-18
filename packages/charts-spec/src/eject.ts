@@ -61,6 +61,8 @@ function resolveChartName(spec: PanelSpec): string {
         ? "PieChart"
         : spec.type === "funnel"
           ? "FunnelChart"
+          : spec.type === "pictorial-bar" || spec.type === "pictorialBar"
+            ? "PictorialBarChart"
           : spec.type === "waterfall"
             ? "WaterfallChart"
             : spec.type === "candlestick"
@@ -176,6 +178,22 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       name: String(row.${nameField}),
       value: Number(row.${valueField}),
     }))}`;
+  } else if (spec.type === "pictorial-bar" || spec.type === "pictorialBar") {
+    const xField = encoding?.x?.field ?? encoding?.category?.field ?? "category";
+    const yEncoding = Array.isArray(encoding?.y) ? encoding?.y[0] : encoding?.y;
+    const valueField = encoding?.value?.field ?? yEncoding?.field ?? "value";
+    if (encoding?.x || encoding?.y || encoding?.category || encoding?.value) {
+      chartBody = `data={{
+  items: ${dataVar}.map((row) => ({
+    category: String(row.${xField}),
+    value: Number(row.${valueField}),
+  })),
+  symbol: ${dataVar}.symbol,
+}}`;
+    } else {
+      chartBody = `data={${dataVar}.data ?? { items: ${dataVar}.items ?? [] }}
+    symbol={${dataVar}.symbol}`;
+    }
   } else if (spec.type === "waterfall") {
     const valueFormat = (spec.props?.valueFormat as string | undefined) ?? "currency";
     const showSigns = spec.props?.showSigns !== false;

@@ -10,6 +10,11 @@ export {
 export { buildWaterfallBridge, type WaterfallBarKind, type WaterfallBridge, type WaterfallConnector } from "./waterfallBridge";
 export { EChartsCandlestick, type EChartBrushRange, type EChartsCandlestickProps } from "./EChartsCandlestick";
 export { EChartsFunnel, type EChartsFunnelProps } from "./EChartsFunnel";
+export {
+  EChartsPictorialBar,
+  type EChartsPictorialBarProps,
+} from "./EChartsPictorialBar";
+export type { PictorialBarData, PictorialBarItem } from "./pictorialBarTypes";
 export { EChartsSunburst, type EChartsSunburstProps } from "./EChartsSunburst";
 export { EChartsTreemap, type EChartsTreemapProps } from "./EChartsTreemap";
 export type { HierarchyNode } from "./hierarchyTypes";

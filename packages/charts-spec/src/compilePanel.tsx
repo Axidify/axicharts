@@ -15,6 +15,7 @@ import {
   LineChart,
   PieChart,
   FunnelChart,
+  PictorialBarChart,
   RadarChart,
   ParallelChart,
   ThemeRiverChart,
@@ -76,6 +77,7 @@ import { registerPluginChartTypes } from "./registerPluginChartTypes";
 import { assertPanelCategoryEnabled } from "./panelCategories";
 import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
 import { resolveCalendarHeatmapData } from "./calendarEncoding";
+import { resolvePictorialBarData } from "./pictorialBarEncoding";
 import { resolveMapDrillProps } from "./mapEncoding";
 import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
 import { wordCloudFromRows } from "./wordCloudEncoding";
@@ -404,6 +406,20 @@ export function compilePanel(
         createElement(FunnelChart, {
           stages,
           ...props,
+        }),
+      );
+    }
+
+    case "pictorial-bar":
+    case "pictorialBar": {
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
+      const data = resolvePictorialBarData(rows, chartProps, resolved.encoding);
+      return wrap(
+        createElement(PictorialBarChart, {
+          data,
+          symbol: chartProps.symbol as string | undefined,
+          symbolRepeat: chartProps.symbolRepeat as boolean | undefined,
+          barGap: chartProps.barGap as number | string | undefined,
         }),
       );
     }

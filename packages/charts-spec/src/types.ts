@@ -71,6 +71,8 @@ export type PanelChartType =
   | "pie"
   | "donut"
   | "funnel"
+  | "pictorial-bar"
+  | "pictorialBar"
   | "waterfall"
   | "candlestick"
   | "heatmap"
@@ -111,6 +113,7 @@ export type PanelSpec = {
     size?: SizeEncoding;
     name?: FieldEncoding;
     value?: FieldEncoding;
+    category?: FieldEncoding;
     open?: FieldEncoding;
     high?: FieldEncoding;
     low?: FieldEncoding;

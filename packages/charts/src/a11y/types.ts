@@ -80,6 +80,18 @@ export type FunnelA11yDescriptor = {
   stages: FunnelA11yStage[];
 };
 
+export type PictorialBarA11yItem = {
+  category: string;
+  value: number;
+};
+
+export type PictorialBarA11yDescriptor = {
+  kind: "pictorial-bar";
+  title?: string;
+  description?: string;
+  items: PictorialBarA11yItem[];
+};
+
 export type HierarchyA11yItem = {
   name: string;
   value: number;
@@ -124,6 +136,7 @@ export type ChartA11yDescriptor =
   | HeatmapA11yDescriptor
   | CalendarHeatmapA11yDescriptor
   | FunnelA11yDescriptor
+  | PictorialBarA11yDescriptor
   | HierarchyA11yDescriptor
   | ParallelA11yDescriptor
   | ThemeRiverA11yDescriptor

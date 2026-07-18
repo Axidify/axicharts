@@ -4,6 +4,7 @@ import {
   formatFunnelShare,
   formatPieShare,
   funnelA11ySummary,
+  pictorialBarA11ySummary,
   heatmapA11ySummary,
   calendarHeatmapA11ySummary,
   hierarchyA11ySummary,
@@ -124,6 +125,23 @@ export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yT
     };
   }
 
+  if (descriptor.kind === "pictorial-bar") {
+    const maxValue = Math.max(...descriptor.items.map((item) => item.value), 1);
+    return {
+      columns: [
+        { key: "category", label: "Category" },
+        { key: "value", label: "Value", align: "right" },
+        { key: "capacity", label: "Capacity", align: "right" },
+      ],
+      rows: descriptor.items.map((item) => ({
+        category: item.category,
+        value: item.value,
+        capacity: `${((item.value / maxValue) * 100).toFixed(1)}%`,
+      })),
+      caption: descriptor.description ?? pictorialBarA11ySummary(descriptor),
+    };
+  }
+
   if (descriptor.kind === "hierarchy") {
     return {
       columns: [
@@ -196,17 +214,18 @@ export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yT
   }
 
   const categoryKey = "category";
+  const cartesian = descriptor as Extract<ChartA11yDescriptor, { kind: "cartesian" }>;
   const columns = [
-    { key: categoryKey, label: descriptor.categoryLabel ?? "Category" },
-    ...descriptor.series.map((item) => ({
+    { key: categoryKey, label: cartesian.categoryLabel ?? "Category" },
+    ...cartesian.series.map((item) => ({
       key: item.name,
       label: item.name,
       align: "right" as const,
     })),
   ];
-  const rows = descriptor.categories.map((category, index) => {
+  const rows = cartesian.categories.map((category, index) => {
     const row: Record<string, string | number> = { [categoryKey]: category };
-    for (const item of descriptor.series) {
+    for (const item of cartesian.series) {
       row[item.name] = item.values[index] ?? "";
     }
     return row;
@@ -215,7 +234,7 @@ export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yT
   return {
     columns,
     rows,
-    caption: descriptor.description ?? cartesianA11ySummary(descriptor),
+    caption: descriptor.description ?? cartesianA11ySummary(cartesian),
   };
 }
 

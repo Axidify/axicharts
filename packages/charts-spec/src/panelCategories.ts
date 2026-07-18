@@ -17,6 +17,8 @@ export const PANEL_TYPE_CATEGORY: Record<string, PanelCategory> = {
   pie: "distribution",
   donut: "distribution",
   funnel: "distribution",
+  "pictorial-bar": "distribution",
+  pictorialBar: "distribution",
   boxplot: "distribution",
   histogram: "distribution",
   waterfall: "financial",

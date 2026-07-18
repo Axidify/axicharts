@@ -24,6 +24,14 @@ const config: StorybookConfig = {
             root,
             "packages/charts/src/entry/quick.ts",
           ),
+          "@axicharts/charts/calendar": path.resolve(
+            root,
+            "packages/charts/src/entry/calendar.ts",
+          ),
+          "@axicharts/charts/pictorial-bar": path.resolve(
+            root,
+            "packages/charts/src/entry/pictorial-bar.ts",
+          ),
           "@axicharts/charts": path.resolve(root, "packages/charts/src"),
           "@axicharts/charts-canvas": path.resolve(
             root,

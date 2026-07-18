@@ -1,0 +1,13 @@
+{
+  "type": "pictorial-bar",
+  "title": "Resource usage",
+  "height": 260,
+  "width": 640,
+  "encoding": {
+    "x": { "field": "resource", "type": "nominal" },
+    "y": { "field": "used", "type": "quantitative" }
+  },
+  "props": {
+    "symbol": "roundRect"
+  }
+}

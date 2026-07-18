@@ -23,6 +23,7 @@ describe("category entrypoints", () => {
   it("exports distribution chart symbols", () => {
     expect(distribution.PieChart).toBeTypeOf("function");
     expect(distribution.FunnelChart).toBeTypeOf("function");
+    expect(distribution.PictorialBarChart).toBeTypeOf("function");
     expect(distribution.BoxplotChart).toBeTypeOf("function");
     expect(distribution.HistogramChart).toBeTypeOf("function");
   });

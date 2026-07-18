@@ -16,6 +16,12 @@ export {
   type FunnelStage,
 } from "../funnel/FunnelChart";
 export {
+  PictorialBarChart,
+  type PictorialBarChartProps,
+  type PictorialBarData,
+  type PictorialBarItem,
+} from "../pictorialBar/PictorialBarChart";
+export {
   ScatterChart,
   type ScatterChartProps,
   type ScatterPoint,

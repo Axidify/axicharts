@@ -692,6 +692,48 @@ describe("compilePanel presentation mode", () => {
     registerBuiltinChartTypes();
     expect(getChartType("calendar")?.Chart).toBeTypeOf("function");
   });
+
+  it("compiles pictorial-bar panels from encoding rows", async () => {
+    const panel = compilePanel(
+      {
+        type: "pictorial-bar",
+        encoding: {
+          x: { field: "resource" },
+          y: { field: "used" },
+        },
+        props: { symbol: "roundRect" },
+      },
+      [
+        { resource: "CPU", used: 72 },
+        { resource: "Memory", used: 58 },
+      ],
+    );
+
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+
+  it("round-trips pictorial-bar through ejectPanel", () => {
+    const spec = {
+      type: "pictorial-bar" as const,
+      encoding: {
+        x: { field: "resource" },
+        y: { field: "used" },
+      },
+      props: { symbol: "roundRect" },
+    };
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain("PictorialBarChart");
+    expect(jsx).toContain("resource");
+    expect(jsx).toContain("used");
+  });
+
+  it("registers pictorial-bar builtin chart type", () => {
+    registerBuiltinChartTypes();
+    expect(getChartType("pictorial-bar")?.Chart).toBeTypeOf("function");
+  });
 });
 
 describe("compilePanel echarts escape hatch", () => {

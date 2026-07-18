@@ -1,10 +1,11 @@
 import type { CalendarHeatmapData, HeatmapMatrix, OhlcPoint, PieSlice } from "@axicharts/charts-echarts";
-import type { FunnelStage } from "@axicharts/charts-echarts";
+import type { FunnelStage, PictorialBarData } from "@axicharts/charts-echarts";
 import type { HierarchyNode } from "@axicharts/charts-echarts";
 import type {
   CandlestickA11yDescriptor,
   CalendarHeatmapA11yDescriptor,
   FunnelA11yDescriptor,
+  PictorialBarA11yDescriptor,
   HeatmapA11yDescriptor,
   HierarchyA11yDescriptor,
   HierarchyA11yItem,
@@ -142,6 +143,26 @@ export function buildFunnelA11yDescriptor({
   };
 }
 
+export function buildPictorialBarA11yDescriptor({
+  data,
+  title,
+  description,
+}: {
+  data: PictorialBarData;
+  title?: string;
+  description?: string;
+}): PictorialBarA11yDescriptor {
+  return {
+    kind: "pictorial-bar",
+    title: title ?? data.items.map((item) => item.category).join(", "),
+    description,
+    items: data.items.map((item) => ({
+      category: item.category,
+      value: item.value,
+    })),
+  };
+}
+
 export function buildHierarchyA11yDescriptor({
   chartType,
   nodes,
@@ -250,6 +271,12 @@ export function funnelA11ySummary(descriptor: FunnelA11yDescriptor): string {
   return `Funnel chart with ${descriptor.stages.length} stages`;
 }
 
+export function pictorialBarA11ySummary(
+  descriptor: PictorialBarA11yDescriptor,
+): string {
+  return `Pictorial bar chart with ${descriptor.items.length} categories`;
+}
+
 export function hierarchyA11ySummary(descriptor: HierarchyA11yDescriptor): string {
   return `${descriptor.chartType} chart with ${descriptor.items.length} leaf nodes`;
 }
@@ -286,6 +313,8 @@ export function chartA11ySummary(descriptor: {
       return calendarHeatmapA11ySummary(descriptor as CalendarHeatmapA11yDescriptor);
     case "funnel":
       return funnelA11ySummary(descriptor as FunnelA11yDescriptor);
+    case "pictorial-bar":
+      return pictorialBarA11ySummary(descriptor as PictorialBarA11yDescriptor);
     case "hierarchy":
       return hierarchyA11ySummary(descriptor as HierarchyA11yDescriptor);
     case "parallel":

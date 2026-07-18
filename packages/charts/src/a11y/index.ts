@@ -5,6 +5,7 @@ export type {
   ChartA11yDescriptor,
   ChartA11yTable,
   FunnelA11yDescriptor,
+  PictorialBarA11yDescriptor,
   HeatmapA11yDescriptor,
   CalendarHeatmapA11yDescriptor,
   HierarchyA11yDescriptor,
@@ -27,6 +28,7 @@ export {
 export {
   buildCandlestickA11yDescriptor,
   buildFunnelA11yDescriptor,
+  buildPictorialBarA11yDescriptor,
   buildHeatmapA11yDescriptor,
   buildCalendarHeatmapA11yDescriptor,
   buildHierarchyA11yDescriptor,

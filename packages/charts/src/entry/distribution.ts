@@ -6,6 +6,12 @@ export {
   type FunnelStage,
 } from "../funnel/FunnelChart";
 export {
+  PictorialBarChart,
+  type PictorialBarChartProps,
+  type PictorialBarData,
+  type PictorialBarItem,
+} from "../pictorialBar/PictorialBarChart";
+export {
   BoxplotChart,
   type BoxplotChartProps,
   type BoxplotItem,

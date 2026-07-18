@@ -4,6 +4,7 @@ import { BarChart } from "../bar/BarChart";
 import { CandlestickChart } from "../candlestick/CandlestickChart";
 import { BoxplotChart } from "../boxplot/BoxplotChart";
 import { FunnelChart } from "../funnel/FunnelChart";
+import { PictorialBarChart } from "../pictorialBar/PictorialBarChart";
 import { HeatmapChart } from "../heatmap/HeatmapChart";
 import { CalendarHeatmapChart } from "../calendar/CalendarHeatmapChart";
 import { HistogramChart } from "../histogram/HistogramChart";
@@ -29,6 +30,11 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "funnel",
     Chart: FunnelChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "pictorial-bar",
+    Chart: PictorialBarChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
   {
