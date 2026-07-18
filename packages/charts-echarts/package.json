@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-echarts",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "ECharts adapters for AxiCharts pie, candlestick, waterfall, and heatmap.",
   "license": "MIT",
   "repository": {
