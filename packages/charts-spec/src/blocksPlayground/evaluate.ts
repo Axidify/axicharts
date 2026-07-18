@@ -2,6 +2,7 @@ import { ejectPanel } from "../eject";
 import { normalizePanelSpec } from "../parseSpec";
 import { normalizeToCartesian } from "../normalizeToCartesian";
 import {
+  detectPreNormalizeWarnings,
   validateCartesianSpec,
   type CartesianValidationError,
   type CartesianValidationIssue,
@@ -25,6 +26,33 @@ export type PlaygroundEvaluation = {
   ejected?: string;
   canRender: boolean;
 };
+
+export function parsePlaygroundData(
+  jsonText: string,
+): { ok: true; rows: SpecData } | { ok: false; error: string } {
+  try {
+    const parsed = JSON.parse(jsonText) as unknown;
+    if (!Array.isArray(parsed)) {
+      return { ok: false, error: "Data must be a JSON array of row objects" };
+    }
+    return { ok: true, rows: parsed as SpecData };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Invalid JSON",
+    };
+  }
+}
+
+/** Prepends sample rows and targets the cartesian entry import for copy-paste. */
+export function formatPlaygroundEject(code: string, rows: SpecData): string {
+  const rowsConst = `const rows = ${JSON.stringify(rows, null, 2)};\n\n`;
+  const withCartesianImport = code.replace(
+    /from "@axicharts\/charts"/g,
+    'from "@axicharts/charts/cartesian"',
+  );
+  return rowsConst + withCartesianImport;
+}
 
 export function evaluatePlaygroundSpec(
   jsonText: string,
@@ -54,6 +82,10 @@ export function evaluatePlaygroundSpec(
     };
   }
 
+  const preWarnings = CARTESIAN_LIKE.has(spec.type)
+    ? detectPreNormalizeWarnings(spec)
+    : [];
+
   const panel = CARTESIAN_LIKE.has(spec.type)
     ? normalizeToCartesian(spec)
     : spec;
@@ -63,16 +95,20 @@ export function evaluatePlaygroundSpec(
     return {
       panel,
       errors: validation.errors,
-      warnings: [],
+      warnings: preWarnings,
       canRender: false,
     };
   }
 
-  const ejected = ejectPanel(panel, "rows", { style: "composable" });
+  const warnings = [...preWarnings, ...validation.warnings];
+  const ejected = formatPlaygroundEject(
+    ejectPanel(panel, "rows", { style: "composable" }),
+    rows,
+  );
   return {
     panel,
     errors: [],
-    warnings: validation.warnings,
+    warnings,
     ejected,
     canRender: true,
   };

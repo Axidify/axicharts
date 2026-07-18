@@ -9,7 +9,7 @@ const ROWS = [
 
 describe("createCartesianPanel", () => {
   it("builds bar + line + rule from finance intent", () => {
-    const panel = createCartesianPanel({
+    const { panel, needsReview, matchedRules } = createCartesianPanel({
       intent: "Weekly revenue bars with target line and quota at 50",
       fields: ["week", "revenue", "target"],
     });
@@ -19,12 +19,14 @@ describe("createCartesianPanel", () => {
     expect(panel.marks?.some((mark) => mark.type === "rule" && mark.value === 50)).toBe(
       true,
     );
+    expect(needsReview).toBe(false);
+    expect(matchedRules).toEqual(expect.arrayContaining(["bar", "line", "rule-slo"]));
     const validation = validateCartesianSpec(panel, { rows: ROWS });
     expect(validation.ok).toBe(true);
   });
 
   it("builds ops SLO panel with band", () => {
-    const panel = createCartesianPanel({
+    const { panel } = createCartesianPanel({
       intent: "p95 latency trend with healthy band 0-150 and SLO at 200",
       fields: ["hour", "latency_ms"],
       mode: "live",
@@ -38,5 +40,14 @@ describe("createCartesianPanel", () => {
         (mark) => mark.type === "band" && mark.min === 0 && mark.max === 150,
       ),
     ).toBe(true);
+  });
+
+  it("sets needsReview for nonsense intent", () => {
+    const { needsReview, matchedRules } = createCartesianPanel({
+      intent: "make me a sandwich",
+      fields: ["week", "revenue"],
+    });
+    expect(needsReview).toBe(true);
+    expect(matchedRules).toEqual(["fallback-line"]);
   });
 });

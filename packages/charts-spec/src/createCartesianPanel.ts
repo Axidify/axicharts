@@ -21,6 +21,9 @@ export function listCartesianMarks(): CartesianMarkCatalogEntry[] {
 
 const X_FIELD_RE = /week|month|day|hour|date|time|period|quarter/i;
 
+const CHART_KEYWORD_RE =
+  /\b(bar|magnitude|revenue|sales|histogram|line|trend|latency|p95|over time|area|volume|cumulative|mrr)\b/i;
+
 function pickXField(fields: string[]): string {
   return fields.find((field) => X_FIELD_RE.test(field)) ?? fields[0] ?? "x";
 }
@@ -38,11 +41,19 @@ export type CreateCartesianPanelInput = {
   theme?: ThemeName;
 };
 
+export type CreateCartesianPanelResult = {
+  panel: PanelSpec;
+  needsReview: boolean;
+  matchedRules: string[];
+};
+
 /**
  * Rules-first cartesian panel builder (C139 prototype).
  * Emits `type: "cartesian"` + `marks[]` only — validate before compile.
  */
-export function createCartesianPanel(input: CreateCartesianPanelInput): PanelSpec {
+export function createCartesianPanel(
+  input: CreateCartesianPanelInput,
+): CreateCartesianPanelResult {
   const intent = input.intent.toLowerCase();
   const fields =
     input.fields ??
@@ -52,6 +63,7 @@ export function createCartesianPanel(input: CreateCartesianPanelInput): PanelSpe
   const xField = input.xField ?? pickXField(fields);
   const numericFields = pickNumericFields(fields, xField);
   const marks: ChartBlockMarkSpec[] = [];
+  const matchedRules: string[] = [];
 
   const revenueField =
     numericFields.find((field) => /revenue|sales|throughput|volume/i.test(field)) ??
@@ -61,6 +73,7 @@ export function createCartesianPanel(input: CreateCartesianPanelInput): PanelSpe
     numericFields.find((field) => field !== revenueField);
 
   if (/bar|magnitude|revenue|sales|histogram/i.test(intent) && revenueField) {
+    matchedRules.push("bar");
     marks.push({
       type: "bar",
       field: revenueField,
@@ -70,6 +83,7 @@ export function createCartesianPanel(input: CreateCartesianPanelInput): PanelSpe
   }
 
   if (/line|trend|latency|p95|over time/i.test(intent) && (targetField ?? revenueField)) {
+    matchedRules.push("line");
     marks.push({
       type: "line",
       field: targetField ?? revenueField!,
@@ -79,6 +93,7 @@ export function createCartesianPanel(input: CreateCartesianPanelInput): PanelSpe
   }
 
   if (/area|volume|cumulative|mrr/i.test(intent) && revenueField) {
+    matchedRules.push("area");
     marks.push({
       type: "area",
       field: revenueField,
@@ -86,12 +101,16 @@ export function createCartesianPanel(input: CreateCartesianPanelInput): PanelSpe
     });
   }
 
+  let usedFallback = false;
   if (marks.length === 0 && revenueField) {
+    usedFallback = true;
+    matchedRules.push("fallback-line");
     marks.push({ type: "line", field: revenueField, label: revenueField });
   }
 
   const sloMatch = intent.match(/(?:slo|quota|threshold|limit)\s*(?:at|of)?\s*(\d+(?:\.\d+)?)/i);
   if (sloMatch?.[1]) {
+    matchedRules.push("rule-slo");
     marks.push({
       type: "rule",
       value: Number(sloMatch[1]),
@@ -102,6 +121,7 @@ export function createCartesianPanel(input: CreateCartesianPanelInput): PanelSpe
 
   const bandMatch = intent.match(/healthy(?:\s*band)?\s*(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)/i);
   if (bandMatch?.[1] && bandMatch[2]) {
+    matchedRules.push("band-healthy");
     marks.push({
       type: "band",
       min: Number(bandMatch[1]),
@@ -112,12 +132,14 @@ export function createCartesianPanel(input: CreateCartesianPanelInput): PanelSpe
   }
 
   if (/stack/i.test(intent) && marks.filter((mark) => mark.type === "bar").length >= 2) {
+    matchedRules.push("stack");
     for (const mark of marks) {
       if (mark.type === "bar") mark.stack = "default";
     }
   }
 
   if (/dual|secondary|right axis|margin/i.test(intent) && marks.length >= 2) {
+    matchedRules.push("dual-axis");
     const dataMarks = marks.filter(
       (mark): mark is Extract<ChartBlockMarkSpec, { type: "line" | "bar" | "area" }> =>
         mark.type === "line" || mark.type === "bar" || mark.type === "area",
@@ -125,7 +147,10 @@ export function createCartesianPanel(input: CreateCartesianPanelInput): PanelSpe
     if (dataMarks[1]) dataMarks[1].yAxisId = "right";
   }
 
-  return {
+  const chartKeywordsMatched = CHART_KEYWORD_RE.test(intent);
+  const needsReview = usedFallback || !chartKeywordsMatched;
+
+  const panel: PanelSpec = {
     specVersion: 1,
     type: "cartesian",
     encoding: { x: { field: xField } },
@@ -133,5 +158,14 @@ export function createCartesianPanel(input: CreateCartesianPanelInput): PanelSpe
     mode: input.mode ?? (intent.includes("live") ? "live" : "interactive"),
     theme: input.theme ?? (intent.includes("studio") ? "studio" : "clean"),
     height: 260,
+    props: {
+      plannerMeta: {
+        needsReview,
+        matchedRules,
+        intent: input.intent,
+      },
+    },
   };
+
+  return { panel, needsReview, matchedRules };
 }

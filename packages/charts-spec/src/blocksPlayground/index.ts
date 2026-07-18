@@ -5,4 +5,9 @@ export {
   presetSpecJson,
   type BlocksPlaygroundPreset,
 } from "./presets";
-export { evaluatePlaygroundSpec, type PlaygroundEvaluation } from "./evaluate";
+export {
+  evaluatePlaygroundSpec,
+  formatPlaygroundEject,
+  parsePlaygroundData,
+  type PlaygroundEvaluation,
+} from "./evaluate";

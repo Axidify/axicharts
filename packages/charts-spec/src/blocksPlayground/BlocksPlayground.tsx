@@ -8,7 +8,7 @@ import {
   presetSpecJson,
   type BlocksPlaygroundPreset,
 } from "./presets";
-import { evaluatePlaygroundSpec } from "./evaluate";
+import { evaluatePlaygroundSpec, parsePlaygroundData } from "./evaluate";
 import { createCartesianPanel } from "../createCartesianPanel";
 
 export type BlocksPlaygroundProps = {
@@ -107,27 +107,27 @@ export function BlocksPlayground({
   const [dataText, setDataText] = useState(() => JSON.stringify(initial.rows, null, 2));
   const [showDataEditor, setShowDataEditor] = useState(false);
   const [intent, setIntent] = useState(initial.intent ?? "");
+  const [needsReview, setNeedsReview] = useState(false);
 
   const loadPreset = useCallback((preset: BlocksPlaygroundPreset) => {
     setPresetId(preset.id);
     setRows(preset.rows);
     setSpecText(presetSpecJson(preset));
     setDataText(JSON.stringify(preset.rows, null, 2));
+    setNeedsReview(false);
   }, []);
 
-  const parsedRows = useMemo(() => {
-    try {
-      const parsed = JSON.parse(dataText) as unknown;
-      return Array.isArray(parsed) ? (parsed as typeof rows) : rows;
-    } catch {
-      return rows;
-    }
-  }, [dataText, rows]);
+  const dataParse = useMemo(() => parsePlaygroundData(dataText), [dataText]);
+  const dataParseError = dataParse.ok ? undefined : dataParse.error;
+  const parsedRows = dataParse.ok ? dataParse.rows : rows;
 
   const evaluation = useMemo(
     () => evaluatePlaygroundSpec(specText, parsedRows),
     [specText, parsedRows],
   );
+
+  const canShowChart =
+    evaluation.canRender && evaluation.panel && !dataParseError;
 
   const gridStyle: CSSProperties = compact
     ? { display: "grid", gap: 12, gridTemplateColumns: "1fr" }
@@ -198,13 +198,30 @@ export function BlocksPlayground({
                 parsedRows.length > 0
                   ? Object.keys(parsedRows[0] ?? {})
                   : Object.keys(initial.rows[0] ?? {});
-              const panel = createCartesianPanel({ intent, fields });
-              setSpecText(JSON.stringify(panel, null, 2));
+              const result = createCartesianPanel({ intent, fields });
+              setSpecText(JSON.stringify(result.panel, null, 2));
+              setNeedsReview(result.needsReview);
             }}
           >
             Generate spec
           </button>
         </div>
+        {needsReview ? (
+          <div
+            style={{
+              marginTop: 12,
+              padding: "10px 12px",
+              borderRadius: 8,
+              border: "1px solid #fcd34d",
+              background: "#fffbeb",
+              fontSize: 12,
+              color: "#92400e",
+            }}
+          >
+            Generated spec needs review — intent did not match chart keywords. Adjust marks
+            manually or refine your intent.
+          </div>
+        ) : null}
       </div>
 
       {showDataEditor ? (
@@ -225,6 +242,18 @@ export function BlocksPlayground({
               resize: "vertical",
             }}
           />
+          {dataParseError ? (
+            <div
+              style={{
+                padding: "8px 12px",
+                borderTop: "1px solid #e2e8f0",
+                fontSize: 11,
+                color: "#b91c1c",
+              }}
+            >
+              Data parse error: {dataParseError}
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -271,13 +300,19 @@ export function BlocksPlayground({
                 ))}
               </ul>
             ) : evaluation.warnings.length > 0 ? (
-              <ul style={{ margin: 0, paddingLeft: 18, color: "#b45309" }}>
-                {evaluation.warnings.map((w) => (
-                  <li key={`${w.code}-${w.path}`}>
-                    <code>{w.code}</code>: {w.message}
-                  </li>
-                ))}
-              </ul>
+              <div>
+                <span style={{ color: "#b45309", fontWeight: 600 }}>
+                  Valid · {evaluation.warnings.length} warning
+                  {evaluation.warnings.length === 1 ? "" : "s"}
+                </span>
+                <ul style={{ margin: "6px 0 0", paddingLeft: 18, color: "#b45309" }}>
+                  {evaluation.warnings.map((w) => (
+                    <li key={`${w.code}-${w.path}`}>
+                      <code>{w.code}</code>: {w.message}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ) : (
               <span style={{ color: "#15803d" }}>Valid cartesian spec</span>
             )}
@@ -287,8 +322,8 @@ export function BlocksPlayground({
         <div style={paneStyle}>
           <div style={paneHeader}>Chart</div>
           <div style={{ flex: 1, padding: 12, minHeight: compact ? 200 : 320 }}>
-            {evaluation.canRender && evaluation.panel ? (
-              <Chart panel={evaluation.panel} data={parsedRows} width="100%" />
+            {canShowChart ? (
+              <Chart panel={evaluation.panel!} data={parsedRows} width="100%" />
             ) : (
               <div
                 style={{
@@ -302,7 +337,9 @@ export function BlocksPlayground({
                   padding: 16,
                 }}
               >
-                Fix validation errors to preview the chart
+                {dataParseError
+                  ? "Fix data JSON to preview the chart"
+                  : "Fix validation errors to preview the chart"}
               </div>
             )}
           </div>

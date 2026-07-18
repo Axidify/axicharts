@@ -58,6 +58,58 @@ function rawMarkKind(raw: unknown): string | undefined {
   return typeof kind === "string" ? kind : undefined;
 }
 
+const CARTESIAN_LIKE_TYPES = new Set([
+  "cartesian",
+  "blocks",
+  "line",
+  "bar",
+  "area",
+  "combo",
+]);
+
+/**
+ * Detect warnings on the raw panel spec before `normalizeToCartesian` merges
+ * legacy overlay props into `marks[]` (which would hide duplicate-channel issues).
+ */
+export function detectPreNormalizeWarnings(spec: PanelSpec): CartesianValidationIssue[] {
+  if (!CARTESIAN_LIKE_TYPES.has(spec.type)) {
+    return [];
+  }
+
+  const warnings: CartesianValidationIssue[] = [];
+  const props = spec.props ?? {};
+  const legacyRules = Array.isArray(props.referenceLines) ? props.referenceLines.length : 0;
+  const legacyBands = Array.isArray(props.thresholdBands) ? props.thresholdBands.length : 0;
+  const annotationOverlays = (readPanelAnnotations(spec) ?? []).filter(
+    (annotation) => annotation.type === "line" || annotation.type === "band",
+  ).length;
+
+  const rawMarks = spec.marks ?? [];
+  let markRules = 0;
+  let markBands = 0;
+  for (const raw of rawMarks) {
+    const kind = rawMarkKind(raw);
+    if (kind === "rule") markRules++;
+    if (kind === "band") markBands++;
+  }
+
+  if (
+    (legacyRules > 0 && markRules > 0) ||
+    (legacyBands > 0 && markBands > 0) ||
+    (annotationOverlays > 0 && (markRules > 0 || markBands > 0))
+  ) {
+    warnings.push({
+      code: "DUPLICATE_OVERLAY_CHANNEL",
+      path: "props",
+      message:
+        "Overlay marks in marks[] and legacy referenceLines/thresholdBands props both set — prefer marks[] only",
+      severity: "warning",
+    });
+  }
+
+  return warnings;
+}
+
 export function validateCartesianSpec(
   spec: PanelSpec,
   options: ValidateCartesianOptions = {},

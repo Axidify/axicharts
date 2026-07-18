@@ -11,6 +11,8 @@ describe("blocksPlayground evaluate", () => {
       expect(result.errors, preset.id).toEqual([]);
       expect(result.canRender, preset.id).toBe(true);
       expect(result.ejected, preset.id).toContain("CartesianChart");
+      expect(result.ejected, preset.id).toContain("const rows =");
+      expect(result.ejected, preset.id).toContain("@axicharts/charts/cartesian");
     }
   });
 

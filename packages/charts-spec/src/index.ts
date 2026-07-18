@@ -35,6 +35,7 @@ export {
 export {
   validateCartesianSpec,
   assertValidCartesianSpec,
+  detectPreNormalizeWarnings,
   CartesianSpecValidationError,
   type CartesianValidationError,
   type CartesianValidationIssue,
@@ -46,6 +47,8 @@ export {
   BlocksPlayground,
   BLOCKS_PLAYGROUND_PRESETS,
   evaluatePlaygroundSpec,
+  formatPlaygroundEject,
+  parsePlaygroundData,
   findPlaygroundPreset,
   presetSpecJson,
   type BlocksPlaygroundProps,
@@ -57,6 +60,7 @@ export {
   listCartesianMarks,
   CARTESIAN_MARK_CATALOG,
   type CreateCartesianPanelInput,
+  type CreateCartesianPanelResult,
   type CartesianMarkCatalogEntry,
 } from "./createCartesianPanel";
 export { compilePanel, type CompileOptions } from "./compilePanel";

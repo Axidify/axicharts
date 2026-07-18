@@ -628,7 +628,7 @@ export function ejectPanel(
       : cartesianUsesComposableMarks(spec);
 
   if (isComposableCartesian) {
-    return `${preambleBlock}import { ${[...imports].join(", ")} } from "@axicharts/charts";
+    return `${preambleBlock}import { ${[...imports].join(", ")} } from "@axicharts/charts/cartesian";
 import { ${themeImport} } from "@axicharts/charts-theme";
 ${chartsImport ? `${chartsImport}\n` : ""}
 <ChartContainer theme={${themeExpr}}${mode}${chromeAttrs} height={${height}} width="100%">
