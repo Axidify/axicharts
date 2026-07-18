@@ -14,6 +14,7 @@ import { StartPage } from "./pages/StartPage";
 import { VerticalsPage } from "./pages/VerticalsPage";
 import { ComparePage } from "./pages/ComparePage";
 import { ShadcnPage } from "./pages/ShadcnPage";
+import { CommunityTemplatesPage } from "./pages/CommunityTemplatesPage";
 
 export function App(): ReactElement {
   return (
@@ -25,6 +26,7 @@ export function App(): ReactElement {
           <Route path="verticals" element={<VerticalsPage />} />
           <Route path="compare" element={<ComparePage />} />
           <Route path="shadcn" element={<ShadcnPage />} />
+          <Route path="templates/community" element={<CommunityTemplatesPage />} />
           <Route path="spec" element={<SpecPage />} />
           <Route path="runtime" element={<RuntimePage />} />
           <Route path="runtime/adapters" element={<RuntimeAdaptersPage />} />

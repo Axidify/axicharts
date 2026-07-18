@@ -56,7 +56,7 @@ Tree-shaken subpaths: `@axicharts/charts/line`, `/bar`, `/area`, `/pie`, `/candl
 - **Spec + eject** — panel JSON compiles to React; `ejectPanel` preserves Cell fills for hand-editing
 - **Live when you need it** — uPlot canvas path for 5–10 Hz dashboards ([compare demo](https://axidify.github.io/axicharts/compare))
 
-Gallery: [docs `/shadcn`](https://axidify.github.io/axicharts/shadcn) · Storybook **Charts/ShadcnParity** · Examples in `packages/charts-spec/examples/`
+Gallery: [docs `/shadcn`](https://axidify.github.io/axicharts/shadcn) · [community templates](https://axidify.github.io/axicharts/templates/community) · Storybook **Charts/ShadcnParity** · Examples in `packages/charts-spec/examples/`
 
 ```bash
 pnpm docs   # → http://localhost:3001/shadcn

@@ -7,6 +7,7 @@ const topLinks = [
   { to: "/start", label: "Getting started" },
   { to: "/compare", label: "vs Recharts" },
   { to: "/shadcn", label: "shadcn gallery" },
+  { to: "/templates/community", label: "Community templates" },
   { to: "/verticals", label: "Verticals" },
   { to: "/spec", label: "Spec layer" },
 ] as const;

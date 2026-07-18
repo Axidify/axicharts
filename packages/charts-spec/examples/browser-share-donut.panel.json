@@ -1,0 +1,15 @@
+{
+  "specVersion": 1,
+  "type": "donut",
+  "title": "Browser share",
+  "theme": "clean",
+  "height": 200,
+  "innerRadius": 42,
+  "encoding": {
+    "name": { "field": "name", "type": "nominal" },
+    "value": { "field": "value", "type": "quantitative" }
+  },
+  "props": {
+    "showLabels": true
+  }
+}

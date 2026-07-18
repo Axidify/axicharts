@@ -1,11 +1,13 @@
 import type { ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Chart, ejectPanel, type PanelSpec } from "@axicharts/charts-spec";
-import { ChartContainer, PieChart } from "@axicharts/charts";
-import { cleanTheme } from "@axicharts/charts-theme";
 import throughputSpec from "../../../packages/charts-spec/examples/throughput-bar-color.panel.json";
 import areaSloSpec from "../../../packages/charts-spec/examples/area-slo-line.panel.json";
 import revenueLineSpec from "../../../packages/charts-spec/examples/revenue-line.panel.json";
+import revenueChartConfigSpec from "../../../packages/charts-spec/examples/revenue-line-chartconfig.panel.json";
+import donutSpec from "../../../packages/charts-spec/examples/browser-share-donut.panel.json";
+import stackedBarSpec from "../../../packages/charts-spec/examples/velocity-stacked-bar.panel.json";
+import multiLineSpec from "../../../packages/charts-spec/examples/burndown-multi-line.panel.json";
 
 const THROUGHPUT_ROWS = [
   { week: "W1", throughput: 120, aboveTarget: true },
@@ -31,7 +33,7 @@ const REVENUE_ROWS = [
   { day: "Fri", revenue: 5900 },
 ];
 
-const PIE_SLICES = [
+const BROWSER_SHARE_ROWS = [
   { name: "Chrome", value: 48 },
   { name: "Safari", value: 28 },
   { name: "Firefox", value: 14 },
@@ -45,6 +47,13 @@ function ShadcnParityGallery(): ReactElement {
 
   return (
     <div style={{ display: "grid", gap: 28, maxWidth: 640 }}>
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: "#64748b" }}>
+          chartConfig — revenue line (revenue-line-chartconfig.panel.json)
+        </div>
+        <Chart panel={revenueChartConfigSpec as PanelSpec} data={REVENUE_ROWS} />
+      </div>
+
       <div>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: "#64748b" }}>
           shadcn-style bar — spec JSON (encoding.color + props.style)
@@ -98,6 +107,12 @@ function ShadcnAdminGallery(): ReactElement {
     >
       <div>
         <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 8, color: "#64748b" }}>
+          chartConfig — revenue line
+        </div>
+        <Chart panel={revenueChartConfigSpec as PanelSpec} data={REVENUE_ROWS} />
+      </div>
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 8, color: "#64748b" }}>
           Bar — throughput by week
         </div>
         <Chart panel={throughputSpec as PanelSpec} data={THROUGHPUT_ROWS} />
@@ -116,11 +131,21 @@ function ShadcnAdminGallery(): ReactElement {
       </div>
       <div>
         <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 8, color: "#64748b" }}>
-          Donut — browser share
+          Donut — browser share (spec)
         </div>
-        <ChartContainer theme={cleanTheme} height={200} width="100%">
-          <PieChart slices={PIE_SLICES} innerRadius={42} showLabels />
-        </ChartContainer>
+        <Chart panel={donutSpec as PanelSpec} data={BROWSER_SHARE_ROWS} />
+      </div>
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 8, color: "#64748b" }}>
+          Stacked bar — sprint velocity
+        </div>
+        <Chart panel={stackedBarSpec as PanelSpec} data={[]} />
+      </div>
+      <div style={{ gridColumn: "1 / -1" }}>
+        <div style={{ fontSize: 11, fontWeight: 600, marginBottom: 8, color: "#64748b" }}>
+          Multi-series line — burndown
+        </div>
+        <Chart panel={multiLineSpec as PanelSpec} data={[]} />
       </div>
     </div>
   );
@@ -134,7 +159,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "GTM-1 shadcn Charts migration gallery — spec examples compile without Recharts; eject preserves encoding.color as Cell JSX. Docs: /shadcn",
+          "GTM-2 shadcn Charts migration gallery — chartConfig, donut/stacked/multi-series spec fixtures, eject Cell fills. Docs: /shadcn · /templates/community",
       },
     },
   },

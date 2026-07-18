@@ -1,9 +1,13 @@
 {
+  "specVersion": 1,
   "type": "line",
   "title": "Revenue trend",
+  "theme": "clean",
+  "height": 200,
+  "fill": true,
   "encoding": {
-    "x": { "field": "week", "label": "Week" },
-    "y": { "field": "revenue", "label": "revenue" }
+    "x": { "field": "day", "type": "nominal", "label": "Day" },
+    "y": { "field": "revenue", "type": "quantitative", "format": "currency", "label": "Revenue" }
   },
   "props": {
     "chartConfig": {
@@ -11,6 +15,7 @@
         "label": "Net revenue",
         "color": "hsl(var(--chart-1))"
       }
-    }
+    },
+    "legendVariant": "inline"
   }
 }

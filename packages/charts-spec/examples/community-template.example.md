@@ -1,4 +1,4 @@
-# Community dashboard template (GTM-1)
+# Community dashboard template (GTM-2)
 
 Register a third-party layout without forking `@axicharts/charts-spec`.
 
@@ -17,4 +17,4 @@ After registration, `listTemplateMeta()` and `suggestTemplate()` can surface you
 
 **Storybook:** `Spec/Template gallery` → `CommunitySlot` — runtime registration demo.
 
-**Docs:** https://axidify.github.io/axicharts/shadcn
+**Docs:** https://axidify.github.io/axicharts/templates/community · https://axidify.github.io/axicharts/shadcn

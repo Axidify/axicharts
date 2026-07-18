@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "chart-axi-bar",
+  "type": "registry:block",
+  "title": "AxiCharts Bar",
+  "description": "Composable bar chart via ChartContainer — shadcn Charts migration path with live canvas option.",
+  "dependencies": [
+    "@axicharts/charts",
+    "@axicharts/charts-theme"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/charts/chart-axi-bar.tsx",
+      "type": "registry:component",
+      "content": "PLACEHOLDER — replace with generated stub at registry submission time. See shadcn-registry/README.md."
+    }
+  ],
+  "docs": "Install peer deps: echarts uplot. Gallery: https://axidify.github.io/axicharts/shadcn"
+}

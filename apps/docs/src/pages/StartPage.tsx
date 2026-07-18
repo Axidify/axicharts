@@ -31,6 +31,11 @@ export function StartPage(): ReactElement {
   return (
     <div>
       <h1 style={{ marginTop: 0 }}>Getting started</h1>
+      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 14 }}>
+        Migrating from Recharts or shadcn/ui Charts? Start with the{" "}
+        <Link to="/shadcn">shadcn migration gallery</Link> — <code>chartConfig</code>, Cell fills,
+        migration checklist, and live <code>/compare</code> demo.
+      </p>
       <h2 style={{ fontSize: 16 }}>Install</h2>
       <pre
         style={{

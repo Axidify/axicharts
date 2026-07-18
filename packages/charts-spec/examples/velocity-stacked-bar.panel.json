@@ -1,0 +1,16 @@
+{
+  "specVersion": 1,
+  "type": "bar",
+  "title": "Sprint velocity",
+  "theme": "clean",
+  "height": 220,
+  "stacked": true,
+  "props": {
+    "categories": ["S1", "S2", "S3", "S4"],
+    "series": [
+      { "name": "Done", "data": [22, 26, 24, 28], "tone": "success" },
+      { "name": "Carry-over", "data": [6, 4, 5, 3], "tone": "warning" }
+    ],
+    "legendVariant": "inline"
+  }
+}

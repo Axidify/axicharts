@@ -13,6 +13,16 @@ Runnable fixtures for `compilePanel`, `ejectPanel`, and the CLI.
 | [latency-line-size.panel.json](./latency-line-size.panel.json) | **Variable point radius** — `encoding.size` on line marks |
 | [area-slo-line.panel.json](./area-slo-line.panel.json) | **Segmented area** — per-point `encoding.color` on area marks |
 
+## shadcn port recipes (GTM-2)
+
+| File | shadcn / Recharts parity |
+|------|--------------------------|
+| [browser-share-donut.panel.json](./browser-share-donut.panel.json) | **Donut** — `type: donut`, `innerRadius`, row-driven slices |
+| [velocity-stacked-bar.panel.json](./velocity-stacked-bar.panel.json) | **Stacked bar** — `stacked: true`, multi-series `props.series` |
+| [burndown-multi-line.panel.json](./burndown-multi-line.panel.json) | **Multi-series line** — burndown ideal vs remaining |
+
+Registry prep (future shadcn/ui submission): [shadcn-registry/](./shadcn-registry/).
+
 ## CLI
 
 ```bash
@@ -33,6 +43,8 @@ Panels with `encoding.size` eject to `<Cell size={…} />` or `<Cell radius={…
 
 Panels with `props.style` eject to `createTheme(cleanTheme, { … })`. Chrome variants eject as `legendVariant` / `tooltipVariant` on `ChartContainer`.
 
+Donut panels eject to `<PieChart innerRadius={…} />`. Stacked cartesian panels eject with `stacked` on the chart component.
+
 ## shadcn Charts port map
 
 | shadcn / Recharts pattern | AxiCharts spec | AxiCharts JSX |
@@ -40,7 +52,10 @@ Panels with `props.style` eject to `createTheme(cleanTheme, { … })`. Chrome va
 | `<Bar><Cell fill /></Bar>` | `encoding.color` | `<Bar><Cell dataKey fill /></Bar>` |
 | Variable bar width / dot size | `encoding.size` | `<Bar><Cell dataKey size /></Bar>` |
 | `chartConfig` labels/colors | `chartConfig` on container | `ChartContainer config={…}` |
+| Donut / pie with hole | `type: donut`, `innerRadius` | `<PieChart innerRadius={…} />` |
+| Stacked bar | `stacked: true` + `props.series` | `<BarChart stacked series={…} />` |
+| Multi-series line | `props.series` | `<LineChart series={…} />` |
 | Theme tokens | `props.style` | `createTheme(base, overrides)` |
 | Tooltip / legend chrome | `props.tooltipVariant` / `legendVariant` | `ChartContainer` props |
 
-Storybook: **Charts/ShadcnParity**, **Compare/Recharts vs AxiCharts**. Docs gallery: `/shadcn` on the docs site (GTM-1).
+Storybook: **Charts/ShadcnParity**, **Compare/Recharts vs AxiCharts**. Docs: `/shadcn`, `/templates/community` (GTM-2).
