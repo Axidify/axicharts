@@ -85,6 +85,7 @@ export type PanelChartType =
   | "navigator"
   | "sankey"
   | "geo"
+  | "map"
   | "gantt"
   | string;
 

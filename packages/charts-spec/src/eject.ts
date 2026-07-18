@@ -71,9 +71,11 @@ function resolveChartName(spec: PanelSpec): string {
                           ? "SankeyChart"
                           : spec.type === "geo"
                             ? "GeoMapChart"
-                            : spec.type === "gantt"
-                              ? "GanttChart"
-                              : "Gauge";
+                            : spec.type === "map"
+                              ? "MapChart"
+                              : spec.type === "gantt"
+                                ? "GanttChart"
+                                : "Gauge";
 }
 
 export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
@@ -227,6 +229,10 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
   } else if (spec.type === "geo") {
     chartBody = `regions={${dataVar}.regions ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).regions ?? [])}}
     showScale={${dataVar}.showScale ?? ${String(chartPropsFromPanel(spec.props ?? {}).showScale ?? true)}}`;
+  } else if (spec.type === "map") {
+    chartBody = `topology={${dataVar}.topology ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).topology ?? {})}}
+    values={${dataVar}.values ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).values ?? {})}}
+    showScale={${dataVar}.showScale ?? ${String(chartPropsFromPanel(spec.props ?? {}).showScale ?? true)}}`;
   } else if (spec.type === "gantt") {
     chartBody = `tasks={${dataVar}.tasks ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).tasks ?? [])}}
     milestones={${dataVar}.milestones ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).milestones ?? [])}}
@@ -249,6 +255,7 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
   } else if (
     spec.type !== "sankey" &&
     spec.type !== "geo" &&
+    spec.type !== "map" &&
     spec.type !== "gantt"
   ) {
     imports.add(chartName);
@@ -259,9 +266,11 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       ? "@axicharts/charts-sankey"
       : spec.type === "geo"
         ? "@axicharts/charts-geo"
-        : spec.type === "gantt"
-          ? "@axicharts/charts-gantt"
-          : null;
+        : spec.type === "map"
+          ? "@axicharts/charts-map"
+          : spec.type === "gantt"
+            ? "@axicharts/charts-gantt"
+            : null;
 
   const chartsImport = pluginImport
     ? `import { ${chartName} } from "${pluginImport}";`

@@ -34,6 +34,7 @@ import {
 } from "@axicharts/charts";
 import { GanttChart } from "@axicharts/charts-gantt";
 import { GeoMapChart } from "@axicharts/charts-geo";
+import { MapChart } from "@axicharts/charts-map";
 import { SankeyChart } from "@axicharts/charts-sankey";
 import { getChartType } from "@axicharts/charts/registry";
 import type { FieldEncoding, PanelSpec, SpecData, ThemeName, ChartMode } from "./types";
@@ -620,6 +621,30 @@ export function compilePanel(
       return wrap(
         createElement(GeoMapChart, {
           regions: regions ?? [],
+          min: props.min as number | undefined,
+          max: props.max as number | undefined,
+          showLabels: props.showLabels as boolean | undefined,
+          showScale: props.showScale as boolean | undefined,
+          surface: props.surface as "light" | "dark" | undefined,
+        }),
+      );
+    }
+
+    case "map": {
+      const topology =
+        (props.topology as Parameters<typeof MapChart>[0]["topology"]) ??
+        (objectData.topology as Parameters<typeof MapChart>[0]["topology"]);
+      const values =
+        (props.values as Parameters<typeof MapChart>[0]["values"]) ??
+        (objectData.values as Parameters<typeof MapChart>[0]["values"]);
+      return wrap(
+        createElement(MapChart, {
+          topology: topology!,
+          values: values ?? {},
+          objectKey: props.objectKey as string | undefined,
+          featureId: props.featureId as string | undefined,
+          nameKey: props.nameKey as string | undefined,
+          projection: props.projection as Parameters<typeof MapChart>[0]["projection"],
           min: props.min as number | undefined,
           max: props.max as number | undefined,
           showLabels: props.showLabels as boolean | undefined,

@@ -235,6 +235,21 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("West");
   });
 
+  it("emits MapChart from plugin package", () => {
+    const jsx = ejectPanel({
+      type: "map",
+      props: {
+        topology: { type: "Topology", objects: {}, arcs: [] },
+        values: { CA: 82 },
+        showScale: true,
+      },
+    });
+
+    expect(jsx).toContain('import { MapChart } from "@axicharts/charts-map"');
+    expect(jsx).toContain("<MapChart");
+    expect(jsx).toContain("CA");
+  });
+
   it("emits GanttChart from plugin package", () => {
     const jsx = ejectPanel(
       {

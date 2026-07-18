@@ -3,6 +3,10 @@ import { isValidElement, type ReactElement } from "react";
 import { render, waitFor } from "@testing-library/react";
 import { registerBuiltinChartTypes } from "@axicharts/charts/registry";
 import { registerTankChart } from "@axicharts/charts-tank";
+import {
+  SAMPLE_US_TOPOLOGY,
+  SAMPLE_US_VALUES,
+} from "@axicharts/charts-map";
 import { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 import { compilePanel } from "./compilePanel";
 
@@ -48,6 +52,28 @@ describe("compilePanel community breadth", () => {
       expect(
         sankeyView.container.querySelector('[aria-label="Sankey flow diagram"]'),
       ).toBeTruthy();
+    });
+  });
+
+  it("compiles map panels from spec props", async () => {
+    const panel = compilePanel(
+      {
+        type: "map",
+        title: "Regional utilization",
+        height: 220,
+        width: 360,
+        props: {
+          topology: SAMPLE_US_TOPOLOGY,
+          values: SAMPLE_US_VALUES,
+        },
+      },
+      {},
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Regional utilization");
+    await waitFor(() => {
+      expect(container.textContent).toContain("California");
     });
   });
 
