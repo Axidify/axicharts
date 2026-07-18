@@ -424,7 +424,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Static side-by-side API comparisons. For the live 6-panel ops wall benchmark (@ 5 Hz), see **Compare → Live ops wall**.",
+          "Static side-by-side API comparisons. For the live ops wall stress demo (Standard / Heavy / Extreme presets, per-column Profiler timings), see **Compare → Live ops wall**.",
       },
     },
   },

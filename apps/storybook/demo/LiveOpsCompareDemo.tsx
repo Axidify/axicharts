@@ -1,4 +1,10 @@
-import type { ReactElement } from "react";
+import {
+  Profiler,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactElement,
+} from "react";
 import { ChartContainer, LineChart } from "@axicharts/charts";
 import { industrialTheme } from "@axicharts/charts-theme";
 import {
@@ -8,15 +14,33 @@ import {
   YAxis,
 } from "recharts";
 import {
+  BENCH_PRESETS,
+  FRAME_BUDGET_MS,
   formatMetric,
-  type LivePanelState,
+  formatMultiplier,
+  getPanelGridColumns,
+  getPanelSpecs,
+  isStruggling,
+  type BenchPresetId,
   type LiveBenchState,
+  type LivePanelState,
+  type TimingMetrics,
   useLiveOpsBench,
+  useTimingMetrics,
 } from "./liveBench";
 
 const PUBLISHED_P95 = {
   axicharts: 2.9,
   recharts: 54.3,
+};
+
+const CONTROL_STYLE: React.CSSProperties = {
+  padding: "6px 10px",
+  borderRadius: 6,
+  border: "1px solid #475569",
+  background: "#0f172a",
+  color: "#e2e8f0",
+  fontSize: 12,
 };
 
 function PanelShell({
@@ -140,18 +164,22 @@ function MetricPill({
   label,
   value,
   accent,
+  sub,
+  warn,
 }: {
   label: string;
   value: string;
   accent?: string;
+  sub?: string;
+  warn?: boolean;
 }): ReactElement {
   return (
     <div
       style={{
         padding: "8px 12px",
         borderRadius: 8,
-        border: "1px solid #334155",
-        background: "#0f172a",
+        border: warn ? "1px solid #b45309" : "1px solid #334155",
+        background: warn ? "rgba(120, 53, 15, 0.15)" : "#0f172a",
       }}
     >
       <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 4 }}>{label}</div>
@@ -165,26 +193,265 @@ function MetricPill({
       >
         {value}
       </div>
+      {sub ? (
+        <div style={{ fontSize: 10, color: "#64748b", marginTop: 4 }}>{sub}</div>
+      ) : null}
+    </div>
+  );
+}
+
+function TimingRow({
+  title,
+  metrics,
+  accent,
+  struggling,
+  throttleNote,
+}: {
+  title: string;
+  metrics: TimingMetrics;
+  accent: string;
+  struggling?: boolean;
+  throttleNote?: string;
+}): ReactElement {
+  return (
+    <div
+      style={{
+        padding: 12,
+        borderRadius: 10,
+        border: struggling ? "1px solid #b45309" : "1px solid #334155",
+        background: struggling ? "rgba(120, 53, 15, 0.1)" : "#0f172a",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: "0.04em",
+          textTransform: "uppercase",
+          color: accent,
+          marginBottom: 10,
+        }}
+      >
+        {title}
+        {struggling ? (
+          <span style={{ marginLeft: 8, color: "#fbbf24", fontWeight: 600 }}>
+            · struggling
+          </span>
+        ) : null}
+      </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(72px, 1fr))",
+          gap: 8,
+        }}
+      >
+        <MiniStat label="p50" value={`${metrics.p50Ms.toFixed(2)} ms`} />
+        <MiniStat label="p95" value={`${metrics.p95Ms.toFixed(2)} ms`} accent={accent} />
+        <MiniStat label="max" value={`${metrics.maxMs.toFixed(2)} ms`} />
+        <MiniStat label="last" value={`${metrics.frameMs.toFixed(2)} ms`} />
+        <MiniStat
+          label=">16ms"
+          value={String(metrics.overBudgetFrames)}
+          warn={metrics.overBudgetFrames > 0}
+        />
+        <MiniStat
+          label="cumulative"
+          value={`${(metrics.cumulativeMs / 1000).toFixed(1)}s`}
+        />
+      </div>
+      {throttleNote ? (
+        <p style={{ margin: "8px 0 0", fontSize: 10, color: "#fbbf24" }}>{throttleNote}</p>
+      ) : null}
+    </div>
+  );
+}
+
+function useRechartsRenderHealth(panelCount: number, running: boolean): number {
+  const [rendered, setRendered] = useState(0);
+
+  useEffect(() => {
+    if (!running) return;
+    const poll = () => {
+      setRendered(document.querySelectorAll(".recharts-surface").length);
+    };
+    poll();
+    const id = window.setInterval(poll, 750);
+    return () => window.clearInterval(id);
+  }, [panelCount, running]);
+
+  return rendered;
+}
+
+function formatRatio(
+  axiP95: number,
+  rechartsP95: number,
+  flushP95: number,
+): string {
+  if (axiP95 > 0 && rechartsP95 > 0) return formatMultiplier(rechartsP95 / axiP95);
+  if (axiP95 > 0 && flushP95 > axiP95) return `>${formatMultiplier(flushP95 / axiP95)}`;
+  return "—";
+}
+
+function MiniStat({
+  label,
+  value,
+  accent,
+  warn,
+}: {
+  label: string;
+  value: string;
+  accent?: string;
+  warn?: boolean;
+}): ReactElement {
+  return (
+    <div>
+      <div style={{ fontSize: 9, color: "#64748b", marginBottom: 2 }}>{label}</div>
+      <div
+        style={{
+          fontSize: 13,
+          fontWeight: 600,
+          fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+          color: warn ? "#fbbf24" : accent ?? "#e2e8f0",
+        }}
+      >
+        {value}
+      </div>
     </div>
   );
 }
 
 export type LiveOpsCompareDemoProps = {
+  preset?: BenchPresetId;
+  panelCount?: number;
   pointCount?: number;
   hz?: number;
   panelHeight?: number;
+  showControls?: boolean;
+  autoThrottleRecharts?: boolean;
 };
 
+function resolveBenchConfig(
+  presetId: BenchPresetId,
+  useCustom: boolean,
+  custom: { panelCount: number; pointCount: number; hz: number; panelHeight: number },
+  props: Pick<LiveOpsCompareDemoProps, "panelCount" | "pointCount" | "hz" | "panelHeight">,
+  showControls: boolean,
+): { panelCount: number; pointCount: number; hz: number; panelHeight: number } {
+  if (!showControls) {
+    const preset = BENCH_PRESETS[presetId];
+    return {
+      panelCount: props.panelCount ?? preset.panelCount,
+      pointCount: props.pointCount ?? preset.pointCount,
+      hz: props.hz ?? preset.hz,
+      panelHeight: props.panelHeight ?? preset.panelHeight,
+    };
+  }
+  if (useCustom) return custom;
+  const preset = BENCH_PRESETS[presetId];
+  return {
+    panelCount: preset.panelCount,
+    pointCount: preset.pointCount,
+    hz: preset.hz,
+    panelHeight: preset.panelHeight,
+  };
+}
+
 export function LiveOpsCompareDemo({
-  pointCount = 2000,
-  hz = 5,
-  panelHeight = 88,
+  preset: presetProp = "standard",
+  panelCount: panelCountProp,
+  pointCount: pointCountProp,
+  hz: hzProp,
+  panelHeight: panelHeightProp,
+  showControls = true,
+  autoThrottleRecharts: autoThrottleProp = false,
 }: LiveOpsCompareDemoProps): ReactElement {
-  const bench = useLiveOpsBench(pointCount, hz);
-  const panelWidth = 220;
+  const [presetId, setPresetId] = useState<BenchPresetId>(presetProp);
+  const [customPanelCount, setCustomPanelCount] = useState(
+    panelCountProp ?? BENCH_PRESETS[presetProp].panelCount,
+  );
+  const [customPointCount, setCustomPointCount] = useState(
+    pointCountProp ?? BENCH_PRESETS[presetProp].pointCount,
+  );
+  const [customHz, setCustomHz] = useState(hzProp ?? BENCH_PRESETS[presetProp].hz);
+  const [customPanelHeight, setCustomPanelHeight] = useState(
+    panelHeightProp ?? BENCH_PRESETS[presetProp].panelHeight,
+  );
+  const [autoThrottle, setAutoThrottle] = useState(autoThrottleProp);
+  const [useCustom, setUseCustom] = useState(false);
+
+  useEffect(() => {
+    setPresetId(presetProp);
+  }, [presetProp]);
+
+  const { panelCount, pointCount, hz, panelHeight } = resolveBenchConfig(
+    presetId,
+    useCustom,
+    {
+      panelCount: customPanelCount,
+      pointCount: customPointCount,
+      hz: customHz,
+      panelHeight: customPanelHeight,
+    },
+    {
+      panelCount: panelCountProp,
+      pointCount: pointCountProp,
+      hz: hzProp,
+      panelHeight: panelHeightProp,
+    },
+    showControls,
+  );
+
+  const panelSpecs = useMemo(() => getPanelSpecs(panelCount), [panelCount]);
+  const gridColumns = getPanelGridColumns(panelCount);
+
+  const bench = useLiveOpsBench({
+    panelCount,
+    pointCount,
+    hz,
+    panelSpecs,
+    autoThrottleRecharts: autoThrottle,
+  });
+
+  const {
+    metrics: axiMetrics,
+    flush: flushAxi,
+    reset: resetAxi,
+    onProfilerRender: onAxiProfiler,
+  } = useTimingMetrics();
+  const {
+    metrics: rechartsMetrics,
+    flush: flushRecharts,
+    reset: resetRecharts,
+    onProfilerRender: onRechartsProfiler,
+  } = useTimingMetrics();
+
+  const configKey = `${panelCount}-${pointCount}-${hz}-${autoThrottle}`;
+  useEffect(() => {
+    resetAxi();
+    resetRecharts();
+  }, [configKey, resetAxi, resetRecharts]);
+
+  useEffect(() => {
+    flushAxi();
+    flushRecharts();
+  }, [bench.frameMs, flushAxi, flushRecharts]);
+
+  const ratioLabel = formatRatio(axiMetrics.p95Ms, rechartsMetrics.p95Ms, bench.p95Ms);
+
+  const rechartsRendered = useRechartsRenderHealth(panelCount, bench.running);
+  const rechartsRenderGap = panelCount - rechartsRendered;
+  const rechartsStruggling =
+    isStruggling(rechartsMetrics) ||
+    rechartsRenderGap > 0 ||
+    bench.p95Ms > FRAME_BUDGET_MS * 2;
+  const axiStruggling = isStruggling(axiMetrics);
+  const totalStruggling = bench.p95Ms > FRAME_BUDGET_MS;
+
+  const panelWidth = Math.max(160, Math.floor(720 / gridColumns) - 24);
 
   return (
-    <div style={{ display: "grid", gap: 20, maxWidth: 1120 }}>
+    <div style={{ display: "grid", gap: 20, maxWidth: 1200 }}>
       <header
         style={{
           display: "flex",
@@ -196,11 +463,11 @@ export function LiveOpsCompareDemo({
       >
         <div>
           <h2 style={{ margin: "0 0 6px", fontSize: 22, color: "#f8fafc" }}>
-            Live ops wall — 6 panels × {pointCount.toLocaleString()} pts @ {hz} Hz
+            Live ops wall — {panelCount} panels × {pointCount.toLocaleString()} pts @ {hz} Hz
           </h2>
-          <p style={{ margin: 0, fontSize: 13, color: "#94a3b8", maxWidth: 640 }}>
-            Same synthetic telemetry stream, same React update loop (`flushSync`). AxiCharts uses
-            uPlot canvas; Recharts uses SVG. Published Chromium 4× p95:{" "}
+          <p style={{ margin: 0, fontSize: 13, color: "#94a3b8", maxWidth: 720 }}>
+            Same synthetic telemetry stream, same React update loop (<code>flushSync</code>).
+            Per-column timings via React Profiler. Published Chromium 4× p95 (6 × 2000):{" "}
             <strong style={{ color: "#60a5fa" }}>{PUBLISHED_P95.axicharts} ms</strong> vs{" "}
             <strong style={{ color: "#f87171" }}>{PUBLISHED_P95.recharts} ms</strong>.
           </p>
@@ -222,28 +489,111 @@ export function LiveOpsCompareDemo({
         </button>
       </header>
 
+      {showControls ? (
+        <ControlsBar
+          presetId={presetId}
+          useCustom={useCustom}
+          customPanelCount={customPanelCount}
+          customPointCount={customPointCount}
+          customHz={customHz}
+          customPanelHeight={customPanelHeight}
+          autoThrottle={autoThrottle}
+          onPresetChange={(id) => {
+            setPresetId(id);
+            setUseCustom(false);
+            const preset = BENCH_PRESETS[id];
+            setCustomPanelCount(preset.panelCount);
+            setCustomPointCount(preset.pointCount);
+            setCustomHz(preset.hz);
+            setCustomPanelHeight(preset.panelHeight);
+          }}
+          onUseCustom={() => setUseCustom(true)}
+          onPanelCount={setCustomPanelCount}
+          onPointCount={setCustomPointCount}
+          onHz={setCustomHz}
+          onPanelHeight={setCustomPanelHeight}
+          onAutoThrottle={setAutoThrottle}
+        />
+      ) : null}
+
+      {totalStruggling || rechartsStruggling ? (
+        <div
+          style={{
+            padding: "10px 14px",
+            borderRadius: 8,
+            border: "1px solid #b45309",
+            background: "rgba(120, 53, 15, 0.2)",
+            color: "#fde68a",
+            fontSize: 12,
+          }}
+        >
+          {rechartsStruggling ? (
+            <strong>Recharts exceeding {FRAME_BUDGET_MS}ms frame budget</strong>
+          ) : (
+            <strong>Combined update loop exceeding frame budget</strong>
+          )}
+          {bench.rechartsThrottled
+            ? ` — auto-throttle active (Recharts @ ~${bench.effectiveRechartsHz.toFixed(1)} Hz)`
+            : autoThrottle
+              ? " — enable auto-throttle to skip Recharts frames when struggling"
+              : " — try Heavy or Extreme presets to see the gap widen"}
+        </div>
+      ) : null}
+
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
           gap: 12,
         }}
       >
         <MetricPill
-          label="AxiCharts live p95 (this tab)"
+          label="Speed ratio (Recharts / Axi)"
+          value={ratioLabel}
+          accent="#fbbf24"
+          sub="Higher = AxiCharts advantage"
+        />
+        <MetricPill
+          label="flushSync p95 (full tick)"
           value={`${bench.p95Ms.toFixed(2)} ms`}
-          accent="#60a5fa"
-        />
-        <MetricPill label="Last frame" value={`${bench.frameMs.toFixed(2)} ms`} />
-        <MetricPill
-          label="Published AxiCharts p95"
-          value={`${PUBLISHED_P95.axicharts} ms`}
-          accent="#60a5fa"
+          warn={totalStruggling}
         />
         <MetricPill
-          label="Published Recharts p95"
-          value={`${PUBLISHED_P95.recharts} ms`}
+          label="Dropped frames (>16ms)"
+          value={String(bench.overBudgetFrames)}
+          accent={bench.overBudgetFrames > 0 ? "#f87171" : undefined}
+          warn={bench.overBudgetFrames > 0}
+        />
+        <MetricPill
+          label="Severe jank (>32ms)"
+          value={String(bench.severeJankFrames)}
+          accent={bench.severeJankFrames > 0 ? "#ef4444" : undefined}
+        />
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 12,
+        }}
+      >
+        <TimingRow
+          title="AxiCharts profiler"
+          metrics={axiMetrics}
+          accent="#60a5fa"
+          struggling={axiStruggling}
+        />
+        <TimingRow
+          title="Recharts profiler"
+          metrics={rechartsMetrics}
           accent="#f87171"
+          struggling={rechartsStruggling}
+          throttleNote={
+            bench.rechartsThrottled
+              ? `Throttled: 1 update per ${bench.rechartsSkipRatio} ticks (~${bench.effectiveRechartsHz.toFixed(1)} Hz)`
+              : undefined
+          }
         />
       </div>
 
@@ -261,6 +611,10 @@ export function LiveOpsCompareDemo({
           accent="#2563eb"
           bench={bench}
           panelHeight={panelHeight}
+          gridColumns={gridColumns}
+          profilerId="axi-live-ops"
+          onProfilerRender={onAxiProfiler}
+          panels={bench.panels}
           renderPanel={(panel) => (
             <AxiPanel key={panel.spec.id} panel={panel} height={panelHeight} />
           )}
@@ -271,6 +625,14 @@ export function LiveOpsCompareDemo({
           accent="#64748b"
           bench={bench}
           panelHeight={panelHeight}
+          gridColumns={gridColumns}
+          profilerId="recharts-live-ops"
+          onProfilerRender={onRechartsProfiler}
+          panels={bench.rechartsPanels}
+          struggling={rechartsStruggling}
+          renderGap={rechartsRenderGap}
+          renderedCount={rechartsRendered}
+          panelCount={panelCount}
           renderPanel={(panel) => (
             <RechartsPanel
               key={panel.spec.id}
@@ -285,12 +647,180 @@ export function LiveOpsCompareDemo({
   );
 }
 
+function ControlsBar({
+  presetId,
+  useCustom,
+  customPanelCount,
+  customPointCount,
+  customHz,
+  customPanelHeight,
+  autoThrottle,
+  onPresetChange,
+  onUseCustom,
+  onPanelCount,
+  onPointCount,
+  onHz,
+  onPanelHeight,
+  onAutoThrottle,
+}: {
+  presetId: BenchPresetId;
+  useCustom: boolean;
+  customPanelCount: number;
+  customPointCount: number;
+  customHz: number;
+  customPanelHeight: number;
+  autoThrottle: boolean;
+  onPresetChange: (id: BenchPresetId) => void;
+  onUseCustom: () => void;
+  onPanelCount: (value: number) => void;
+  onPointCount: (value: number) => void;
+  onHz: (value: number) => void;
+  onPanelHeight: (value: number) => void;
+  onAutoThrottle: (value: boolean) => void;
+}): ReactElement {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gap: 12,
+        padding: 14,
+        borderRadius: 10,
+        border: "1px solid #334155",
+        background: "#020617",
+      }}
+    >
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+        <span style={{ fontSize: 11, color: "#94a3b8", marginRight: 4 }}>Preset</span>
+        {(Object.keys(BENCH_PRESETS) as BenchPresetId[]).map((id) => {
+          const preset = BENCH_PRESETS[id];
+          const active = !useCustom && presetId === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onPresetChange(id)}
+              style={{
+                ...CONTROL_STYLE,
+                borderColor: active ? "#2563eb" : "#475569",
+                background: active ? "#1e3a5f" : "#0f172a",
+                cursor: "pointer",
+              }}
+            >
+              {preset.label}
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          onClick={onUseCustom}
+          style={{
+            ...CONTROL_STYLE,
+            borderColor: useCustom ? "#2563eb" : "#475569",
+            background: useCustom ? "#1e3a5f" : "#0f172a",
+            cursor: "pointer",
+          }}
+        >
+          Custom
+        </button>
+      </div>
+      <p style={{ margin: 0, fontSize: 11, color: "#64748b" }}>
+        {useCustom
+          ? "Custom fixture — adjust panel count, points, and Hz"
+          : BENCH_PRESETS[presetId].description}
+      </p>
+      {useCustom ? (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 12,
+            alignItems: "center",
+          }}
+        >
+          <label style={{ fontSize: 11, color: "#94a3b8", display: "flex", gap: 6, alignItems: "center" }}>
+            Panels
+            <input
+              type="number"
+              min={1}
+              max={12}
+              value={customPanelCount}
+              onChange={(event) => onPanelCount(Number(event.target.value))}
+              style={{ ...CONTROL_STYLE, width: 56 }}
+            />
+          </label>
+          <label style={{ fontSize: 11, color: "#94a3b8", display: "flex", gap: 6, alignItems: "center" }}>
+            Points
+            <input
+              type="number"
+              min={120}
+              max={10000}
+              step={100}
+              value={customPointCount}
+              onChange={(event) => onPointCount(Number(event.target.value))}
+              style={{ ...CONTROL_STYLE, width: 72 }}
+            />
+          </label>
+          <label style={{ fontSize: 11, color: "#94a3b8", display: "flex", gap: 6, alignItems: "center" }}>
+            Hz
+            <input
+              type="number"
+              min={1}
+              max={15}
+              value={customHz}
+              onChange={(event) => onHz(Number(event.target.value))}
+              style={{ ...CONTROL_STYLE, width: 48 }}
+            />
+          </label>
+          <label style={{ fontSize: 11, color: "#94a3b8", display: "flex", gap: 6, alignItems: "center" }}>
+            Height
+            <input
+              type="number"
+              min={56}
+              max={140}
+              step={4}
+              value={customPanelHeight}
+              onChange={(event) => onPanelHeight(Number(event.target.value))}
+              style={{ ...CONTROL_STYLE, width: 56 }}
+            />
+          </label>
+        </div>
+      ) : null}
+      <label
+        style={{
+          fontSize: 11,
+          color: "#94a3b8",
+          display: "flex",
+          gap: 8,
+          alignItems: "center",
+          cursor: "pointer",
+          width: "fit-content",
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={autoThrottle}
+          onChange={(event) => onAutoThrottle(event.target.checked)}
+        />
+        Auto-throttle Recharts when frame budget exceeded (skip frames to recover)
+      </label>
+    </div>
+  );
+}
+
 function CompareColumn({
   title,
   subtitle,
   accent,
   bench,
   panelHeight,
+  gridColumns,
+  profilerId,
+  onProfilerRender,
+  panels,
+  struggling,
+  renderGap,
+  renderedCount,
+  panelCount: expectedPanels,
   renderPanel,
 }: {
   title: string;
@@ -298,6 +828,14 @@ function CompareColumn({
   accent: string;
   bench: LiveBenchState;
   panelHeight: number;
+  gridColumns: number;
+  profilerId: string;
+  onProfilerRender: React.ProfilerOnRenderCallback;
+  panels: LivePanelState[];
+  struggling?: boolean;
+  renderGap?: number;
+  renderedCount?: number;
+  panelCount?: number;
   renderPanel: (panel: LivePanelState) => ReactElement;
 }): ReactElement {
   return (
@@ -313,24 +851,34 @@ function CompareColumn({
           }}
         >
           {title}
+          {struggling ? (
+            <span style={{ marginLeft: 6, color: "#fbbf24" }}>⚠</span>
+          ) : null}
         </div>
         <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>{subtitle}</div>
+        {renderGap != null && renderGap > 0 && renderedCount != null && expectedPanels != null ? (
+          <p style={{ margin: "6px 0 0", fontSize: 11, color: "#fbbf24" }}>
+            SVG render falling behind — {renderedCount}/{expectedPanels} panels on screen
+          </p>
+        ) : null}
       </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 8,
-          padding: 12,
-          borderRadius: 12,
-          border: "1px solid #334155",
-          background: "#020617",
-        }}
-      >
-        {bench.panels.map((panel) => renderPanel(panel))}
-      </div>
+      <Profiler id={profilerId} onRender={onProfilerRender}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`,
+            gap: 8,
+            padding: 12,
+            borderRadius: 12,
+            border: struggling ? "1px solid #b45309" : "1px solid #334155",
+            background: "#020617",
+          }}
+        >
+          {panels.map((panel) => renderPanel(panel))}
+        </div>
+      </Profiler>
       <p style={{ margin: "8px 0 0", fontSize: 11, color: "#64748b" }}>
-        Panel height {panelHeight}px · {bench.pointCount.toLocaleString()} points per series
+        {gridColumns}-col grid · {panelHeight}px panels · {bench.pointCount.toLocaleString()} pts
       </p>
     </section>
   );
