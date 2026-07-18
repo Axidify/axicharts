@@ -13,7 +13,8 @@
   },
   "files": [
     "dist",
-    "tokens.css"
+    "tokens.css",
+    "studio-tokens.css"
   ],
   "type": "module",
   "exports": {
@@ -21,7 +22,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./tokens.css": "./tokens.css"
+    "./tokens.css": "./tokens.css",
+    "./studio-tokens.css": "./studio-tokens.css"
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean",

@@ -3,7 +3,9 @@ export {
   liveTheme,
   industrialTheme,
   presentationTheme,
+  studioTheme,
   type ChartTheme,
+  type ChartThemeSvgPolish,
   type LineCurve,
 } from "./themes";
 export { createTheme } from "./createTheme";

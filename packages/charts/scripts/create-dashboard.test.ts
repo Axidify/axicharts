@@ -55,6 +55,19 @@ describe("create-dashboard scaffold", () => {
     });
   });
 
+  it("parses --preset studio", () => {
+    expect(parseCreateDashboardArgs(["my-app", "--preset", "studio"])).toEqual({
+      targetDir: "my-app",
+      category: "studio",
+      preset: "studio",
+    });
+    expect(parseCreateDashboardArgs(["--preset=studio"])).toEqual({
+      targetDir: "axicharts-dashboard",
+      category: "studio",
+      preset: "studio",
+    });
+  });
+
   it("rejects unknown presets", () => {
     expect(() => parseCreateDashboardArgs(["--preset", "lite"])).toThrow(
       /Invalid --preset/,
@@ -74,6 +87,20 @@ describe("create-dashboard scaffold", () => {
     expect(pkg.dependencies["@axicharts/charts-full"]).toBe("latest");
     expect(pkg.dependencies.echarts).toBe("^5.6.0");
     expect(pkg.dependencies.uplot).toBe("^1.6.31");
+  });
+
+  it("scaffolds studio preset with StudioLineChart", async () => {
+    const dir = await makeTempDir();
+    await scaffoldDashboard(dir, "studio", "studio");
+
+    const app = await readFile(path.join(dir, "src/App.tsx"), "utf8");
+    const pkg = JSON.parse(await readFile(path.join(dir, "package.json"), "utf8"));
+
+    expect(app).toContain("@axicharts/charts/studio");
+    expect(app).toContain("StudioLineChart");
+    expect(app).toContain('data-theme="studio"');
+    expect(app).toContain("studio-tokens.css");
+    expect(pkg.dependencies["@axicharts/charts"]).toBe("latest");
   });
 
   it("rejects unknown categories", () => {

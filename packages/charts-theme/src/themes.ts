@@ -1,8 +1,17 @@
 import type { ChartColorTokens } from "./cssTokens";
+import { createTheme } from "./createTheme";
+
+export type ChartThemeSvgPolish = {
+  areaGradient?: boolean;
+  barHighlight?: boolean;
+  softGrid?: boolean;
+  lineGlow?: boolean;
+};
 
 export type ChartTheme = {
   name: string;
   tokens?: ChartColorTokens;
+  svg?: ChartThemeSvgPolish;
   grid: {
     show: boolean;
     horizontal: boolean;
@@ -88,3 +97,18 @@ export const presentationTheme: ChartTheme = {
   caption: { show: true },
   values: { monospace: false },
 };
+
+/** Editorial dashboard polish — gradient areas, soft grid, refined typography. */
+export const studioTheme = createTheme(cleanTheme, {
+  name: "studio",
+  grid: { opacity: 0.38, strokeWidth: 1 },
+  line: { strokeWidth: 2.5, curve: "monotone" },
+  area: { show: true, fillOpacity: 1 },
+  bar: { radius: 7, gap: 0.32 },
+  svg: {
+    areaGradient: true,
+    barHighlight: true,
+    softGrid: true,
+    lineGlow: true,
+  },
+});

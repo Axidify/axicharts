@@ -2,7 +2,7 @@ import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 
 export const SPEC_VERSION = 1;
 
-export type ThemeName = "clean" | "live" | "industrial" | "presentation";
+export type ThemeName = "clean" | "live" | "industrial" | "presentation" | "studio";
 
 export type ChartMode = "static" | "interactive" | "live" | "presentation";
 

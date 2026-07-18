@@ -21,6 +21,14 @@ import {
 } from "./ChartScalesContext";
 import { buildCartesianA11yDescriptor } from "../a11y/cartesianDescriptor";
 import { SVG_A11Y_DESC_ID, SVG_A11Y_TITLE_ID, SvgA11yHead } from "../a11y/SvgA11yHead";
+import {
+  StudioAreaSeries,
+  StudioGridLines,
+  StudioLineSeries,
+  studioAxisFontSize,
+  studioFlag,
+  studioSeriesId,
+} from "./studioPolish";
 
 export type SvgCartesianLineProps = {
   width: number;
@@ -57,6 +65,9 @@ export function SvgCartesianLine({
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme, height < 72);
   const tickCount = Math.min(4, categories.length);
+  const axisFontSize = studioAxisFontSize(theme);
+  const useStudioArea = fill && studioFlag(theme, "areaGradient");
+  const useStudioLine = !fill && studioFlag(theme, "lineGlow");
   const descriptor = buildCartesianA11yDescriptor({
     chartType: fill ? "area" : "line",
     categories,
@@ -73,26 +84,17 @@ export function SvgCartesianLine({
         aria-labelledby={`${SVG_A11Y_TITLE_ID} ${SVG_A11Y_DESC_ID}`}
       >
         <SvgA11yHead descriptor={descriptor} />
-        {[0.25, 0.5, 0.75].map((ratio) => {
-          const y = plot.y + plot.height * ratio;
-          return (
-            <line
-              key={ratio}
-              x1={plot.x}
-              x2={plot.x + plot.width}
-              y1={y}
-              y2={y}
-              stroke={gridStroke}
-              strokeWidth={1}
-            />
-          );
-        })}
+        <StudioGridLines theme={theme} plot={plot} gridStroke={gridStroke} />
         {series.map((item, seriesIndex) => {
           const color =
             item.color ?? resolveSeriesColor(item.tone, seriesIndex);
           const defaultPath = fill
             ? areaPath(item.data, min, max, plot)
             : linePath(item.data, min, max, plot);
+          const seriesStyle = seriesEnterDelayMs
+            ? { animationDelay: `${seriesEnterDelayMs(seriesIndex)}ms` }
+            : undefined;
+          const seriesId = studioSeriesId(item.name, seriesIndex);
 
           if (item.renderPath) {
             return (
@@ -109,6 +111,34 @@ export function SvgCartesianLine({
             );
           }
 
+          if (useStudioArea) {
+            return (
+              <StudioAreaSeries
+                key={item.name}
+                id={seriesId}
+                path={defaultPath}
+                color={color}
+                strokeWidth={theme.line.strokeWidth}
+                lineGlow={studioFlag(theme, "lineGlow")}
+                style={seriesStyle}
+              />
+            );
+          }
+
+          if (useStudioLine) {
+            return (
+              <StudioLineSeries
+                key={item.name}
+                id={seriesId}
+                path={defaultPath}
+                color={color}
+                strokeWidth={theme.line.strokeWidth}
+                lineGlow
+                style={seriesStyle}
+              />
+            );
+          }
+
           return (
             <path
               key={item.name}
@@ -120,11 +150,7 @@ export function SvgCartesianLine({
               strokeWidth={theme.line.strokeWidth}
               strokeLinejoin="round"
               strokeLinecap="round"
-              style={
-                seriesEnterDelayMs
-                  ? { animationDelay: `${seriesEnterDelayMs(seriesIndex)}ms` }
-                  : undefined
-              }
+              style={seriesStyle}
             />
           );
         })}
@@ -158,7 +184,8 @@ export function SvgCartesianLine({
                   y={plot.y + plot.height + 14}
                   textAnchor="middle"
                   fill={chrome.axis}
-                  fontSize={10}
+                  fontSize={axisFontSize}
+                  fontFamily="system-ui, -apple-system, sans-serif"
                 >
                   {categories[categoryIndex]}
                 </text>
@@ -174,7 +201,8 @@ export function SvgCartesianLine({
                   y={y + 3}
                   textAnchor="end"
                   fill={chrome.axis}
-                  fontSize={10}
+                  fontSize={axisFontSize}
+                  fontFamily="system-ui, -apple-system, sans-serif"
                 >
                   {Math.round(value)}
                 </text>

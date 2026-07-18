@@ -18,3 +18,5 @@
   --chart-axis: hsl(215 20% 65%);
   --chart-area-fill: hsl(var(--chart-1) / 0.2);
 }
+
+@import "./studio-tokens.css";

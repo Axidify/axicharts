@@ -19,5 +19,8 @@ export function createTheme(
     bar: { ...base.bar, ...overrides.bar },
     caption: { ...base.caption, ...overrides.caption },
     values: { ...base.values, ...overrides.values },
+    svg: overrides.svg
+      ? { ...(base.svg ?? {}), ...overrides.svg }
+      : base.svg,
   };
 }

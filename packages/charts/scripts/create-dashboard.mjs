@@ -11,7 +11,7 @@ const CATEGORIES = [
   "kpi",
 ];
 
-const PRESETS = ["full"];
+const PRESETS = ["full", "studio"];
 
 const TOKENS_CSS = `:root {
   --chart-1: 221 83% 53%;
@@ -215,6 +215,21 @@ function packageJson(targetDir, category, preset = null) {
   );
 }
 
+function studioSample() {
+  return {
+    imports: `import { StudioLineChart } from "@axicharts/charts/studio";
+import "@axicharts/charts-theme/studio-tokens.css";`,
+    chart: `      <div data-theme="studio">
+        <StudioLineChart
+          title="p95 latency"
+          labels={["Mon", "Tue", "Wed", "Thu", "Fri"]}
+          data={[42, 38, 55, 49, 62]}
+        />
+      </div>`,
+    peerNote: "studio",
+  };
+}
+
 function fullSample() {
   return {
     imports: `import { ChartContainer, LineChart } from "@axicharts/charts-full";
@@ -231,7 +246,12 @@ import { cleanTheme } from "@axicharts/charts-full/theme";`,
 }
 
 function appTsx(category, preset = null) {
-  const sample = preset === "full" ? fullSample() : categorySample(category);
+  const sample =
+    preset === "full"
+      ? fullSample()
+      : preset === "studio"
+        ? studioSample()
+        : categorySample(category);
   return `${sample.imports}
 import "./tokens.css";
 
@@ -240,7 +260,7 @@ export function App() {
     <main>
       <h1>My dashboard</h1>
       <p className="lead">
-        Scaffolded with AxiCharts — ${preset === "full" ? "preset" : "category"} <code>${preset === "full" ? "full" : category}</code>.
+        Scaffolded with AxiCharts — ${preset ? "preset" : "category"} <code>${preset ?? category}</code>.
       </p>
       <section className="card" style={{ width: "100%" }}>
 ${sample.chart}
@@ -305,7 +325,7 @@ export function parseCreateDashboardArgs(argv = process.argv.slice(2)) {
 
   return {
     targetDir: positional[0] ?? "axicharts-dashboard",
-    category: preset === "full" ? "full" : category,
+    category: preset === "full" ? "full" : preset === "studio" ? "studio" : category,
     preset,
   };
 }
@@ -378,7 +398,11 @@ ${preset === "full"
   ? `- Import charts from \`@axicharts/charts-full\` and themes from \`@axicharts/charts-full/theme\`
 - Add spec/runtime via \`@axicharts/charts-full/spec\` and \`@axicharts/charts-full/runtime\`
 - For smaller bundles, switch to category subpaths (\`@axicharts/charts/cartesian\`, etc.)`
-  : `- Import from \`@axicharts/charts/${category}\` for tree-shaken category APIs
+  : preset === "studio"
+    ? `- Import from \`@axicharts/charts/studio\` for editorial SVG defaults
+- Apply \`@axicharts/charts-theme/studio-tokens.css\` and \`data-theme="studio"\` on containers
+- Switch to \`@axicharts/charts/cartesian\` when you need composable control`
+    : `- Import from \`@axicharts/charts/${category}\` for tree-shaken category APIs
 - Use \`@axicharts/charts/quick\` for a one-component line chart hello-world
 - Wire \`src/tokens.css\` \`--chart-*\` vars to match your design system
 - Add more panels with \`ChartContainer\` + chart components from the same category subpath`}
@@ -416,6 +440,20 @@ export function formatNextSteps(targetDir, category, preset = null) {
       "  @axicharts/charts-full/theme   — cleanTheme, tokens",
       "  @axicharts/charts-full/spec    — compilePanel, ejectPanel",
       "  @axicharts/charts-full/runtime — mosaic presets, embed SDK",
+    ].join("\n");
+  }
+
+  if (preset === "studio") {
+    return [
+      `Created ${targetDir} (preset: studio)`,
+      "Next:",
+      `  cd ${targetDir}`,
+      "  pnpm install",
+      "  pnpm dev",
+      "",
+      "Imports:",
+      "  @axicharts/charts/studio              — StudioLineChart, StudioBarChart",
+      "  @axicharts/charts-theme/studio-tokens.css — refined palette",
     ].join("\n");
   }
 
