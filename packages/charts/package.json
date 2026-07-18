@@ -38,14 +38,31 @@
       "types": "./dist/entry/pie.d.ts",
       "import": "./dist/entry/pie.js"
     },
+    "./area": {
+      "types": "./dist/entry/area.d.ts",
+      "import": "./dist/entry/area.js"
+    },
+    "./candlestick": {
+      "types": "./dist/entry/candlestick.d.ts",
+      "import": "./dist/entry/candlestick.js"
+    },
+    "./waterfall": {
+      "types": "./dist/entry/waterfall.d.ts",
+      "import": "./dist/entry/waterfall.js"
+    },
+    "./heatmap": {
+      "types": "./dist/entry/heatmap.d.ts",
+      "import": "./dist/entry/heatmap.js"
+    },
     "./registry": {
       "types": "./dist/registry/index.d.ts",
       "import": "./dist/registry/index.js"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/registry/index.ts src/entry/line.ts src/entry/bar.ts src/entry/pie.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --clean",
-    "dev": "tsup src/index.ts src/registry/index.ts src/entry/line.ts src/entry/bar.ts src/entry/pie.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --watch",
+    "build": "tsup src/index.ts src/registry/index.ts src/entry/line.ts src/entry/bar.ts src/entry/pie.ts src/entry/area.ts src/entry/candlestick.ts src/entry/waterfall.ts src/entry/heatmap.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --clean",
+    "dev": "tsup src/index.ts src/registry/index.ts src/entry/line.ts src/entry/bar.ts src/entry/pie.ts src/entry/area.ts src/entry/candlestick.ts src/entry/waterfall.ts src/entry/heatmap.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --watch",
+    "create-dashboard": "node scripts/create-dashboard.mjs",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

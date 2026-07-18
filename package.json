@@ -20,7 +20,8 @@
     "size": "size-limit",
     "validate:runtime": "pnpm --filter @axicharts/charts-runtime validate:examples",
     "typecheck": "turbo run typecheck",
-    "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm size && pnpm validate:runtime"
+    "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm size && pnpm validate:runtime",
+    "create:dashboard": "node packages/charts/scripts/create-dashboard.mjs"
   },
   "devDependencies": {
     "@size-limit/file": "^11.1.6",

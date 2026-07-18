@@ -23,7 +23,9 @@ import { usePlotSync } from "../sync/usePlotSync";
 import { sliceCartesianByBrushRange } from "../sync/brushRange";
 import { useCartesianBrush } from "../sync/useCartesianBrush";
 import type { BrushRange } from "../sync/brushRange";
+import { usePlotRenderer } from "../plot/usePlotRenderer";
 import { usePlotSampling } from "../plot/usePlotSampling";
+import { SvgCartesianLine } from "../svg/SvgCartesianLine";
 import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
@@ -67,6 +69,7 @@ type LinePlotProps = {
   onBrushRangeChange?: (range: BrushRange) => void;
   overviewCategories?: string[];
   overviewSeries?: PlotSeries[];
+  engine: "canvas" | "svg";
 };
 
 function LinePlot({
@@ -87,6 +90,7 @@ function LinePlot({
   onBrushRangeChange,
   overviewCategories,
   overviewSeries,
+  engine,
 }: LinePlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
@@ -99,28 +103,41 @@ function LinePlot({
 
   return (
     <div style={{ width: Math.floor(size.width), height: Math.floor(size.height) - legendHeight }}>
-      <UPlotLine
-        width={Math.floor(size.width)}
-        height={plotHeight}
-        categories={categories}
-        series={series}
-        theme={theme}
-        curve={curve}
-        fill={fill}
-        showAxes={showAxes}
-        valueSuffix={valueSuffix}
-        dualAxis={stacked ? false : dualAxis}
-        stacked={stacked}
-        thresholdBands={thresholdBands}
-        referenceLines={referenceLines}
-        showCursor={chrome.showCrosshair}
-        useNativeLegend={false}
-        onCursor={plotSync.onCursor}
-        onSyncIndex={plotSync.onSyncIndex}
-        syncIndex={plotSync.syncIndex}
-        syncSourceId={plotSync.syncSourceId}
-        chartId={plotSync.chartId}
-      />
+      {engine === "svg" ? (
+        <SvgCartesianLine
+          width={Math.floor(size.width)}
+          height={plotHeight}
+          categories={categories}
+          series={series}
+          theme={theme}
+          fill={fill}
+          showAxes={showAxes}
+          stacked={stacked}
+        />
+      ) : (
+        <UPlotLine
+          width={Math.floor(size.width)}
+          height={plotHeight}
+          categories={categories}
+          series={series}
+          theme={theme}
+          curve={curve}
+          fill={fill}
+          showAxes={showAxes}
+          valueSuffix={valueSuffix}
+          dualAxis={stacked ? false : dualAxis}
+          stacked={stacked}
+          thresholdBands={thresholdBands}
+          referenceLines={referenceLines}
+          showCursor={chrome.showCrosshair}
+          useNativeLegend={false}
+          onCursor={plotSync.onCursor}
+          onSyncIndex={plotSync.onSyncIndex}
+          syncIndex={plotSync.syncIndex}
+          syncSourceId={plotSync.syncSourceId}
+          chartId={plotSync.chartId}
+        />
+      )}
       {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
         <UPlotRangeOverview
           width={Math.floor(size.width)}
@@ -178,10 +195,11 @@ export function LineChart({
     () => sliceCartesianByBrushRange(categories, series, effectiveRange),
     [categories, series, effectiveRange],
   );
-  const maxPoints = usePlotSampling({
+  const { engine, maxPoints } = usePlotRenderer({
     pointCount: brushed.categories.length,
     renderer,
     refreshHz,
+    forceCanvas: brush,
   });
   const prepared = useMemo(
     () => preparePlotData(brushed.categories, brushed.series, maxPoints),
@@ -232,6 +250,7 @@ export function LineChart({
             onBrushRangeChange={brush ? onBrushRangeChange : undefined}
             overviewCategories={brush ? categories : undefined}
             overviewSeries={brush ? series : undefined}
+            engine={engine}
           />
         }
       />

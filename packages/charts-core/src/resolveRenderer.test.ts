@@ -9,6 +9,16 @@ describe("resolveRenderer", () => {
         mode: "interactive",
         plotWidth: 400,
       }),
+    ).toEqual({ engine: "canvas", maxPoints: null });
+  });
+
+  it("selects svg for static mode under 2k points", () => {
+    expect(
+      resolveRenderer({
+        pointCount: 120,
+        mode: "static",
+        plotWidth: 400,
+      }),
     ).toEqual({ engine: "svg", maxPoints: null });
   });
 

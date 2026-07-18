@@ -1,27 +1,23 @@
 "use client";
 
 import { useMemo } from "react";
-import { resolveRenderer, type RendererPreference } from "@axicharts/charts-core";
-import { useChartLayout } from "../container/ChartLayoutContext";
+import { usePlotRenderer } from "./usePlotRenderer";
 
 export function usePlotSampling({
   pointCount,
   renderer = "auto",
   refreshHz,
+  forceCanvas = false,
 }: {
   pointCount: number;
-  renderer?: RendererPreference;
+  renderer?: import("@axicharts/charts-core").RendererPreference;
   refreshHz?: number;
+  forceCanvas?: boolean;
 }): number | null {
-  const { mode, size } = useChartLayout();
-
-  return useMemo(() => {
-    return resolveRenderer({
-      renderer,
-      mode,
-      pointCount,
-      plotWidth: size.width,
-      refreshHz,
-    }).maxPoints;
-  }, [renderer, mode, pointCount, size.width, refreshHz]);
+  return usePlotRenderer({
+    pointCount,
+    renderer,
+    refreshHz,
+    forceCanvas,
+  }).maxPoints;
 }

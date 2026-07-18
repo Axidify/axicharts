@@ -37,6 +37,19 @@ export function LatencyPanel() {
 }
 ```
 
+## Scaffold a dashboard
+
+From the axicharts repo (or after cloning):
+
+```bash
+pnpm create:dashboard my-dashboard
+cd my-dashboard
+pnpm install
+pnpm dev
+```
+
+Tree-shaken subpaths: `@axicharts/charts/line`, `/bar`, `/area`, `/pie`, `/candlestick`, `/waterfall`, `/heatmap`.
+
 ## Packages
 
 | Package | Description |

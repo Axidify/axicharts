@@ -82,6 +82,13 @@ export function resolveRenderer(
     };
   }
 
+  if (mode === "static" && pointCount < LARGE_SERIES_THRESHOLD) {
+    return {
+      engine: "svg",
+      maxPoints: null,
+    };
+  }
+
   if (pointCount >= LARGE_SERIES_THRESHOLD) {
     return {
       engine: "canvas",
@@ -90,7 +97,7 @@ export function resolveRenderer(
   }
 
   return {
-    engine: mode === "presentation" ? "svg" : "svg",
+    engine: mode === "presentation" ? "svg" : "canvas",
     maxPoints: null,
   };
 }

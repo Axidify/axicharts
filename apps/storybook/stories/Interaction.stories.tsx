@@ -67,4 +67,12 @@ export const StaticNoChrome: Story = {
       />
     </ChartContainer>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "C84 static mode — no tooltip/legend/crosshair and SVG renderer for series under 2k points.",
+      },
+    },
+  },
 };

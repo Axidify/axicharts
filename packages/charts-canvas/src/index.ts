@@ -24,7 +24,7 @@ export type {
   UPlotComboProps,
   UPlotLineProps,
 } from "./types";
-export { SERIES_COLORS, SERIES_PALETTE, resolveChromeColors, isDarkChartTheme } from "./colors";
+export { SERIES_COLORS, SERIES_PALETTE, resolveChromeColors, chromeGridStroke, isDarkChartTheme } from "./colors";
 export { resolveSeriesColor, resolveSeriesTone } from "./seriesColor";
 export { shouldUseDualAxis } from "./dualAxis";
 export { lineSeriesPaths, resolveLineCurve, type LineCurve } from "./linePaths";

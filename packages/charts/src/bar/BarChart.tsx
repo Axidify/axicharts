@@ -22,7 +22,8 @@ import { usePlotSync } from "../sync/usePlotSync";
 import { sliceCartesianByBrushRange } from "../sync/brushRange";
 import { useCartesianBrush } from "../sync/useCartesianBrush";
 import type { BrushRange } from "../sync/brushRange";
-import { usePlotSampling } from "../plot/usePlotSampling";
+import { usePlotRenderer } from "../plot/usePlotRenderer";
+import { SvgCartesianBar } from "../svg/SvgCartesianBar";
 import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
@@ -61,6 +62,7 @@ type BarPlotProps = {
   onBrushRangeChange?: (range: BrushRange) => void;
   overviewCategories?: string[];
   overviewSeries?: PlotSeries[];
+  engine: "canvas" | "svg";
 };
 
 function BarPlot({
@@ -78,6 +80,7 @@ function BarPlot({
   onBrushRangeChange,
   overviewCategories,
   overviewSeries,
+  engine,
 }: BarPlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
@@ -89,26 +92,38 @@ function BarPlot({
 
   return (
     <div style={{ width: Math.floor(size.width), height: Math.floor(size.height) - legendHeight }}>
-      <UPlotBar
-        width={Math.floor(size.width)}
-        height={plotHeight}
-        categories={categories}
-        series={series}
-        theme={theme}
-        showAxes={showAxes}
-        showValues={showValues}
-        valueSuffix={valueSuffix}
-        referenceLines={referenceLines}
-        stacked={stacked}
-        thresholdBands={thresholdBands}
-        showCursor={chrome.showCrosshair}
-        useNativeLegend={false}
-        onCursor={plotSync.onCursor}
-        onSyncIndex={plotSync.onSyncIndex}
-        syncIndex={plotSync.syncIndex}
-        syncSourceId={plotSync.syncSourceId}
-        chartId={plotSync.chartId}
-      />
+      {engine === "svg" ? (
+        <SvgCartesianBar
+          width={Math.floor(size.width)}
+          height={plotHeight}
+          categories={categories}
+          series={series}
+          theme={theme}
+          showAxes={showAxes}
+          stacked={stacked}
+        />
+      ) : (
+        <UPlotBar
+          width={Math.floor(size.width)}
+          height={plotHeight}
+          categories={categories}
+          series={series}
+          theme={theme}
+          showAxes={showAxes}
+          showValues={showValues}
+          valueSuffix={valueSuffix}
+          referenceLines={referenceLines}
+          stacked={stacked}
+          thresholdBands={thresholdBands}
+          showCursor={chrome.showCrosshair}
+          useNativeLegend={false}
+          onCursor={plotSync.onCursor}
+          onSyncIndex={plotSync.onSyncIndex}
+          syncIndex={plotSync.syncIndex}
+          syncSourceId={plotSync.syncSourceId}
+          chartId={plotSync.chartId}
+        />
+      )}
       {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
         <UPlotRangeOverview
           width={Math.floor(size.width)}
@@ -163,10 +178,11 @@ export function BarChart({
     () => sliceCartesianByBrushRange(categories, series, effectiveRange),
     [categories, series, effectiveRange],
   );
-  const maxPoints = usePlotSampling({
+  const { engine, maxPoints } = usePlotRenderer({
     pointCount: brushed.categories.length,
     renderer,
     refreshHz,
+    forceCanvas: brush,
   });
   const prepared = useMemo(
     () => preparePlotData(brushed.categories, brushed.series, maxPoints),
@@ -211,6 +227,7 @@ export function BarChart({
             onBrushRangeChange={brush ? onBrushRangeChange : undefined}
             overviewCategories={brush ? categories : undefined}
             overviewSeries={brush ? series : undefined}
+            engine={engine}
           />
         }
       />

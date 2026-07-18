@@ -60,6 +60,30 @@
     "gzip": true
   },
   {
+    "name": "@axicharts/charts/area",
+    "path": "packages/charts/dist/entry/area.js",
+    "limit": "8 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/candlestick",
+    "path": "packages/charts/dist/entry/candlestick.js",
+    "limit": "8 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/waterfall",
+    "path": "packages/charts/dist/entry/waterfall.js",
+    "limit": "8 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/heatmap",
+    "path": "packages/charts/dist/entry/heatmap.js",
+    "limit": "8 KB",
+    "gzip": true
+  },
+  {
     "name": "@axicharts/charts-runtime/workspace",
     "path": "packages/charts-runtime/dist/workspace/index.js",
     "limit": "2 KB",
