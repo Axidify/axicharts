@@ -163,6 +163,33 @@ describe("compilePanel panel style", () => {
   });
 });
 
+describe("compilePanel chrome variants", () => {
+  it("passes legend and tooltip variants to ChartContainer", () => {
+    const panel = compilePanel(
+      {
+        type: "line",
+        encoding: {
+          x: { field: "week" },
+          y: { field: "revenue" },
+        },
+        props: {
+          legendVariant: "inline",
+          tooltipVariant: "minimal",
+        },
+        height: 180,
+      },
+      [
+        { week: "W1", revenue: 120 },
+        { week: "W2", revenue: 90 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+    expect(container.innerHTML).not.toContain("legendVariant");
+  });
+});
+
 describe("compilePanel table", () => {
   it("renders tabular rows from spec data", () => {
     const panel = compilePanel(

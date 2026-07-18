@@ -8,6 +8,7 @@ import {
   type ChartTheme,
 } from "@axicharts/charts-theme";
 import type { SeriesTone } from "@axicharts/charts-canvas";
+import type { LegendVariant, TooltipVariant } from "../chrome/chromeVariants";
 import {
   ChartLayoutContext,
   type ChartConfig,
@@ -48,6 +49,8 @@ export type ChartContainerProps = {
   emptyMessage?: string;
   errorMessage?: string;
   tagTones?: Record<string, SeriesTone>;
+  legendVariant?: LegendVariant;
+  tooltipVariant?: TooltipVariant;
   onResize?: (size: { width: number; height: number }) => void;
 };
 
@@ -76,6 +79,8 @@ export function ChartContainer({
   emptyMessage,
   errorMessage,
   tagTones,
+  legendVariant,
+  tooltipVariant,
   onResize,
 }: ChartContainerProps): ReactElement {
   const [ref, measured] = useResizeObserver(debounceMs);
@@ -138,6 +143,8 @@ export function ChartContainer({
         lastUpdatedAt,
         staleAfterMs,
         tagTones,
+        legendVariant,
+        tooltipVariant,
       }}
     >
       <div

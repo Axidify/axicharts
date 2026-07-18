@@ -68,8 +68,10 @@ export {
   EChartsInteractionShell,
   getInteractionChrome,
   type LegendProps,
+  type LegendVariant,
   type TooltipProps,
   type TooltipRow,
+  type TooltipVariant,
 } from "./chrome";
 export {
   ChartInteractionProvider,

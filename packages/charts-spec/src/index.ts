@@ -58,4 +58,11 @@ export {
   readPanelStyle,
   themeWithPanelStyle,
 } from "./panelStyle";
+export {
+  chartPropsWithoutChromeMeta,
+  readPanelChrome,
+  type LegendVariant,
+  type PanelChromeSpec,
+  type TooltipVariant,
+} from "./panelChrome";
 export { asRows, pluckField, readArray, readNumber } from "./data";

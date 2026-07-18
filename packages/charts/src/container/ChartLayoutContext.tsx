@@ -3,6 +3,7 @@ import type { ChartSize } from "@axicharts/charts-core";
 import type { SeriesTone } from "@axicharts/charts-canvas";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartDataState } from "../state/types";
+import type { LegendVariant, TooltipVariant } from "../chrome/chromeVariants";
 
 export type ChartConfig = Record<
   string,
@@ -25,6 +26,8 @@ export type ChartLayoutContextValue = {
   lastUpdatedAt?: number;
   staleAfterMs?: number;
   tagTones?: Record<string, SeriesTone>;
+  legendVariant?: LegendVariant;
+  tooltipVariant?: TooltipVariant;
 };
 
 export const ChartLayoutContext = createContext<ChartLayoutContextValue | null>(

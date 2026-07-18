@@ -65,12 +65,12 @@ function LinePlot({
   thresholdBands,
   referenceLines,
 }: LinePlotProps): ReactElement {
-  const { size, theme, mode } = useChartLayout();
+  const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync();
   const chrome = getInteractionChrome(mode);
   const showLegend =
     chrome.showLegend && series.length > 1 && !compact;
-  const legendHeight = getLegendHeight(showLegend);
+  const legendHeight = getLegendHeight(showLegend, legendVariant);
   const plotHeight = Math.floor(size.height) - legendHeight;
 
   return (

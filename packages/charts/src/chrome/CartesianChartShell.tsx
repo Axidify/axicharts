@@ -37,11 +37,11 @@ function CartesianChromeInner({
   getRows,
   plot,
 }: CartesianChromeProps): ReactElement {
-  const { mode } = useChartLayout();
+  const { mode, legendVariant } = useChartLayout();
   const chrome = getInteractionChrome(mode);
   const showLegend =
     chrome.showLegend && series.length > 1 && !compact;
-  const legendHeight = getLegendHeight(showLegend);
+  const legendHeight = getLegendHeight(showLegend, legendVariant);
 
   useEffect(() => {
     if (mode === "presentation") {

@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactElement } from "react";
+import type { ReactElement } from "react";
 import type { PlotSeries } from "@axicharts/charts-canvas";
 import { isDarkChartTheme } from "@axicharts/charts-canvas";
 import { useChartLayout } from "../container/ChartLayoutContext";
@@ -10,6 +10,13 @@ import {
   resolveSeriesColor,
   resolveSeriesLabel,
 } from "./resolveSeries";
+import {
+  DEFAULT_TOOLTIP_VARIANT,
+  tooltipRowsGap,
+  tooltipSurfaceStyle,
+  tooltipTitleStyle,
+  type TooltipVariant,
+} from "./chromeVariants";
 
 export type TooltipRow = {
   label: string;
@@ -24,35 +31,17 @@ export type TooltipProps = {
   getRows?: (index: number) => TooltipRow[] | null;
 };
 
-function tooltipSurfaceStyle(dark: boolean): CSSProperties {
-  return {
-    minWidth: 132,
-    maxWidth: 240,
-    padding: "10px 12px",
-    borderRadius: 10,
-    border: dark ? "1px solid rgba(51, 65, 85, 0.9)" : "1px solid rgba(226, 232, 240, 0.95)",
-    background: dark ? "rgba(15, 23, 42, 0.92)" : "rgba(255, 255, 255, 0.94)",
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
-    boxShadow: dark
-      ? "0 12px 28px rgba(0, 0, 0, 0.35)"
-      : "0 10px 28px rgba(15, 23, 42, 0.1)",
-    fontSize: 11,
-    color: dark ? "#f8fafc" : "#0f172a",
-    pointerEvents: "none",
-    zIndex: 3,
-  };
-}
-
 function TooltipRows({
   rows,
   dark,
+  variant,
 }: {
   rows: TooltipRow[];
   dark: boolean;
+  variant: TooltipVariant;
 }): ReactElement {
   return (
-    <div style={{ display: "grid", gap: 5 }}>
+    <div style={{ display: "grid", gap: tooltipRowsGap(variant) }}>
       {rows.map((row) => (
         <div
           key={`${row.label}-${row.value}`}
@@ -60,7 +49,7 @@ function TooltipRows({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 12,
+            gap: variant === "dense" ? 8 : 12,
           }}
         >
           <span
@@ -70,8 +59,8 @@ function TooltipRows({
               <span
                 aria-hidden
                 style={{
-                  width: 7,
-                  height: 7,
+                  width: variant === "dense" ? 6 : 7,
+                  height: variant === "dense" ? 6 : 7,
                   borderRadius: 999,
                   background: row.color,
                   boxShadow: `0 0 0 2px ${dark ? "rgba(15, 23, 42, 0.5)" : "rgba(255, 255, 255, 0.95)"}`,
@@ -102,9 +91,10 @@ export function Tooltip({
   getRows,
 }: TooltipProps): ReactElement | null {
   const { cursor, itemHover } = useChartInteraction();
-  const { config, theme } = useChartLayout();
+  const { config, theme, tooltipVariant = DEFAULT_TOOLTIP_VARIANT } = useChartLayout();
   const dark = isDarkChartTheme(theme.name);
-  const surface = tooltipSurfaceStyle(dark);
+  const surface = tooltipSurfaceStyle(tooltipVariant, dark);
+  const titleStyle = tooltipTitleStyle(dark);
 
   if (itemHover) {
     const left = Math.min(
@@ -124,17 +114,8 @@ export function Tooltip({
           ...surface,
         }}
       >
-        <div
-          style={{
-            fontWeight: 600,
-            marginBottom: 7,
-            color: dark ? "#e2e8f0" : "#334155",
-            fontSize: 11,
-          }}
-        >
-          {itemHover.title}
-        </div>
-        <TooltipRows rows={itemHover.rows} dark={dark} />
+        <div style={titleStyle}>{itemHover.title}</div>
+        <TooltipRows rows={itemHover.rows} dark={dark} variant={tooltipVariant} />
       </div>
     );
   }
@@ -175,19 +156,8 @@ export function Tooltip({
         ...surface,
       }}
     >
-      {category ? (
-        <div
-          style={{
-            fontWeight: 600,
-            marginBottom: 7,
-            color: dark ? "#e2e8f0" : "#334155",
-            fontSize: 11,
-          }}
-        >
-          {category}
-        </div>
-      ) : null}
-      <TooltipRows rows={rows} dark={dark} />
+      {category ? <div style={titleStyle}>{category}</div> : null}
+      <TooltipRows rows={rows} dark={dark} variant={tooltipVariant} />
     </div>
   );
 }

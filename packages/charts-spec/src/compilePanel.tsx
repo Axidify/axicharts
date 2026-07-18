@@ -30,10 +30,18 @@ import { applySpecCompilers } from "./specCompiler";
 import { resolveTheme } from "./themes";
 import { fillsFromColorField } from "./colorEncoding";
 import {
+  chartPropsWithoutChromeMeta,
+  readPanelChrome,
+} from "./panelChrome";
+import {
   chartPropsWithoutStyle,
   readPanelStyle,
   themeWithPanelStyle,
 } from "./panelStyle";
+
+function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
+  return chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props));
+}
 
 export type CompileOptions = {
   theme?: ThemeName;
@@ -73,9 +81,19 @@ function wrapChart(
   const width = options.width ?? spec.width ?? "100%";
   const dark = theme.name === "live" || theme.name === "industrial";
 
+  const chrome = readPanelChrome(spec.props);
+
   const panel = createElement(
     ChartContainer,
-    { theme, mode, height, width, tagTones },
+    {
+      theme,
+      mode,
+      height,
+      width,
+      tagTones,
+      legendVariant: chrome.legendVariant,
+      tooltipVariant: chrome.tooltipVariant,
+    },
     chart,
   );
 
@@ -131,7 +149,7 @@ function compileRegisteredPanel(
   const chartProps = {
     ...objectDataFromSpec(data),
     ...(rows[0] ?? {}),
-    ...chartPropsWithoutStyle(spec.props ?? {}),
+    ...chartPropsFromPanel(spec.props ?? {}),
   };
 
   return wrapChart(
@@ -149,7 +167,7 @@ export function compilePanel(
 ): ReactElement {
   const resolved = applySpecCompilers(spec, data);
   const rows = asRows(data);
-  const props = chartPropsWithoutStyle(resolved.props ?? {});
+  const props = chartPropsFromPanel(resolved.props ?? {});
   const objectData = objectDataFromSpec(data);
   const tagTones = options.tagTones ?? readTagTones(objectData);
   const wrap = (chart: ReactElement) =>
