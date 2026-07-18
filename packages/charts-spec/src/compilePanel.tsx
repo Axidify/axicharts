@@ -546,6 +546,7 @@ export function compilePanel(
             | undefined,
           rotationRange: chartProps.rotationRange as [number, number] | undefined,
           gridSize: chartProps.gridSize as number | undefined,
+          sizeRange: chartProps.sizeRange as [number, number] | undefined,
         }),
       );
     }

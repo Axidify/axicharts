@@ -17,6 +17,7 @@ export type EChartsWordCloudProps = {
   shape?: "circle" | "cardioid" | "diamond" | "triangle" | "pentagon" | "star";
   rotationRange?: [number, number];
   gridSize?: number;
+  sizeRange?: [number, number];
   onItemHover?: (event: EChartItemHoverEvent) => void;
   mergeOption?: boolean;
   animate?: boolean;
@@ -45,13 +46,20 @@ function EChartsWordCloudPlot({
   words,
   shape = "circle",
   rotationRange = [-45, 45],
-  gridSize = 8,
+  gridSize = 6,
+  sizeRange,
   onItemHover,
   mergeOption = false,
   animate = false,
 }: EChartsWordCloudProps): ReactElement {
   const palette = seriesPalette(theme);
   const total = words.reduce((sum, word) => sum + word.value, 0);
+  const resolvedSizeRange =
+    sizeRange ??
+    ([
+      Math.round(Math.max(14, height * 0.035)),
+      Math.round(Math.max(56, height * 0.17)),
+    ] as [number, number]);
 
   const option: EChartsOption = withPresentationAnimation(
     {
@@ -62,9 +70,9 @@ function EChartsWordCloudPlot({
           shape,
           gridSize,
           rotationRange,
-          sizeRange: [12, 56],
-          width: "96%",
-          height: "96%",
+          sizeRange: resolvedSizeRange,
+          width: "100%",
+          height: "100%",
           drawOutOfBound: false,
           layoutAnimation: animate,
           textStyle: {

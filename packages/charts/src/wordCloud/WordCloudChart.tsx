@@ -17,6 +17,7 @@ export type WordCloudChartProps = {
   shape?: "circle" | "cardioid" | "diamond" | "triangle" | "pentagon" | "star";
   rotationRange?: [number, number];
   gridSize?: number;
+  sizeRange?: [number, number];
 };
 
 function WordCloudPlot({
@@ -24,6 +25,7 @@ function WordCloudPlot({
   shape,
   rotationRange,
   gridSize,
+  sizeRange,
 }: WordCloudChartProps): ReactElement {
   const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
@@ -37,6 +39,7 @@ function WordCloudPlot({
       shape={shape}
       rotationRange={rotationRange}
       gridSize={gridSize}
+      sizeRange={sizeRange}
       onItemHover={interaction.onItemHover}
       mergeOption={mode === "live"}
       animate={mode === "presentation"}
@@ -49,6 +52,7 @@ export function WordCloudChart({
   shape,
   rotationRange,
   gridSize,
+  sizeRange,
 }: WordCloudChartProps): ReactElement | null {
   const { size, ready } = useChartLayout();
 
@@ -73,6 +77,7 @@ export function WordCloudChart({
             shape={shape}
             rotationRange={rotationRange}
             gridSize={gridSize}
+            sizeRange={sizeRange}
           />
         }
       />

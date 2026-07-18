@@ -35,9 +35,9 @@ const THEME_RIVER_POINTS = [
 
 function AnalyticsWall(): ReactElement {
   return (
-    <div style={{ display: "grid", gap: 24, maxWidth: 960 }}>
+    <div style={{ display: "grid", gap: 20, maxWidth: 960 }}>
       <div>
-        <ChartContainer theme={cleanTheme} height={360} width="100%">
+        <ChartContainer theme={cleanTheme} height={300} width="100%">
           <ParallelChart dimensions={OPS_DIMENSIONS} series={OPS_SERIES} />
         </ChartContainer>
         <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
@@ -45,7 +45,7 @@ function AnalyticsWall(): ReactElement {
         </p>
       </div>
       <div>
-        <ChartContainer theme={cleanTheme} height={320} width="100%">
+        <ChartContainer theme={cleanTheme} height={260} width="100%">
           <ThemeRiverChart points={THEME_RIVER_POINTS} />
         </ChartContainer>
         <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>

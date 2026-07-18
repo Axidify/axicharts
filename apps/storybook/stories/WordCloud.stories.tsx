@@ -41,24 +41,24 @@ function WordCloudWall(): ReactElement {
   return (
     <div style={{ display: "grid", gap: 24, maxWidth: 960 }}>
       <div>
-        <ChartContainer theme={cleanTheme} height={320} width="100%">
-          <WordCloudChart words={INCIDENT_TAGS} />
+        <ChartContainer theme={cleanTheme} height={420} width="100%">
+          <WordCloudChart words={INCIDENT_TAGS} gridSize={5} />
         </ChartContainer>
         <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
           C108 WordCloudChart — incident tag frequency via ECharts word cloud
         </p>
       </div>
       <div>
-        <ChartContainer theme={cleanTheme} height={280} width="100%">
-          <WordCloudChart words={FEEDBACK_THEMES} shape="cardioid" />
+        <ChartContainer theme={cleanTheme} height={360} width="100%">
+          <WordCloudChart words={FEEDBACK_THEMES} shape="cardioid" gridSize={5} />
         </ChartContainer>
         <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
           Feedback themes — product survey keyword weights
         </p>
       </div>
       <div>
-        <ChartContainer theme={cleanTheme} height={260} width="100%">
-          <WordCloudChart words={ALERT_KEYWORDS} rotationRange={[-90, 90]} />
+        <ChartContainer theme={cleanTheme} height={320} width="100%">
+          <WordCloudChart words={ALERT_KEYWORDS} rotationRange={[-90, 90]} gridSize={5} />
         </ChartContainer>
         <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
           Ops alert keywords — severity-toned terms from paging rules

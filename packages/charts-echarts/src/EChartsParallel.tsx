@@ -35,6 +35,7 @@ export function EChartsParallel({
 }: EChartsParallelProps): ReactElement {
   const palette = seriesPalette(theme);
   const labelStyle = axisLabelStyle(theme);
+  const showLegend = series.length > 1;
 
   const maxByDimension = dimensions.map((dimension, index) => {
     if (dimension.max != null) {
@@ -50,6 +51,13 @@ export function EChartsParallel({
   const option: EChartsOption = withPresentationAnimation(
     {
       tooltip: hiddenTooltip(),
+      legend: showLegend
+        ? {
+            show: true,
+            top: 0,
+            textStyle: { color: labelStyle.color, fontSize: 11 },
+          }
+        : { show: false },
       parallelAxis: dimensions.map((dimension, index) => ({
         dim: index,
         name: showAxes ? dimension.name : "",
@@ -61,7 +69,7 @@ export function EChartsParallel({
       parallel: {
         left: 48,
         right: 48,
-        top: 36,
+        top: showLegend ? 48 : 36,
         bottom: 36,
         parallelAxisDefault: {
           type: "value",
@@ -71,31 +79,25 @@ export function EChartsParallel({
           axisLabel: labelStyle,
         },
       },
-      series: [
-        {
-          type: "parallel",
-          lineStyle: {
-            width: 1.5,
-            opacity: lineOpacity,
-          },
-          emphasis: {
-            lineStyle: {
-              width: 3,
-              opacity: 0.95,
-            },
-          },
-          data: series.map((item, index) => ({
-            value: item.values,
-            name: item.name,
-            lineStyle: {
-              color:
-                item.color ??
-                toneColor(item.tone, theme) ??
-                palette[index % palette.length],
-            },
-          })),
+      series: series.map((item, index) => ({
+        type: "parallel" as const,
+        name: item.name,
+        lineStyle: {
+          width: 1.5,
+          opacity: lineOpacity,
+          color:
+            item.color ??
+            toneColor(item.tone, theme) ??
+            palette[index % palette.length],
         },
-      ],
+        emphasis: {
+          lineStyle: {
+            width: 3,
+            opacity: 0.95,
+          },
+        },
+        data: [item.values],
+      })),
     },
     animate,
   );

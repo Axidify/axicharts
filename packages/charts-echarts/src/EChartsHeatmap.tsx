@@ -171,6 +171,9 @@ export function EChartsHeatmap({
         label: {
           show: labelVisible,
           fontSize: 10,
+          color: "#0f172a",
+          textBorderColor: "rgba(255,255,255,0.85)",
+          textBorderWidth: 2,
           formatter: (params) => {
             const raw = params.value;
             const value = Array.isArray(raw)

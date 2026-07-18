@@ -47,6 +47,8 @@ function RiskReturnScatter(): ReactElement {
           ]}
           xSuffix=""
           ySuffix=""
+          xLabel="Risk"
+          yLabel="Return %"
         />
       </ChartContainer>
       <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>

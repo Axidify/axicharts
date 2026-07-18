@@ -12,6 +12,8 @@ import { useEChartsInteraction } from "../sync/useEChartsInteraction";
 export type ScatterChartProps = {
   series: ScatterSeries[];
   showAxes?: boolean;
+  xLabel?: string;
+  yLabel?: string;
   xSuffix?: string;
   ySuffix?: string;
 };
@@ -19,6 +21,8 @@ export type ScatterChartProps = {
 function ScatterPlot({
   series,
   showAxes,
+  xLabel,
+  yLabel,
   xSuffix,
   ySuffix,
 }: ScatterChartProps): ReactElement {
@@ -32,6 +36,8 @@ function ScatterPlot({
       series={series}
       theme={theme}
       showAxes={showAxes}
+      xLabel={xLabel}
+      yLabel={yLabel}
       xSuffix={xSuffix}
       ySuffix={ySuffix}
       onItemHover={interaction.onItemHover}
@@ -42,6 +48,8 @@ function ScatterPlot({
 export function ScatterChart({
   series,
   showAxes,
+  xLabel,
+  yLabel,
   xSuffix,
   ySuffix,
 }: ScatterChartProps): ReactElement | null {
@@ -59,6 +67,8 @@ export function ScatterChart({
         <ScatterPlot
           series={series}
           showAxes={axes}
+          xLabel={xLabel}
+          yLabel={yLabel}
           xSuffix={xSuffix}
           ySuffix={ySuffix}
         />

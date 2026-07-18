@@ -20,6 +20,8 @@ export type EChartsScatterProps = {
   series: ScatterSeries[];
   theme: ChartTheme;
   showAxes?: boolean;
+  xLabel?: string;
+  yLabel?: string;
   xSuffix?: string;
   ySuffix?: string;
   onItemHover?: (event: EChartItemHoverEvent) => void;
@@ -37,16 +39,22 @@ export function EChartsScatter({
   series,
   theme,
   showAxes = true,
+  xLabel,
+  yLabel,
   xSuffix = "",
   ySuffix = "",
   onItemHover,
 }: EChartsScatterProps): ReactElement {
   const showLegend = series.length > 1;
+  const baseGrid = gridOptions(theme);
   const grid = {
-    ...gridOptions(theme),
-    top: showLegend ? 28 : gridOptions(theme).top,
+    ...baseGrid,
+    top: showLegend ? 28 : baseGrid.top,
+    bottom: xLabel ? 36 : baseGrid.bottom,
+    left: yLabel ? 48 : baseGrid.left,
   };
 
+  const axisNameStyle = axisLabelStyle(theme);
   const palette = seriesPalette(theme);
   const option: EChartsOption = {
     grid,
@@ -54,7 +62,7 @@ export function EChartsScatter({
       ? {
           show: true,
           top: 0,
-          textStyle: { color: axisLabelStyle(theme).color, fontSize: 11 },
+          textStyle: { color: axisNameStyle.color, fontSize: 11 },
         }
       : { show: false },
     tooltip: hiddenTooltip(),
@@ -62,6 +70,10 @@ export function EChartsScatter({
       type: "value",
       scale: true,
       show: showAxes,
+      name: xLabel,
+      nameLocation: "middle",
+      nameGap: 28,
+      nameTextStyle: axisNameStyle,
       axisLabel: axisLabelStyle(theme),
       splitLine: splitLineStyle(theme),
     },
@@ -69,6 +81,11 @@ export function EChartsScatter({
       type: "value",
       scale: true,
       show: showAxes,
+      name: yLabel,
+      nameLocation: "middle",
+      nameGap: 40,
+      nameRotate: 90,
+      nameTextStyle: axisNameStyle,
       axisLabel: axisLabelStyle(theme),
       splitLine: splitLineStyle(theme),
     },
