@@ -46,7 +46,7 @@ function EChartsWordCloudPlot({
   words,
   shape = "circle",
   rotationRange = [-45, 45],
-  gridSize = 6,
+  gridSize = 3,
   sizeRange,
   onItemHover,
   mergeOption = false,
@@ -57,8 +57,8 @@ function EChartsWordCloudPlot({
   const resolvedSizeRange =
     sizeRange ??
     ([
-      Math.round(Math.max(14, height * 0.035)),
-      Math.round(Math.max(56, height * 0.17)),
+      Math.round(Math.max(18, height * 0.05)),
+      Math.round(Math.max(80, height * 0.32)),
     ] as [number, number]);
 
   const option: EChartsOption = withPresentationAnimation(
@@ -71,14 +71,18 @@ function EChartsWordCloudPlot({
           gridSize,
           rotationRange,
           sizeRange: resolvedSizeRange,
-          width: "100%",
-          height: "100%",
+          left: "2%",
+          top: "2%",
+          width: "96%",
+          height: "96%",
+          // @ts-expect-error echarts-wordcloud shrinkToFit
+          shrinkToFit: true,
           drawOutOfBound: false,
-          layoutAnimation: animate,
+          layoutAnimation: true,
           textStyle: {
             fontFamily: theme.values.monospace
               ? "ui-monospace, SFMono-Regular, Menlo, monospace"
-              : "inherit",
+              : "sans-serif",
           },
           emphasis: {
             focus: "self",

@@ -15,6 +15,9 @@ const config: StorybookConfig = {
   },
   async viteFinal(config) {
     return mergeConfig(config, {
+      optimizeDeps: {
+        exclude: ["echarts-wordcloud"],
+      },
       resolve: {
         alias: {
           "@axicharts/charts": path.resolve(root, "packages/charts/src"),
@@ -49,6 +52,11 @@ const config: StorybookConfig = {
           "@axicharts/charts-runtime/validation": path.resolve(
             root,
             "packages/charts-runtime/src/validation",
+          ),
+          // echarts-wordcloud registers on echarts/lib/echarts; align with charts-echarts runtime.
+          "echarts/lib/echarts": path.resolve(
+            root,
+            "packages/charts-echarts/src/echartsRuntime.ts",
           ),
         },
       },

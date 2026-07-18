@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import "./echartsRuntime";
 
 let wordCloudReady = false;
 let wordCloudLoading: Promise<void> | null = null;

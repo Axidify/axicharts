@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
+import { echarts } from "./echartsRuntime";
 import { treePathToDrillPath } from "./treemapDrill";
 
 export type EChartItemHoverEvent = {
@@ -95,7 +95,11 @@ export function useEChart({
   useEffect(() => {
     if (!rootRef.current || width < 1 || height < 1) return;
 
-    const chart = echarts.init(rootRef.current, undefined, { renderer: "canvas" });
+    const chart = echarts.init(rootRef.current, undefined, {
+      renderer: "canvas",
+      width,
+      height,
+    });
     chartRef.current = chart;
 
     const publishCursor = (index: number | null) => {
@@ -233,6 +237,7 @@ export function useEChart({
   useEffect(() => {
     const chart = chartRef.current;
     if (!chart) return;
+    chart.resize({ width, height });
     chart.setOption(option, {
       notMerge: !mergeOption,
       lazyUpdate: mergeOption,
@@ -250,7 +255,7 @@ export function useEChart({
         onBrushRangeRef.current({ start: primary.start, end: primary.end });
       }
     }
-  }, [option, mergeOption]);
+  }, [option, mergeOption, width, height]);
 
   useEffect(() => {
     chartRef.current?.resize({ width, height });
