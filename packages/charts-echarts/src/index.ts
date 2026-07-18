@@ -53,6 +53,13 @@ export { EChartsThemeRiver, type EChartsThemeRiverProps } from "./EChartsThemeRi
 export type { ThemeRiverPoint } from "./themeRiverTypes";
 export { EChartsBump, type EChartsBumpProps } from "./EChartsBump";
 export type { BumpChartData, BumpSeries } from "./bumpTypes";
+export { EChartsGraph, type EChartsGraphProps, type GraphLayout } from "./EChartsGraph";
+export type {
+  GraphChartData,
+  GraphNode,
+  GraphEdge,
+  GraphCategory,
+} from "./graphTypes";
 export { EChartsWordCloud, type EChartsWordCloudProps } from "./EChartsWordCloud";
 export type { WordCloudWord } from "./wordCloudTypes";
 export {

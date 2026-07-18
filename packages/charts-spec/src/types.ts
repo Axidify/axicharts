@@ -83,6 +83,8 @@ export type PanelChartType =
   | "theme-river"
   | "bump"
   | "bump-chart"
+  | "graph"
+  | "network"
   | "wordcloud"
   | "word-cloud"
   | "scatter"
@@ -123,6 +125,8 @@ export type PanelSpec = {
     low?: FieldEncoding;
     close?: FieldEncoding;
     series?: FieldEncoding;
+    source?: FieldEncoding;
+    target?: FieldEncoding;
   };
   props?: Record<string, unknown>;
   theme?: ThemeName;

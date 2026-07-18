@@ -67,6 +67,8 @@ function resolveChartName(spec: PanelSpec): string {
             ? "LiquidFillChart"
           : spec.type === "bump" || spec.type === "bump-chart"
             ? "BumpChart"
+          : spec.type === "graph" || spec.type === "network"
+            ? "GraphChart"
           : spec.type === "waterfall"
             ? "WaterfallChart"
             : spec.type === "candlestick"
@@ -387,6 +389,22 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
         return match ? Number(match.${rankField}) : entities.length;
       }),
     })),
+  };
+})()}`;
+  } else if (spec.type === "graph" || spec.type === "network") {
+    const sourceField = encoding?.source?.field ?? "source";
+    const targetField = encoding?.target?.field ?? "target";
+    const valueField = encoding?.value?.field ?? "value";
+    chartBody = `data={${dataVar}.nodes && ${dataVar}.edges ? ${dataVar} : (() => {
+  const edges = ${dataVar}.map((row) => ({
+    source: String(row.${sourceField}),
+    target: String(row.${targetField}),
+    ...(row.${valueField} != null ? { value: Number(row.${valueField}) } : {}),
+  }));
+  const nodeIds = [...new Set(edges.flatMap((edge) => [edge.source, edge.target]))];
+  return {
+    nodes: nodeIds.map((id) => ({ id, name: id })),
+    edges,
   };
 })()}`;
   } else if (spec.type === "wordcloud" || spec.type === "word-cloud") {

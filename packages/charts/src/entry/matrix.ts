@@ -34,6 +34,15 @@ export {
   type BumpSeries,
 } from "../bump/BumpChart";
 export {
+  GraphChart,
+  type GraphChartProps,
+  type GraphChartData,
+  type GraphNode,
+  type GraphEdge,
+  type GraphCategory,
+  type GraphLayout,
+} from "../graph/GraphChart";
+export {
   WordCloudChart,
   type WordCloudChartProps,
   type WordCloudWord,

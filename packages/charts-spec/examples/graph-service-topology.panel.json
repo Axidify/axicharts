@@ -1,0 +1,30 @@
+{
+  "type": "graph",
+  "title": "Service dependency mesh",
+  "height": 400,
+  "width": 720,
+  "encoding": {
+    "source": { "field": "source", "type": "nominal" },
+    "target": { "field": "target", "type": "nominal" },
+    "value": { "field": "rps", "type": "quantitative" }
+  },
+  "props": {
+    "layout": "force",
+    "roam": true,
+    "showLegend": false,
+    "categories": [
+      { "name": "Gateway" },
+      { "name": "Core" },
+      { "name": "Data" }
+    ],
+    "nodes": [
+      { "id": "api-gateway", "name": "API Gateway", "category": "Gateway", "value": 1200, "tone": "info" },
+      { "id": "auth-service", "name": "Auth", "category": "Core", "value": 420, "tone": "success" },
+      { "id": "user-service", "name": "Users", "category": "Core", "value": 680 },
+      { "id": "order-service", "name": "Orders", "category": "Core", "value": 540, "tone": "warning" },
+      { "id": "payment-service", "name": "Payments", "category": "Core", "value": 310 },
+      { "id": "inventory-service", "name": "Inventory", "category": "Data", "value": 260 },
+      { "id": "notification-service", "name": "Notify", "category": "Data", "value": 180 }
+    ]
+  }
+}

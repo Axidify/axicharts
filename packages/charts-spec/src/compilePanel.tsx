@@ -21,6 +21,7 @@ import {
   ParallelChart,
   ThemeRiverChart,
   BumpChart,
+  GraphChart,
   WordCloudChart,
   ScatterChart,
   Stat,
@@ -84,6 +85,7 @@ import { resolveLiquidFillValue } from "./liquidFillEncoding";
 import { resolveMapDrillProps } from "./mapEncoding";
 import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
 import { bumpFromRows } from "./bumpEncoding";
+import { graphFromRows } from "./graphEncoding";
 import { wordCloudFromRows } from "./wordCloudEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
 import { panelPropsWithGraphics } from "./panelGraphics";
@@ -641,6 +643,26 @@ export function compilePanel(
           showLabels: chartProps.showLabels as boolean | undefined,
           showAxes: chartProps.showAxes as boolean | undefined,
           smooth: chartProps.smooth as boolean | undefined,
+        }),
+      );
+    }
+
+    case "graph":
+    case "network": {
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
+      const data = graphFromRows(rows, chartProps, {
+        source: resolved.encoding?.source,
+        target: resolved.encoding?.target,
+        value: resolved.encoding?.value,
+      });
+      return wrap(
+        createElement(GraphChart, {
+          data,
+          layout: chartProps.layout as "force" | "none" | "circular" | undefined,
+          roam: chartProps.roam as boolean | undefined,
+          showLegend: chartProps.showLegend as boolean | undefined,
+          repulsion: chartProps.repulsion as number | undefined,
+          edgeLength: chartProps.edgeLength as number | [number, number] | undefined,
         }),
       );
     }

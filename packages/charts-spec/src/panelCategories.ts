@@ -31,6 +31,8 @@ export const PANEL_TYPE_CATEGORY: Record<string, PanelCategory> = {
   "theme-river": "matrix",
   bump: "matrix",
   "bump-chart": "matrix",
+  graph: "matrix",
+  network: "matrix",
   wordcloud: "matrix",
   "word-cloud": "matrix",
   treemap: "matrix",

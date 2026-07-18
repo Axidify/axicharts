@@ -12,6 +12,7 @@ import {
   pieA11ySummary,
   themeRiverA11ySummary,
   bumpA11ySummary,
+  graphA11ySummary,
   wordCloudA11ySummary,
 } from "./echartsDescriptor";
 
@@ -211,6 +212,22 @@ export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yT
         })),
       ),
       caption: descriptor.description ?? bumpA11ySummary(descriptor),
+    };
+  }
+
+  if (descriptor.kind === "graph") {
+    return {
+      columns: [
+        { key: "source", label: "Source" },
+        { key: "target", label: "Target" },
+        { key: "value", label: "Weight", align: "right" },
+      ],
+      rows: descriptor.edges.map((edge) => ({
+        source: edge.source,
+        target: edge.target,
+        value: edge.value ?? "",
+      })),
+      caption: descriptor.description ?? graphA11ySummary(descriptor),
     };
   }
 

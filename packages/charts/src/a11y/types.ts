@@ -129,6 +129,14 @@ export type BumpA11yDescriptor = {
   series: { name: string; ranks: number[] }[];
 };
 
+export type GraphA11yDescriptor = {
+  kind: "graph";
+  title?: string;
+  description?: string;
+  nodes: { id: string; name: string; value?: number }[];
+  edges: { source: string; target: string; value?: number }[];
+};
+
 export type WordCloudA11yDescriptor = {
   kind: "word-cloud";
   title?: string;
@@ -149,6 +157,7 @@ export type ChartA11yDescriptor =
   | ParallelA11yDescriptor
   | ThemeRiverA11yDescriptor
   | BumpA11yDescriptor
+  | GraphA11yDescriptor
   | WordCloudA11yDescriptor;
 
 export type ChartA11yTable = {

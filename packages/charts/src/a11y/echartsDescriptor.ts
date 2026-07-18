@@ -14,6 +14,7 @@ import type {
   SingleValueA11yDescriptor,
   ThemeRiverA11yDescriptor,
   BumpA11yDescriptor,
+  GraphA11yDescriptor,
   WordCloudA11yDescriptor,
 } from "./types";
 import { singleValueA11ySummary } from "./singleValueDescriptor";
@@ -251,6 +252,35 @@ export function buildBumpA11yDescriptor({
   };
 }
 
+export function buildGraphA11yDescriptor({
+  data,
+  title,
+  description,
+}: {
+  data: {
+    nodes: { id: string; name?: string; value?: number }[];
+    edges: { source: string; target: string; value?: number }[];
+  };
+  title?: string;
+  description?: string;
+}): GraphA11yDescriptor {
+  return {
+    kind: "graph",
+    title: title ?? data.nodes.map((node) => node.name ?? node.id).join(", "),
+    description,
+    nodes: data.nodes.map((node) => ({
+      id: node.id,
+      name: node.name ?? node.id,
+      value: node.value,
+    })),
+    edges: data.edges.map((edge) => ({
+      source: edge.source,
+      target: edge.target,
+      value: edge.value,
+    })),
+  };
+}
+
 export function buildWordCloudA11yDescriptor({
   words,
   title,
@@ -316,6 +346,10 @@ export function bumpA11ySummary(descriptor: BumpA11yDescriptor): string {
   return `Bump chart with ${descriptor.series.length} entities across ${descriptor.categories.length} periods`;
 }
 
+export function graphA11ySummary(descriptor: GraphA11yDescriptor): string {
+  return `Network graph with ${descriptor.nodes.length} nodes and ${descriptor.edges.length} edges`;
+}
+
 export function wordCloudA11ySummary(descriptor: WordCloudA11yDescriptor): string {
   return `Word cloud with ${descriptor.words.length} terms`;
 }
@@ -349,6 +383,8 @@ export function chartA11ySummary(descriptor: {
       return themeRiverA11ySummary(descriptor as ThemeRiverA11yDescriptor);
     case "bump":
       return bumpA11ySummary(descriptor as BumpA11yDescriptor);
+    case "graph":
+      return graphA11ySummary(descriptor as GraphA11yDescriptor);
     case "word-cloud":
       return wordCloudA11ySummary(descriptor as WordCloudA11yDescriptor);
     default:

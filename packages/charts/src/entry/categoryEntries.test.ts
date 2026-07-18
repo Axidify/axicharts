@@ -41,6 +41,7 @@ describe("category entrypoints", () => {
     expect(matrix.ParallelChart).toBeTypeOf("function");
     expect(matrix.ThemeRiverChart).toBeTypeOf("function");
     expect(matrix.BumpChart).toBeTypeOf("function");
+    expect(matrix.GraphChart).toBeTypeOf("function");
     expect(matrix.WordCloudChart).toBeTypeOf("function");
     expect(matrix.TreemapChart).toBeTypeOf("function");
     expect(matrix.SunburstChart).toBeTypeOf("function");

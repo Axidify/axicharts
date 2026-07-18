@@ -14,6 +14,7 @@ export type {
   SingleValueA11yDescriptor,
   ThemeRiverA11yDescriptor,
   BumpA11yDescriptor,
+  GraphA11yDescriptor,
   WordCloudA11yDescriptor,
 } from "./types";
 export {
@@ -37,6 +38,7 @@ export {
   buildPieA11yDescriptor,
   buildThemeRiverA11yDescriptor,
   buildBumpA11yDescriptor,
+  buildGraphA11yDescriptor,
   buildWordCloudA11yDescriptor,
   chartA11ySummary,
   flattenHierarchyNodes,

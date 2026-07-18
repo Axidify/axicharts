@@ -15,6 +15,7 @@ import { RadarChart } from "../radar/RadarChart";
 import { ParallelChart } from "../parallel/ParallelChart";
 import { ThemeRiverChart } from "../themeRiver/ThemeRiverChart";
 import { BumpChart } from "../bump/BumpChart";
+import { GraphChart } from "../graph/GraphChart";
 import { WordCloudChart } from "../wordCloud/WordCloudChart";
 import { ScatterChart } from "../scatter/ScatterChart";
 import { TreemapChart } from "../treemap/TreemapChart";
@@ -97,6 +98,11 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "bump",
     Chart: BumpChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "graph",
+    Chart: GraphChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
   {

@@ -821,6 +821,52 @@ describe("compilePanel presentation mode", () => {
     registerBuiltinChartTypes();
     expect(getChartType("bump")?.Chart).toBeTypeOf("function");
   });
+
+  it("compiles graph panels from long-form rows", async () => {
+    const panel = compilePanel(
+      {
+        type: "graph",
+        title: "Service mesh",
+        height: 360,
+        encoding: {
+          source: { field: "source" },
+          target: { field: "target" },
+          value: { field: "rps" },
+        },
+      },
+      [
+        { source: "api", target: "auth", rps: 120 },
+        { source: "api", target: "orders", rps: 90 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Service mesh");
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+
+  it("round-trips graph through ejectPanel", () => {
+    const spec = {
+      type: "graph" as const,
+      title: "Topology",
+      encoding: {
+        source: { field: "source" },
+        target: { field: "target" },
+        value: { field: "weight" },
+      },
+    };
+    const jsx = ejectPanel(spec, "data");
+    expect(jsx).toContain("GraphChart");
+    expect(jsx).toContain("source");
+    expect(jsx).toContain("target");
+  });
+
+  it("registers graph builtin chart type", () => {
+    registerBuiltinChartTypes();
+    expect(getChartType("graph")?.Chart).toBeTypeOf("function");
+  });
 });
 
 describe("compilePanel echarts escape hatch", () => {

@@ -14,7 +14,7 @@
   {
     "name": "@axicharts/charts-echarts",
     "path": "packages/charts-echarts/dist/index.js",
-    "limit": "15.75 KB",
+    "limit": "16.25 KB",
     "gzip": true
   },
   {
@@ -104,6 +104,12 @@
   {
     "name": "@axicharts/charts/bump",
     "path": "packages/charts/dist/entry/bump.js",
+    "limit": "6 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/network",
+    "path": "packages/charts/dist/entry/network.js",
     "limit": "6 KB",
     "gzip": true
   },

@@ -2,16 +2,21 @@ import type { ReactElement, ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import {
   BoxplotChart,
+  BumpChart,
+  CalendarHeatmapChart,
   CandlestickChart,
   ChartContainer,
   ComboChart,
   Digital,
   FunnelChart,
   Gauge,
+  GraphChart,
   HeatmapChart,
   HistogramChart,
   LineChart,
+  LiquidFillChart,
   ParallelChart,
+  PictorialBarChart,
   RadarChart,
   ScatterChart,
   Stat,
@@ -23,6 +28,9 @@ import {
   WordCloudChart,
   type ComboSeries,
   type HeatmapMatrix,
+  type CalendarHeatmapData,
+  type BumpChartData,
+  type GraphChartData,
 } from "@axicharts/charts";
 import { Chart } from "@axicharts/charts-spec";
 import { cleanTheme, industrialTheme } from "@axicharts/charts-theme";
@@ -153,6 +161,47 @@ const WORDS = [
   { text: "retry", value: 22 },
   { text: "cache", value: 15 },
 ];
+
+const CALENDAR_COMPACT: CalendarHeatmapData = {
+  year: 2026,
+  points: [
+    { date: "2026-07-14", value: 4 },
+    { date: "2026-07-15", value: 7 },
+    { date: "2026-07-16", value: 2 },
+    { date: "2026-07-17", value: 9 },
+    { date: "2026-07-18", value: 6 },
+  ],
+};
+
+const PICTORIAL_ITEMS = [
+  { category: "A", value: 42, symbol: "rect" },
+  { category: "B", value: 28, symbol: "roundRect" },
+  { category: "C", value: 18, symbol: "triangle" },
+];
+
+const BUMP_COMPACT: BumpChartData = {
+  categories: ["Q1", "Q2", "Q3"],
+  series: [
+    { name: "Alpha", ranks: [1, 2, 1] },
+    { name: "Beta", ranks: [2, 1, 2] },
+    { name: "Gamma", ranks: [3, 3, 3] },
+  ],
+};
+
+const GRAPH_COMPACT: GraphChartData = {
+  nodes: [
+    { id: "api", name: "API", value: 120, tone: "info" as const },
+    { id: "auth", name: "Auth", value: 80, tone: "success" as const },
+    { id: "db", name: "DB", value: 60 },
+    { id: "cache", name: "Cache", value: 45 },
+  ],
+  edges: [
+    { source: "api", target: "auth", value: 42 },
+    { source: "api", target: "db", value: 36 },
+    { source: "api", target: "cache", value: 28 },
+    { source: "auth", target: "db", value: 18 },
+  ],
+};
 
 /** Compact catalog fixtures — strip panel chrome that duplicates card labels. */
 function catalogPanel(spec: PanelSpec): PanelSpec {
@@ -335,6 +384,11 @@ function ChartCatalogWall(): ReactElement {
               />
             </ChartContainer>
           </CatalogCard>
+          <CatalogCard label="Pictorial bar">
+            <ChartContainer theme={cleanTheme} height={140} width="100%">
+              <PictorialBarChart items={PICTORIAL_ITEMS} />
+            </ChartContainer>
+          </CatalogCard>
         </div>
       </section>
 
@@ -362,6 +416,11 @@ function ChartCatalogWall(): ReactElement {
               <HeatmapChart matrix={HEATMAP} min={0} max={1} />
             </ChartContainer>
           </CatalogCard>
+          <CatalogCard label="Calendar heatmap">
+            <ChartContainer theme={cleanTheme} height={140} width="100%">
+              <CalendarHeatmapChart data={CALENDAR_COMPACT} showLabels={false} />
+            </ChartContainer>
+          </CatalogCard>
           <CatalogCard label="Radar">
             <ChartContainer theme={cleanTheme} height={140} width="100%">
               <RadarChart indicators={RADAR_INDICATORS} series={RADAR_SERIES} />
@@ -375,6 +434,16 @@ function ChartCatalogWall(): ReactElement {
           <CatalogCard label="Theme river">
             <ChartContainer theme={cleanTheme} height={140} width="100%">
               <ThemeRiverChart points={THEME_RIVER} />
+            </ChartContainer>
+          </CatalogCard>
+          <CatalogCard label="Bump">
+            <ChartContainer theme={cleanTheme} height={140} width="100%">
+              <BumpChart data={BUMP_COMPACT} showLabels={false} showAxes={false} />
+            </ChartContainer>
+          </CatalogCard>
+          <CatalogCard label="Network graph">
+            <ChartContainer theme={cleanTheme} height={140} width="100%">
+              <GraphChart data={GRAPH_COMPACT} roam={false} />
             </ChartContainer>
           </CatalogCard>
           <CatalogCard label="Treemap">
@@ -420,6 +489,11 @@ function ChartCatalogWall(): ReactElement {
           </CatalogCard>
           <CatalogCard label="Status lamp">
             <StatusLamp status="running" label="Line 3" />
+          </CatalogCard>
+          <CatalogCard label="Liquid fill">
+            <ChartContainer theme={industrialTheme} height={120} width="100%">
+              <LiquidFillChart value={0.68} label="Tank" />
+            </ChartContainer>
           </CatalogCard>
         </div>
       </section>
