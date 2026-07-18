@@ -21,8 +21,15 @@ export function listCartesianMarks(): CartesianMarkCatalogEntry[] {
 
 const X_FIELD_RE = /week|month|day|hour|date|time|period|quarter/i;
 
-const CHART_KEYWORD_RE =
-  /\b(bar|magnitude|revenue|sales|histogram|line|trend|latency|p95|over time|area|volume|cumulative|mrr)\b/i;
+/** Filler phrasing with no chart semantics — agent should refine intent. */
+const VAGUE_FILLER_RE =
+  /\b(something|anything|whatever|stuff|things|cool|nice|pretty|sandwich|help\s+me|make\s+me\s+a|just\s+show)\b/i;
+
+const BAR_INTENT_RE = /\b(bars?|bar chart|histogram|magnitude)\b/i;
+const LINE_INTENT_RE = /\b(lines?|line chart|trend|latency|p95|over time|target line)\b/i;
+const AREA_INTENT_RE = /\b(areas?|area chart|volume|cumulative|mrr)\b/i;
+
+export type PlannerReviewReason = "no_data_mark" | "vague_intent" | null;
 
 function pickXField(fields: string[]): string {
   return fields.find((field) => X_FIELD_RE.test(field)) ?? fields[0] ?? "x";
@@ -30,6 +37,42 @@ function pickXField(fields: string[]): string {
 
 function pickNumericFields(fields: string[], xField: string): string[] {
   return fields.filter((field) => field !== xField);
+}
+
+function parseRuleValue(intent: string): number | null {
+  const sloMatch = intent.match(
+    /(?:slo|quota|threshold|limit)\s*(?:at|of)?\s*(\d+(?:\.\d+)?)\s*(?:ms)?/i,
+  );
+  return sloMatch?.[1] ? Number(sloMatch[1]) : null;
+}
+
+function parseBandRange(intent: string): { min: number; max: number } | null {
+  const rangeMatch = intent.match(
+    /healthy(?:\s*band)?\s*(\d+(?:\.\d+)?)\s*(?:ms)?\s*[-–]\s*(\d+(?:\.\d+)?)\s*(?:ms)?/i,
+  );
+  if (rangeMatch?.[1] && rangeMatch[2]) {
+    return { min: Number(rangeMatch[1]), max: Number(rangeMatch[2]) };
+  }
+
+  const underMatch = intent.match(
+    /healthy(?:\s*band)?\s*(?:under|below|<)\s*(\d+(?:\.\d+)?)\s*(?:ms)?/i,
+  );
+  if (underMatch?.[1]) {
+    return { min: 0, max: Number(underMatch[1]) };
+  }
+
+  const betweenMatch = intent.match(
+    /(?:healthy\s*)?band\s*(?:between\s*)?(\d+(?:\.\d+)?)\s*(?:and|to)\s*(\d+(?:\.\d+)?)\s*(?:ms)?/i,
+  );
+  if (betweenMatch?.[1] && betweenMatch[2]) {
+    return { min: Number(betweenMatch[1]), max: Number(betweenMatch[2]) };
+  }
+
+  return null;
+}
+
+function isVagueIntent(intent: string): boolean {
+  return VAGUE_FILLER_RE.test(intent);
 }
 
 export type CreateCartesianPanelInput = {
@@ -45,11 +88,15 @@ export type CreateCartesianPanelResult = {
   panel: PanelSpec;
   needsReview: boolean;
   matchedRules: string[];
+  reviewReason: PlannerReviewReason;
 };
 
 /**
  * Rules-first cartesian panel builder (C139 prototype).
  * Emits `type: "cartesian"` + `marks[]` only — validate before compile.
+ *
+ * Data marks (bar/line/area) are added only when intent names a mark type.
+ * No silent fallback chart — vague or overlay-only intents return needsReview.
  */
 export function createCartesianPanel(
   input: CreateCartesianPanelInput,
@@ -72,7 +119,7 @@ export function createCartesianPanel(
     numericFields.find((field) => /target|plan|forecast|margin/i.test(field)) ??
     numericFields.find((field) => field !== revenueField);
 
-  if (/bar|magnitude|revenue|sales|histogram/i.test(intent) && revenueField) {
+  if (BAR_INTENT_RE.test(intent) && revenueField) {
     matchedRules.push("bar");
     marks.push({
       type: "bar",
@@ -82,7 +129,7 @@ export function createCartesianPanel(
     });
   }
 
-  if (/line|trend|latency|p95|over time/i.test(intent) && (targetField ?? revenueField)) {
+  if (LINE_INTENT_RE.test(intent) && (targetField ?? revenueField)) {
     matchedRules.push("line");
     marks.push({
       type: "line",
@@ -92,7 +139,7 @@ export function createCartesianPanel(
     });
   }
 
-  if (/area|volume|cumulative|mrr/i.test(intent) && revenueField) {
+  if (AREA_INTENT_RE.test(intent) && revenueField) {
     matchedRules.push("area");
     marks.push({
       type: "area",
@@ -101,31 +148,24 @@ export function createCartesianPanel(
     });
   }
 
-  let usedFallback = false;
-  if (marks.length === 0 && revenueField) {
-    usedFallback = true;
-    matchedRules.push("fallback-line");
-    marks.push({ type: "line", field: revenueField, label: revenueField });
-  }
-
-  const sloMatch = intent.match(/(?:slo|quota|threshold|limit)\s*(?:at|of)?\s*(\d+(?:\.\d+)?)/i);
-  if (sloMatch?.[1]) {
+  const ruleValue = parseRuleValue(intent);
+  if (ruleValue != null) {
     matchedRules.push("rule-slo");
     marks.push({
       type: "rule",
-      value: Number(sloMatch[1]),
+      value: ruleValue,
       label: "SLO",
       tone: "warning",
     });
   }
 
-  const bandMatch = intent.match(/healthy(?:\s*band)?\s*(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)/i);
-  if (bandMatch?.[1] && bandMatch[2]) {
+  const bandRange = parseBandRange(intent);
+  if (bandRange) {
     matchedRules.push("band-healthy");
     marks.push({
       type: "band",
-      min: Number(bandMatch[1]),
-      max: Number(bandMatch[2]),
+      min: bandRange.min,
+      max: bandRange.max,
       label: "Healthy band",
       tone: "success",
     });
@@ -147,8 +187,16 @@ export function createCartesianPanel(
     if (dataMarks[1]) dataMarks[1].yAxisId = "right";
   }
 
-  const chartKeywordsMatched = CHART_KEYWORD_RE.test(intent);
-  const needsReview = usedFallback || !chartKeywordsMatched;
+  const hasDataMark = matchedRules.some((rule) =>
+    rule === "bar" || rule === "line" || rule === "area",
+  );
+  const vague = isVagueIntent(intent);
+  const reviewReason: PlannerReviewReason = !hasDataMark
+    ? vague
+      ? "vague_intent"
+      : "no_data_mark"
+    : null;
+  const needsReview = reviewReason != null;
 
   const panel: PanelSpec = {
     specVersion: 1,
@@ -161,11 +209,12 @@ export function createCartesianPanel(
     props: {
       plannerMeta: {
         needsReview,
+        reviewReason,
         matchedRules,
         intent: input.intent,
       },
     },
   };
 
-  return { panel, needsReview, matchedRules };
+  return { panel, needsReview, matchedRules, reviewReason };
 }

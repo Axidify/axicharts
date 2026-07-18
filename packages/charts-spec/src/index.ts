@@ -61,6 +61,7 @@ export {
   CARTESIAN_MARK_CATALOG,
   type CreateCartesianPanelInput,
   type CreateCartesianPanelResult,
+  type PlannerReviewReason,
   type CartesianMarkCatalogEntry,
 } from "./createCartesianPanel";
 export { compilePanel, type CompileOptions } from "./compilePanel";

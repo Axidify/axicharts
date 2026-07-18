@@ -108,6 +108,7 @@ export function BlocksPlayground({
   const [showDataEditor, setShowDataEditor] = useState(false);
   const [intent, setIntent] = useState(initial.intent ?? "");
   const [needsReview, setNeedsReview] = useState(false);
+  const [reviewReason, setReviewReason] = useState<string | null>(null);
 
   const loadPreset = useCallback((preset: BlocksPlaygroundPreset) => {
     setPresetId(preset.id);
@@ -115,6 +116,7 @@ export function BlocksPlayground({
     setSpecText(presetSpecJson(preset));
     setDataText(JSON.stringify(preset.rows, null, 2));
     setNeedsReview(false);
+    setReviewReason(null);
   }, []);
 
   const dataParse = useMemo(() => parsePlaygroundData(dataText), [dataText]);
@@ -201,6 +203,7 @@ export function BlocksPlayground({
               const result = createCartesianPanel({ intent, fields });
               setSpecText(JSON.stringify(result.panel, null, 2));
               setNeedsReview(result.needsReview);
+              setReviewReason(result.reviewReason);
             }}
           >
             Generate spec
@@ -218,8 +221,11 @@ export function BlocksPlayground({
               color: "#92400e",
             }}
           >
-            Generated spec needs review — intent did not match chart keywords. Adjust marks
-            manually or refine your intent.
+            {reviewReason === "vague_intent"
+              ? "Intent is too vague — name a chart type (bar, line, area) and what to plot. No marks were generated."
+              : reviewReason === "no_data_mark"
+                ? "Intent matched overlays only (rule/band) — add a data mark (bar, line, area) or refine your intent."
+                : "Generated spec needs review — adjust marks manually or refine your intent."}
           </div>
         ) : null}
       </div>

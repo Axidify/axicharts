@@ -37,9 +37,12 @@ describe("blocksPlayground adversarial cases", () => {
       fields: ["week", "revenue", "target"],
     });
     expect(result.needsReview).toBe(true);
-    expect(result.matchedRules).toContain("fallback-line");
+    expect(result.reviewReason).toBe("vague_intent");
+    expect(result.matchedRules).toEqual([]);
+    expect(result.panel.marks).toEqual([]);
     expect(result.panel.props?.plannerMeta).toMatchObject({
       needsReview: true,
+      reviewReason: "vague_intent",
       intent: "make me a sandwich",
     });
   });

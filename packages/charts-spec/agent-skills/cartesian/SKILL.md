@@ -31,9 +31,9 @@ Use `mark` or `type` key on each mark object (canonical: `mark` in JSON fixtures
 
 1. Read `dataProfile.fields` or sample row keys.
 2. Emit `encoding.x.field` for shared category/time axis.
-3. Append one or more data marks (`bar`/`line`/`area`).
-4. Append overlays (`rule`, `band`) when intent mentions SLO/quota/range.
-5. Call `validateCartesianSpec(spec, { rows })` — retry on `UNKNOWN_FIELD` using `suggestion`.
+3. Append one or more data marks (`bar`/`line`/`area`) — **intent must name the mark type** (`bars`, `line`, `area chart`, `trend`, `target line`, etc.). `createCartesianPanel` does not guess; vague or overlay-only intents return `needsReview` with `reviewReason` (`vague_intent` | `no_data_mark`) and may omit data marks.
+4. Append overlays (`rule`, `band`) when intent mentions SLO/quota/range (`healthy band 44-52`, `under 150`, `between 40 and 50`).
+5. Call `validateCartesianSpec(spec, { rows })` — retry on `UNKNOWN_FIELD` using `suggestion`; on `MISSING_DATA_MARK`, refine intent with an explicit bar/line/area.
 6. Optional: `ejectPanel(spec)` for human handoff to composable JSX.
 
 ## Few-shot presets
