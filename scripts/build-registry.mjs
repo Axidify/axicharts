@@ -75,6 +75,13 @@ const ITEMS = [
     target: "components/charts/chart-axi-swarm.tsx",
   },
   {
+    name: "chart-axi-ridgeline",
+    title: "AxiCharts Ridgeline",
+    description: "Stacked horizontal KDE density curves per category — joyplot / ridgeline distribution.",
+    file: "chart-axi-ridgeline.tsx",
+    target: "components/charts/chart-axi-ridgeline.tsx",
+  },
+  {
     name: "chart-axi-chart-config",
     title: "AxiCharts chartConfig helper",
     description: "Shared ChartConfig labels/colors — import into registry chart blocks or your own panels.",

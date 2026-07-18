@@ -125,6 +125,12 @@ export {
   type SwarmSeries,
 } from "../swarm/SwarmChart";
 export {
+  RidgelineChart,
+  type RidgelineChartProps,
+  type RidgelineItem,
+  type RidgelineSeries,
+} from "../ridgeline/RidgelineChart";
+export {
   HistogramChart,
   type HistogramChartProps,
 } from "../histogram/HistogramChart";

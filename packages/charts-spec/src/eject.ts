@@ -73,6 +73,8 @@ function resolveChartName(spec: PanelSpec): string {
             ? "ViolinChart"
           : spec.type === "swarm" || spec.type === "beeswarm"
             ? "SwarmChart"
+          : spec.type === "ridgeline" || spec.type === "joyplot"
+            ? "RidgelineChart"
           : spec.type === "waterfall"
             ? "WaterfallChart"
             : spec.type === "candlestick"
@@ -452,6 +454,27 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       : `items={${dataVar}.items ?? [...new Set(${dataVar}.map((row) => String(row.${categoryField})))].map((category) => ({
   category,
   values: ${dataVar}.filter((row) => String(row.${categoryField}) === category).map((row) => Number(row.${valueField})).filter((value) => Number.isFinite(value)),
+}))}`;
+  } else if (spec.type === "ridgeline" || spec.type === "joyplot") {
+    const categoryField = encoding?.x?.field ?? "category";
+    const valueField = Array.isArray(encoding?.y)
+      ? encoding.y[0]?.field
+      : encoding?.y?.field ?? "value";
+    const seriesField = encoding?.series?.field;
+    chartBody = seriesField
+      ? `series={${dataVar}.series ?? (() => {
+  const seriesNames = [...new Set(${dataVar}.map((row) => String(row.${seriesField})))];
+  return seriesNames.map((name) => ({
+    name,
+    items: [...new Set(${dataVar}.filter((row) => String(row.${seriesField}) === name).map((row) => String(row.${categoryField})))].map((category) => ({
+      category,
+      samples: ${dataVar}.filter((row) => String(row.${seriesField}) === name && String(row.${categoryField}) === category).map((row) => Number(row.${valueField})).filter((value) => Number.isFinite(value)),
+    })),
+  }));
+})()}`
+      : `items={${dataVar}.items ?? [...new Set(${dataVar}.map((row) => String(row.${categoryField})))].map((category) => ({
+  category,
+  samples: ${dataVar}.filter((row) => String(row.${categoryField}) === category).map((row) => Number(row.${valueField})).filter((value) => Number.isFinite(value)),
 }))}`;
   } else if (spec.type === "wordcloud" || spec.type === "word-cloud") {
     const textField = encoding?.name?.field ?? "text";

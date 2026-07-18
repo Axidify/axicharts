@@ -17,6 +17,7 @@ import type {
   GraphA11yDescriptor,
   ViolinA11yDescriptor,
   SwarmA11yDescriptor,
+  RidgelineA11yDescriptor,
   WordCloudA11yDescriptor,
 } from "./types";
 import { singleValueA11ySummary } from "./singleValueDescriptor";
@@ -334,6 +335,45 @@ export function buildSwarmA11yDescriptor({
   };
 }
 
+export function buildRidgelineA11yDescriptor({
+  items,
+  series,
+  title,
+  description,
+}: {
+  items?: { category: string; samples?: number[] }[];
+  series?: { name: string; items: { category: string; samples?: number[] }[] }[];
+  title?: string;
+  description?: string;
+}): RidgelineA11yDescriptor {
+  const groups =
+    series && series.length > 0
+      ? series
+      : items && items.length > 0
+        ? [{ name: "Distribution", items }]
+        : [];
+  const categories = groups[0]?.items.map((item) => item.category) ?? [];
+
+  return {
+    kind: "ridgeline",
+    title:
+      title ??
+      groups
+        .map((group) => group.name)
+        .filter(Boolean)
+        .join(", "),
+    description,
+    categories: [...categories],
+    series: groups.map((group) => ({
+      name: group.name,
+      sampleCount: group.items.reduce(
+        (sum, item) => sum + (item.samples?.length ?? 0),
+        0,
+      ),
+    })),
+  };
+}
+
 export function buildGraphA11yDescriptor({
   data,
   title,
@@ -440,6 +480,10 @@ export function swarmA11ySummary(descriptor: SwarmA11yDescriptor): string {
   return `Swarm chart with ${descriptor.categories.length} categories and ${descriptor.series.length} series`;
 }
 
+export function ridgelineA11ySummary(descriptor: RidgelineA11yDescriptor): string {
+  return `Ridgeline chart with ${descriptor.categories.length} categories and ${descriptor.series.length} series`;
+}
+
 export function wordCloudA11ySummary(descriptor: WordCloudA11yDescriptor): string {
   return `Word cloud with ${descriptor.words.length} terms`;
 }
@@ -479,6 +523,8 @@ export function chartA11ySummary(descriptor: {
       return violinA11ySummary(descriptor as ViolinA11yDescriptor);
     case "swarm":
       return swarmA11ySummary(descriptor as SwarmA11yDescriptor);
+    case "ridgeline":
+      return ridgelineA11ySummary(descriptor as RidgelineA11yDescriptor);
     case "word-cloud":
       return wordCloudA11ySummary(descriptor as WordCloudA11yDescriptor);
     default:

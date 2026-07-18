@@ -5,6 +5,7 @@ import {
   BoxplotChart,
   ViolinChart,
   SwarmChart,
+  RidgelineChart,
   CandlestickChart,
   ChartContainer,
   ChartNavigator,
@@ -90,6 +91,7 @@ import { bumpFromRows } from "./bumpEncoding";
 import { graphFromRows } from "./graphEncoding";
 import { violinFromRows } from "./violinEncoding";
 import { swarmFromRows } from "./swarmEncoding";
+import { ridgelineFromRows } from "./ridgelineEncoding";
 import { wordCloudFromRows } from "./wordCloudEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
 import { panelPropsWithGraphics } from "./panelGraphics";
@@ -751,6 +753,30 @@ export function compilePanel(
           pointRadius: chartProps.pointRadius as number | undefined,
           pointOpacity: chartProps.pointOpacity as number | undefined,
           jitterWidth: chartProps.jitterWidth as number | undefined,
+          showMedianLine: chartProps.showMedianLine as boolean | undefined,
+        }),
+      );
+    }
+
+    case "ridgeline":
+    case "joyplot": {
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
+      const yEncoding = Array.isArray(resolved.encoding?.y)
+        ? resolved.encoding.y[0]
+        : resolved.encoding?.y;
+      const data = ridgelineFromRows(rows, chartProps, {
+        x: resolved.encoding?.x,
+        y: yEncoding,
+        series: resolved.encoding?.series,
+      });
+      return wrap(
+        createElement(RidgelineChart, {
+          items: data.items,
+          series: data.series,
+          showAxes: chartProps.showAxes as boolean | undefined,
+          valueSuffix: chartProps.valueSuffix as string | undefined,
+          bandwidth: chartProps.bandwidth as number | undefined,
+          ridgeHeight: chartProps.ridgeHeight as number | undefined,
           showMedianLine: chartProps.showMedianLine as boolean | undefined,
         }),
       );

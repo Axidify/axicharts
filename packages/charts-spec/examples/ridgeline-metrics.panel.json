@@ -1,0 +1,14 @@
+{
+  "type": "ridgeline",
+  "title": "Service latency distribution",
+  "height": 360,
+  "width": 640,
+  "encoding": {
+    "x": { "field": "service", "type": "nominal" },
+    "y": { "field": "latency_ms", "type": "quantitative" }
+  },
+  "props": {
+    "showMedianLine": true,
+    "valueSuffix": " ms"
+  }
+}

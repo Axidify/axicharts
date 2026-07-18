@@ -958,6 +958,52 @@ describe("compilePanel presentation mode", () => {
     expect(getChartType("swarm")?.Chart).toBeTypeOf("function");
     expect(getChartType("beeswarm")?.Chart).toBeTypeOf("function");
   });
+
+  it("compiles ridgeline panels from long-form rows", async () => {
+    const panel = compilePanel(
+      {
+        type: "ridgeline",
+        title: "Latency ridgeline",
+        height: 360,
+        encoding: {
+          x: { field: "service", type: "nominal" },
+          y: { field: "latency_ms", type: "quantitative" },
+        },
+      },
+      [
+        { service: "API", latency_ms: 12 },
+        { service: "API", latency_ms: 18 },
+        { service: "DB", latency_ms: 30 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Latency ridgeline");
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+
+  it("round-trips ridgeline through ejectPanel", () => {
+    const spec = {
+      type: "ridgeline" as const,
+      encoding: {
+        x: { field: "service" },
+        y: { field: "latency_ms" },
+      },
+      props: { showMedianLine: true, valueSuffix: " ms" },
+    };
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain("RidgelineChart");
+    expect(jsx).toContain("service");
+    expect(jsx).toContain("latency_ms");
+  });
+
+  it("registers ridgeline builtin chart type", () => {
+    registerBuiltinChartTypes();
+    expect(getChartType("ridgeline")?.Chart).toBeTypeOf("function");
+    expect(getChartType("joyplot")?.Chart).toBeTypeOf("function");
+  });
 });
 
 describe("compilePanel echarts escape hatch", () => {

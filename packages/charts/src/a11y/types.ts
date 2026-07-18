@@ -153,6 +153,14 @@ export type SwarmA11yDescriptor = {
   series: { name: string; pointCount: number }[];
 };
 
+export type RidgelineA11yDescriptor = {
+  kind: "ridgeline";
+  title?: string;
+  description?: string;
+  categories: string[];
+  series: { name: string; sampleCount: number }[];
+};
+
 export type WordCloudA11yDescriptor = {
   kind: "word-cloud";
   title?: string;
@@ -176,6 +184,7 @@ export type ChartA11yDescriptor =
   | GraphA11yDescriptor
   | ViolinA11yDescriptor
   | SwarmA11yDescriptor
+  | RidgelineA11yDescriptor
   | WordCloudA11yDescriptor;
 
 export type ChartA11yTable = {

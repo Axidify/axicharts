@@ -7,6 +7,7 @@ import { ChartInteractionProvider } from "./interaction/ChartInteractionContext"
 import { BoxplotChart } from "./boxplot/BoxplotChart";
 import { ViolinChart } from "./violin/ViolinChart";
 import { SwarmChart } from "./swarm/SwarmChart";
+import { RidgelineChart } from "./ridgeline/RidgelineChart";
 import { CandlestickChart } from "./candlestick/CandlestickChart";
 import { FunnelChart } from "./funnel/FunnelChart";
 import { CalendarHeatmapChart } from "./calendar/CalendarHeatmapChart";
@@ -42,6 +43,7 @@ const captured = {
   themeRiver: null as CapturedProps | null,
   violin: null as CapturedProps | null,
   swarm: null as CapturedProps | null,
+  ridgeline: null as CapturedProps | null,
 };
 
 vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
@@ -114,6 +116,10 @@ vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
     },
     EChartsSwarm: (props: CapturedProps) => {
       captured.swarm = props;
+      return null;
+    },
+    EChartsRidgeline: (props: CapturedProps) => {
+      captured.ridgeline = props;
       return null;
     },
   };
@@ -342,6 +348,20 @@ describe("live mode merge wiring", () => {
     expectLiveMerge(captured.swarm);
   });
 
+  it("passes mergeOption to ridgeline adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <RidgelineChart
+          items={[
+            { category: "API", samples: [12, 18, 22, 28] },
+          ]}
+        />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.ridgeline);
+  });
+
   it("passes mergeOption to histogram adapter when mode is live", () => {
     render(
       <TestShell mode="live">
@@ -549,5 +569,20 @@ describe("presentation mode animation wiring", () => {
 
     expect(captured.swarm?.animate).toBe(true);
     expect(captured.swarm?.mergeOption).toBe(false);
+  });
+
+  it("enables presentation sweep on ridgeline", () => {
+    render(
+      <TestShell mode="presentation">
+        <RidgelineChart
+          items={[
+            { category: "API", samples: [12, 18, 22, 28, 35] },
+          ]}
+        />
+      </TestShell>,
+    );
+
+    expect(captured.ridgeline?.animate).toBe(true);
+    expect(captured.ridgeline?.mergeOption).toBe(false);
   });
 });

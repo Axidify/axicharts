@@ -23,6 +23,8 @@ export const PANEL_TYPE_CATEGORY: Record<string, PanelCategory> = {
   violin: "distribution",
   swarm: "distribution",
   beeswarm: "distribution",
+  ridgeline: "distribution",
+  joyplot: "distribution",
   histogram: "distribution",
   waterfall: "financial",
   candlestick: "financial",

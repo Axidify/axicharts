@@ -94,6 +94,8 @@ export type PanelChartType =
   | "violin"
   | "swarm"
   | "beeswarm"
+  | "ridgeline"
+  | "joyplot"
   | "histogram"
   | "stat"
   | "gauge"

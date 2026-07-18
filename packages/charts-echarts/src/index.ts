@@ -48,6 +48,15 @@ export {
   resolveSwarmPoints,
   swarmCategories,
 } from "./swarmTypes";
+export { EChartsRidgeline, type EChartsRidgelineProps } from "./EChartsRidgeline";
+export type { RidgelineItem, RidgelineSeries } from "./ridgelineTypes";
+export {
+  ridgeBaselineOffset,
+  ridgeDensityHeight,
+  resolveRidgelineDensity,
+  resolveRidgelineMedian,
+  ridgelineCategories,
+} from "./ridgelineTypes";
 export { EChartsHistogram, type EChartsHistogramProps } from "./EChartsHistogram";
 export type { BoxplotItem, BoxplotSeries } from "./boxplotTypes";
 export { EChartsScatter, type EChartsScatterProps } from "./EChartsScatter";

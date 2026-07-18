@@ -5,6 +5,7 @@ import { CandlestickChart } from "../candlestick/CandlestickChart";
 import { BoxplotChart } from "../boxplot/BoxplotChart";
 import { ViolinChart } from "../violin/ViolinChart";
 import { SwarmChart } from "../swarm/SwarmChart";
+import { RidgelineChart } from "../ridgeline/RidgelineChart";
 import { FunnelChart } from "../funnel/FunnelChart";
 import { PictorialBarChart } from "../pictorialBar/PictorialBarChart";
 import { LiquidFillChart } from "../liquidFill/LiquidFillChart";
@@ -130,6 +131,16 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "beeswarm",
     Chart: SwarmChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "ridgeline",
+    Chart: RidgelineChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "joyplot",
+    Chart: RidgelineChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
   {

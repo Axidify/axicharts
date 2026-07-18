@@ -48,6 +48,10 @@ const config: StorybookConfig = {
             root,
             "packages/charts/src/entry/swarm.ts",
           ),
+          "@axicharts/charts/ridgeline": path.resolve(
+            root,
+            "packages/charts/src/entry/ridgeline.ts",
+          ),
           "@axicharts/charts/network": path.resolve(
             root,
             "packages/charts/src/entry/network.ts",

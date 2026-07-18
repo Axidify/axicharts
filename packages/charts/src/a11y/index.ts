@@ -17,6 +17,7 @@ export type {
   GraphA11yDescriptor,
   ViolinA11yDescriptor,
   SwarmA11yDescriptor,
+  RidgelineA11yDescriptor,
   WordCloudA11yDescriptor,
 } from "./types";
 export {
@@ -43,6 +44,7 @@ export {
   buildGraphA11yDescriptor,
   buildViolinA11yDescriptor,
   buildSwarmA11yDescriptor,
+  buildRidgelineA11yDescriptor,
   buildWordCloudA11yDescriptor,
   chartA11ySummary,
   flattenHierarchyNodes,
