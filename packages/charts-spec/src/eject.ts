@@ -67,6 +67,8 @@ function resolveChartName(spec: PanelSpec): string {
               ? "CandlestickChart"
               : spec.type === "heatmap"
                 ? "HeatmapChart"
+                : spec.type === "calendar" || spec.type === "calendar-heatmap"
+                  ? "CalendarHeatmapChart"
                 : spec.type === "radar"
                   ? "RadarChart"
                   : spec.type === "parallel"
@@ -278,6 +280,24 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       chartBody = `matrix={${dataVar}.matrix}
     min={${dataVar}.min}
     max={${dataVar}.max}${spec.props?.showLabels === false ? "" : "\n    showLabels"}`;
+    }
+  } else if (spec.type === "calendar" || spec.type === "calendar-heatmap") {
+    const dateField = encoding?.date?.field ?? encoding?.x?.field ?? "date";
+    const yEncoding = Array.isArray(encoding?.y) ? encoding?.y[0] : encoding?.y;
+    const valueField = encoding?.value?.field ?? yEncoding?.field ?? "value";
+    if (encoding?.date || encoding?.value || (encoding?.x && encoding?.y)) {
+      chartBody = `data={{
+  points: ${dataVar}.map((row) => ({
+    date: String(row.${dateField}),
+    value: Number(row.${valueField}),
+  })),
+  year: ${dataVar}.year,
+  range: ${dataVar}.range,
+}}`;
+    } else {
+      chartBody = `data={${dataVar}.data ?? { points: ${dataVar}.points ?? [] }}
+    year={${dataVar}.year}
+    range={${dataVar}.range}`;
     }
   } else if (spec.type === "radar") {
     const nameField = encoding?.name?.field ?? "name";

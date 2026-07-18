@@ -345,6 +345,24 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("showLabels");
   });
 
+  it("emits CalendarHeatmapChart from encoding rows", () => {
+    const jsx = ejectPanel(
+      {
+        type: "calendar",
+        encoding: {
+          date: { field: "date" },
+          value: { field: "count" },
+        },
+      },
+      "activity",
+    );
+
+    expect(jsx).toContain("<CalendarHeatmapChart");
+    expect(jsx).toContain("points:");
+    expect(jsx).toContain("row.date");
+    expect(jsx).toContain("row.count");
+  });
+
   it("emits RadarChart from encoding rows", () => {
     const jsx = ejectPanel(
       {

@@ -14,7 +14,7 @@
   {
     "name": "@axicharts/charts-echarts",
     "path": "packages/charts-echarts/dist/index.js",
-    "limit": "13.65 KB",
+    "limit": "14.5 KB",
     "gzip": true
   },
   {
@@ -81,6 +81,12 @@
     "name": "@axicharts/charts/heatmap",
     "path": "packages/charts/dist/entry/heatmap.js",
     "limit": "8 KB",
+    "gzip": true
+  },
+  {
+    "name": "@axicharts/charts/calendar",
+    "path": "packages/charts/dist/entry/calendar.js",
+    "limit": "6 KB",
     "gzip": true
   },
   {

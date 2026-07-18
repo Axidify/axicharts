@@ -5,6 +5,12 @@ export {
   type HeatmapMatrix,
 } from "../heatmap/HeatmapChart";
 export {
+  CalendarHeatmapChart,
+  type CalendarHeatmapChartProps,
+  type CalendarHeatmapData,
+  type CalendarHeatmapPoint,
+} from "../calendar/CalendarHeatmapChart";
+export {
   RadarChart,
   type RadarChartProps,
   type RadarIndicator,

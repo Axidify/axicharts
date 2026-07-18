@@ -49,3 +49,14 @@ export type HeatmapMatrix = {
   yCategories: string[];
   values: number[][];
 };
+
+export type CalendarHeatmapPoint = {
+  date: string;
+  value: number;
+};
+
+export type CalendarHeatmapData = {
+  points: CalendarHeatmapPoint[];
+  year?: number;
+  range?: [string, string];
+};

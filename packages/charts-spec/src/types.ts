@@ -74,6 +74,8 @@ export type PanelChartType =
   | "waterfall"
   | "candlestick"
   | "heatmap"
+  | "calendar"
+  | "calendar-heatmap"
   | "radar"
   | "parallel"
   | "theme-river"
@@ -104,6 +106,7 @@ export type PanelSpec = {
   encoding?: {
     x?: FieldEncoding;
     y?: FieldEncoding | FieldEncoding[];
+    date?: FieldEncoding;
     color?: ColorEncoding;
     size?: SizeEncoding;
     name?: FieldEncoding;

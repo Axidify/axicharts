@@ -34,6 +34,7 @@ describe("category entrypoints", () => {
 
   it("exports matrix chart symbols", () => {
     expect(matrix.HeatmapChart).toBeTypeOf("function");
+    expect(matrix.CalendarHeatmapChart).toBeTypeOf("function");
     expect(matrix.RadarChart).toBeTypeOf("function");
     expect(matrix.EChartsOptionChart).toBeTypeOf("function");
     expect(matrix.ParallelChart).toBeTypeOf("function");

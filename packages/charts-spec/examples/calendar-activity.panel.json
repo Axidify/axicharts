@@ -1,0 +1,13 @@
+{
+  "type": "calendar",
+  "title": "Activity — last 90 days",
+  "height": 220,
+  "width": 720,
+  "encoding": {
+    "date": { "field": "date", "type": "temporal" },
+    "value": { "field": "count", "type": "quantitative" }
+  },
+  "props": {
+    "year": 2026
+  }
+}

@@ -1,8 +1,9 @@
-import type { HeatmapMatrix, OhlcPoint, PieSlice } from "@axicharts/charts-echarts";
+import type { CalendarHeatmapData, HeatmapMatrix, OhlcPoint, PieSlice } from "@axicharts/charts-echarts";
 import type { FunnelStage } from "@axicharts/charts-echarts";
 import type { HierarchyNode } from "@axicharts/charts-echarts";
 import type {
   CandlestickA11yDescriptor,
+  CalendarHeatmapA11yDescriptor,
   FunnelA11yDescriptor,
   HeatmapA11yDescriptor,
   HierarchyA11yDescriptor,
@@ -101,6 +102,26 @@ export function buildHeatmapA11yDescriptor({
     xCategories: [...matrix.xCategories],
     yCategories: [...matrix.yCategories],
     values: matrix.values.map((row) => [...row]),
+  };
+}
+
+export function buildCalendarHeatmapA11yDescriptor({
+  data,
+  year,
+  title,
+  description,
+}: {
+  data: CalendarHeatmapData;
+  year?: number;
+  title?: string;
+  description?: string;
+}): CalendarHeatmapA11yDescriptor {
+  return {
+    kind: "calendar",
+    title: title ?? "Calendar heatmap",
+    description,
+    year: year ?? data.year,
+    points: data.points.map((point) => ({ date: point.date, value: point.value })),
   };
 }
 
@@ -219,6 +240,12 @@ export function heatmapA11ySummary(descriptor: HeatmapA11yDescriptor): string {
   return `Heatmap with ${descriptor.xCategories.length} columns and ${descriptor.yCategories.length} rows`;
 }
 
+export function calendarHeatmapA11ySummary(
+  descriptor: CalendarHeatmapA11yDescriptor,
+): string {
+  return `Calendar heatmap with ${descriptor.points.length} days`;
+}
+
 export function funnelA11ySummary(descriptor: FunnelA11yDescriptor): string {
   return `Funnel chart with ${descriptor.stages.length} stages`;
 }
@@ -255,6 +282,8 @@ export function chartA11ySummary(descriptor: {
       return candlestickA11ySummary(descriptor as CandlestickA11yDescriptor);
     case "heatmap":
       return heatmapA11ySummary(descriptor as HeatmapA11yDescriptor);
+    case "calendar":
+      return calendarHeatmapA11ySummary(descriptor as CalendarHeatmapA11yDescriptor);
     case "funnel":
       return funnelA11ySummary(descriptor as FunnelA11yDescriptor);
     case "hierarchy":

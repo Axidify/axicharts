@@ -7,6 +7,7 @@ import { ChartInteractionProvider } from "./interaction/ChartInteractionContext"
 import { BoxplotChart } from "./boxplot/BoxplotChart";
 import { CandlestickChart } from "./candlestick/CandlestickChart";
 import { FunnelChart } from "./funnel/FunnelChart";
+import { CalendarHeatmapChart } from "./calendar/CalendarHeatmapChart";
 import { HeatmapChart } from "./heatmap/HeatmapChart";
 import { HistogramChart } from "./histogram/HistogramChart";
 import { ParallelChart } from "./parallel/ParallelChart";
@@ -27,6 +28,7 @@ const captured = {
   funnel: null as CapturedProps | null,
   treemap: null as CapturedProps | null,
   heatmap: null as CapturedProps | null,
+  calendar: null as CapturedProps | null,
   waterfall: null as CapturedProps | null,
   scatter: null as CapturedProps | null,
   radar: null as CapturedProps | null,
@@ -60,6 +62,10 @@ vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
     },
     EChartsHeatmap: (props: CapturedProps) => {
       captured.heatmap = props;
+      return null;
+    },
+    EChartsCalendarHeatmap: (props: CapturedProps) => {
+      captured.calendar = props;
       return null;
     },
     EChartsWaterfall: (props: CapturedProps) => {
@@ -218,6 +224,21 @@ describe("live mode merge wiring", () => {
     expectLiveMerge(captured.heatmap);
   });
 
+  it("passes mergeOption to calendar heatmap adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <CalendarHeatmapChart
+          data={{
+            year: 2026,
+            points: [{ date: "2026-07-18", value: 4 }],
+          }}
+        />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.calendar);
+  });
+
   it("passes mergeOption to scatter adapter when mode is live", () => {
     render(
       <TestShell mode="live">
@@ -353,6 +374,22 @@ describe("presentation mode animation wiring", () => {
 
     expect(captured.heatmap?.animate).toBe(true);
     expect(captured.heatmap?.mergeOption).toBe(false);
+  });
+
+  it("enables presentation sweep on calendar heatmap", () => {
+    render(
+      <TestShell mode="presentation">
+        <CalendarHeatmapChart
+          data={{
+            year: 2026,
+            points: [{ date: "2026-07-18", value: 4 }],
+          }}
+        />
+      </TestShell>,
+    );
+
+    expect(captured.calendar?.animate).toBe(true);
+    expect(captured.calendar?.mergeOption).toBe(false);
   });
 
   it("enables presentation sweep on waterfall", () => {

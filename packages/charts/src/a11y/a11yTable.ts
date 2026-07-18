@@ -5,6 +5,7 @@ import {
   formatPieShare,
   funnelA11ySummary,
   heatmapA11ySummary,
+  calendarHeatmapA11ySummary,
   hierarchyA11ySummary,
   parallelA11ySummary,
   pieA11ySummary,
@@ -90,6 +91,20 @@ export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yT
       ],
       rows,
       caption: descriptor.description ?? heatmapA11ySummary(descriptor),
+    };
+  }
+
+  if (descriptor.kind === "calendar") {
+    return {
+      columns: [
+        { key: "date", label: "Date" },
+        { key: "value", label: "Value", align: "right" },
+      ],
+      rows: descriptor.points.map((point) => ({
+        date: point.date,
+        value: point.value,
+      })),
+      caption: descriptor.description ?? calendarHeatmapA11ySummary(descriptor),
     };
   }
 

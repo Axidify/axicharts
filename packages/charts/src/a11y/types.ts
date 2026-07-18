@@ -60,6 +60,14 @@ export type HeatmapA11yDescriptor = {
   values: number[][];
 };
 
+export type CalendarHeatmapA11yDescriptor = {
+  kind: "calendar";
+  title?: string;
+  description?: string;
+  year?: number;
+  points: { date: string; value: number }[];
+};
+
 export type FunnelA11yStage = {
   name: string;
   value: number;
@@ -114,6 +122,7 @@ export type ChartA11yDescriptor =
   | PieA11yDescriptor
   | CandlestickA11yDescriptor
   | HeatmapA11yDescriptor
+  | CalendarHeatmapA11yDescriptor
   | FunnelA11yDescriptor
   | HierarchyA11yDescriptor
   | ParallelA11yDescriptor

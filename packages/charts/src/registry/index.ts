@@ -5,6 +5,7 @@ import { CandlestickChart } from "../candlestick/CandlestickChart";
 import { BoxplotChart } from "../boxplot/BoxplotChart";
 import { FunnelChart } from "../funnel/FunnelChart";
 import { HeatmapChart } from "../heatmap/HeatmapChart";
+import { CalendarHeatmapChart } from "../calendar/CalendarHeatmapChart";
 import { HistogramChart } from "../histogram/HistogramChart";
 import { LineChart } from "../line/LineChart";
 import { PieChart } from "../pie/PieChart";
@@ -58,6 +59,11 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "heatmap",
     Chart: HeatmapChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "calendar",
+    Chart: CalendarHeatmapChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
   {

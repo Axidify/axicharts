@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { isValidElement, type ReactElement } from "react";
 import { render, waitFor } from "@testing-library/react";
-import { registerBuiltinChartTypes } from "@axicharts/charts/registry";
+import { registerBuiltinChartTypes, getChartType } from "@axicharts/charts/registry";
 import { registerTankChart } from "@axicharts/charts-tank";
 import {
   SAMPLE_DRILL_VALUES,
@@ -664,6 +664,33 @@ describe("compilePanel presentation mode", () => {
     await waitFor(() => {
       expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
     });
+  });
+
+  it("compiles calendar panels from encoding rows", async () => {
+    const panel = compilePanel(
+      {
+        type: "calendar",
+        encoding: {
+          date: { field: "date" },
+          value: { field: "count" },
+        },
+        props: { year: 2026 },
+      },
+      [
+        { date: "2026-01-01", count: 2 },
+        { date: "2026-01-02", count: 5 },
+      ],
+    );
+
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+
+  it("registers calendar builtin chart type", () => {
+    registerBuiltinChartTypes();
+    expect(getChartType("calendar")?.Chart).toBeTypeOf("function");
   });
 });
 

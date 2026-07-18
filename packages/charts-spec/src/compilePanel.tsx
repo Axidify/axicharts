@@ -11,6 +11,7 @@ import {
   Gauge,
   HeatmapChart,
   HistogramChart,
+  CalendarHeatmapChart,
   LineChart,
   PieChart,
   FunnelChart,
@@ -74,6 +75,7 @@ import {
 import { registerPluginChartTypes } from "./registerPluginChartTypes";
 import { assertPanelCategoryEnabled } from "./panelCategories";
 import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
+import { resolveCalendarHeatmapData } from "./calendarEncoding";
 import { resolveMapDrillProps } from "./mapEncoding";
 import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
 import { wordCloudFromRows } from "./wordCloudEncoding";
@@ -526,6 +528,27 @@ export function compilePanel(
           max: chartProps.max as number | undefined,
           showLabels: chartProps.showLabels as boolean | undefined,
           showAxes: chartProps.showAxes as boolean | undefined,
+        }),
+      );
+    }
+
+    case "calendar":
+    case "calendar-heatmap": {
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
+      const data = resolveCalendarHeatmapData(
+        rows,
+        chartProps,
+        resolved.encoding,
+      );
+      return wrap(
+        createElement(CalendarHeatmapChart, {
+          data,
+          year: chartProps.year as number | undefined,
+          range: chartProps.range as [string, string] | undefined,
+          min: chartProps.min as number | undefined,
+          max: chartProps.max as number | undefined,
+          showLabels: chartProps.showLabels as boolean | undefined,
+          cellSize: chartProps.cellSize as number | [number, number] | undefined,
         }),
       );
     }

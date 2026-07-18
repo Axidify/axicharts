@@ -22,6 +22,8 @@ export const PANEL_TYPE_CATEGORY: Record<string, PanelCategory> = {
   waterfall: "financial",
   candlestick: "financial",
   heatmap: "matrix",
+  calendar: "matrix",
+  "calendar-heatmap": "matrix",
   radar: "matrix",
   parallel: "matrix",
   "theme-river": "matrix",

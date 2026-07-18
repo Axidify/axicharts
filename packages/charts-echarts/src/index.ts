@@ -30,6 +30,12 @@ export {
   type HeatmapBrushRange,
 } from "./EChartsHeatmap";
 export {
+  EChartsCalendarHeatmap,
+  inferCalendarRange,
+  inferCalendarYear,
+  type EChartsCalendarHeatmapProps,
+} from "./EChartsCalendarHeatmap";
+export {
   EChartsOptionChart,
   type EChartsOptionChartProps,
 } from "./EChartsOptionChart";
@@ -55,6 +61,8 @@ export {
   SERIES_COLORS,
   SERIES_PALETTE,
   type HeatmapMatrix,
+  type CalendarHeatmapData,
+  type CalendarHeatmapPoint,
   type OhlcPoint,
   type PieSlice,
   type SeriesTone,

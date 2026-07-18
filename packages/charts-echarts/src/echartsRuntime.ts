@@ -15,6 +15,7 @@ import {
 } from "echarts/charts";
 import {
   AxisPointerComponent,
+  CalendarComponent,
   DataZoomComponent,
   DatasetComponent,
   GridComponent,
@@ -52,6 +53,7 @@ echarts.use([
   SingleAxisComponent,
   TooltipComponent,
   VisualMapComponent,
+  CalendarComponent,
   CanvasRenderer,
 ]);
 
