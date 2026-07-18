@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "description": "Composable React charts for dashboards — Recharts/shadcn alternative with live canvas, spec JSON, and industrial primitives.",
   "keywords": [
     "react",

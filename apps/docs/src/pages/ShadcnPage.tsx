@@ -138,6 +138,10 @@ export function ShadcnPage(): ReactElement {
           </li>
         </ul>
         <p style={{ ...docBodyStyle(), marginBottom: 0, fontSize: 13 }}>
+          <Link to="/shadcn/registry" style={{ color: docColors.accent }}>
+            shadcn custom registry install
+          </Link>
+          {" · "}
           <Link to="/compare" style={{ color: docColors.accent }}>
             Live ops wall (/compare)
           </Link>
@@ -241,8 +245,11 @@ export function ShadcnPage(): ReactElement {
         <h2 style={{ marginTop: 0, fontSize: 18 }}>Spec JSON → eject JSX</h2>
         <p style={docBodyStyle()}>
           Example: <code>throughput-bar-color.panel.json</code> ejects composable Cell fills — same
-          path as <code>compilePanel</code>. Registry prep:{" "}
-          <code>packages/charts-spec/examples/shadcn-registry/</code>.
+          path as <code>compilePanel</code>. Install via{" "}
+          <Link to="/shadcn/registry" style={{ color: docColors.accent }}>
+            shadcn custom registry
+          </Link>{" "}
+          (<code>registry/</code> at repo root).
         </p>
         <pre style={{ ...codeBlock, maxHeight: 240 }}>{ejectedBar}</pre>
       </div>

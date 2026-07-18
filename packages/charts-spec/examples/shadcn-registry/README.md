@@ -1,39 +1,48 @@
-# shadcn/ui registry prep (GTM-2)
+# shadcn/ui custom registry (GTM-3)
 
-In-repo documentation for a future **shadcn-style component registry** submission. This is **not** an external PR to [shadcn/ui](https://ui.shadcn.com) — see GTM-3 in the Dashboarder roadmap.
+Hosted **custom registry** for AxiCharts chart blocks — install via `npx shadcn@latest add <url>` without an upstream shadcn/ui PR.
 
-## Goal
+## Hosted URLs
 
-Let `npx shadcn@latest add chart-axi-*` (or a custom registry URL) install:
+| Item | Install command |
+|------|-----------------|
+| Catalog | https://axidify.github.io/axicharts/registry/registry.json |
+| Bar | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-bar.json` |
+| Line | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-line.json` |
+| Donut | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-donut.json` |
+| Area | `npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-area.json` |
 
-1. A thin wrapper around `ChartContainer` + chart children
-2. Peer dependencies on `@axicharts/charts`, `@axicharts/charts-theme`, `echarts`, `uplot`
-3. Optional `chartConfig` TypeScript helper matching shadcn Charts conventions
+Docs install guide: https://axidify.github.io/axicharts/shadcn/registry
 
-## Registry item shape
+## Source layout
 
-See [`registry-item.json`](./registry-item.json) for a stub aligned with [shadcn registry schema](https://ui.shadcn.com/docs/registry/registry-item-json).
+```
+registry/
+  registry.json              # catalog index (generated)
+  components/charts/*.tsx    # thin ChartContainer wrappers
+scripts/build-registry.mjs   # → apps/docs/public/registry/
+```
 
-## Dependencies to declare
+Run `node scripts/build-registry.mjs` (also runs on `pnpm docs` prebuild).
+
+## Dependencies declared per item
 
 ```json
 {
   "dependencies": [
     "@axicharts/charts",
     "@axicharts/charts-theme"
-  ],
-  "devDependencies": [],
-  "registryDependencies": []
+  ]
 }
 ```
 
-Peer / app-level (document in README, not bundled):
+Peer / app-level (documented in item `docs` field and install page):
 
 - `react`, `react-dom`
 - `echarts` (pie, candlestick, waterfall, heatmap adapters)
 - `uplot` (live cartesian canvas path)
 
-## Component stub
+## Component pattern
 
 Registry consumers get composable JSX — not an option blob:
 
@@ -41,27 +50,24 @@ Registry consumers get composable JSX — not an option blob:
 import { ChartContainer, BarChart } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
 
-export function ChartBarDemo() {
+export function ChartAxiBar() {
   return (
     <ChartContainer theme={cleanTheme} height={220} config={chartConfig}>
-      <BarChart
-        categories={["Mon", "Tue", "Wed"]}
-        series={[{ name: "Desktop", data: [186, 305, 237] }]}
-      />
+      <BarChart categories={[...]} series={[...]} />
     </ChartContainer>
   );
 }
 ```
 
-## Spec path (differentiator)
-
-For AI / runtime dashboards, pair registry components with panel JSON:
-
-- Examples: `../browser-share-donut.panel.json`, `../revenue-line-chartconfig.panel.json`
-- CLI: `npx @axicharts/charts-spec eject examples/throughput-bar-color.panel.json`
-
 ## Links
 
 - Docs gallery: `/shadcn`
+- Registry install: `/shadcn/registry`
 - Community templates: `/templates/community`
-- Migration checklist: docs `/shadcn` § Recharts → AxiCharts
+- Launch copy: [LAUNCH.md](./LAUNCH.md)
+
+## GTM-4 (defer)
+
+- Upstream shadcn/ui registry submission
+- Paid template marketplace
+- Actual social posting (draft bullets in LAUNCH.md only)

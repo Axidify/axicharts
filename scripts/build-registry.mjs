@@ -1,0 +1,106 @@
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const registryRoot = join(root, "registry");
+const componentsDir = join(registryRoot, "components/charts");
+const outputDir = join(root, "apps/docs/public/registry");
+
+const chartsPkg = JSON.parse(
+  readFileSync(join(root, "packages/charts/package.json"), "utf8"),
+);
+const version = chartsPkg.version;
+
+const PEER_DOCS =
+  "Peer deps (install in your app): react react-dom echarts uplot. Copy tokens.css from @axicharts/charts-theme for --chart-* CSS vars. Gallery: https://axidify.github.io/axicharts/shadcn";
+
+const ITEMS = [
+  {
+    name: "chart-axi-bar",
+    title: "AxiCharts Bar",
+    description:
+      "Composable bar chart via ChartContainer + chartConfig — shadcn Charts migration path.",
+    file: "chart-axi-bar.tsx",
+    target: "components/charts/chart-axi-bar.tsx",
+  },
+  {
+    name: "chart-axi-line",
+    title: "AxiCharts Line",
+    description:
+      "Line chart with optional area fill — ChartContainer + chartConfig pattern.",
+    file: "chart-axi-line.tsx",
+    target: "components/charts/chart-axi-line.tsx",
+  },
+  {
+    name: "chart-axi-donut",
+    title: "AxiCharts Donut",
+    description: "Donut chart via PieChart innerRadius — browser-share style slice.",
+    file: "chart-axi-donut.tsx",
+    target: "components/charts/chart-axi-donut.tsx",
+  },
+  {
+    name: "chart-axi-area",
+    title: "AxiCharts Area",
+    description: "Filled area chart — SLO / trend dashboards with chartConfig labels.",
+    file: "chart-axi-area.tsx",
+    target: "components/charts/chart-axi-area.tsx",
+  },
+];
+
+function buildItem(item) {
+  const content = readFileSync(join(componentsDir, item.file), "utf8");
+  return {
+    $schema: "https://ui.shadcn.com/schema/registry-item.json",
+    name: item.name,
+    type: "registry:block",
+    title: item.title,
+    description: item.description,
+    categories: ["charts", "dashboard"],
+    dependencies: [
+      `@axicharts/charts@${version}`,
+      `@axicharts/charts-theme@${version}`,
+    ],
+    registryDependencies: [],
+    files: [
+      {
+        path: item.target,
+        type: "registry:component",
+        content,
+      },
+    ],
+    docs: PEER_DOCS,
+  };
+}
+
+mkdirSync(outputDir, { recursive: true });
+
+const builtItems = ITEMS.map((item) => {
+  const registryItem = buildItem(item);
+  writeFileSync(
+    join(outputDir, `${item.name}.json`),
+    `${JSON.stringify(registryItem, null, 2)}\n`,
+  );
+  return {
+    name: item.name,
+    type: registryItem.type,
+    title: item.title,
+    description: item.description,
+    categories: registryItem.categories,
+    dependencies: registryItem.dependencies,
+    registryDependencies: registryItem.registryDependencies,
+    files: registryItem.files.map(({ path, type }) => ({ path, type })),
+  };
+});
+
+const registry = {
+  $schema: "https://ui.shadcn.com/schema/registry.json",
+  name: "axicharts",
+  homepage: "https://axidify.github.io/axicharts/shadcn/registry",
+  items: builtItems,
+};
+
+writeFileSync(join(outputDir, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
+writeFileSync(join(registryRoot, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
+
+console.log(`Built ${builtItems.length} registry items → apps/docs/public/registry/`);

@@ -21,7 +21,7 @@ Runnable fixtures for `compilePanel`, `ejectPanel`, and the CLI.
 | [velocity-stacked-bar.panel.json](./velocity-stacked-bar.panel.json) | **Stacked bar** — `stacked: true`, multi-series `props.series` |
 | [burndown-multi-line.panel.json](./burndown-multi-line.panel.json) | **Multi-series line** — burndown ideal vs remaining |
 
-Registry prep (future shadcn/ui submission): [shadcn-registry/](./shadcn-registry/).
+Registry prep (shadcn custom registry): [shadcn-registry/](./shadcn-registry/) · source in repo `registry/`.
 
 ## CLI
 

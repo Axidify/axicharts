@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prebuild": "node ../../scripts/sync-docs-schema.mjs",
-    "dev": "node ../../scripts/sync-docs-schema.mjs && vite",
+    "prebuild": "node ../../scripts/sync-docs-schema.mjs && node ../../scripts/build-registry.mjs",
+    "dev": "node ../../scripts/sync-docs-schema.mjs && node ../../scripts/build-registry.mjs && vite",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit"
