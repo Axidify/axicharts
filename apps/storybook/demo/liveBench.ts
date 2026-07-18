@@ -23,22 +23,6 @@ export type LivePanelState = {
   values: number[];
 };
 
-export const OPS_PANELS: LivePanelSpec[] = [
-  { id: "cpu", label: "CPU", base: 62, variance: 14, tone: "warning", stroke: "#d97706" },
-  { id: "memory", label: "Memory", base: 71, variance: 10, tone: "info", stroke: "#0891b2" },
-  { id: "p95", label: "p95 latency", base: 48, variance: 18, tone: "default", stroke: "#2563eb" },
-  { id: "errors", label: "Errors/min", base: 3.2, variance: 2.5, tone: "critical", stroke: "#dc2626" },
-  { id: "throughput", label: "Throughput", base: 1180, variance: 220, tone: "success", stroke: "#16a34a" },
-  { id: "queue", label: "Queue depth", base: 24, variance: 12, tone: "warning", stroke: "#7c3aed" },
-];
-
-const EXTRA_PANELS: LivePanelSpec[] = [
-  { id: "disk", label: "Disk I/O", base: 340, variance: 80, tone: "info", stroke: "#0d9488" },
-  { id: "network", label: "Network", base: 890, variance: 160, tone: "success", stroke: "#65a30d" },
-  { id: "connections", label: "Connections", base: 412, variance: 90, tone: "default", stroke: "#4f46e5" },
-  { id: "gc", label: "GC pause", base: 12, variance: 6, tone: "warning", stroke: "#ea580c" },
-];
-
 const PANEL_PALETTE = [
   "#2563eb",
   "#d97706",
@@ -58,21 +42,16 @@ const PANEL_TONES: LivePanelSpec["tone"][] = [
   "critical",
 ];
 
+/** Synthetic load-generator panels — not real ops telemetry. */
 export function getPanelSpecs(panelCount: number): LivePanelSpec[] {
-  const base = [...OPS_PANELS, ...EXTRA_PANELS];
-  if (panelCount <= base.length) return base.slice(0, panelCount);
-
-  return Array.from({ length: panelCount }, (_, index) => {
-    const seed = base[index % base.length]!;
-    return {
-      id: `metric-${index + 1}`,
-      label: `Metric ${index + 1}`,
-      base: seed.base * (0.85 + (index % 5) * 0.05),
-      variance: seed.variance,
-      tone: PANEL_TONES[index % PANEL_TONES.length],
-      stroke: PANEL_PALETTE[index % PANEL_PALETTE.length]!,
-    };
-  });
+  return Array.from({ length: panelCount }, (_, index) => ({
+    id: `series-${index + 1}`,
+    label: `Series ${index + 1}`,
+    base: 40 + (index % 5) * 4,
+    variance: 8 + (index % 3) * 2,
+    tone: PANEL_TONES[index % PANEL_TONES.length],
+    stroke: PANEL_PALETTE[index % PANEL_PALETTE.length]!,
+  }));
 }
 
 export type BenchPresetId = "standard" | "heavy" | "extreme";
@@ -95,7 +74,7 @@ export const BENCH_PRESETS: Record<BenchPresetId, BenchPreset> = {
     pointCount: 2000,
     hz: 5,
     panelHeight: 88,
-    description: "Published benchmark — 6 × 2000 pts @ 5 Hz",
+    description: "CI benchmark fixture — 6 × 2000 pts @ 5 Hz",
   },
   heavy: {
     id: "heavy",
@@ -113,11 +92,15 @@ export const BENCH_PRESETS: Record<BenchPresetId, BenchPreset> = {
     pointCount: 10000,
     hz: 10,
     panelHeight: 72,
-    description: "10 panels × 10000 pts @ 10 Hz — pushes Recharts hard",
+    description: "10 panels × 10000 pts @ 10 Hz — stresses Recharts",
   },
 };
 
 export const FRAME_BUDGET_MS = 16;
+
+export const ISOLATED_BENCH_WARMUP = 5;
+export const ISOLATED_BENCH_UPDATES = 30;
+export const ISOLATED_BENCH_SETTLE_MS = 250;
 
 export function getPanelGridColumns(panelCount: number): number {
   if (panelCount <= 4) return 2;
@@ -137,8 +120,15 @@ export function createPanelState(spec: LivePanelSpec, pointCount: number): LiveP
 
 export function shiftSeries(values: number[]): number[] {
   const last = values[values.length - 1] ?? 0;
-  const delta = (Math.random() - 0.5) * (Math.abs(last) * 0.05 + 0.8);
+  const delta = (Math.random() - 0.5) * 2;
   return [...values.slice(1), Math.max(0, last + delta)];
+}
+
+export function shiftPanels(panels: LivePanelState[]): LivePanelState[] {
+  return panels.map((panel) => ({
+    ...panel,
+    values: shiftSeries(panel.values),
+  }));
 }
 
 export function percentile(sorted: number[], p: number): number {
@@ -190,6 +180,19 @@ function buildTimingMetrics(
     sampleCount: samples.length,
     overBudgetFrames,
     severeJankFrames,
+  };
+}
+
+function recordSample(
+  samples: number[],
+  elapsed: number,
+  budgetMs: number,
+  windowSize: number,
+): { samples: number[]; overBudget: boolean; severeJank: boolean } {
+  return {
+    samples: [...samples, elapsed].slice(-windowSize),
+    overBudget: elapsed > budgetMs,
+    severeJank: elapsed > budgetMs * 2,
   };
 }
 
@@ -249,6 +252,45 @@ export function useTimingMetrics(
   return { metrics, record, flush, reset, onProfilerRender };
 }
 
+export type CiBenchReference = {
+  fixtureId: string;
+  environment: string;
+  panels: number;
+  points: number;
+  axichartsP95Ms: number;
+  rechartsP95Ms: number;
+  echartsP95Ms?: number;
+};
+
+/** Published CI numbers from benchmarks/results/latest/browser-competitive.json */
+const CI_BENCH_FIXTURES: CiBenchReference[] = [
+  {
+    fixtureId: "dashboard-6up",
+    environment: "chromium-4x",
+    panels: 6,
+    points: 2000,
+    axichartsP95Ms: 2.9,
+    rechartsP95Ms: 54.3,
+    echartsP95Ms: 26.5,
+  },
+];
+
+export function lookupCiReference(
+  panelCount: number,
+  pointCount: number,
+): CiBenchReference | undefined {
+  return CI_BENCH_FIXTURES.find(
+    (fixture) => fixture.panels === panelCount && fixture.points === pointCount,
+  );
+}
+
+export type IsolatedBenchResult = {
+  status: "pending" | "running" | "done";
+  axiP95Ms: number;
+  rechartsP95Ms: number;
+  updates: number;
+};
+
 export type LiveBenchConfig = {
   panelCount: number;
   pointCount: number;
@@ -260,22 +302,41 @@ export type LiveBenchConfig = {
 export type LiveBenchState = {
   panels: LivePanelState[];
   rechartsPanels: LivePanelState[];
-  frameMs: number;
-  p50Ms: number;
-  p95Ms: number;
-  maxMs: number;
-  cumulativeMs: number;
-  overBudgetFrames: number;
-  severeJankFrames: number;
+  axiLive: TimingMetrics;
+  rechartsLive: TimingMetrics;
+  isolatedBench: IsolatedBenchResult;
+  activeLibrary: "axicharts" | "recharts";
   hz: number;
   effectiveRechartsHz: number;
   pointCount: number;
   panelCount: number;
   running: boolean;
+  calibrating: boolean;
   rechartsThrottled: boolean;
   rechartsSkipRatio: number;
   toggle: () => void;
+  rerunIsolatedBench: () => void;
 };
+
+function runIsolatedUpdates(
+  warmup: number,
+  updates: number,
+  update: () => void,
+): number {
+  for (let index = 0; index < warmup; index++) {
+    update();
+  }
+
+  const times: number[] = [];
+  for (let index = 0; index < updates; index++) {
+    const start = performance.now();
+    flushSync(update);
+    times.push(performance.now() - start);
+  }
+
+  times.sort((a, b) => a - b);
+  return percentile(times, 0.95);
+}
 
 export function useLiveOpsBench({
   panelCount,
@@ -289,154 +350,275 @@ export function useLiveOpsBench({
     [panelCount, panelSpecs],
   );
   const [running, setRunning] = useState(true);
+  const [calibrating, setCalibrating] = useState(true);
   const [panels, setPanels] = useState<LivePanelState[]>(() =>
     specs.map((spec) => createPanelState(spec, pointCount)),
   );
   const [rechartsPanels, setRechartsPanels] = useState<LivePanelState[]>(() =>
     specs.map((spec) => createPanelState(spec, pointCount)),
   );
-  const [frameMs, setFrameMs] = useState(0);
-  const [p50Ms, setP50Ms] = useState(0);
-  const [p95Ms, setP95Ms] = useState(0);
-  const [maxMs, setMaxMs] = useState(0);
-  const [cumulativeMs, setCumulativeMs] = useState(0);
-  const [overBudgetFrames, setOverBudgetFrames] = useState(0);
-  const [severeJankFrames, setSevereJankFrames] = useState(0);
+  const [axiLive, setAxiLive] = useState<TimingMetrics>(createEmptyTimingMetrics);
+  const [rechartsLive, setRechartsLive] = useState<TimingMetrics>(createEmptyTimingMetrics);
+  const [isolatedBench, setIsolatedBench] = useState<IsolatedBenchResult>({
+    status: "pending",
+    axiP95Ms: 0,
+    rechartsP95Ms: 0,
+    updates: ISOLATED_BENCH_UPDATES,
+  });
+  const [activeLibrary, setActiveLibrary] = useState<"axicharts" | "recharts">("axicharts");
   const [rechartsSkipRatio, setRechartsSkipRatio] = useState(1);
-  const samplesRef = useRef<number[]>([]);
-  const cumulativeRef = useRef(0);
-  const overBudgetRef = useRef(0);
-  const severeJankRef = useRef(0);
+
+  const panelsRef = useRef(panels);
+  const rechartsPanelsRef = useRef(rechartsPanels);
   const tickRef = useRef(0);
   const rechartsSkipRef = useRef(1);
+  const axiSamplesRef = useRef<number[]>([]);
+  const axiCumulativeRef = useRef(0);
+  const axiOverBudgetRef = useRef(0);
+  const axiSevereRef = useRef(0);
+  const rechartsSamplesRef = useRef<number[]>([]);
+  const rechartsCumulativeRef = useRef(0);
+  const rechartsOverBudgetRef = useRef(0);
+  const rechartsSevereRef = useRef(0);
+  const [isolatedGeneration, setIsolatedGeneration] = useState(0);
+
+  panelsRef.current = panels;
+  rechartsPanelsRef.current = rechartsPanels;
+
+  const resetLiveMetrics = useCallback(() => {
+    axiSamplesRef.current = [];
+    axiCumulativeRef.current = 0;
+    axiOverBudgetRef.current = 0;
+    axiSevereRef.current = 0;
+    rechartsSamplesRef.current = [];
+    rechartsCumulativeRef.current = 0;
+    rechartsOverBudgetRef.current = 0;
+    rechartsSevereRef.current = 0;
+    setAxiLive(createEmptyTimingMetrics());
+    setRechartsLive(createEmptyTimingMetrics());
+  }, []);
+
+  const rerunIsolatedBench = useCallback(() => {
+    setIsolatedGeneration((value) => value + 1);
+  }, []);
 
   useEffect(() => {
     const seeded = specs.map((spec) => createPanelState(spec, pointCount));
     setPanels(seeded);
-    setRechartsPanels(seeded.map((panel) => ({ ...panel, values: [...panel.values] })));
-    samplesRef.current = [];
-    cumulativeRef.current = 0;
-    overBudgetRef.current = 0;
-    severeJankRef.current = 0;
+    setRechartsPanels(
+      seeded.map((panel) => ({ ...panel, values: [...panel.values] })),
+    );
+    panelsRef.current = seeded;
+    rechartsPanelsRef.current = seeded.map((panel) => ({
+      ...panel,
+      values: [...panel.values],
+    }));
     tickRef.current = 0;
     rechartsSkipRef.current = 1;
     setRechartsSkipRatio(1);
-    setFrameMs(0);
-    setP50Ms(0);
-    setP95Ms(0);
-    setMaxMs(0);
-    setCumulativeMs(0);
-    setOverBudgetFrames(0);
-    setSevereJankFrames(0);
-  }, [pointCount, specs]);
+    resetLiveMetrics();
+    setIsolatedBench({
+      status: "pending",
+      axiP95Ms: 0,
+      rechartsP95Ms: 0,
+      updates: ISOLATED_BENCH_UPDATES,
+    });
+    rerunIsolatedBench();
+  }, [pointCount, resetLiveMetrics, rerunIsolatedBench, specs]);
 
   useEffect(() => {
-    if (!running) return;
+    let cancelled = false;
+
+    const timer = window.setTimeout(() => {
+      if (cancelled) return;
+
+      setCalibrating(true);
+      setIsolatedBench({
+        status: "running",
+        axiP95Ms: 0,
+        rechartsP95Ms: 0,
+        updates: ISOLATED_BENCH_UPDATES,
+      });
+
+      const axiP95Ms = runIsolatedUpdates(
+        ISOLATED_BENCH_WARMUP,
+        ISOLATED_BENCH_UPDATES,
+        () => {
+          const next = shiftPanels(panelsRef.current);
+          panelsRef.current = next;
+          setPanels(next);
+        },
+      );
+
+      if (cancelled) return;
+
+      const rechartsP95Ms = runIsolatedUpdates(
+        ISOLATED_BENCH_WARMUP,
+        ISOLATED_BENCH_UPDATES,
+        () => {
+          const next = shiftPanels(rechartsPanelsRef.current);
+          rechartsPanelsRef.current = next;
+          setRechartsPanels(next);
+        },
+      );
+
+      if (cancelled) return;
+
+      setIsolatedBench({
+        status: "done",
+        axiP95Ms,
+        rechartsP95Ms,
+        updates: ISOLATED_BENCH_UPDATES,
+      });
+
+      const synced = panelsRef.current.map((panel) => ({
+        ...panel,
+        values: [...panel.values],
+      }));
+      rechartsPanelsRef.current = synced;
+      setRechartsPanels(synced);
+      setCalibrating(false);
+    }, ISOLATED_BENCH_SETTLE_MS);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [isolatedGeneration]);
+
+  useEffect(() => {
+    if (!running || calibrating) return;
 
     const id = window.setInterval(() => {
-      const start = performance.now();
-      let nextPanels: LivePanelState[] = [];
-      flushSync(() => {
-        setPanels((current) => {
-          nextPanels = current.map((panel) => ({
-            ...panel,
-            values: shiftSeries(panel.values),
-          }));
-          return nextPanels;
-        });
+      tickRef.current += 1;
+      const tick = tickRef.current;
+      const updateAxi = tick % 2 === 1;
 
-        tickRef.current += 1;
-        const shouldUpdateRecharts = tickRef.current % rechartsSkipRef.current === 0;
-        if (shouldUpdateRecharts) {
-          setRechartsPanels(
-            nextPanels.map((panel) => ({
+      const nextPanels = shiftPanels(panelsRef.current);
+      panelsRef.current = nextPanels;
+
+      const start = performance.now();
+      flushSync(() => {
+        if (updateAxi) {
+          setActiveLibrary("axicharts");
+          setPanels(nextPanels);
+        } else {
+          const skip = rechartsSkipRef.current;
+          if (tick % (2 * skip) === 0) {
+            setActiveLibrary("recharts");
+            const nextRecharts = nextPanels.map((panel) => ({
               ...panel,
               values: [...panel.values],
-            })),
-          );
+            }));
+            rechartsPanelsRef.current = nextRecharts;
+            setRechartsPanels(nextRecharts);
+          }
         }
       });
       const elapsed = performance.now() - start;
-      cumulativeRef.current += elapsed;
-      if (elapsed > FRAME_BUDGET_MS) overBudgetRef.current += 1;
-      if (elapsed > FRAME_BUDGET_MS * 2) severeJankRef.current += 1;
 
-      const samples = [...samplesRef.current, elapsed].slice(-60);
-      samplesRef.current = samples;
-      const sorted = [...samples].sort((a, b) => a - b);
+      if (updateAxi) {
+        axiCumulativeRef.current += elapsed;
+        const recorded = recordSample(
+          axiSamplesRef.current,
+          elapsed,
+          FRAME_BUDGET_MS,
+          60,
+        );
+        axiSamplesRef.current = recorded.samples;
+        if (recorded.overBudget) axiOverBudgetRef.current += 1;
+        if (recorded.severeJank) axiSevereRef.current += 1;
+        setAxiLive(
+          buildTimingMetrics(
+            axiSamplesRef.current,
+            axiCumulativeRef.current,
+            axiOverBudgetRef.current,
+            axiSevereRef.current,
+          ),
+        );
+      } else if (tick % (2 * rechartsSkipRef.current) === 0) {
+        rechartsCumulativeRef.current += elapsed;
+        const recorded = recordSample(
+          rechartsSamplesRef.current,
+          elapsed,
+          FRAME_BUDGET_MS,
+          60,
+        );
+        rechartsSamplesRef.current = recorded.samples;
+        if (recorded.overBudget) rechartsOverBudgetRef.current += 1;
+        if (recorded.severeJank) rechartsSevereRef.current += 1;
+        setRechartsLive(
+          buildTimingMetrics(
+            rechartsSamplesRef.current,
+            rechartsCumulativeRef.current,
+            rechartsOverBudgetRef.current,
+            rechartsSevereRef.current,
+          ),
+        );
 
-      setFrameMs(elapsed);
-      setP50Ms(percentile(sorted, 0.5));
-      setP95Ms(percentile(sorted, 0.95));
-      setMaxMs(sorted[sorted.length - 1] ?? 0);
-      setCumulativeMs(cumulativeRef.current);
-      setOverBudgetFrames(overBudgetRef.current);
-      setSevereJankFrames(severeJankRef.current);
-
-      if (autoThrottleRecharts && elapsed > FRAME_BUDGET_MS) {
-        const nextSkip = Math.min(8, rechartsSkipRef.current * 2);
-        if (nextSkip !== rechartsSkipRef.current) {
+        if (autoThrottleRecharts && elapsed > FRAME_BUDGET_MS) {
+          const nextSkip = Math.min(8, rechartsSkipRef.current * 2);
+          if (nextSkip !== rechartsSkipRef.current) {
+            rechartsSkipRef.current = nextSkip;
+            setRechartsSkipRatio(nextSkip);
+          }
+        } else if (
+          autoThrottleRecharts &&
+          elapsed < FRAME_BUDGET_MS * 0.75 &&
+          rechartsSkipRef.current > 1
+        ) {
+          const nextSkip = Math.max(1, Math.floor(rechartsSkipRef.current / 2));
           rechartsSkipRef.current = nextSkip;
           setRechartsSkipRatio(nextSkip);
         }
-      } else if (autoThrottleRecharts && elapsed < FRAME_BUDGET_MS * 0.75 && rechartsSkipRef.current > 1) {
-        const nextSkip = Math.max(1, Math.floor(rechartsSkipRef.current / 2));
-        rechartsSkipRef.current = nextSkip;
-        setRechartsSkipRatio(nextSkip);
       }
     }, 1000 / hz);
 
     return () => window.clearInterval(id);
-  }, [autoThrottleRecharts, hz, running]);
+  }, [autoThrottleRecharts, calibrating, hz, running]);
 
-  const effectiveRechartsHz = hz / rechartsSkipRatio;
+  const effectiveRechartsHz = hz / (2 * rechartsSkipRatio);
 
   return useMemo(
     () => ({
       panels,
       rechartsPanels,
-      frameMs,
-      p50Ms,
-      p95Ms,
-      maxMs,
-      cumulativeMs,
-      overBudgetFrames,
-      severeJankFrames,
+      axiLive,
+      rechartsLive,
+      isolatedBench,
+      activeLibrary,
       hz,
       effectiveRechartsHz,
       pointCount,
       panelCount: specs.length,
       running,
+      calibrating,
       rechartsThrottled: rechartsSkipRatio > 1,
       rechartsSkipRatio,
       toggle: () => setRunning((value) => !value),
+      rerunIsolatedBench,
     }),
     [
       panels,
       rechartsPanels,
-      frameMs,
-      p50Ms,
-      p95Ms,
-      maxMs,
-      cumulativeMs,
-      overBudgetFrames,
-      severeJankFrames,
+      axiLive,
+      rechartsLive,
+      isolatedBench,
+      activeLibrary,
       hz,
       effectiveRechartsHz,
       pointCount,
       specs.length,
       running,
+      calibrating,
       rechartsSkipRatio,
+      rerunIsolatedBench,
     ],
   );
 }
 
-export function formatMetric(spec: LivePanelSpec, value: number): string {
-  if (spec.id === "throughput" || spec.id === "network") return `${Math.round(value)}`;
-  if (spec.id === "errors") return value.toFixed(1);
-  if (spec.id === "p95" || spec.id === "gc") return `${value.toFixed(0)} ms`;
-  if (spec.id === "cpu" || spec.id === "memory") return `${value.toFixed(0)}%`;
-  return value.toFixed(0);
+export function formatSeriesValue(value: number): string {
+  return value.toFixed(1);
 }
 
 export function formatMultiplier(ratio: number): string {

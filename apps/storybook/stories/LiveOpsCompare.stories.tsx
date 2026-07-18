@@ -10,7 +10,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Live ops wall stress demo — AxiCharts (uPlot canvas) vs Recharts (SVG) on the same `flushSync` data stream. Presets from published benchmark (Standard) through Heavy and Extreme. Per-column React Profiler timings, frame-budget jank counters, and optional Recharts auto-throttle.",
+          "Live ops wall stress demo — AxiCharts (uPlot canvas) vs Recharts (SVG) on a synthetic load generator. Isolated flushSync calibration (bench-harness methodology) plus alternating live ticks for fair per-library timing. CI reference numbers shown separately from device-measured p95.",
       },
     },
   },

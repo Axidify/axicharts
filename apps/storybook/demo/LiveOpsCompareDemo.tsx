@@ -16,11 +16,13 @@ import {
 import {
   BENCH_PRESETS,
   FRAME_BUDGET_MS,
-  formatMetric,
+  ISOLATED_BENCH_UPDATES,
   formatMultiplier,
+  formatSeriesValue,
   getPanelGridColumns,
   getPanelSpecs,
   isStruggling,
+  lookupCiReference,
   type BenchPresetId,
   type LiveBenchState,
   type LivePanelState,
@@ -28,11 +30,6 @@ import {
   useLiveOpsBench,
   useTimingMetrics,
 } from "./liveBench";
-
-const PUBLISHED_P95 = {
-  axicharts: 2.9,
-  recharts: 54.3,
-};
 
 const CONTROL_STYLE: React.CSSProperties = {
   padding: "6px 10px",
@@ -46,21 +43,19 @@ const CONTROL_STYLE: React.CSSProperties = {
 function PanelShell({
   label,
   value,
-  warn,
   children,
 }: {
   label: string;
   value: string;
-  warn?: boolean;
   children: ReactElement;
 }): ReactElement {
   return (
     <div
       style={{
-        border: warn ? "1px solid #b45309" : "1px solid #334155",
+        border: "1px solid #334155",
         borderRadius: 8,
         padding: "8px 10px",
-        background: warn ? "rgba(120, 53, 15, 0.12)" : "#0f172a",
+        background: "#0f172a",
         minWidth: 0,
       }}
     >
@@ -78,7 +73,7 @@ function PanelShell({
           style={{
             fontSize: 11,
             fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-            color: warn ? "#fbbf24" : "#e2e8f0",
+            color: "#e2e8f0",
           }}
         >
           {value}
@@ -91,14 +86,9 @@ function PanelShell({
 
 function AxiPanel({ panel, height }: { panel: LivePanelState; height: number }): ReactElement {
   const last = panel.values[panel.values.length - 1] ?? 0;
-  const warn = panel.spec.id === "errors" && last > 4;
 
   return (
-    <PanelShell
-      label={panel.spec.label}
-      value={formatMetric(panel.spec, last)}
-      warn={warn}
-    >
+    <PanelShell label={panel.spec.label} value={formatSeriesValue(last)}>
       <ChartContainer
         theme={industrialTheme}
         mode="live"
@@ -132,18 +122,13 @@ function RechartsPanel({
   width: number;
 }): ReactElement {
   const last = panel.values[panel.values.length - 1] ?? 0;
-  const warn = panel.spec.id === "errors" && last > 4;
   const data = panel.categories.map((category, index) => ({
     x: category,
     y: panel.values[index] ?? 0,
   }));
 
   return (
-    <PanelShell
-      label={panel.spec.label}
-      value={formatMetric(panel.spec, last)}
-      warn={warn}
-    >
+    <PanelShell label={panel.spec.label} value={formatSeriesValue(last)}>
       <RechartsLineChart width={width} height={height} data={data}>
         <XAxis dataKey="x" hide />
         <YAxis hide domain={["auto", "auto"]} />
@@ -206,12 +191,14 @@ function TimingRow({
   accent,
   struggling,
   throttleNote,
+  footnote,
 }: {
   title: string;
   metrics: TimingMetrics;
   accent: string;
   struggling?: boolean;
   throttleNote?: string;
+  footnote?: string;
 }): ReactElement {
   return (
     <div
@@ -251,29 +238,24 @@ function TimingRow({
         <MiniStat label="max" value={`${metrics.maxMs.toFixed(2)} ms`} />
         <MiniStat label="last" value={`${metrics.frameMs.toFixed(2)} ms`} />
         <MiniStat
-          label=">16ms"
+          label={`>${FRAME_BUDGET_MS}ms`}
           value={String(metrics.overBudgetFrames)}
           warn={metrics.overBudgetFrames > 0}
         />
-        <MiniStat
-          label="cumulative"
-          value={`${(metrics.cumulativeMs / 1000).toFixed(1)}s`}
-        />
+        <MiniStat label="samples" value={String(metrics.sampleCount)} />
       </div>
       {throttleNote ? (
         <p style={{ margin: "8px 0 0", fontSize: 10, color: "#fbbf24" }}>{throttleNote}</p>
+      ) : null}
+      {footnote ? (
+        <p style={{ margin: "8px 0 0", fontSize: 10, color: "#64748b" }}>{footnote}</p>
       ) : null}
     </div>
   );
 }
 
-function formatRatio(
-  axiP95: number,
-  rechartsP95: number,
-  flushP95: number,
-): string {
+function formatRatio(axiP95: number, rechartsP95: number): string {
   if (axiP95 > 0 && rechartsP95 > 0) return formatMultiplier(rechartsP95 / axiP95);
-  if (axiP95 > 0 && flushP95 > axiP95) return `>${formatMultiplier(flushP95 / axiP95)}`;
   return "—";
 }
 
@@ -388,6 +370,7 @@ export function LiveOpsCompareDemo({
 
   const panelSpecs = useMemo(() => getPanelSpecs(panelCount), [panelCount]);
   const gridColumns = getPanelGridColumns(panelCount);
+  const ciReference = lookupCiReference(panelCount, pointCount);
 
   const bench = useLiveOpsBench({
     panelCount,
@@ -419,14 +402,18 @@ export function LiveOpsCompareDemo({
   useEffect(() => {
     flushAxi();
     flushRecharts();
-  }, [bench.frameMs, flushAxi, flushRecharts]);
+  }, [bench.axiLive.frameMs, bench.rechartsLive.frameMs, flushAxi, flushRecharts]);
 
-  const ratioLabel = formatRatio(axiMetrics.p95Ms, rechartsMetrics.p95Ms, bench.p95Ms);
+  const isolated = bench.isolatedBench;
+  const primaryAxiP95 =
+    isolated.status === "done" ? isolated.axiP95Ms : bench.axiLive.p95Ms;
+  const primaryRechartsP95 =
+    isolated.status === "done" ? isolated.rechartsP95Ms : bench.rechartsLive.p95Ms;
+  const ratioLabel = formatRatio(primaryAxiP95, primaryRechartsP95);
 
   const rechartsStruggling =
-    isStruggling(rechartsMetrics) || bench.p95Ms > FRAME_BUDGET_MS * 2;
-  const axiStruggling = isStruggling(axiMetrics);
-  const totalStruggling = bench.p95Ms > FRAME_BUDGET_MS;
+    isStruggling(bench.rechartsLive) || primaryRechartsP95 > FRAME_BUDGET_MS;
+  const axiStruggling = isStruggling(bench.axiLive) || primaryAxiP95 > FRAME_BUDGET_MS;
 
   const panelWidth = Math.max(160, Math.floor(720 / gridColumns) - 24);
 
@@ -445,28 +432,64 @@ export function LiveOpsCompareDemo({
           <h2 style={{ margin: "0 0 6px", fontSize: 22, color: "#f8fafc" }}>
             Live ops wall — {panelCount} panels × {pointCount.toLocaleString()} pts @ {hz} Hz
           </h2>
-          <p style={{ margin: 0, fontSize: 13, color: "#94a3b8", maxWidth: 720 }}>
-            Same synthetic telemetry stream, same React update loop (<code>flushSync</code>).
-            Per-column timings via React Profiler. Published Chromium 4× p95 (6 × 2000):{" "}
-            <strong style={{ color: "#60a5fa" }}>{PUBLISHED_P95.axicharts} ms</strong> vs{" "}
-            <strong style={{ color: "#f87171" }}>{PUBLISHED_P95.recharts} ms</strong>.
+          <p style={{ margin: 0, fontSize: 13, color: "#94a3b8", maxWidth: 760 }}>
+            Synthetic load generator drives chart updates — not real CPU/memory telemetry.
+            Performance uses the same isolated <code>flushSync</code> methodology as{" "}
+            <code>apps/bench-harness</code>: each library measured alone ({ISOLATED_BENCH_UPDATES}{" "}
+            updates), then live alternating ticks (one library per tick) for ongoing samples.
+            Side-by-side rendering cannot match CI numbers exactly — your device differs from
+            headless Chromium 4×.
           </p>
+          {ciReference ? (
+            <p style={{ margin: "8px 0 0", fontSize: 12, color: "#64748b" }}>
+              Published CI reference ({ciReference.environment}, {ciReference.panels} ×{" "}
+              {ciReference.points} pts): AxiCharts{" "}
+              <strong style={{ color: "#60a5fa" }}>{ciReference.axichartsP95Ms} ms</strong> ·
+              Recharts{" "}
+              <strong style={{ color: "#f87171" }}>{ciReference.rechartsP95Ms} ms</strong>
+              {ciReference.echartsP95Ms != null
+                ? ` · ECharts ${ciReference.echartsP95Ms} ms`
+                : ""}
+            </p>
+          ) : (
+            <p style={{ margin: "8px 0 0", fontSize: 12, color: "#64748b" }}>
+              No published CI fixture for this panel/point count — use measured numbers below.
+            </p>
+          )}
         </div>
-        <button
-          type="button"
-          onClick={bench.toggle}
-          style={{
-            padding: "8px 14px",
-            borderRadius: 8,
-            border: "1px solid #475569",
-            background: bench.running ? "#1e293b" : "#0f172a",
-            color: "#e2e8f0",
-            cursor: "pointer",
-            fontSize: 13,
-          }}
-        >
-          {bench.running ? "Pause stream" : "Resume stream"}
-        </button>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={bench.rerunIsolatedBench}
+            disabled={bench.calibrating}
+            style={{
+              padding: "8px 14px",
+              borderRadius: 8,
+              border: "1px solid #475569",
+              background: "#0f172a",
+              color: bench.calibrating ? "#64748b" : "#e2e8f0",
+              cursor: bench.calibrating ? "not-allowed" : "pointer",
+              fontSize: 13,
+            }}
+          >
+            {bench.calibrating ? "Calibrating…" : "Re-run calibration"}
+          </button>
+          <button
+            type="button"
+            onClick={bench.toggle}
+            style={{
+              padding: "8px 14px",
+              borderRadius: 8,
+              border: "1px solid #475569",
+              background: bench.running ? "#1e293b" : "#0f172a",
+              color: "#e2e8f0",
+              cursor: "pointer",
+              fontSize: 13,
+            }}
+          >
+            {bench.running ? "Pause stream" : "Resume stream"}
+          </button>
+        </div>
       </header>
 
       {showControls ? (
@@ -496,7 +519,7 @@ export function LiveOpsCompareDemo({
         />
       ) : null}
 
-      {totalStruggling || rechartsStruggling ? (
+      {rechartsStruggling ? (
         <div
           style={{
             padding: "10px 14px",
@@ -507,23 +530,19 @@ export function LiveOpsCompareDemo({
             fontSize: 12,
           }}
         >
-          {rechartsStruggling ? (
-            <strong>Recharts exceeding {FRAME_BUDGET_MS}ms frame budget</strong>
-          ) : (
-            <strong>Combined update loop exceeding frame budget</strong>
-          )}
+          <strong>Recharts exceeding {FRAME_BUDGET_MS}ms frame budget on this device</strong>
           {bench.rechartsThrottled
             ? ` — auto-throttle active (Recharts @ ~${bench.effectiveRechartsHz.toFixed(1)} Hz)`
             : autoThrottle
               ? " — enable auto-throttle to skip Recharts frames when struggling"
-              : " — try Heavy or Extreme presets to see the gap widen"}
+              : " — try Heavy or Extreme presets to widen the gap"}
         </div>
       ) : null}
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
           gap: 12,
         }}
       >
@@ -531,23 +550,63 @@ export function LiveOpsCompareDemo({
           label="Speed ratio (Recharts / Axi)"
           value={ratioLabel}
           accent="#fbbf24"
-          sub="Higher = AxiCharts advantage"
+          sub={
+            isolated.status === "done"
+              ? "From isolated calibration on this device"
+              : "Live estimate until calibration completes"
+          }
         />
         <MetricPill
-          label="flushSync p95 (full tick)"
-          value={`${bench.p95Ms.toFixed(2)} ms`}
-          warn={totalStruggling}
+          label="AxiCharts p95 (isolated)"
+          value={
+            isolated.status === "done"
+              ? `${isolated.axiP95Ms.toFixed(2)} ms`
+              : isolated.status === "running"
+                ? "…"
+                : "—"
+          }
+          accent="#60a5fa"
+          sub={`Measured on this device · ${ISOLATED_BENCH_UPDATES} updates`}
         />
         <MetricPill
-          label="Dropped frames (>16ms)"
-          value={String(bench.overBudgetFrames)}
-          accent={bench.overBudgetFrames > 0 ? "#f87171" : undefined}
-          warn={bench.overBudgetFrames > 0}
+          label="Recharts p95 (isolated)"
+          value={
+            isolated.status === "done"
+              ? `${isolated.rechartsP95Ms.toFixed(2)} ms`
+              : isolated.status === "running"
+                ? "…"
+                : "—"
+          }
+          accent="#f87171"
+          warn={primaryRechartsP95 > FRAME_BUDGET_MS}
+          sub={`Measured on this device · ${ISOLATED_BENCH_UPDATES} updates`}
         />
         <MetricPill
-          label="Severe jank (>32ms)"
-          value={String(bench.severeJankFrames)}
-          accent={bench.severeJankFrames > 0 ? "#ef4444" : undefined}
+          label="Active library"
+          value={bench.activeLibrary === "axicharts" ? "AxiCharts" : "Recharts"}
+          sub="Alternating ticks — one library per update"
+        />
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <TimingRow
+          title="AxiCharts — live flushSync"
+          metrics={bench.axiLive}
+          accent="#60a5fa"
+          struggling={axiStruggling}
+          footnote="Alternating tick samples on this device"
+        />
+        <TimingRow
+          title="Recharts — live flushSync"
+          metrics={bench.rechartsLive}
+          accent="#f87171"
+          struggling={rechartsStruggling}
+          throttleNote={
+            bench.rechartsThrottled
+              ? `Throttled: 1 update per ${bench.rechartsSkipRatio * 2} ticks (~${bench.effectiveRechartsHz.toFixed(1)} Hz)`
+              : undefined
+          }
+          footnote="Alternating tick samples on this device"
         />
       </div>
 
@@ -556,24 +615,20 @@ export function LiveOpsCompareDemo({
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           gap: 12,
+          opacity: 0.85,
         }}
       >
         <TimingRow
-          title="AxiCharts profiler"
+          title="AxiCharts — React Profiler (supplementary)"
           metrics={axiMetrics}
           accent="#60a5fa"
-          struggling={axiStruggling}
+          footnote="Profiler commit time — not used for primary ratio"
         />
         <TimingRow
-          title="Recharts profiler"
+          title="Recharts — React Profiler (supplementary)"
           metrics={rechartsMetrics}
           accent="#f87171"
-          struggling={rechartsStruggling}
-          throttleNote={
-            bench.rechartsThrottled
-              ? `Throttled: 1 update per ${bench.rechartsSkipRatio} ticks (~${bench.effectiveRechartsHz.toFixed(1)} Hz)`
-              : undefined
-          }
+          footnote="Profiler commit time — not used for primary ratio"
         />
       </div>
 
@@ -844,7 +899,8 @@ function CompareColumn({
         </div>
       </Profiler>
       <p style={{ margin: "8px 0 0", fontSize: 11, color: "#64748b" }}>
-        {gridColumns}-col grid · {panelHeight}px panels · {bench.pointCount.toLocaleString()} pts
+        {gridColumns}-col grid · {panelHeight}px panels · {bench.pointCount.toLocaleString()} pts ·
+        synthetic load
       </p>
     </section>
   );
