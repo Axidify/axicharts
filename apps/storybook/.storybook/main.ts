@@ -40,6 +40,10 @@ const config: StorybookConfig = {
             root,
             "packages/charts/src/entry/bump.ts",
           ),
+          "@axicharts/charts/violin": path.resolve(
+            root,
+            "packages/charts/src/entry/violin.ts",
+          ),
           "@axicharts/charts/network": path.resolve(
             root,
             "packages/charts/src/entry/network.ts",
