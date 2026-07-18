@@ -121,6 +121,22 @@ export {
   useBrushSync,
   type UseCartesianBrushInput,
 } from "./sync/useCartesianBrush";
+export {
+  ChartNavigator,
+  CHART_NAVIGATOR_HEIGHT,
+  type ChartNavigatorConfig,
+  type ChartNavigatorProps,
+} from "./navigator/ChartNavigator";
+export {
+  NavigatorPresetButtons,
+  NAVIGATOR_PRESETS_HEIGHT,
+  type NavigatorPresetButtonsProps,
+} from "./navigator/NavigatorPresetButtons";
+export {
+  brushRangeForPreset,
+  DEFAULT_NAVIGATOR_PRESETS,
+  type NavigatorPreset,
+} from "./navigator/navigatorPresets";
 export { SyncHighlight, type SyncHighlightProps } from "./sync/SyncHighlight";
 export { useEChartsInteraction } from "./sync/useEChartsInteraction";
 export {

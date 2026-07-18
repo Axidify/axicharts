@@ -6,6 +6,7 @@ import type { BrushRange } from "./brushRange";
 
 export type UseCartesianBrushInput = {
   brush?: boolean;
+  brushStart?: number;
   brushEnd?: number;
 };
 
@@ -16,13 +17,14 @@ export function useBrushSync(input: UseCartesianBrushInput) {
 
 export function useCartesianBrush({
   brush = false,
+  brushStart = 0,
   brushEnd = 100,
 }: UseCartesianBrushInput) {
   const { syncId, syncFollower } = useChartLayout();
   const sync = useOptionalChartSync();
 
   const [leaderRange, setLeaderRange] = useState<BrushRange>(() => ({
-    start: 0,
+    start: brushStart,
     end: brushEnd,
   }));
 

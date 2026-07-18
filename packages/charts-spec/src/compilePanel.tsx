@@ -5,6 +5,8 @@ import {
   BoxplotChart,
   CandlestickChart,
   ChartContainer,
+  ChartNavigator,
+  CHART_NAVIGATOR_HEIGHT,
   ComboChart,
   Gauge,
   HeatmapChart,
@@ -25,6 +27,7 @@ import {
   type StatTone,
   type SeriesTone,
   type ComboSeries,
+  type NavigatorPreset,
   readTagTones,
   applyTagTonesToSeries,
   resolveTagStatTone,
@@ -544,6 +547,36 @@ export function compilePanel(
         surface: props.surface as "light" | "dark" | undefined,
         title: String(props.title ?? resolved.title ?? "Active alarms"),
       });
+    }
+
+    case "navigator": {
+      const categories = resolved.encoding?.x
+        ? (pluckField(rows, resolved.encoding.x) as string[])
+        : ((props.categories as string[]) ?? []);
+      const baseSeries =
+        seriesFromEncoding(rows, resolved.encoding?.y).length > 0
+          ? seriesFromEncoding(rows, resolved.encoding?.y)
+          : ((props.series as PlotSeries[]) ?? []);
+      const navigatorProps =
+        (props.navigator as Record<string, unknown> | undefined) ?? {};
+      const presets =
+        (props.presets as NavigatorPreset[] | undefined) ??
+        (navigatorProps.presets as NavigatorPreset[] | undefined);
+      const initialPreset =
+        (props.initialPreset as NavigatorPreset | undefined) ??
+        (navigatorProps.initialPreset as NavigatorPreset | undefined);
+
+      return wrapChart(
+        { ...resolved, height: resolved.height ?? CHART_NAVIGATOR_HEIGHT },
+        createElement(ChartNavigator, {
+          categories,
+          series: applyTagTonesToSeries(baseSeries, tagTones),
+          presets,
+          initialPreset,
+        }),
+        options,
+        tagTones,
+      );
     }
 
     case "markdown":

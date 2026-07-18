@@ -82,6 +82,7 @@ export type PanelChartType =
   | "table"
   | "markdown"
   | "text"
+  | "navigator"
   | "sankey"
   | "geo"
   | "gantt"

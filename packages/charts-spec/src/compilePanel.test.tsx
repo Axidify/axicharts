@@ -354,6 +354,31 @@ describe("compilePanel markdown", () => {
   });
 });
 
+describe("compilePanel navigator", () => {
+  it("compiles navigator panel with preset props", () => {
+    const panel = compilePanel(
+      {
+        type: "navigator",
+        props: {
+          syncId: "nav",
+          navigator: { presets: ["1D", "1W", "ALL"], initialPreset: "1W" },
+        },
+        encoding: { x: { field: "day" }, y: { field: "value" } },
+      },
+      [
+        { day: "2026-01-01", value: 10 },
+        { day: "2026-01-02", value: 12 },
+        { day: "2026-01-03", value: 11 },
+      ],
+    );
+
+    expect(isValidElement(panel)).toBe(true);
+    const container = panel as ReactElement<{ height?: number; syncId?: string }>;
+    expect(container.props.syncId).toBe("nav");
+    expect(container.props.height).toBe(48);
+  });
+});
+
 describe("compilePanel brush sync", () => {
   it("passes syncId and syncFollower to ChartContainer", () => {
     const panel = compilePanel(
