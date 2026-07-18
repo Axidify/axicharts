@@ -1,0 +1,18 @@
+{
+  "specVersion": 1,
+  "type": "area",
+  "title": "Latency vs SLO",
+  "theme": "clean",
+  "height": 220,
+  "fill": true,
+  "encoding": {
+    "x": { "field": "day", "type": "nominal" },
+    "y": { "field": "latency", "type": "quantitative" },
+    "color": { "field": "meets_slo", "type": "semantic" }
+  },
+  "props": {
+    "legendVariant": "compact",
+    "tooltipVariant": "dense"
+  },
+  "valueSuffix": " ms"
+}

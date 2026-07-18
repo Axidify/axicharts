@@ -1,15 +1,27 @@
 import type { ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { ChartContainer, LineChart, Stat } from "@axicharts/charts";
+import {
+  Bar,
+  BarChart,
+  Cell,
+  ChartContainer,
+  LineChart,
+  Stat,
+  XAxis,
+  YAxis,
+} from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
 import {
   Area,
   AreaChart,
+  Bar as RechartsBar,
+  BarChart as RechartsBarChart,
   CartesianGrid,
+  Cell as RechartsCell,
   Line,
   LineChart as RechartsLineChart,
-  XAxis,
-  YAxis,
+  XAxis as RechartsXAxis,
+  YAxis as RechartsYAxis,
 } from "recharts";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -165,8 +177,8 @@ function RechartsBarePanel(): ReactElement {
       </div>
       <div style={{ padding: 16 }}>
         <RechartsLineChart width={468} height={180} data={ROWS}>
-          <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-          <YAxis tick={{ fontSize: 11 }} width={32} />
+          <RechartsXAxis dataKey="day" tick={{ fontSize: 11 }} />
+          <RechartsYAxis tick={{ fontSize: 11 }} width={32} />
           <Line
             type="monotone"
             dataKey="p95"
@@ -233,13 +245,13 @@ function RechartsStyledPanel(): ReactElement {
               </linearGradient>
             </defs>
             <CartesianGrid stroke="#e2e8f0" vertical={false} />
-            <XAxis
+            <RechartsXAxis
               dataKey="day"
               tick={{ fontSize: 11, fill: "#64748b" }}
               axisLine={{ stroke: "#e2e8f0" }}
               tickLine={false}
             />
-            <YAxis
+            <RechartsYAxis
               tick={{ fontSize: 11, fill: "#64748b" }}
               axisLine={false}
               tickLine={false}
@@ -324,6 +336,85 @@ function SideBySideComparison(): ReactElement {
   );
 }
 
+const WEEKS = ["W1", "W2", "W3", "W4", "W5"];
+const THROUGHPUT = [120, 90, 150, 110, 180];
+const TARGET = 150;
+
+const THROUGHPUT_ROWS = WEEKS.map((week, index) => ({
+  week,
+  throughput: THROUGHPUT[index]!,
+  aboveTarget: THROUGHPUT[index]! >= TARGET,
+}));
+
+function GranularBarComparison(): ReactElement {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 20,
+        maxWidth: 900,
+      }}
+    >
+      <div>
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            color: "#2563eb",
+            marginBottom: 8,
+          }}
+        >
+          AxiCharts · Cell per category (C68)
+        </div>
+        <ChartContainer theme={cleanTheme} height={220} width="100%">
+          <BarChart data={THROUGHPUT_ROWS} showValues valueSuffix=" req/min">
+            <XAxis dataKey="week" />
+            <YAxis />
+            <Bar dataKey="throughput">
+              {THROUGHPUT_ROWS.map((row) => (
+                <Cell
+                  key={row.week}
+                  dataKey={row.week}
+                  fill={row.aboveTarget ? "#16a34a" : "#d97706"}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ChartContainer>
+      </div>
+      <div>
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            color: "#64748b",
+            marginBottom: 8,
+          }}
+        >
+          Recharts · Cell fill parity
+        </div>
+        <RechartsBarChart width={420} height={220} data={THROUGHPUT_ROWS}>
+          <RechartsXAxis dataKey="week" tick={{ fontSize: 11 }} />
+          <RechartsYAxis tick={{ fontSize: 11 }} width={32} />
+          <RechartsBar dataKey="throughput" radius={[5, 5, 0, 0]}>
+            {THROUGHPUT_ROWS.map((row) => (
+              <RechartsCell
+                key={row.week}
+                fill={row.aboveTarget ? "#16a34a" : "#d97706"}
+              />
+            ))}
+          </RechartsBar>
+        </RechartsBarChart>
+      </div>
+    </div>
+  );
+}
+
 const meta = {
   title: "Compare/Recharts vs AxiCharts",
   component: SideBySideComparison,
@@ -335,6 +426,18 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const GranularBarCells: Story = {
+  render: () => <GranularBarComparison />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Per-category bar fills — AxiCharts Bar/Cell composable vs Recharts Bar/Cell (C73 parity).",
+      },
+    },
+  },
+};
 
 export const CleanDefault: Story = {
   render: () => <SideBySideComparison />,

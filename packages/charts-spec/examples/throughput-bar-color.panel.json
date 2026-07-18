@@ -1,0 +1,22 @@
+{
+  "specVersion": 1,
+  "type": "bar",
+  "title": "Weekly throughput",
+  "theme": "clean",
+  "height": 220,
+  "encoding": {
+    "x": { "field": "week", "type": "nominal" },
+    "y": { "field": "throughput", "type": "quantitative" },
+    "color": { "field": "aboveTarget", "type": "semantic" }
+  },
+  "props": {
+    "showValues": true,
+    "style": {
+      "bar": { "radius": 8, "gap": 0.32 },
+      "grid": { "opacity": 0.4 }
+    },
+    "legendVariant": "inline",
+    "tooltipVariant": "minimal"
+  },
+  "valueSuffix": " req/min"
+}

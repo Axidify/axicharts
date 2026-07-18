@@ -96,4 +96,40 @@ describe("ejectPanel", () => {
     expect(jsx).toContain('"radius":10');
     expect(jsx).not.toContain("style=");
   });
+
+  it("emits Cell fills for encoding.color on bar panels", () => {
+    const jsx = ejectPanel({
+      type: "bar",
+      theme: "clean",
+      encoding: {
+        x: { field: "week" },
+        y: { field: "throughput" },
+        color: { field: "aboveTarget", type: "semantic" },
+      },
+      props: { showValues: true },
+    });
+
+    expect(jsx).toContain("resolveColorFill");
+    expect(jsx).toContain("<Cell");
+    expect(jsx).toContain("row.aboveTarget");
+    expect(jsx).toContain("<Bar dataKey=\"throughput\">");
+    expect(jsx).not.toContain("encoding.color");
+  });
+
+  it("emits chrome variants on ChartContainer", () => {
+    const jsx = ejectPanel({
+      type: "line",
+      encoding: {
+        x: { field: "week" },
+        y: { field: "revenue" },
+      },
+      props: {
+        legendVariant: "inline",
+        tooltipVariant: "dense",
+      },
+    });
+
+    expect(jsx).toContain('legendVariant="inline"');
+    expect(jsx).toContain('tooltipVariant="dense"');
+  });
 });

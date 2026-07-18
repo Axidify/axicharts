@@ -1,0 +1,38 @@
+# Panel spec examples
+
+Runnable fixtures for `compilePanel`, `ejectPanel`, and the CLI.
+
+## Granular styling (C68–C73)
+
+| File | shadcn / Recharts parity |
+|------|--------------------------|
+| [revenue-line.panel.json](./revenue-line.panel.json) | Basic area line — `encoding.x` / `encoding.y` |
+| [throughput-bar-color.panel.json](./throughput-bar-color.panel.json) | **Colored bars** — `encoding.color`, `props.style`, chrome variants |
+| [area-slo-line.panel.json](./area-slo-line.panel.json) | **Segmented area** — per-point `encoding.color` on area marks |
+
+## CLI
+
+```bash
+# Compile to stdout (requires app harness) or eject Layer 1 JSX
+npx @axicharts/charts-spec eject examples/throughput-bar-color.panel.json
+
+# Plan from profile + intent
+npx @axicharts/charts-spec plan profile.json --intent "throughput color by above target"
+```
+
+## Eject output
+
+Panels with `encoding.color` eject to composable `<Bar><Cell fill /></Bar>` (or Line/Area) with a `resolveColorFill` helper — same renderer path as `compilePanel`.
+
+Panels with `props.style` eject to `createTheme(cleanTheme, { … })`. Chrome variants eject as `legendVariant` / `tooltipVariant` on `ChartContainer`.
+
+## shadcn Charts port map
+
+| shadcn / Recharts pattern | AxiCharts spec | AxiCharts JSX |
+|---------------------------|----------------|---------------|
+| `<Bar><Cell fill /></Bar>` | `encoding.color` | `<Bar><Cell dataKey fill /></Bar>` |
+| `chartConfig` labels/colors | `chartConfig` on container | `ChartContainer config={…}` |
+| Theme tokens | `props.style` | `createTheme(base, overrides)` |
+| Tooltip / legend chrome | `props.tooltipVariant` / `legendVariant` | `ChartContainer` props |
+
+Storybook: **Charts/ShadcnParity**, **Compare/Recharts vs AxiCharts**.

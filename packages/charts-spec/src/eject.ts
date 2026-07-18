@@ -1,8 +1,19 @@
 import type { PanelSpec } from "./types";
+import {
+  cartesianHasColorEncoding,
+  ejectCartesianBody,
+  ejectCartesianChartName,
+  ejectCartesianImports,
+} from "./ejectCartesian";
+import { chartPropsWithoutChromeMeta, readPanelChrome } from "./panelChrome";
 import { chartPropsWithoutStyle, readPanelStyle } from "./panelStyle";
 
 function quote(value: string): string {
   return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+}
+
+function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
+  return chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props));
 }
 
 function serializeProps(props: Record<string, unknown>, indent: string): string {
@@ -20,9 +31,38 @@ function serializeProps(props: Record<string, unknown>, indent: string): string 
   return lines.join("\n");
 }
 
+function resolveChartName(spec: PanelSpec): string {
+  if (spec.type === "line" || spec.type === "area" || spec.type === "bar") {
+    return ejectCartesianChartName(spec);
+  }
+
+  return spec.type === "pie"
+    ? "PieChart"
+    : spec.type === "donut"
+      ? "PieChart"
+      : spec.type === "funnel"
+        ? "FunnelChart"
+        : spec.type === "waterfall"
+          ? "WaterfallChart"
+          : spec.type === "candlestick"
+            ? "CandlestickChart"
+            : spec.type === "heatmap"
+              ? "HeatmapChart"
+              : spec.type === "scatter"
+                ? "ScatterChart"
+                : spec.type === "treemap"
+                  ? "TreemapChart"
+                  : spec.type === "stat"
+                    ? "Stat"
+                    : spec.type === "table"
+                      ? "DataTable"
+                      : "Gauge";
+}
+
 export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
   const theme = spec.theme ?? "clean";
   const panelStyle = readPanelStyle(spec.props);
+  const chrome = readPanelChrome(spec.props);
   const themeImport = panelStyle
     ? `createTheme, ${theme}Theme`
     : `${theme}Theme`;
@@ -32,39 +72,16 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
         ...panelStyle,
       })})`
     : `${theme}Theme`;
-  const mode = spec.mode ? `\n      mode="${spec.mode}"` : "";
+  const mode = spec.mode ? `\n  mode="${spec.mode}"` : "";
   const height = spec.height ?? 240;
-  const chartName =
-    spec.type === "line"
-      ? "LineChart"
-      : spec.type === "area"
-        ? "AreaChart"
-        : spec.type === "bar"
-          ? "BarChart"
-          : spec.type === "pie"
-            ? "PieChart"
-            : spec.type === "donut"
-              ? "PieChart"
-            : spec.type === "funnel"
-              ? "FunnelChart"
-              : spec.type === "waterfall"
-              ? "WaterfallChart"
-              : spec.type === "candlestick"
-                ? "CandlestickChart"
-                : spec.type === "heatmap"
-                  ? "HeatmapChart"
-                  : spec.type === "scatter"
-                    ? "ScatterChart"
-                    : spec.type === "treemap"
-                      ? "TreemapChart"
-                      : spec.type === "stat"
-                    ? "Stat"
-                    : spec.type === "table"
-                      ? "DataTable"
-                    : "Gauge";
+  const chartName = resolveChartName(spec);
+  const chromeAttrs = [
+    chrome.legendVariant ? `\n  legendVariant="${chrome.legendVariant}"` : "",
+    chrome.tooltipVariant ? `\n  tooltipVariant="${chrome.tooltipVariant}"` : "",
+  ].join("");
 
   if (spec.type === "stat" || spec.type === "gauge" || spec.type === "table") {
-    const props = chartPropsWithoutStyle(spec.props ?? {});
+    const props = chartPropsFromPanel(spec.props ?? {});
     const merged =
       spec.type === "stat" || spec.type === "gauge"
         ? { ...props, label: props.label ?? spec.title }
@@ -74,14 +91,12 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
 
   const encoding = spec.encoding;
   let chartBody = "";
+  let preamble = "";
 
   if (spec.type === "line" || spec.type === "area" || spec.type === "bar") {
-    const xField = encoding?.x?.field ?? "category";
-    const yField = Array.isArray(encoding?.y)
-      ? encoding.y[0]?.field
-      : encoding?.y?.field ?? "value";
-    chartBody = `categories={${dataVar}.map((row) => String(row.${xField}))}
-      series={[{ name: ${quote(yField ?? "value")}, data: ${dataVar}.map((row) => Number(row.${yField})) }]}${spec.fill ? "\n      fill" : ""}${spec.stacked ? "\n      stacked" : ""}${spec.valueSuffix ? `\n      valueSuffix=${quote(spec.valueSuffix)}` : ""}`;
+    const cartesian = ejectCartesianBody(spec, dataVar);
+    chartBody = cartesian.body;
+    preamble = cartesian.preamble ?? "";
   } else if (spec.type === "pie" || spec.type === "donut") {
     const nameField = encoding?.name?.field ?? "name";
     const valueField = encoding?.value?.field ?? "value";
@@ -90,60 +105,82 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       (spec.props?.innerRadius as number | undefined) ??
       (spec.type === "donut" ? 42 : undefined);
     chartBody = `slices={${dataVar}.map((row) => ({
-        name: String(row.${nameField}),
-        value: Number(row.${valueField}),
-      }))}${innerRadius != null ? `\n      innerRadius={${innerRadius}}` : ""}`;
+      name: String(row.${nameField}),
+      value: Number(row.${valueField}),
+    }))}${innerRadius != null ? `\n    innerRadius={${innerRadius}}` : ""}`;
   } else if (spec.type === "funnel") {
     const nameField = encoding?.name?.field ?? "name";
     const valueField = encoding?.value?.field ?? "value";
     chartBody = `stages={${dataVar}.map((row) => ({
-        name: String(row.${nameField}),
-        value: Number(row.${valueField}),
-      }))}`;
+      name: String(row.${nameField}),
+      value: Number(row.${valueField}),
+    }))}`;
   } else if (spec.type === "waterfall") {
     chartBody = `items={${dataVar}}
-      valueFormat="currency"`;
+    valueFormat="currency"`;
   } else if (spec.type === "candlestick") {
     chartBody = `categories={${dataVar}.map((row) => String(row.${encoding?.x?.field ?? "time"}))}
-      data={${dataVar}.map((row) => ({
-        open: Number(row.open),
-        high: Number(row.high),
-        low: Number(row.low),
-        close: Number(row.close),
-      }))}`;
+    data={${dataVar}.map((row) => ({
+      open: Number(row.open),
+      high: Number(row.high),
+      low: Number(row.low),
+      close: Number(row.close),
+    }))}`;
   } else if (spec.type === "scatter") {
     const xField = encoding?.x?.field ?? "x";
     const yField = Array.isArray(encoding?.y)
       ? encoding.y[0]?.field
       : encoding?.y?.field ?? "y";
     chartBody = `series={[{
-        name: "Series",
-        points: ${dataVar}.map((row) => ({
-          x: Number(row.${xField}),
-          y: Number(row.${yField}),
-          label: row.label != null ? String(row.label) : undefined,
-        })),
-      }]}`;
+      name: "Series",
+      points: ${dataVar}.map((row) => ({
+        x: Number(row.${xField}),
+        y: Number(row.${yField}),
+        label: row.label != null ? String(row.label) : undefined,
+      })),
+    }]}`;
   } else if (spec.type === "treemap") {
     chartBody = `nodes={${dataVar}.nodes ?? ${dataVar}.map((row) => ({
-        name: String(row.name),
-        value: Number(row.value),
-      }))}`;
+      name: String(row.name),
+      value: Number(row.value),
+    }))}`;
   } else if (spec.type === "heatmap") {
     chartBody = `matrix={${dataVar}.matrix}
-      min={${dataVar}.min}
-      max={${dataVar}.max}`;
+    min={${dataVar}.min}
+    max={${dataVar}.max}`;
   }
 
-  const chartProps = chartPropsWithoutStyle(spec.props ?? {});
-  const extraProps = Object.keys(chartProps).length
-    ? `\n      ${serializeProps(chartProps, "      ")}`
-    : "";
+  const chartProps = chartPropsFromPanel(spec.props ?? {});
+  const extraProps =
+    !cartesianHasColorEncoding(spec) && Object.keys(chartProps).length > 0
+      ? `\n    ${serializeProps(chartProps, "    ")}`
+      : "";
 
-  return `import { ChartContainer, ${chartName} } from "@axicharts/charts";
+  const imports = new Set<string>(["ChartContainer"]);
+  if (spec.type === "line" || spec.type === "area" || spec.type === "bar") {
+    for (const item of ejectCartesianImports(spec)) {
+      imports.add(item);
+    }
+  } else {
+    imports.add(chartName);
+  }
+
+  const preambleBlock = preamble ? `${preamble}\n\n` : "";
+
+  if (cartesianHasColorEncoding(spec)) {
+    return `${preambleBlock}import { ${[...imports].join(", ")} } from "@axicharts/charts";
 import { ${themeImport} } from "@axicharts/charts-theme";
 
-<ChartContainer theme={${themeExpr}}${mode} height={${height}} width="100%">
+<ChartContainer theme={${themeExpr}}${mode}${chromeAttrs} height={${height}} width="100%">
+  <${chartName}
+    ${chartBody}
+</ChartContainer>`;
+  }
+
+  return `${preambleBlock}import { ${[...imports].join(", ")} } from "@axicharts/charts";
+import { ${themeImport} } from "@axicharts/charts-theme";
+
+<ChartContainer theme={${themeExpr}}${mode}${chromeAttrs} height={${height}} width="100%">
   <${chartName}
     ${chartBody}${extraProps}
   />
