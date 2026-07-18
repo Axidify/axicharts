@@ -25,6 +25,9 @@ const VISUAL_STORIES = [
   },
 ] as const;
 
+/** Fixed viewport clip — avoids 1–3px height drift between macOS baselines and Linux CI. */
+const VIEWPORT_CLIP = { x: 0, y: 0, width: 1280, height: 900 };
+
 for (const story of VISUAL_STORIES) {
   test(`visual ${story.name}`, async ({ page }) => {
     const params = new URLSearchParams({
@@ -36,8 +39,8 @@ for (const story of VISUAL_STORIES) {
     });
     await page.waitForSelector(story.waitFor, { timeout: 60_000 });
     await page.waitForTimeout(story.settleMs ?? 1200);
-    const target = page.locator("#storybook-root");
-    await expect(target).toHaveScreenshot(`${story.name}.png`, {
+    await expect(page).toHaveScreenshot(`${story.name}.png`, {
+      clip: VIEWPORT_CLIP,
       maxDiffPixelRatio: story.maxDiffPixelRatio ?? 0.02,
     });
   });
