@@ -1,11 +1,17 @@
-export type ExportChartFormat = "png" | "svg";
+import { pngResultToPdf } from "./exportChartPdf";
+
+export type ExportChartFormat = "png" | "svg" | "pdf";
 
 export type ExportChartOptions = {
   format: ExportChartFormat;
   /** Background fill for raster export. Defaults to white. */
   background?: string;
-  /** Device pixel ratio for PNG export. Defaults to 2. */
+  /** Device pixel ratio for PNG/PDF export. Defaults to 2. */
   pixelRatio?: number;
+  /** PDF document title metadata (format: pdf). */
+  title?: string;
+  /** PDF document subject metadata (format: pdf). */
+  subject?: string;
 };
 
 export type ExportChartResult = {
@@ -144,7 +150,7 @@ async function canvasToSvg(
 }
 
 /**
- * Export a chart panel or ChartContainer subtree to PNG or SVG.
+ * Export a chart panel or ChartContainer subtree to PNG, SVG, or PDF.
  */
 export async function exportChart(
   target: HTMLElement,
@@ -159,16 +165,28 @@ export async function exportChart(
 
   const background = options.background ?? "#ffffff";
   const pixelRatio = options.pixelRatio ?? 2;
+  const pdfMetadata =
+    options.title || options.subject ?
+      { title: options.title, subject: options.subject }
+    : undefined;
 
   if (surface.kind === "canvas") {
     if (options.format === "png") {
       return canvasToPng(surface.node, background, pixelRatio);
+    }
+    if (options.format === "pdf") {
+      const png = await canvasToPng(surface.node, background, pixelRatio);
+      return pngResultToPdf(png, pdfMetadata);
     }
     return canvasToSvg(surface.node, background);
   }
 
   if (options.format === "png") {
     return svgToPng(surface.node, background, pixelRatio);
+  }
+  if (options.format === "pdf") {
+    const png = await svgToPng(surface.node, background, pixelRatio);
+    return pngResultToPdf(png, pdfMetadata);
   }
   return svgResult(surface.node);
 }

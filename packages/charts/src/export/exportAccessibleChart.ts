@@ -54,7 +54,16 @@ export async function exportAccessibleChart(
   const includeDataTable = options.includeDataTable ?? true;
   const enhanceSvg = options.enhanceSvg ?? true;
   const descriptor = resolveChartA11y(target);
-  const result = await exportChart(target, options);
+  const chartTitle = descriptor?.title;
+  const result = await exportChart(target, {
+    ...options,
+    title: options.title ?? chartTitle,
+    subject:
+      options.subject ??
+      (descriptor && includeDataTable ?
+        `Chart data export (${descriptor.kind})`
+      : undefined),
+  });
 
   if (!descriptor) {
     return result;

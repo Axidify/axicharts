@@ -17,11 +17,11 @@ function ExportChartDemo(): ReactElement {
   const canvasRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<HTMLDivElement>(null);
   const wallRef = useRef<HTMLDivElement>(null);
-  const [status, setStatus] = useState("Click export to download PNG/SVG snapshots.");
+  const [status, setStatus] = useState("Click export to download PNG/SVG/PDF snapshots.");
 
   async function exportPanel(
     target: HTMLDivElement | null,
-    format: "png" | "svg",
+    format: "png" | "svg" | "pdf",
     filename: string,
   ) {
     if (!target) return;
@@ -30,16 +30,16 @@ function ExportChartDemo(): ReactElement {
     setStatus(`Exported ${filename} (${result.width}×${result.height} ${format.toUpperCase()}).`);
   }
 
-  async function exportWall() {
+  async function exportWall(format: "png" | "pdf") {
     if (!wallRef.current) return;
     const panels = [
       ...wallRef.current.querySelectorAll<HTMLDivElement>("[data-export-panel]"),
     ];
-    const results = await exportChartBatch(panels, { format: "png" });
+    const results = await exportChartBatch(panels, { format });
     results.forEach((result, index) => {
-      downloadExport(result, `mosaic-panel-${index + 1}.png`);
+      downloadExport(result, `mosaic-panel-${index + 1}.${format}`);
     });
-    setStatus(`Batch exported ${results.length} mosaic panels as PNG.`);
+    setStatus(`Batch exported ${results.length} mosaic panels as ${format.toUpperCase()}.`);
   }
 
   return (
@@ -54,8 +54,17 @@ function ExportChartDemo(): ReactElement {
         <button type="button" onClick={() => exportPanel(svgRef.current, "svg", "stat.svg")}>
           Export stat SVG
         </button>
-        <button type="button" onClick={() => void exportWall()}>
+        <button type="button" onClick={() => exportPanel(canvasRef.current, "pdf", "line-chart.pdf")}>
+          Export line PDF
+        </button>
+        <button type="button" onClick={() => exportPanel(svgRef.current, "pdf", "stat.pdf")}>
+          Export stat PDF
+        </button>
+        <button type="button" onClick={() => void exportWall("png")}>
           Batch export mosaic PNG
+        </button>
+        <button type="button" onClick={() => void exportWall("pdf")}>
+          Batch export mosaic PDF
         </button>
       </div>
       <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>{status}</p>
@@ -106,7 +115,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C95 exportChart — PNG/SVG export for canvas (uPlot/ECharts) and SVG KPI panels, plus batch mosaic export.",
+          "C95 exportChart — PNG/SVG/PDF export for canvas (uPlot/ECharts) and SVG KPI panels, plus batch mosaic export. PDF uses a lazy-loaded jspdf raster embed (v1).",
       },
     },
   },
