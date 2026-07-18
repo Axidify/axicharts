@@ -19,4 +19,13 @@
   --chart-area-fill: hsl(var(--chart-1) / 0.2);
 }
 
-@import "./studio-tokens.css";
+[data-theme="studio"] {
+  --chart-1: 220 72% 50%;
+  --chart-2: 172 66% 38%;
+  --chart-3: 152 58% 36%;
+  --chart-4: 28 88% 52%;
+  --chart-5: 258 74% 58%;
+  --chart-grid: hsl(var(--border, 214 32% 91%) / 0.42);
+  --chart-axis: hsl(215 18% 42% / 0.88);
+  --chart-area-fill: hsl(var(--chart-1) / 0.22);
+}
