@@ -70,6 +70,12 @@ export function parseA11yDescriptor(raw: string): ChartA11yDescriptor | null {
       }
       return parsed;
     }
+    if (parsed.kind === "word-cloud") {
+      if (!Array.isArray(parsed.words)) {
+        return null;
+      }
+      return parsed;
+    }
     return null;
   } catch {
     return null;

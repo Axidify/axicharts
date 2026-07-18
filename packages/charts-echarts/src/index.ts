@@ -78,6 +78,8 @@ export { EChartsParallel, type EChartsParallelProps } from "./EChartsParallel";
 export type { ParallelDimension, ParallelSeries } from "./parallelTypes";
 export { EChartsThemeRiver, type EChartsThemeRiverProps } from "./EChartsThemeRiver";
 export type { ThemeRiverPoint } from "./themeRiverTypes";
+export { EChartsWordCloud, type EChartsWordCloudProps } from "./EChartsWordCloud";
+export type { WordCloudWord } from "./wordCloudTypes";
 export { EChartsPie, type EChartsPieProps } from "./EChartsPie";
 export { EChartsWaterfall, type EChartsWaterfallProps } from "./EChartsWaterfall";
 export type { TreemapNode } from "./treemapTypes";

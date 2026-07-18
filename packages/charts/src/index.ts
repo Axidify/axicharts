@@ -65,6 +65,11 @@ export {
   type ThemeRiverPoint,
 } from "./themeRiver/ThemeRiverChart";
 export {
+  WordCloudChart,
+  type WordCloudChartProps,
+  type WordCloudWord,
+} from "./wordCloud/WordCloudChart";
+export {
   BoxplotChart,
   type BoxplotChartProps,
   type BoxplotItem,

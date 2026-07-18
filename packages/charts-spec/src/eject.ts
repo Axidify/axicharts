@@ -61,6 +61,8 @@ function resolveChartName(spec: PanelSpec): string {
                     ? "ParallelChart"
                     : spec.type === "theme-river"
                       ? "ThemeRiverChart"
+                      : spec.type === "wordcloud" || spec.type === "word-cloud"
+                        ? "WordCloudChart"
                   : spec.type === "scatter"
                   ? "ScatterChart"
                   : spec.type === "treemap"
@@ -251,6 +253,13 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       time: row.${timeField},
       value: Number(row.${valueField}),
       series: String(row.${seriesField}),
+    }))}`;
+  } else if (spec.type === "wordcloud" || spec.type === "word-cloud") {
+    const textField = encoding?.name?.field ?? "text";
+    const valueField = encoding?.value?.field ?? "value";
+    chartBody = `words={${dataVar}.words ?? ${dataVar}.map((row) => ({
+      text: String(row.${textField}),
+      value: Number(row.${valueField}),
     }))}`;
   } else if (spec.type === "combo") {
     chartBody = ejectComboBody(spec, dataVar);

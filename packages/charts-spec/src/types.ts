@@ -75,6 +75,8 @@ export type PanelChartType =
   | "radar"
   | "parallel"
   | "theme-river"
+  | "wordcloud"
+  | "word-cloud"
   | "scatter"
   | "treemap"
   | "sunburst"

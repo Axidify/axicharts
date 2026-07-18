@@ -11,6 +11,7 @@ import type {
   PieA11yDescriptor,
   SingleValueA11yDescriptor,
   ThemeRiverA11yDescriptor,
+  WordCloudA11yDescriptor,
 } from "./types";
 import { singleValueA11ySummary } from "./singleValueDescriptor";
 
@@ -186,6 +187,26 @@ export function buildThemeRiverA11yDescriptor({
   };
 }
 
+export function buildWordCloudA11yDescriptor({
+  words,
+  title,
+  description,
+}: {
+  words: { text: string; value: number }[];
+  title?: string;
+  description?: string;
+}): WordCloudA11yDescriptor {
+  return {
+    kind: "word-cloud",
+    title: title ?? words.map((word) => word.text).join(", "),
+    description,
+    words: words.map((word) => ({
+      text: word.text,
+      value: word.value,
+    })),
+  };
+}
+
 export function pieA11ySummary(descriptor: PieA11yDescriptor): string {
   return `${descriptor.chartType} chart with ${descriptor.slices.length} segments`;
 }
@@ -215,6 +236,10 @@ export function themeRiverA11ySummary(descriptor: ThemeRiverA11yDescriptor): str
   return `Theme river with ${seriesCount} streams and ${descriptor.points.length} points`;
 }
 
+export function wordCloudA11ySummary(descriptor: WordCloudA11yDescriptor): string {
+  return `Word cloud with ${descriptor.words.length} terms`;
+}
+
 export function chartA11ySummary(descriptor: {
   kind: string;
   title?: string;
@@ -238,6 +263,8 @@ export function chartA11ySummary(descriptor: {
       return parallelA11ySummary(descriptor as ParallelA11yDescriptor);
     case "theme-river":
       return themeRiverA11ySummary(descriptor as ThemeRiverA11yDescriptor);
+    case "word-cloud":
+      return wordCloudA11ySummary(descriptor as WordCloudA11yDescriptor);
     default:
       return "Chart";
   }

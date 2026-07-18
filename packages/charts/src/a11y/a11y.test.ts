@@ -10,6 +10,7 @@ import {
   buildParallelA11yDescriptor,
   buildPieA11yDescriptor,
   buildThemeRiverA11yDescriptor,
+  buildWordCloudA11yDescriptor,
 } from "./echartsDescriptor";
 import { buildSingleValueA11yDescriptor } from "./singleValueDescriptor";
 import { buildChartA11yTable, chartA11yTableToHtml } from "./a11yTable";
@@ -159,6 +160,26 @@ describe("chart a11y", () => {
       time: "2026-01-01",
       series: "API",
       value: 12,
+    });
+  });
+
+  it("builds word cloud a11y table with text/weight/share", () => {
+    const wordCloud = buildWordCloudA11yDescriptor({
+      words: [
+        { text: "timeout", value: 40 },
+        { text: "retry", value: 10 },
+      ],
+    });
+    const table = buildChartA11yTable(wordCloud);
+    expect(table.rows[0]).toEqual({
+      text: "timeout",
+      value: 40,
+      share: "80.0%",
+    });
+    expect(table.rows[1]).toEqual({
+      text: "retry",
+      value: 10,
+      share: "20.0%",
     });
   });
 

@@ -12,11 +12,16 @@ vi.mock("./useEChart", () => ({
   },
 }));
 
+vi.mock("./useWordCloudExtension", () => ({
+  useWordCloudExtension: () => true,
+}));
+
 import { EChartsCandlestick } from "./EChartsCandlestick";
 import { EChartsFunnel } from "./EChartsFunnel";
 import { EChartsParallel } from "./EChartsParallel";
 import { EChartsPie } from "./EChartsPie";
 import { EChartsThemeRiver } from "./EChartsThemeRiver";
+import { EChartsWordCloud } from "./EChartsWordCloud";
 import { EChartsTreemap } from "./EChartsTreemap";
 import { withPresentationAnimation } from "./presentationAnimation";
 
@@ -143,6 +148,25 @@ describe("live merge adapters", () => {
         points={[
           { time: "2026-01-01", value: 12, series: "API" },
           { time: "2026-01-02", value: 15, series: "API" },
+        ]}
+        theme={cleanTheme}
+        mergeOption
+      />,
+    );
+
+    const call = useEChartCalls.at(-1);
+    expect(call?.mergeOption).toBe(true);
+    expect((call?.option as { animation?: boolean }).animation).toBe(false);
+  });
+
+  it("passes mergeOption to useEChart for word cloud in live mode", () => {
+    renderAdapter(
+      <EChartsWordCloud
+        width={320}
+        height={240}
+        words={[
+          { text: "timeout", value: 12 },
+          { text: "retry", value: 8 },
         ]}
         theme={cleanTheme}
         mergeOption

@@ -514,4 +514,29 @@ describe("compilePanel analytics breadth", () => {
       expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
     });
   });
+
+  it("compiles word-cloud panels from tag rows", async () => {
+    const panel = compilePanel(
+      {
+        type: "word-cloud",
+        title: "Incident tags",
+        height: 280,
+        width: 480,
+        encoding: {
+          name: { field: "tag" },
+          value: { field: "count" },
+        },
+      },
+      [
+        { tag: "timeout", count: 12 },
+        { tag: "retry", count: 8 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Incident tags");
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
 });

@@ -341,4 +341,20 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("<ThemeRiverChart");
     expect(jsx).toContain("points=");
   });
+
+  it("emits WordCloudChart from encoding rows", () => {
+    const jsx = ejectPanel(
+      {
+        type: "word-cloud",
+        encoding: {
+          name: { field: "tag" },
+          value: { field: "count" },
+        },
+      },
+      "tags",
+    );
+
+    expect(jsx).toContain("<WordCloudChart");
+    expect(jsx).toContain("words=");
+  });
 });

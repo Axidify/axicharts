@@ -17,6 +17,7 @@ import {
   RadarChart,
   ParallelChart,
   ThemeRiverChart,
+  WordCloudChart,
   ScatterChart,
   Stat,
   SunburstChart,
@@ -64,6 +65,7 @@ import {
 import { registerPluginChartTypes } from "./registerPluginChartTypes";
 import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
 import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
+import { wordCloudFromRows } from "./wordCloudEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
@@ -514,6 +516,31 @@ export function compilePanel(
         createElement(ThemeRiverChart, {
           points,
           showAxes: chartProps.showAxes as boolean | undefined,
+        }),
+      );
+    }
+
+    case "wordcloud":
+    case "word-cloud": {
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
+      const { words } = wordCloudFromRows(
+        rows,
+        chartProps,
+        resolved.encoding,
+      );
+      return wrap(
+        createElement(WordCloudChart, {
+          words,
+          shape: chartProps.shape as
+            | "circle"
+            | "cardioid"
+            | "diamond"
+            | "triangle"
+            | "pentagon"
+            | "star"
+            | undefined,
+          rotationRange: chartProps.rotationRange as [number, number] | undefined,
+          gridSize: chartProps.gridSize as number | undefined,
         }),
       );
     }

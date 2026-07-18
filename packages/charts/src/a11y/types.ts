@@ -101,6 +101,13 @@ export type ThemeRiverA11yDescriptor = {
   points: { time: string | number; value: number; series: string }[];
 };
 
+export type WordCloudA11yDescriptor = {
+  kind: "word-cloud";
+  title?: string;
+  description?: string;
+  words: { text: string; value: number }[];
+};
+
 export type ChartA11yDescriptor =
   | CartesianA11yDescriptor
   | SingleValueA11yDescriptor
@@ -110,7 +117,8 @@ export type ChartA11yDescriptor =
   | FunnelA11yDescriptor
   | HierarchyA11yDescriptor
   | ParallelA11yDescriptor
-  | ThemeRiverA11yDescriptor;
+  | ThemeRiverA11yDescriptor
+  | WordCloudA11yDescriptor;
 
 export type ChartA11yTable = {
   columns: { key: string; label: string; align?: "left" | "right" }[];

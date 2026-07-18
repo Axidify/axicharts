@@ -11,6 +11,7 @@ export type {
   PieA11yDescriptor,
   SingleValueA11yDescriptor,
   ThemeRiverA11yDescriptor,
+  WordCloudA11yDescriptor,
 } from "./types";
 export {
   buildCartesianA11yDescriptor,
@@ -30,6 +31,7 @@ export {
   buildParallelA11yDescriptor,
   buildPieA11yDescriptor,
   buildThemeRiverA11yDescriptor,
+  buildWordCloudA11yDescriptor,
   chartA11ySummary,
   flattenHierarchyNodes,
 } from "./echartsDescriptor";

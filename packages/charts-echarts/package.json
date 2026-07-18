@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-echarts",
-  "version": "0.3.12",
+  "version": "0.3.13",
   "description": "ECharts adapters for AxiCharts pie, candlestick, waterfall, and heatmap.",
   "license": "MIT",
   "repository": {
@@ -22,8 +22,8 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --external react --external react-dom --external echarts --clean",
-    "dev": "tsup src/index.ts --format esm --dts --external react --external react-dom --external echarts --watch",
+    "build": "tsup src/index.ts --format esm --dts --external react --external react-dom --external echarts --external echarts-wordcloud --clean",
+    "dev": "tsup src/index.ts --format esm --dts --external react --external react-dom --external echarts --external echarts-wordcloud --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
@@ -33,7 +33,8 @@
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "dependencies": {
-    "@axicharts/charts-theme": "workspace:*"
+    "@axicharts/charts-theme": "workspace:*",
+    "echarts-wordcloud": "^2.1.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.2.0",

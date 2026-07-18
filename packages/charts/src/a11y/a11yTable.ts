@@ -9,6 +9,7 @@ import {
   parallelA11ySummary,
   pieA11ySummary,
   themeRiverA11ySummary,
+  wordCloudA11ySummary,
 } from "./echartsDescriptor";
 
 export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yTable {
@@ -158,6 +159,24 @@ export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yT
         value: point.value,
       })),
       caption: descriptor.description ?? themeRiverA11ySummary(descriptor),
+    };
+  }
+
+  if (descriptor.kind === "word-cloud") {
+    const total = descriptor.words.reduce((sum, word) => sum + word.value, 0);
+    return {
+      columns: [
+        { key: "text", label: "Word" },
+        { key: "value", label: "Weight", align: "right" },
+        { key: "share", label: "Share", align: "right" },
+      ],
+      rows: descriptor.words.map((word) => ({
+        text: word.text,
+        value: word.value,
+        share:
+          total > 0 ? `${((word.value / total) * 100).toFixed(1)}%` : "0%",
+      })),
+      caption: descriptor.description ?? wordCloudA11ySummary(descriptor),
     };
   }
 
