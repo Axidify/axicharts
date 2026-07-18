@@ -421,6 +421,12 @@ const meta = {
   parameters: {
     layout: "padded",
     backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        component:
+          "Static side-by-side API comparisons. For the live 6-panel ops wall benchmark (@ 5 Hz), see **Compare → Live ops wall**.",
+      },
+    },
   },
 } satisfies Meta<typeof SideBySideComparison>;
 

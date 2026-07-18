@@ -12,6 +12,7 @@ import { RuntimeSchemaPage } from "./pages/RuntimeSchemaPage";
 import { SpecPage } from "./pages/SpecPage";
 import { StartPage } from "./pages/StartPage";
 import { VerticalsPage } from "./pages/VerticalsPage";
+import { ComparePage } from "./pages/ComparePage";
 
 export function App(): ReactElement {
   return (
@@ -21,6 +22,7 @@ export function App(): ReactElement {
           <Route index element={<HomePage />} />
           <Route path="start" element={<StartPage />} />
           <Route path="verticals" element={<VerticalsPage />} />
+          <Route path="compare" element={<ComparePage />} />
           <Route path="spec" element={<SpecPage />} />
           <Route path="runtime" element={<RuntimePage />} />
           <Route path="runtime/adapters" element={<RuntimeAdaptersPage />} />

@@ -5,6 +5,7 @@ import { docColors, docRadii, docShadow } from "../styles/docTokens";
 const topLinks = [
   { to: "/", label: "Home" },
   { to: "/start", label: "Getting started" },
+  { to: "/compare", label: "vs Recharts" },
   { to: "/verticals", label: "Verticals" },
   { to: "/spec", label: "Spec layer" },
 ] as const;
