@@ -10,6 +10,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      "@axicharts/charts/quick": path.resolve(root, "packages/charts/src/entry/quick.ts"),
       "@axicharts/charts-gantt": path.resolve(root, "packages/charts-gantt/src"),
       "@axicharts/charts-sankey": path.resolve(root, "packages/charts-sankey/src"),
       "@axicharts/charts-andon": path.resolve(root, "packages/charts-andon/src"),

@@ -53,6 +53,11 @@ describe("category entrypoints", () => {
     expect(kpi.presentationEnterStyle).toBeTypeOf("function");
   });
 
+  it("exports quick hello-world symbol", async () => {
+    const quick = await import("./quick");
+    expect(quick.QuickLineChart).toBeTypeOf("function");
+  });
+
   it("full re-exports the root barrel", () => {
     expect(full.LineChart).toBeTypeOf("function");
     expect(full.PieChart).toBeTypeOf("function");

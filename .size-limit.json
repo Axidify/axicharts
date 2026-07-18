@@ -126,6 +126,12 @@
     "gzip": true
   },
   {
+    "name": "@axicharts/charts/quick",
+    "path": "packages/charts/dist/entry/quick.js",
+    "limit": "5 KB",
+    "gzip": true
+  },
+  {
     "name": "@axicharts/charts/full",
     "path": "packages/charts/dist/entry/full.js",
     "limit": "14 KB",

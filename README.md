@@ -27,6 +27,26 @@ Peer dependencies: `react`, `react-dom`, `uplot`, `echarts`.
 
 ## Quick start
 
+### Simplest chart
+
+```tsx
+import { QuickLineChart } from "@axicharts/charts/quick";
+
+export function LatencySparkline() {
+  return (
+    <QuickLineChart
+      data={[42, 38, 55, 49, 62, 58, 71]}
+      labels={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+      title="p95 latency"
+    />
+  );
+}
+```
+
+`QuickLineChart` wraps `ChartContainer` + `LineChart` with `cleanTheme`, `mode="static"`, and `width="100%"`. Optional props: `labels`, `title`, `height`, `theme`, `mode`.
+
+### Full control
+
 ```tsx
 import { ChartContainer, LineChart } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
@@ -46,7 +66,22 @@ export function LatencyPanel() {
 
 ## Scaffold a dashboard
 
-From the axicharts repo (or after cloning):
+One command from npm (no clone required):
+
+```bash
+npx @axicharts/charts create-dashboard my-dashboard
+cd my-dashboard
+pnpm install
+pnpm dev
+```
+
+Pick a taxonomy category (`cartesian`, `distribution`, `financial`, `matrix`, `industrial`, `kpi`):
+
+```bash
+npx @axicharts/charts create-dashboard ops-board --category distribution
+```
+
+From the axicharts repo:
 
 ```bash
 pnpm create:dashboard my-dashboard
@@ -55,7 +90,21 @@ pnpm install
 pnpm dev
 ```
 
-Tree-shaken subpaths: `@axicharts/charts/line`, `/bar`, `/area`, `/pie`, `/candlestick`, `/waterfall`, `/heatmap`.
+### Category installs
+
+Tree-shaken category subpaths — install only the chart families you need:
+
+| Subpath | Charts | Peer deps |
+|---------|--------|-----------|
+| `@axicharts/charts/cartesian` | Line, area, bar, combo, scatter | `uplot` |
+| `@axicharts/charts/distribution` | Pie, funnel, boxplot, histogram | `echarts` |
+| `@axicharts/charts/financial` | Waterfall, candlestick | `echarts` |
+| `@axicharts/charts/matrix` | Heatmap, radar, treemap, … | `echarts` |
+| `@axicharts/charts/industrial` | Gauge, digital, status lamp | — |
+| `@axicharts/charts/kpi` | Stat + presentation motion | — |
+| `@axicharts/charts/quick` | `QuickLineChart` hello-world | `uplot` |
+
+Per-chart subpaths: `@axicharts/charts/line`, `/bar`, `/area`, `/pie`, `/candlestick`, `/waterfall`, `/heatmap`.
 
 ## Migrating from Recharts / shadcn Charts
 

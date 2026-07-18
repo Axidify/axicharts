@@ -2,10 +2,184 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-const targetDir = process.argv[2] ?? "axicharts-dashboard";
+const CATEGORIES = [
+  "cartesian",
+  "distribution",
+  "financial",
+  "matrix",
+  "industrial",
+  "kpi",
+];
 
-const files = {
-  "package.json": JSON.stringify(
+const TOKENS_CSS = `:root {
+  --chart-1: 221 83% 53%;
+  --chart-2: 188 94% 35%;
+  --chart-3: 142 71% 36%;
+  --chart-4: 32 95% 44%;
+  --chart-5: 262 83% 58%;
+  --chart-grid: hsl(214 32% 91% / 0.95);
+  --chart-axis: hsl(215 16% 47%);
+  --chart-area-fill: hsl(var(--chart-1) / 0.18);
+  --chart-alarm-warning: 32 95% 44%;
+  --chart-alarm-critical: 0 72% 51%;
+  --chart-stale: 215 16% 47%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --chart-grid: hsl(215 20% 22% / 0.8);
+    --chart-axis: hsl(215 20% 65%);
+    --chart-area-fill: hsl(var(--chart-1) / 0.2);
+  }
+}
+`;
+
+const GLOBAL_CSS = `*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  color: #e2e8f0;
+  background: radial-gradient(circle at top, #1e293b 0%, #0f172a 55%, #020617 100%);
+}
+
+main {
+  width: min(960px, 100%);
+  margin: 0 auto;
+  padding: clamp(16px, 4vw, 32px);
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.lead {
+  margin: 0 0 24px;
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+.card {
+  width: 100%;
+  padding: clamp(16px, 3vw, 24px);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.72);
+  box-shadow: 0 24px 48px rgba(2, 6, 23, 0.35);
+  backdrop-filter: blur(8px);
+}
+`;
+
+function categorySample(category) {
+  switch (category) {
+    case "distribution":
+      return {
+        imports: `import { ChartContainer, PieChart } from "@axicharts/charts/distribution";`,
+        chart: `      <ChartContainer mode="static" height={280} width="100%">
+        <PieChart
+          slices={[
+            { name: "Alpha", value: 42 },
+            { name: "Beta", value: 28 },
+            { name: "Gamma", value: 18 },
+            { name: "Delta", value: 12 },
+          ]}
+          showLabels
+        />
+      </ChartContainer>`,
+        peerNote: "distribution",
+      };
+    case "financial":
+      return {
+        imports: `import { ChartContainer, WaterfallChart } from "@axicharts/charts/financial";`,
+        chart: `      <ChartContainer mode="static" height={280} width="100%">
+        <WaterfallChart
+          items={[
+            { name: "Revenue", value: 120 },
+            { name: "COGS", value: -45 },
+            { name: "Opex", value: -30 },
+            { name: "Net", value: 45, isTotal: true },
+          ]}
+          valueFormat="currency"
+        />
+      </ChartContainer>`,
+        peerNote: "financial",
+      };
+    case "matrix":
+      return {
+        imports: `import { ChartContainer, HeatmapChart } from "@axicharts/charts/matrix";`,
+        chart: `      <ChartContainer mode="static" height={280} width="100%">
+        <HeatmapChart
+          matrix={{
+            xCategories: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+            yCategories: ["A", "B", "C"],
+            values: [
+              [12, 18, 9, 14, 11],
+              [8, 15, 20, 10, 16],
+              [14, 11, 13, 19, 7],
+            ],
+          }}
+        />
+      </ChartContainer>`,
+        peerNote: "matrix",
+      };
+    case "industrial":
+      return {
+        imports: `import { ChartContainer, Gauge } from "@axicharts/charts/industrial";`,
+        chart: `      <ChartContainer mode="static" height={220} width="100%">
+        <Gauge value={72} min={0} max={100} label="Tank level" unit="%" />
+      </ChartContainer>`,
+        peerNote: "industrial",
+      };
+    case "kpi":
+      return {
+        imports: `import { ChartContainer, Stat } from "@axicharts/charts/kpi";`,
+        chart: `      <ChartContainer mode="static" height={160} width="100%">
+        <Stat value="99.95%" label="Availability (30d)" tone="success" surface="dark" />
+      </ChartContainer>`,
+        peerNote: "kpi",
+      };
+    case "cartesian":
+    default:
+      return {
+        imports: `import { QuickLineChart } from "@axicharts/charts/quick";`,
+        chart: `      <QuickLineChart
+        title="p95 latency"
+        labels={["Mon", "Tue", "Wed", "Thu", "Fri"]}
+        data={[42, 38, 55, 49, 62]}
+      />`,
+        peerNote: "cartesian",
+      };
+  }
+}
+
+function packageJson(targetDir, category) {
+  const needsEcharts = ["distribution", "financial", "matrix"].includes(category);
+  const dependencies = {
+    "@axicharts/charts": "latest",
+    "@axicharts/charts-theme": "latest",
+    react: "^19.0.0",
+    "react-dom": "^19.0.0",
+    uplot: "^1.6.31",
+  };
+  if (needsEcharts) {
+    dependencies.echarts = "^5.6.0";
+  }
+
+  return JSON.stringify(
     {
       name: path.basename(targetDir),
       private: true,
@@ -15,14 +189,7 @@ const files = {
         build: "vite build",
         preview: "vite preview",
       },
-      dependencies: {
-        "@axicharts/charts": "latest",
-        "@axicharts/charts-theme": "latest",
-        react: "^19.0.0",
-        "react-dom": "^19.0.0",
-        uplot: "^1.6.31",
-        echarts: "^5.6.0",
-      },
+      dependencies,
       devDependencies: {
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
@@ -33,13 +200,77 @@ const files = {
     },
     null,
     2,
-  ),
-  "index.html": `<!doctype html>
+  );
+}
+
+function appTsx(category) {
+  const sample = categorySample(category);
+  return `${sample.imports}
+import "./tokens.css";
+
+export function App() {
+  return (
+    <main>
+      <h1>My dashboard</h1>
+      <p className="lead">
+        Scaffolded with AxiCharts — category <code>${category}</code>.
+      </p>
+      <section className="card" style={{ width: "100%" }}>
+${sample.chart}
+      </section>
+    </main>
+  );
+}
+`;
+}
+
+export function parseCreateDashboardArgs(argv = process.argv.slice(2)) {
+  let category = "cartesian";
+  const positional = [];
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === "--category" || arg === "-c") {
+      const value = argv[index + 1];
+      if (!value || !CATEGORIES.includes(value)) {
+        throw new Error(
+          `Invalid --category. Expected one of: ${CATEGORIES.join(", ")}`,
+        );
+      }
+      category = value;
+      index += 1;
+      continue;
+    }
+    if (arg.startsWith("--category=")) {
+      const value = arg.slice("--category=".length);
+      if (!CATEGORIES.includes(value)) {
+        throw new Error(
+          `Invalid --category. Expected one of: ${CATEGORIES.join(", ")}`,
+        );
+      }
+      category = value;
+      continue;
+    }
+    positional.push(arg);
+  }
+
+  return {
+    targetDir: positional[0] ?? "axicharts-dashboard",
+    category,
+  };
+}
+
+export function buildDashboardFiles(targetDir, category = "cartesian") {
+  const sample = categorySample(category);
+  return {
+    "package.json": packageJson(targetDir, category),
+    "index.html": `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AxiCharts Dashboard</title>
+    <link rel="stylesheet" href="/src/global.css" />
   </head>
   <body>
     <div id="root"></div>
@@ -47,30 +278,30 @@ const files = {
   </body>
 </html>
 `,
-  "vite.config.ts": `import { defineConfig } from "vite";
+    "vite.config.ts": `import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
 });
 `,
-  "tsconfig.json": JSON.stringify(
-    {
-      compilerOptions: {
-        target: "ES2022",
-        lib: ["ES2022", "DOM", "DOM.Iterable"],
-        module: "ESNext",
-        moduleResolution: "Bundler",
-        jsx: "react-jsx",
-        strict: true,
-        skipLibCheck: true,
+    "tsconfig.json": JSON.stringify(
+      {
+        compilerOptions: {
+          target: "ES2022",
+          lib: ["ES2022", "DOM", "DOM.Iterable"],
+          module: "ESNext",
+          moduleResolution: "Bundler",
+          jsx: "react-jsx",
+          strict: true,
+          skipLibCheck: true,
+        },
+        include: ["src"],
       },
-      include: ["src"],
-    },
-    null,
-    2,
-  ),
-  "src/main.tsx": `import { StrictMode } from "react";
+      null,
+      2,
+    ),
+    "src/main.tsx": `import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 
@@ -80,46 +311,73 @@ createRoot(document.getElementById("root")!).render(
   </StrictMode>,
 );
 `,
-  "src/App.tsx": `import { ChartContainer, LineChart } from "@axicharts/charts/cartesian";
-import { cleanTheme } from "@axicharts/charts-theme";
+    "src/App.tsx": appTsx(category),
+    "src/tokens.css": TOKENS_CSS,
+    "src/global.css": GLOBAL_CSS,
+    "README.md": `# ${path.basename(targetDir)}
 
-export function App() {
-  return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: 24 }}>
-      <h1>My dashboard</h1>
-      <ChartContainer theme={cleanTheme} mode="static" height={220} width={640}>
-        <LineChart
-          categories={["Mon", "Tue", "Wed", "Thu", "Fri"]}
-          series={[{ name: "p95 latency", data: [42, 38, 55, 49, 62] }]}
-          fill
-        />
-      </ChartContainer>
-    </main>
-  );
-}
-`,
-  "README.md": `# ${path.basename(targetDir)}
-
-Scaffolded with \`pnpm create:dashboard\`.
+Scaffolded with \`npx @axicharts/charts create-dashboard\` (category: **${category}**).
 
 \`\`\`bash
 pnpm install
 pnpm dev
 \`\`\`
+
+## Next steps
+
+- Import from \`@axicharts/charts/${category}\` for tree-shaken category APIs
+- Use \`@axicharts/charts/quick\` for a one-component line chart hello-world
+- Wire \`src/tokens.css\` \`--chart-*\` vars to match your design system
+- Add more panels with \`ChartContainer\` + chart components from the same category subpath
 `,
-};
-
-await mkdir(path.resolve(targetDir), { recursive: true });
-await mkdir(path.resolve(targetDir, "src"), { recursive: true });
-
-for (const [file, content] of Object.entries(files)) {
-  const filePath = path.join(targetDir, file);
-  await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, content);
+  };
 }
 
-console.log(`Created ${targetDir}`);
-console.log("Next:");
-console.log(`  cd ${targetDir}`);
-console.log("  pnpm install");
-console.log("  pnpm dev");
+export async function scaffoldDashboard(targetDir, category = "cartesian") {
+  const files = buildDashboardFiles(targetDir, category);
+  const resolvedDir = path.resolve(targetDir);
+
+  await mkdir(resolvedDir, { recursive: true });
+  await mkdir(path.join(resolvedDir, "src"), { recursive: true });
+
+  for (const [file, content] of Object.entries(files)) {
+    const filePath = path.join(resolvedDir, file);
+    await mkdir(path.dirname(filePath), { recursive: true });
+    await writeFile(filePath, content);
+  }
+
+  return { targetDir, category };
+}
+
+export function formatNextSteps(targetDir, category) {
+  return [
+    `Created ${targetDir} (${category})`,
+    "Next:",
+    `  cd ${targetDir}`,
+    "  pnpm install",
+    "  pnpm dev",
+    "",
+    "Imports:",
+    `  @axicharts/charts/${category}  — category bundle`,
+    "  @axicharts/charts/quick       — one-line line chart (cartesian)",
+    "",
+    "Rescaffold another category:",
+    `  npx @axicharts/charts create-dashboard ops-board --category distribution`,
+  ].join("\n");
+}
+
+const isMain =
+  process.argv[1] &&
+  (process.argv[1].endsWith("create-dashboard.mjs") ||
+    process.argv[1].endsWith("bin/create-dashboard.mjs"));
+
+if (isMain) {
+  try {
+    const { targetDir, category } = parseCreateDashboardArgs();
+    await scaffoldDashboard(targetDir, category);
+    console.log(formatNextSteps(targetDir, category));
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : error);
+    process.exitCode = 1;
+  }
+}

@@ -1,8 +1,21 @@
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { ChartContainer, LineChart } from "@axicharts/charts";
+import { QuickLineChart } from "@axicharts/charts/quick";
 import { cleanTheme } from "@axicharts/charts-theme";
 import { PLANNER_CLI_CODE } from "../demos/runtimePlannerDemo";
+
+const QUICK_CODE = `import { QuickLineChart } from "@axicharts/charts/quick";
+
+export function LatencySparkline() {
+  return (
+    <QuickLineChart
+      data={[42, 38, 55, 49, 62, 58, 71]}
+      labels={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+      title="p95 latency"
+    />
+  );
+}`;
 
 const CODE = `import { ChartContainer, LineChart } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
@@ -47,6 +60,35 @@ export function StartPage(): ReactElement {
       >
         {`npm install @axicharts/charts @axicharts/charts-theme echarts uplot`}
       </pre>
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>Hello world (3 lines)</h2>
+      <div
+        style={{
+          border: "1px solid #e2e8f0",
+          borderRadius: 8,
+          padding: 16,
+          background: "#fff",
+          maxWidth: 640,
+        }}
+      >
+        <QuickLineChart
+          data={[42, 38, 55, 49, 62, 58, 71]}
+          labels={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+          title="p95 latency"
+        />
+      </div>
+      <pre
+        style={{
+          ...codeBlockStyle,
+          background: "#f1f5f9",
+          marginTop: 12,
+        }}
+      >
+        {QUICK_CODE}
+      </pre>
+      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 13 }}>
+        Scaffold a Vite dashboard:{" "}
+        <code>npx @axicharts/charts create-dashboard my-app --category cartesian</code>
+      </p>
       <h2 style={{ fontSize: 16, marginTop: 28 }}>Live example</h2>
       <div
         style={{
