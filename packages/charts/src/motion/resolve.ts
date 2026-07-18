@@ -6,6 +6,13 @@ import type {
   ChartAnimateUpdateConfig,
   ResolvedChartAnimate,
 } from "./types";
+import {
+  isCartesianMotionPresetName,
+  resolveCartesianMotionPreset,
+  resolveSeriesEnterDelay,
+} from "./presets";
+
+export { resolveSeriesEnterDelay } from "./presets";
 
 const DEFAULT_ENTER: ChartAnimateEnterConfig = {
   duration: 520,
@@ -49,6 +56,10 @@ function normalizeUpdate(
 }
 
 function resolvePreset(animate: ChartAnimate): ResolvedChartAnimate {
+  if (typeof animate === "string" && isCartesianMotionPresetName(animate)) {
+    return resolvePreset(resolveCartesianMotionPreset(animate));
+  }
+
   switch (animate) {
     case "none":
       return { enter: null, update: null };
@@ -58,8 +69,12 @@ function resolvePreset(animate: ChartAnimate): ResolvedChartAnimate {
       return { enter: null, update: { ...DEFAULT_UPDATE } };
     default:
       return {
-        enter: normalizeEnter(animate.enter),
-        update: normalizeUpdate(animate.update),
+        enter:
+          "enter" in animate ? normalizeEnter(animate.enter) : null,
+        update:
+          "update" in animate
+            ? normalizeUpdate(animate.update)
+            : null,
       };
   }
 }

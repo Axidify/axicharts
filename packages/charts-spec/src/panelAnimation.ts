@@ -1,4 +1,5 @@
 import type { ChartAnimate, ChartAnimateConfig } from "./types";
+import { matchCartesianMotionPreset } from "@axicharts/charts/motion";
 
 export type PanelAnimationSpec = ChartAnimate;
 
@@ -26,5 +27,8 @@ export function chartPropsWithoutAnimation(
 export function animationToSpecField(
   animation: ChartAnimate | undefined,
 ): ChartAnimateConfig | ChartAnimate | undefined {
-  return animation;
+  if (animation == null) return undefined;
+  if (typeof animation === "string") return animation;
+  const preset = matchCartesianMotionPreset(animation);
+  return preset ?? animation;
 }

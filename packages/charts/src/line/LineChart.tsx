@@ -87,6 +87,7 @@ type LinePlotProps = {
   overviewSeries?: PlotSeries[];
   engine: "canvas" | "svg";
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
+  seriesEnterDelayMs?: (seriesIndex: number) => number;
 };
 
 function LinePlot({
@@ -111,6 +112,7 @@ function LinePlot({
   overviewSeries,
   engine,
   onMarkerDragEnd,
+  seriesEnterDelayMs,
 }: LinePlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
@@ -138,6 +140,7 @@ function LinePlot({
           fill={fill}
           showAxes={showAxes}
           stacked={stacked}
+          seriesEnterDelayMs={seriesEnterDelayMs}
         />
       ) : (
         <UPlotLine
@@ -291,6 +294,7 @@ export function LineChart({
         valueSuffix={valueSuffix}
         compact={compact}
         plotMotionStyle={motion.plotStyle}
+        plotClassName={motion.plotClassName}
         plotKey={motion.plotKey}
         skipPresentationPlotEnter={motion.skipPresentationPlotEnter}
         plot={
@@ -316,6 +320,7 @@ export function LineChart({
             overviewSeries={brush ? series : undefined}
             engine={engine}
             onMarkerDragEnd={onMarkerDragEnd}
+            seriesEnterDelayMs={motion.seriesEnterDelayMs}
           />
         }
       />

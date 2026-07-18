@@ -1,6 +1,6 @@
 import type { PanelSpec } from "./types";
 import { readPanelStyle } from "./panelStyle";
-import { readPanelAnimation } from "./panelAnimation";
+import { readPanelAnimation, animationToSpecField } from "./panelAnimation";
 import {
   cartesianHasSizeEncoding,
   ejectSizeProp,
@@ -82,7 +82,7 @@ function chartLevelCurveFlag(spec: PanelSpec): string {
 
 function chartLevelFlags(spec: PanelSpec): string[] {
   const annotations = spec.annotations ?? spec.props?.annotations;
-  const animation = readPanelAnimation(spec);
+  const animation = animationToSpecField(readPanelAnimation(spec));
   return [
     spec.fill && spec.type !== "bar" ? "fill" : "",
     spec.stacked ? "stacked" : "",

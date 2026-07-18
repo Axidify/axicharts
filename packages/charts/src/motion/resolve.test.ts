@@ -47,6 +47,20 @@ describe("resolveChartAnimate", () => {
     expect(warn).toHaveBeenCalledOnce();
   });
 
+  it("resolves stagger preset", () => {
+    const resolved = resolveChartAnimate("static", "stagger");
+    expect(resolved.enter).toMatchObject({ duration: 520, staggerMs: 80 });
+    expect(resolved.update).toBeNull();
+  });
+
+  it("resolves spring preset", () => {
+    const resolved = resolveChartAnimate("static", "spring");
+    expect(resolved.enter).toMatchObject({
+      duration: 680,
+      easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+    });
+  });
+
   it("parses object config", () => {
     const resolved = resolveChartAnimate("static", {
       enter: { duration: 400, delay: 50 },

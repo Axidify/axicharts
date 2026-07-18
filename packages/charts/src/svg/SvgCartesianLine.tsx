@@ -27,6 +27,7 @@ export type SvgCartesianLineProps = {
   fill?: boolean;
   showAxes?: boolean;
   stacked?: boolean;
+  seriesEnterDelayMs?: (seriesIndex: number) => number;
 };
 
 export function SvgCartesianLine({
@@ -38,6 +39,7 @@ export function SvgCartesianLine({
   fill = false,
   showAxes = true,
   stacked = false,
+  seriesEnterDelayMs,
 }: SvgCartesianLineProps): ReactElement {
   const plot = plotRect(width, height);
   const { min, max } = computeValueExtents(series, stacked);
@@ -90,6 +92,11 @@ export function SvgCartesianLine({
             strokeWidth={theme.line.strokeWidth}
             strokeLinejoin="round"
             strokeLinecap="round"
+            style={
+              seriesEnterDelayMs
+                ? { animationDelay: `${seriesEnterDelayMs(seriesIndex)}ms` }
+                : undefined
+            }
           />
         );
       })}

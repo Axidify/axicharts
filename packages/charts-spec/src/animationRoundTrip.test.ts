@@ -67,4 +67,64 @@ describe("animation spec round-trip", () => {
     expect(jsx).toContain('"enter":{"duration":500}');
     expect(jsx).toContain('"update":{"duration":250}');
   });
+
+  it("ejects preset name when config matches canonical stagger preset", () => {
+    const spec = {
+      type: "line" as const,
+      animation: {
+        enter: {
+          duration: 520,
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          delay: 0,
+          staggerMs: 80,
+        },
+      },
+      encoding: {
+        x: { field: "month" },
+        y: { field: "revenue" },
+      },
+    };
+
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain('animate={"stagger"}');
+  });
+
+  it("ejects preset name when config matches canonical spring preset", () => {
+    const spec = {
+      type: "bar" as const,
+      animation: {
+        enter: {
+          duration: 680,
+          easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+          delay: 0,
+        },
+      },
+      encoding: {
+        x: { field: "month" },
+        y: { field: "revenue" },
+      },
+    };
+
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain('animate={"spring"}');
+  });
+
+  it("compiles line panel with stagger animation preset", () => {
+    const spec = {
+      type: "line" as const,
+      animation: "stagger" as const,
+      encoding: {
+        x: { field: "month" },
+        y: { field: "revenue" },
+      },
+      height: 200,
+    };
+
+    const panel = compilePanel(spec, ROWS);
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain('animate={"stagger"}');
+  });
 });

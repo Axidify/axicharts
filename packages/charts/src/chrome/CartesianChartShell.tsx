@@ -28,6 +28,7 @@ export type CartesianChromeProps = {
   getRows?: (index: number) => TooltipRow[] | null;
   plot: ReactNode;
   plotMotionStyle?: CSSProperties;
+  plotClassName?: string;
   plotKey?: string;
   skipPresentationPlotEnter?: boolean;
 };
@@ -40,6 +41,7 @@ function CartesianChromeInner({
   getRows,
   plot,
   plotMotionStyle,
+  plotClassName,
   plotKey,
   skipPresentationPlotEnter = false,
 }: CartesianChromeProps): ReactElement {
@@ -64,6 +66,7 @@ function CartesianChromeInner({
       ) : null}
       <div
         key={plotKey}
+        className={plotClassName}
         style={{
           position: "absolute",
           top: legendHeight,

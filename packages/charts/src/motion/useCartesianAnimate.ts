@@ -6,6 +6,7 @@ import { useChartLayout } from "../container/ChartLayoutContext";
 import type { ChartAnimate, CartesianMotionKind } from "./types";
 import {
   resolveChartAnimate,
+  resolveSeriesEnterDelay,
   shouldAnimateEnter,
   shouldAnimateUpdate,
 } from "./resolve";
@@ -24,18 +25,22 @@ export type UseCartesianAnimateInput = {
   animate?: ChartAnimate;
   kind: CartesianMotionKind;
   dataSignature: string;
+  seriesIndex?: number;
 };
 
 export type UseCartesianAnimateResult = {
   plotStyle: CSSProperties | undefined;
+  plotClassName?: string;
   plotKey: string;
   skipPresentationPlotEnter: boolean;
+  seriesEnterDelayMs?: (seriesIndex: number) => number;
 };
 
 export function useCartesianAnimate({
   animate,
   kind,
   dataSignature,
+  seriesIndex,
 }: UseCartesianAnimateInput): UseCartesianAnimateResult {
   const { mode } = useChartLayout();
   const resolved = useMemo(
@@ -72,9 +77,24 @@ export function useCartesianAnimate({
   const presentationMode = mode === "presentation";
   const explicitAnimate = animate != null;
 
+  const plotClassName =
+    enterEnabled &&
+    resolved.enter &&
+    (resolved.enter.staggerMs ?? 0) > 0 &&
+    kind === "line"
+      ? "axicharts-motion-line"
+      : undefined;
+
   const plotStyle = useMemo((): CSSProperties | undefined => {
     if (enterEnabled && resolved.enter) {
-      return cartesianEnterStyle(kind, resolved.enter, {
+      const enter =
+        seriesIndex != null
+          ? {
+              ...resolved.enter,
+              delay: resolveSeriesEnterDelay(resolved.enter, seriesIndex),
+            }
+          : resolved.enter;
+      return cartesianEnterStyle(kind, enter, {
         presentationMode: presentationMode && explicitAnimate,
       });
     }
@@ -93,15 +113,25 @@ export function useCartesianAnimate({
     presentationMode,
     resolved.enter,
     resolved.update,
+    seriesIndex,
     updateEnabled,
     updateTick,
   ]);
+
+  const seriesEnterDelayMs = useMemo(() => {
+    if (!enterEnabled || !resolved.enter) return undefined;
+    const staggerMs = resolved.enter.staggerMs ?? 0;
+    if (staggerMs <= 0) return undefined;
+    return (index: number) => resolveSeriesEnterDelay(resolved.enter!, index);
+  }, [enterEnabled, resolved.enter]);
 
   const plotKey = enterEnabled ? `enter-${dataSignature}` : `plot-${updateTick}`;
 
   return {
     plotStyle,
+    plotClassName,
     plotKey,
     skipPresentationPlotEnter: explicitAnimate && enterEnabled,
+    seriesEnterDelayMs,
   };
 }
