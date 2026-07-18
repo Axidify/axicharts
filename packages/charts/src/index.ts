@@ -41,6 +41,16 @@ export {
   type HeatmapChartProps,
   type HeatmapMatrix,
 } from "./heatmap/HeatmapChart";
+export {
+  BoxplotChart,
+  type BoxplotChartProps,
+  type BoxplotItem,
+  type BoxplotSeries,
+} from "./boxplot/BoxplotChart";
+export {
+  HistogramChart,
+  type HistogramChartProps,
+} from "./histogram/HistogramChart";
 export { Gauge, type GaugeProps } from "./gauge/Gauge";
 export { Digital, type DigitalProps } from "./digital/Digital";
 export {

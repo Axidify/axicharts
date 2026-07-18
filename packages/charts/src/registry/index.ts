@@ -2,8 +2,10 @@ import type { ChartTypeRegistration } from "./types";
 import { AreaChart } from "../area/AreaChart";
 import { BarChart } from "../bar/BarChart";
 import { CandlestickChart } from "../candlestick/CandlestickChart";
+import { BoxplotChart } from "../boxplot/BoxplotChart";
 import { FunnelChart } from "../funnel/FunnelChart";
 import { HeatmapChart } from "../heatmap/HeatmapChart";
+import { HistogramChart } from "../histogram/HistogramChart";
 import { LineChart } from "../line/LineChart";
 import { PieChart } from "../pie/PieChart";
 import { ScatterChart } from "../scatter/ScatterChart";
@@ -46,6 +48,16 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "heatmap",
     Chart: HeatmapChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "boxplot",
+    Chart: BoxplotChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "histogram",
+    Chart: HistogramChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
 ];

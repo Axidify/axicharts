@@ -74,6 +74,8 @@ export type PanelChartType =
   | "heatmap"
   | "scatter"
   | "treemap"
+  | "boxplot"
+  | "histogram"
   | "stat"
   | "gauge"
   | "table"

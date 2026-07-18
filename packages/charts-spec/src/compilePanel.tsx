@@ -2,11 +2,13 @@ import { createElement, type ReactElement } from "react";
 import {
   AreaChart,
   BarChart,
+  BoxplotChart,
   CandlestickChart,
   ChartContainer,
   ComboChart,
   Gauge,
   HeatmapChart,
+  HistogramChart,
   LineChart,
   PieChart,
   FunnelChart,
@@ -406,6 +408,28 @@ export function compilePanel(
           matrix,
           min: props.min as number | undefined,
           max: props.max as number | undefined,
+        }),
+      );
+    }
+
+    case "boxplot": {
+      const items = props.items as Parameters<typeof BoxplotChart>[0]["items"];
+      const series = props.series as Parameters<typeof BoxplotChart>[0]["series"];
+      return wrap(
+        createElement(BoxplotChart, {
+          items,
+          series,
+        }),
+      );
+    }
+
+    case "histogram": {
+      const categories = props.categories as string[];
+      const values = props.values as number[];
+      return wrap(
+        createElement(HistogramChart, {
+          categories,
+          values,
         }),
       );
     }

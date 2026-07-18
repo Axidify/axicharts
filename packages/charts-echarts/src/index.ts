@@ -1,5 +1,6 @@
 import {
   BarChart,
+  BoxplotChart,
   CandlestickChart,
   FunnelChart,
   HeatmapChart,
@@ -20,6 +21,7 @@ import { CanvasRenderer } from "echarts/renderers";
 
 echarts.use([
   BarChart,
+  BoxplotChart,
   CandlestickChart,
   FunnelChart,
   HeatmapChart,
@@ -41,6 +43,9 @@ export { EChartsCandlestick, type EChartsCandlestickProps } from "./EChartsCandl
 export { EChartsFunnel, type EChartsFunnelProps } from "./EChartsFunnel";
 export { EChartsTreemap, type EChartsTreemapProps } from "./EChartsTreemap";
 export type { FunnelStage } from "./funnelTypes";
+export { EChartsBoxplot, type EChartsBoxplotProps } from "./EChartsBoxplot";
+export { EChartsHistogram, type EChartsHistogramProps } from "./EChartsHistogram";
+export type { BoxplotItem, BoxplotSeries } from "./boxplotTypes";
 export { EChartsScatter, type EChartsScatterProps } from "./EChartsScatter";
 export { EChartsHeatmap, type EChartsHeatmapProps } from "./EChartsHeatmap";
 export { EChartsPie, type EChartsPieProps } from "./EChartsPie";
