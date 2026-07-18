@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { useOptionalChartSync } from "./ChartSyncContext";
 import { resolveFollowerBrushRange } from "./brushSync";
@@ -9,6 +9,10 @@ export type UseCartesianBrushInput = {
   brushStart?: number;
   brushEnd?: number;
 };
+
+function brushRangesEqual(a: BrushRange, b: BrushRange): boolean {
+  return a.start === b.start && a.end === b.end;
+}
 
 /** Unified cartesian brush sync — leaders publish; followers slice via ChartSyncGroup. */
 export function useBrushSync(input: UseCartesianBrushInput) {
@@ -22,6 +26,8 @@ export function useCartesianBrush({
 }: UseCartesianBrushInput) {
   const { syncId, syncFollower } = useChartLayout();
   const sync = useOptionalChartSync();
+  const syncRef = useRef(sync);
+  syncRef.current = sync;
 
   const [leaderRange, setLeaderRange] = useState<BrushRange>(() => ({
     start: brushStart,
@@ -37,21 +43,24 @@ export function useCartesianBrush({
     return followerRange;
   }, [brush, leaderRange, followerRange]);
 
-  const onBrushRangeChange = useCallback(
-    (range: BrushRange) => {
-      if (!brush) return;
-      setLeaderRange(range);
-      if (sync && syncId) {
-        sync.publishBrushRange(range, syncId);
-      }
-    },
-    [brush, sync, syncId],
-  );
+  const onBrushRangeChange = useCallback((range: BrushRange) => {
+    if (!brush) return;
+    setLeaderRange((prev) => (brushRangesEqual(prev, range) ? prev : range));
+    const bus = syncRef.current;
+    if (bus && syncId) {
+      bus.publishBrushRange(range, syncId);
+    }
+  }, [brush, syncId]);
 
   useEffect(() => {
-    if (!brush || !sync || !syncId) return;
-    sync.publishBrushRange(leaderRange, syncId);
-  }, [brush, sync, syncId, leaderRange]);
+    if (!brush || !syncId) return;
+    const bus = syncRef.current;
+    if (!bus) return;
+    bus.publishBrushRange(leaderRange, syncId);
+    // Publish the initial leader window once; subsequent updates go through
+    // onBrushRangeChange to avoid sync/context feedback loops.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [brush, syncId]);
 
   return {
     brush,

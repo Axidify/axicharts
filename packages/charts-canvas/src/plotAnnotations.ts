@@ -241,17 +241,19 @@ export function createAnnotationDrawHook({
   markers?: PlotMarkerAnnotation[];
   categories?: string[];
   onDraw?: (u: uPlot, seriesIdx: number) => void;
-}): (u: uPlot, seriesIdx: number) => void {
+}): (u: uPlot, seriesIdx?: number) => void {
   return (u, seriesIdx) => {
     if (seriesIdx === 1) {
       drawThresholdBands(u, bands);
     }
-    if (seriesIdx === u.series.length - 1) {
+    const onFinalPass =
+      seriesIdx === undefined || seriesIdx === u.series.length - 1;
+    if (onFinalPass) {
       drawReferenceLines(u, referenceLines);
       drawVerticalLines(u, verticalLines, categories);
       drawPlotLabels(u, labels, categories);
       drawPlotMarkers(u, markers, categories);
-      onDraw?.(u, seriesIdx);
+      onDraw?.(u, seriesIdx ?? u.series.length - 1);
     }
   };
 }

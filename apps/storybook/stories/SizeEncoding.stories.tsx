@@ -31,7 +31,7 @@ function SizeEncodingDemo(): ReactElement {
           Spec — encoding.size bar width by volume
         </div>
         <Chart
-          spec={{
+          panel={{
             type: "bar",
             title: "Throughput by week",
             encoding: {
@@ -53,7 +53,7 @@ function SizeEncodingDemo(): ReactElement {
           Spec — encoding.size point radius on line
         </div>
         <Chart
-          spec={{
+          panel={{
             type: "line",
             encoding: {
               x: { field: "week", type: "nominal" },

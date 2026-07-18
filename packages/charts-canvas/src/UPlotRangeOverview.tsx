@@ -32,12 +32,11 @@ function buildData(categories: string[], series: PlotSeries[]): uPlot.AlignedDat
 function buildOptions(
   width: number,
   theme: ChartTheme,
-  range: BrushRangePercent,
   total: number,
   onRangeChange: (range: BrushRangePercent) => void,
+  applyingRangeRef: React.MutableRefObject<boolean>,
 ): uPlot.Options {
   const dark = theme.name === "live" || theme.name === "industrial";
-  const { startIndex, endIndex } = indicesFromBrushRange(range, total);
 
   return {
     width,
@@ -61,22 +60,9 @@ function buildOptions(
       y: { auto: true },
     },
     hooks: {
-      ready: [
-        (u: uPlot) => {
-          if (total <= 0) return;
-          const left = u.valToPos(startIndex, "x", true);
-          const right = u.valToPos(endIndex, "x", true);
-          u.setSelect({
-            left,
-            top: 0,
-            width: Math.max(1, right - left),
-            height: RANGE_OVERVIEW_HEIGHT,
-          });
-        },
-      ],
       setSelect: [
         (u: uPlot) => {
-          if (total <= 0) return;
+          if (total <= 0 || applyingRangeRef.current) return;
           const count = total;
           const startIdx = Math.max(0, u.posToIdx(u.select.left));
           const endIdx = Math.min(
@@ -109,11 +95,11 @@ export function UPlotRangeOverview({
 
   const options = useMemo(
     () =>
-      buildOptions(width, theme, range, total, (next) => {
+      buildOptions(width, theme, total, (next) => {
         if (applyingRangeRef.current) return;
         onRangeChangeRef.current(next);
-      }),
-    [width, theme, range, total],
+      }, applyingRangeRef),
+    [width, theme, total],
   );
 
   useEffect(() => {
@@ -149,7 +135,9 @@ export function UPlotRangeOverview({
       width: Math.max(1, right - left),
       height: RANGE_OVERVIEW_HEIGHT,
     });
-    applyingRangeRef.current = false;
+    queueMicrotask(() => {
+      applyingRangeRef.current = false;
+    });
   }, [range, total]);
 
   if (width < 1 || total === 0) {

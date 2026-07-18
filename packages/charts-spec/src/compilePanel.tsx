@@ -206,6 +206,11 @@ export function compilePanel(
   data: SpecData,
   options: CompileOptions = {},
 ): ReactElement {
+  if (!spec) {
+    throw new Error(
+      "compilePanel: panel spec is required (use the Chart `panel` prop, not `spec`)",
+    );
+  }
   registerPluginChartTypes();
 
   const resolved = applySpecCompilers(spec, data);
