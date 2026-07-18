@@ -11,9 +11,9 @@ import {
 } from "@axicharts/charts";
 import { liveTheme } from "@axicharts/charts-theme";
 
-const BAR_COUNT = 48;
+const BAR_COUNT = 56;
 const SESSIONS = Array.from({ length: BAR_COUNT }, (_, index) => {
-  const totalMinutes = 9 * 60 + 30 + index;
+  const totalMinutes = 8 * 60 + index * 5;
   const hour = Math.floor(totalMinutes / 60);
   const minute = totalMinutes % 60;
   return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
@@ -135,7 +135,7 @@ function TradingDeskMockup(): ReactElement {
             color: "#94a3b8",
           }}
         >
-          NASDAQ · RTH
+          NASDAQ · extended session
         </span>
         <span style={{ flex: 1 }} />
         <span
@@ -233,11 +233,13 @@ function TradingDeskMockup(): ReactElement {
                 data={OHLC}
                 volume={VOLUME}
                 brush
-                brushEnd={45}
+                brushEnd={55}
+                sessionShading="rth"
               />
             </ChartContainer>
             <p style={{ marginTop: 6, fontSize: 11, color: "#94a3b8" }}>
-              Drag slider or scroll to zoom · brush window synced to RSI panel
+              Pre-market / after-hours shading · volume bars match candle direction ·
+              brush window synced to RSI panel
             </p>
           </div>
 
@@ -249,6 +251,7 @@ function TradingDeskMockup(): ReactElement {
               theme={liveTheme}
               mode="live"
               syncId="rsi"
+              syncFollower="ohlc"
               height={120}
               width="100%"
             >
@@ -343,7 +346,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Round 3 acceptance target (5/5) — live KPI tiles, session H/L chip, OHLC brush + synced RSI window/crosshair with 30/70 references, correlation callout, net P&L strip on positions table.",
+          "C111 trading polish — extended session shading, directional volume bars, OHLC brush + synced RSI follower window/crosshair with 30/70 references.",
       },
     },
   },

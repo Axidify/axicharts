@@ -29,6 +29,7 @@ function applyTradingPanelRules(panel: PanelSpec, ctx: VerticalPanelContext): Pa
         ...panel.props,
         brush: true,
         brushEnd: 45,
+        sessionShading: "rth",
         syncId: "ohlc",
         ...(volumeField || /volume|vwap/.test(intent)
           ? { volumeField: volumeField ?? "volume" }

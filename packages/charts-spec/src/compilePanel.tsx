@@ -427,6 +427,9 @@ export function compilePanel(
         createElement(WaterfallChart, {
           items,
           valueFormat: props.valueFormat as "currency" | "number" | "compact" | undefined,
+          showLabels: props.showLabels as boolean | undefined,
+          showSigns: props.showSigns as boolean | undefined,
+          connectorStyle: props.connectorStyle as "solid" | "dashed" | undefined,
         }),
       );
     }
@@ -453,7 +456,9 @@ export function compilePanel(
           data: candleData,
           volume,
           brush: props.brush as boolean | undefined,
+          brushStart: props.brushStart as number | undefined,
           brushEnd: props.brushEnd as number | undefined,
+          sessionShading: props.sessionShading as boolean | "rth" | undefined,
         }),
       );
     }

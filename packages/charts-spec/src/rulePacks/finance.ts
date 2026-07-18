@@ -42,6 +42,9 @@ function applyFinancePanelRules(panel: PanelSpec, ctx: VerticalPanelContext): Pa
       mode: "interactive",
       props: {
         valueFormat: ctx.metric.unit === "USD" || /revenue|usd/i.test(name) ? "currency" : "number",
+        showLabels: true,
+        showSigns: true,
+        connectorStyle: "dashed",
       },
     };
   }

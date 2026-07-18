@@ -16,14 +16,23 @@ import { useEChartsInteraction } from "../sync/useEChartsInteraction";
 export type WaterfallChartProps = {
   items: WaterfallItem[];
   valueFormat?: "currency" | "number" | "compact";
+  showLabels?: boolean;
+  showSigns?: boolean;
+  connectorStyle?: "solid" | "dashed";
 };
 
 function WaterfallPlot({
   items,
   valueFormat,
+  showLabels,
+  showSigns,
+  connectorStyle,
 }: {
   items: WaterfallItem[];
   valueFormat: WaterfallChartProps["valueFormat"];
+  showLabels?: boolean;
+  showSigns?: boolean;
+  connectorStyle?: "solid" | "dashed";
 }): ReactElement {
   const { size, theme } = useChartLayout();
   const interaction = useEChartsInteraction();
@@ -36,6 +45,9 @@ function WaterfallPlot({
       items={items}
       theme={theme}
       valueFormat={formatValue}
+      showLabels={showLabels}
+      showSigns={showSigns}
+      connectorStyle={connectorStyle}
       onCursor={interaction.onCursor}
     />
   );
@@ -44,6 +56,9 @@ function WaterfallPlot({
 export function WaterfallChart({
   items,
   valueFormat = "currency",
+  showLabels = true,
+  showSigns = true,
+  connectorStyle = "dashed",
 }: WaterfallChartProps): ReactElement | null {
   const { size, ready } = useChartLayout();
   const categories = items.map((item) => item.name);
@@ -74,7 +89,15 @@ export function WaterfallChart({
             },
           ];
         }}
-        plot={<WaterfallPlot items={items} valueFormat={valueFormat} />}
+        plot={
+          <WaterfallPlot
+            items={items}
+            valueFormat={valueFormat}
+            showLabels={showLabels}
+            showSigns={showSigns}
+            connectorStyle={connectorStyle}
+          />
+        }
       />
     </div>
   );

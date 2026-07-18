@@ -7,13 +7,36 @@ export type WaterfallConnector = [
   { coord: [string, number] },
 ];
 
+export type WaterfallBarKind = "total" | "positive" | "negative";
+
 export type WaterfallBridge = {
   placeholders: number[];
   values: number[];
   colors: string[];
   labels: string[];
   connectors: WaterfallConnector[];
+  /** Signed delta or total value for label display. */
+  displayValues: number[];
+  isTotals: boolean[];
+  kinds: WaterfallBarKind[];
 };
+
+function totalBarColor(theme?: Pick<ChartTheme, "tokens">): string {
+  return toneColor("default", theme);
+}
+
+function deltaColor(
+  delta: number,
+  item: WaterfallItem,
+  theme?: Pick<ChartTheme, "tokens">,
+): string {
+  if (item.tone) {
+    return toneColor(item.tone, theme);
+  }
+  return delta >= 0
+    ? toneColor("success", theme)
+    : toneColor("critical", theme);
+}
 
 export function buildWaterfallBridge(
   items: WaterfallItem[],
@@ -24,6 +47,9 @@ export function buildWaterfallBridge(
   const colors: string[] = [];
   const labels: string[] = [];
   const connectors: WaterfallConnector[] = [];
+  const displayValues: number[] = [];
+  const isTotals: boolean[] = [];
+  const kinds: WaterfallBarKind[] = [];
   const levels: number[] = [];
   let running = 0;
 
@@ -34,22 +60,29 @@ export function buildWaterfallBridge(
       const displayValue = running === 0 ? item.value : running;
       placeholders.push(0);
       values.push(displayValue);
-      colors.push(toneColor(item.tone ?? "default", theme));
+      colors.push(item.tone ? toneColor(item.tone, theme) : totalBarColor(theme));
+      displayValues.push(displayValue);
+      isTotals.push(true);
+      kinds.push("total");
       levels.push(displayValue);
       running = item.value;
       continue;
     }
 
     const delta = item.value;
+    displayValues.push(delta);
+    isTotals.push(false);
+    kinds.push(delta >= 0 ? "positive" : "negative");
+
     if (delta >= 0) {
       placeholders.push(running);
       values.push(delta);
-      colors.push(toneColor(item.tone ?? "success", theme));
+      colors.push(deltaColor(delta, item, theme));
       running += delta;
     } else {
       placeholders.push(running + delta);
       values.push(Math.abs(delta));
-      colors.push(toneColor(item.tone ?? "critical", theme));
+      colors.push(deltaColor(delta, item, theme));
       running += delta;
     }
     levels.push(running);
@@ -62,5 +95,14 @@ export function buildWaterfallBridge(
     ]);
   }
 
-  return { placeholders, values, colors, labels, connectors };
+  return {
+    placeholders,
+    values,
+    colors,
+    labels,
+    connectors,
+    displayValues,
+    isTotals,
+    kinds,
+  };
 }

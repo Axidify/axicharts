@@ -26,6 +26,9 @@ describe("buildWaterfallBridge", () => {
 
     expect(bridge.placeholders).toEqual([0, 75, 0]);
     expect(bridge.values).toEqual([120, 45, 75]);
+    expect(bridge.displayValues).toEqual([120, -45, 75]);
+    expect(bridge.isTotals).toEqual([false, false, true]);
+    expect(bridge.kinds).toEqual(["positive", "negative", "total"]);
     expect(bridge.connectors[0]).toEqual([
       { coord: ["Revenue", 120] },
       { coord: ["COGS", 120] },

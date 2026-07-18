@@ -1,8 +1,14 @@
 import "./echartsRuntime";
 
 export { buildDataZoom, type BuildDataZoomInput } from "./dataZoom";
-export { buildWaterfallBridge, type WaterfallBridge, type WaterfallConnector } from "./waterfallBridge";
-export { EChartsCandlestick, type EChartsCandlestickProps } from "./EChartsCandlestick";
+export {
+  buildSessionMarkAreas,
+  sessionMarkAreaToECharts,
+  type SessionMarkAreaBand,
+  type SessionShading,
+} from "./candlestickSession";
+export { buildWaterfallBridge, type WaterfallBarKind, type WaterfallBridge, type WaterfallConnector } from "./waterfallBridge";
+export { EChartsCandlestick, type EChartBrushRange, type EChartsCandlestickProps } from "./EChartsCandlestick";
 export { EChartsFunnel, type EChartsFunnelProps } from "./EChartsFunnel";
 export { EChartsSunburst, type EChartsSunburstProps } from "./EChartsSunburst";
 export { EChartsTreemap, type EChartsTreemapProps } from "./EChartsTreemap";

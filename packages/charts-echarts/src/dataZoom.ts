@@ -4,6 +4,8 @@ import type { DataZoomComponentOption } from "echarts";
 export type BuildDataZoomInput = {
   withVolume: boolean;
   theme: ChartTheme;
+  /** Initial visible window start (%). Default 0. */
+  start?: number;
   /** Initial visible window end (%). Default 100 = full range. */
   end?: number;
 };
@@ -15,6 +17,7 @@ function isDarkTheme(theme: ChartTheme): boolean {
 export function buildDataZoom({
   withVolume,
   theme,
+  start = 0,
   end = 100,
 }: BuildDataZoomInput): DataZoomComponentOption[] {
   const xAxisIndex = withVolume ? [0, 1] : [0];
@@ -24,14 +27,14 @@ export function buildDataZoom({
     {
       type: "inside",
       xAxisIndex,
-      start: 0,
+      start,
       end,
       filterMode: "filter",
     },
     {
       type: "slider",
       xAxisIndex,
-      start: 0,
+      start,
       end,
       bottom: 4,
       height: 18,

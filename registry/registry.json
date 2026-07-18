@@ -13,8 +13,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.25",
-        "@axicharts/charts-theme@0.3.25"
+        "@axicharts/charts@0.3.26",
+        "@axicharts/charts-theme@0.3.26"
       ],
       "registryDependencies": [],
       "files": [
@@ -34,8 +34,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.25",
-        "@axicharts/charts-theme@0.3.25"
+        "@axicharts/charts@0.3.26",
+        "@axicharts/charts-theme@0.3.26"
       ],
       "registryDependencies": [],
       "files": [
@@ -55,8 +55,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.25",
-        "@axicharts/charts-theme@0.3.25"
+        "@axicharts/charts@0.3.26",
+        "@axicharts/charts-theme@0.3.26"
       ],
       "registryDependencies": [],
       "files": [
@@ -76,8 +76,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.25",
-        "@axicharts/charts-theme@0.3.25"
+        "@axicharts/charts@0.3.26",
+        "@axicharts/charts-theme@0.3.26"
       ],
       "registryDependencies": [],
       "files": [
@@ -97,8 +97,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.25",
-        "@axicharts/charts-theme@0.3.25"
+        "@axicharts/charts@0.3.26",
+        "@axicharts/charts-theme@0.3.26"
       ],
       "registryDependencies": [],
       "files": [
@@ -118,8 +118,8 @@
         "dashboard"
       ],
       "dependencies": [
-        "@axicharts/charts@0.3.25",
-        "@axicharts/charts-theme@0.3.25"
+        "@axicharts/charts@0.3.26",
+        "@axicharts/charts-theme@0.3.26"
       ],
       "registryDependencies": [],
       "files": [

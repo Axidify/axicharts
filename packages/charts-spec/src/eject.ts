@@ -160,16 +160,40 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       value: Number(row.${valueField}),
     }))}`;
   } else if (spec.type === "waterfall") {
+    const valueFormat = (spec.props?.valueFormat as string | undefined) ?? "currency";
+    const showSigns = spec.props?.showSigns !== false;
+    const connectorStyle =
+      (spec.props?.connectorStyle as string | undefined) ?? "dashed";
     chartBody = `items={${dataVar}}
-    valueFormat="currency"`;
+    valueFormat="${valueFormat}"${
+      spec.props?.showLabels === false ? "" : "\n    showLabels"
+    }${showSigns ? "\n    showSigns" : "\n    showSigns={false}"}${
+      connectorStyle === "dashed" ? "\n    connectorStyle=\"dashed\"" : `\n    connectorStyle="${connectorStyle}"`
+    }`;
   } else if (spec.type === "candlestick") {
+    const volumeField = spec.props?.volumeField as string | undefined;
+    const sessionShading = spec.props?.sessionShading;
     chartBody = `categories={${dataVar}.map((row) => String(row.${encoding?.x?.field ?? "time"}))}
     data={${dataVar}.map((row) => ({
       open: Number(row.open),
       high: Number(row.high),
       low: Number(row.low),
       close: Number(row.close),
-    }))}`;
+    }))}${
+      volumeField
+        ? `\n    volume={${dataVar}.map((row) => Number(row.${volumeField}))}`
+        : ""
+    }${spec.props?.brush ? "\n    brush" : ""}${
+      typeof spec.props?.brushEnd === "number"
+        ? `\n    brushEnd={${spec.props.brushEnd}}`
+        : ""
+    }${
+      sessionShading === "rth"
+        ? '\n    sessionShading="rth"'
+        : sessionShading
+          ? "\n    sessionShading"
+          : ""
+    }`;
   } else if (spec.type === "scatter") {
     const xField = encoding?.x?.field ?? "x";
     const yField = Array.isArray(encoding?.y)

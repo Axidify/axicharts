@@ -20,6 +20,10 @@ export type EChartsWaterfallProps = {
   items: WaterfallItem[];
   theme: ChartTheme;
   valueFormat?: (value: number) => string;
+  showLabels?: boolean;
+  /** Prefix +/- on delta bar labels (IBCS). */
+  showSigns?: boolean;
+  connectorStyle?: "solid" | "dashed";
   onCursor?: (event: EChartCursorEvent) => void;
 };
 
@@ -28,16 +32,33 @@ function connectorLineColor(theme: ChartTheme): string {
   return dark ? "#64748b" : "#94a3b8";
 }
 
+function formatWaterfallLabel(
+  displayValue: number,
+  isTotal: boolean,
+  showSigns: boolean,
+  valueFormat: (value: number) => string,
+): string {
+  if (isTotal || !showSigns) {
+    return valueFormat(displayValue);
+  }
+  const sign = displayValue > 0 ? "+" : displayValue < 0 ? "−" : "";
+  return `${sign}${valueFormat(Math.abs(displayValue))}`;
+}
+
 export function EChartsWaterfall({
   width,
   height,
   items,
   theme,
   valueFormat = (value) => `${value}`,
+  showLabels = true,
+  showSigns = true,
+  connectorStyle = "dashed",
   onCursor,
 }: EChartsWaterfallProps): ReactElement {
-  const { placeholders, values, colors, labels, connectors } =
-    buildWaterfallBridge(items, theme);
+  const bridge = buildWaterfallBridge(items, theme);
+  const { placeholders, values, colors, labels, connectors, displayValues, isTotals } =
+    bridge;
 
   const option: EChartsOption = {
     grid: gridOptions(theme),
@@ -59,17 +80,29 @@ export function EChartsWaterfall({
         type: "bar",
         stack: "waterfall",
         itemStyle: { borderColor: "transparent", color: "transparent" },
-        emphasis: { itemStyle: { borderColor: "transparent", color: "transparent" } },
+        emphasis: {
+          itemStyle: { borderColor: "transparent", color: "transparent" },
+        },
         data: placeholders,
       },
       {
         type: "bar",
         stack: "waterfall",
+        barMaxWidth: 56,
         label: {
-          show: true,
+          show: showLabels,
           position: "top",
-          formatter: ({ value }) => valueFormat(Number(value)),
+          formatter: (params) => {
+            const index = params.dataIndex ?? 0;
+            return formatWaterfallLabel(
+              displayValues[index] ?? 0,
+              isTotals[index] ?? false,
+              showSigns,
+              valueFormat,
+            );
+          },
           fontSize: 11,
+          fontWeight: 600,
         },
         markLine: {
           symbol: ["none", "none"],
@@ -78,14 +111,31 @@ export function EChartsWaterfall({
           lineStyle: {
             color: connectorLineColor(theme),
             width: 1,
-            type: "solid",
+            type: connectorStyle,
           },
           data: connectors,
         },
-        data: values.map((value, index) => ({
-          value,
-          itemStyle: { color: colors[index] },
-        })),
+        data: values.map((value, index) => {
+          const total = isTotals[index];
+          const color = colors[index]!;
+          const dark = theme.name === "live" || theme.name === "industrial";
+          return {
+            value,
+            label: showLabels
+              ? {
+                  position: total ? ("inside" as const) : ("top" as const),
+                  color: total ? "#f8fafc" : dark ? "#e2e8f0" : "#334155",
+                }
+              : { show: false },
+            itemStyle: {
+              color,
+              borderColor: total ? "#1e293b" : color,
+              borderWidth: total ? 1.5 : 0,
+              borderRadius: total ? [4, 4, 4, 4] : [4, 4, 0, 0],
+              opacity: total ? 1 : 0.92,
+            },
+          };
+        }),
       },
     ],
   };

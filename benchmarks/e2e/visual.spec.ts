@@ -21,6 +21,12 @@ const VISUAL_STORIES = [
     maxDiffPixelRatio: 0.08,
   },
   {
+    id: "charts-finance--ibcs-waterfall",
+    name: "finance-ibcs-waterfall",
+    waitFor: "canvas",
+    settleMs: 2000,
+  },
+  {
     id: "charts-navigator--ops-multi-panel",
     name: "navigator-ops",
     waitFor: ".axicharts-uplot",
