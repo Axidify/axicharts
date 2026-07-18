@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { useOptionalChartSync } from "./ChartSyncContext";
 import { resolveFollowerBrushRange } from "./brushSync";
-import type { BrushRange } from "./brushRange";
+import { normalizeBrushRange, type BrushRange } from "./brushRange";
 
 export type UseCartesianBrushInput = {
   brush?: boolean;
@@ -29,10 +29,16 @@ export function useCartesianBrush({
   const syncRef = useRef(sync);
   syncRef.current = sync;
 
-  const [leaderRange, setLeaderRange] = useState<BrushRange>(() => ({
-    start: brushStart,
-    end: brushEnd,
-  }));
+  const initialLeaderRange = useMemo(
+    () =>
+      normalizeBrushRange({ start: brushStart, end: brushEnd }) ?? {
+        start: brushStart,
+        end: brushEnd,
+      },
+    [brushStart, brushEnd],
+  );
+
+  const [leaderRange, setLeaderRange] = useState<BrushRange>(() => initialLeaderRange);
 
   const followerRange = resolveFollowerBrushRange(sync, syncId, syncFollower);
 
@@ -45,10 +51,14 @@ export function useCartesianBrush({
 
   const onBrushRangeChange = useCallback((range: BrushRange) => {
     if (!brush) return;
-    setLeaderRange((prev) => (brushRangesEqual(prev, range) ? prev : range));
+    const normalized =
+      normalizeBrushRange(range) ?? normalizeBrushRange({ start: 0, end: 100 })!;
+    setLeaderRange((prev) =>
+      brushRangesEqual(prev, normalized) ? prev : normalized,
+    );
     const bus = syncRef.current;
     if (bus && syncId) {
-      bus.publishBrushRange(range, syncId);
+      bus.publishBrushRange(normalized, syncId);
     }
   }, [brush, syncId]);
 

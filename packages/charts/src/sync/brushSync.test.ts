@@ -53,4 +53,22 @@ describe("resolveFollowerBrushRange", () => {
       range,
     );
   });
+
+  it("ignores empty published brush ranges", () => {
+    expect(
+      resolveFollowerBrushRange(
+        syncState({ brushRange: { start: 40, end: 40 }, brushSourceId: "nav" }),
+        "throughput",
+      ),
+    ).toBeNull();
+  });
+
+  it("normalizes inverted follower ranges", () => {
+    expect(
+      resolveFollowerBrushRange(
+        syncState({ brushRange: { start: 80, end: 20 }, brushSourceId: "nav" }),
+        "throughput",
+      ),
+    ).toEqual({ start: 20, end: 80 });
+  });
 });

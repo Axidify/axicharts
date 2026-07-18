@@ -378,4 +378,26 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("<WordCloudChart");
     expect(jsx).toContain("words=");
   });
+
+  it("emits ChartNavigator with preset and minRangePercent props", () => {
+    const jsx = ejectPanel(
+      {
+        type: "navigator",
+        props: {
+          navigator: {
+            presets: ["1D", "1W", "1M", "ALL"],
+            initialPreset: "1W",
+            minRangePercent: 5,
+          },
+        },
+        encoding: { x: { field: "day" }, y: { field: "value" } },
+      },
+      "rows",
+    );
+
+    expect(jsx).toContain("<ChartNavigator");
+    expect(jsx).toContain('initialPreset={"1W"}');
+    expect(jsx).toContain("minRangePercent={5}");
+    expect(jsx).toContain('presets={["1D","1W","1M","ALL"]}');
+  });
 });

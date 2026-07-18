@@ -429,7 +429,22 @@ describe("compilePanel navigator", () => {
     expect(isValidElement(panel)).toBe(true);
     const container = panel as ReactElement<{ height?: number; syncId?: string }>;
     expect(container.props.syncId).toBe("nav");
-    expect(container.props.height).toBe(48);
+    expect(container.props.height).toBe(52);
+  });
+
+  it("compiles navigator panel with minRangePercent", () => {
+    const panel = compilePanel(
+      {
+        type: "navigator",
+        props: {
+          navigator: { initialPreset: "1M", minRangePercent: 6 },
+        },
+        encoding: { x: { field: "day" }, y: { field: "value" } },
+      },
+      [{ day: "2026-01-01", value: 10 }],
+    );
+
+    expect(isValidElement(panel)).toBe(true);
   });
 });
 

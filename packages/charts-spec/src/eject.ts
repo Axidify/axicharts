@@ -84,7 +84,9 @@ function resolveChartName(spec: PanelSpec): string {
                               ? "MapChart"
                               : spec.type === "gantt"
                                 ? "GanttChart"
-                                : "Gauge";
+                                : spec.type === "navigator"
+                                  ? "ChartNavigator"
+                                  : "Gauge";
 }
 
 export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
@@ -302,6 +304,33 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     chartBody = `tasks={${dataVar}.tasks ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).tasks ?? [])}}
     milestones={${dataVar}.milestones ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).milestones ?? [])}}
     today={${dataVar}.today ?? ${String(chartPropsFromPanel(spec.props ?? {}).today ?? "undefined")}}`;
+  } else if (spec.type === "navigator") {
+    const xField = encoding?.x?.field ?? "date";
+    const yField = Array.isArray(encoding?.y)
+      ? encoding.y[0]?.field
+      : encoding?.y?.field ?? "value";
+    const navigatorProps =
+      (spec.props?.navigator as Record<string, unknown> | undefined) ?? {};
+    const presets =
+      (spec.props?.presets as unknown) ?? navigatorProps.presets;
+    const initialPreset =
+      (spec.props?.initialPreset as unknown) ?? navigatorProps.initialPreset;
+    const minRangePercent =
+      (spec.props?.minRangePercent as number | undefined) ??
+      (navigatorProps.minRangePercent as number | undefined);
+    chartBody = `categories={${dataVar}.map((row) => String(row.${xField}))}
+    series={[{
+      name: "Series",
+      data: ${dataVar}.map((row) => Number(row.${yField})),
+    }]}${
+      presets ? `\n    presets={${JSON.stringify(presets)}}` : ""
+    }${
+      initialPreset ? `\n    initialPreset={${quote(String(initialPreset))}}` : ""
+    }${
+      typeof minRangePercent === "number"
+        ? `\n    minRangePercent={${minRangePercent}}`
+        : ""
+    }`;
   }
 
   const chartProps = chartPropsFromPanel(spec.props ?? {});

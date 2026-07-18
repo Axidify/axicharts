@@ -137,6 +137,9 @@ export { sliceHeatmapByBrushRange } from "./sync/heatmapBrush";
 export {
   sliceCartesianByBrushRange,
   mapSyncIndexForBrushRange,
+  normalizeBrushRange,
+  isEmptyBrushRange,
+  DEFAULT_BRUSH_MIN_RANGE_PERCENT,
 } from "./sync/brushRange";
 export {
   useCartesianBrush,

@@ -26,39 +26,89 @@ const LATENCY = CATEGORIES.map(
   (_, index) => 32 + Math.round(Math.sin(index / 6) * 12) + index * 0.3,
 );
 
+function PanelLabel({ children }: { children: string }) {
+  return (
+    <div
+      style={{
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: "0.04em",
+        textTransform: "uppercase",
+        color: "#64748b",
+        marginBottom: 4,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function OpsNavigatorDashboard() {
   return (
     <ChartSyncGroup>
-      <div style={{ display: "grid", gap: 12, maxWidth: 760 }}>
-        <ChartContainer theme={cleanTheme} height={CHART_NAVIGATOR_HEIGHT} syncId="nav">
-          <ChartNavigator
-            categories={CATEGORIES}
-            series={[{ name: "Throughput", data: THROUGHPUT }]}
-            initialPreset="1M"
-          />
-        </ChartContainer>
-        <ChartContainer theme={cleanTheme} height={220} syncId="throughput" syncFollower="nav">
-          <BarChart
-            categories={CATEGORIES}
-            series={[{ name: "Throughput", data: THROUGHPUT }]}
-            showValues
-          />
-        </ChartContainer>
-        <ChartContainer theme={cleanTheme} height={160} syncId="errors" syncFollower="nav">
-          <LineChart
-            categories={CATEGORIES}
-            series={[{ name: "Error rate", data: ERROR_RATE, tone: "warning" }]}
-            valueSuffix="%"
-            fill
-          />
-        </ChartContainer>
-        <ChartContainer theme={cleanTheme} height={160} syncId="latency" syncFollower="nav">
-          <AreaChart
-            categories={CATEGORIES}
-            series={[{ name: "p95 latency", data: LATENCY, tone: "info" }]}
-            valueSuffix="ms"
-          />
-        </ChartContainer>
+      <div
+        style={{
+          display: "grid",
+          gap: 14,
+          maxWidth: 820,
+          padding: 16,
+          borderRadius: 12,
+          border: "1px solid #e2e8f0",
+          background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
+        }}
+      >
+        <header>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "#0f172a" }}>
+            Ops wall — range navigator
+          </div>
+          <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+            C112 polish — preset pills, overview drag guard, follower sync
+          </div>
+        </header>
+        <div>
+          <PanelLabel>Navigator leader</PanelLabel>
+          <ChartContainer theme={cleanTheme} height={CHART_NAVIGATOR_HEIGHT} syncId="nav">
+            <ChartNavigator
+              categories={CATEGORIES}
+              series={[{ name: "Throughput", data: THROUGHPUT }]}
+              initialPreset="1M"
+              minRangePercent={4}
+            />
+          </ChartContainer>
+        </div>
+        <div>
+          <PanelLabel>Throughput (follower)</PanelLabel>
+          <ChartContainer theme={cleanTheme} height={220} syncId="throughput" syncFollower="nav">
+            <BarChart
+              categories={CATEGORIES}
+              series={[{ name: "Throughput", data: THROUGHPUT }]}
+              showValues
+            />
+          </ChartContainer>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div>
+            <PanelLabel>Error rate</PanelLabel>
+            <ChartContainer theme={cleanTheme} height={160} syncId="errors" syncFollower="nav">
+              <LineChart
+                categories={CATEGORIES}
+                series={[{ name: "Error rate", data: ERROR_RATE, tone: "warning" }]}
+                valueSuffix="%"
+                fill
+              />
+            </ChartContainer>
+          </div>
+          <div>
+            <PanelLabel>p95 latency</PanelLabel>
+            <ChartContainer theme={cleanTheme} height={160} syncId="latency" syncFollower="nav">
+              <AreaChart
+                categories={CATEGORIES}
+                series={[{ name: "p95 latency", data: LATENCY, tone: "info" }]}
+                valueSuffix="ms"
+              />
+            </ChartContainer>
+          </div>
+        </div>
       </div>
     </ChartSyncGroup>
   );
@@ -144,7 +194,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C97 stock navigator — mini overview strip + preset ranges (1D/1W/1M/ALL) publishes brush window to ChartSyncGroup; follower panels slice via syncFollower.",
+          "C97 stock navigator + C112 polish — mini overview strip + preset ranges (1D/1W/1M/ALL) publishes brush window to ChartSyncGroup; follower panels slice via syncFollower.",
       },
     },
   },

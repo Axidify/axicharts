@@ -64,4 +64,32 @@ describe("useCartesianBrush", () => {
       end: 65,
     });
   });
+
+  it("does not republish when follower receives the same normalized range", () => {
+    layoutState.syncId = "leader";
+    layoutState.syncFollower = undefined;
+
+    const publishSpy = vi.fn();
+    const { result } = renderHook(
+      () => ({
+        bus: useChartSync(),
+        brush: useCartesianBrush({ brush: true, brushEnd: 100 }),
+      }),
+      { wrapper },
+    );
+
+    const originalPublish = result.current.bus.publishBrushRange;
+    result.current.bus.publishBrushRange = (...args) => {
+      publishSpy(...args);
+      originalPublish(...args);
+    };
+
+    act(() => {
+      result.current.brush.onBrushRangeChange({ start: 10, end: 60 });
+      result.current.brush.onBrushRangeChange({ start: 10, end: 60 });
+    });
+
+    expect(publishSpy).toHaveBeenCalledTimes(2);
+    expect(result.current.brush.effectiveRange).toEqual({ start: 10, end: 60 });
+  });
 });

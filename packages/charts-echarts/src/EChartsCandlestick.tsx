@@ -56,7 +56,12 @@ function resolveZoomWindow(
   followerBrushRange: EChartBrushRange | null | undefined,
 ): { start: number; end: number } {
   if (!brush && followerBrushRange) {
-    return followerBrushRange;
+    const start = Math.max(0, Math.min(100, followerBrushRange.start));
+    const end = Math.max(0, Math.min(100, followerBrushRange.end));
+    if (end > start) {
+      return { start, end };
+    }
+    return { start: 0, end: 100 };
   }
   return { start: brushStart, end: brushEnd };
 }

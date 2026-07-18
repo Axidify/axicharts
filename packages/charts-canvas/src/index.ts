@@ -20,6 +20,10 @@ export {
 export {
   brushRangeFromIndices,
   indicesFromBrushRange,
+  normalizeBrushRangePercent,
+  brushRangeFromIndicesWithMinGuard,
+  isEmptyBrushRangePercent,
+  DEFAULT_BRUSH_MIN_RANGE_PERCENT,
   type BrushRangePercent,
 } from "./brushRangePercent";
 export type {

@@ -1,7 +1,9 @@
 import type { BrushRange } from "./brushRange";
+import { isEmptyBrushRange, normalizeBrushRange } from "./brushRange";
 import type { ChartSyncContextValue } from "./ChartSyncContext";
 
 export type { BrushRange };
+export { isEmptyBrushRange, normalizeBrushRange } from "./brushRange";
 
 /**
  * Resolves the brush range a panel should follow from ChartSyncGroup.
@@ -11,6 +13,7 @@ export type { BrushRange };
  * - Followers mirror the active leader range unless `syncFollower` pins a leader id.
  * - Multiple leaders: last `publishBrushRange` wins (same as cursor `publish`).
  * - Panels never follow their own `syncId`.
+ * - Empty or degenerate published ranges are ignored (followers show full data).
  */
 export function resolveFollowerBrushRange(
   sync: ChartSyncContextValue | null,
@@ -29,5 +32,5 @@ export function resolveFollowerBrushRange(
     return null;
   }
 
-  return sync.brushRange;
+  return normalizeBrushRange(sync.brushRange);
 }

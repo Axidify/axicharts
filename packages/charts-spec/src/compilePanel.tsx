@@ -658,6 +658,9 @@ export function compilePanel(
       const initialPreset =
         (props.initialPreset as NavigatorPreset | undefined) ??
         (navigatorProps.initialPreset as NavigatorPreset | undefined);
+      const minRangePercent =
+        (props.minRangePercent as number | undefined) ??
+        (navigatorProps.minRangePercent as number | undefined);
 
       return wrapChart(
         { ...resolved, height: resolved.height ?? CHART_NAVIGATOR_HEIGHT },
@@ -666,6 +669,7 @@ export function compilePanel(
           series: applyTagTonesToSeries(baseSeries, tagTones),
           presets,
           initialPreset,
+          minRangePercent,
         }),
         options,
         tagTones,

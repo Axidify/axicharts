@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type ReactElement } from "react";
+import { useCallback, useEffect, useId, useMemo, useState, type ReactElement } from "react";
 import {
   UPlotRangeOverview,
   RANGE_OVERVIEW_HEIGHT,
@@ -19,6 +19,7 @@ import { NavigatorPresetButtons, NAVIGATOR_PRESETS_HEIGHT } from "./NavigatorPre
 export type ChartNavigatorConfig = {
   presets?: NavigatorPreset[];
   initialPreset?: NavigatorPreset;
+  minRangePercent?: number;
 };
 
 export type ChartNavigatorProps = {
@@ -27,6 +28,7 @@ export type ChartNavigatorProps = {
   presets?: NavigatorPreset[];
   initialPreset?: NavigatorPreset;
   brushEnd?: number;
+  minRangePercent?: number;
 };
 
 export const CHART_NAVIGATOR_HEIGHT =
@@ -38,7 +40,9 @@ export function ChartNavigator({
   presets = DEFAULT_NAVIGATOR_PRESETS,
   initialPreset = "ALL",
   brushEnd,
+  minRangePercent,
 }: ChartNavigatorProps): ReactElement | null {
+  const overviewId = useId();
   const { size, theme, ready } = useChartLayout();
   const initialRange = useMemo(
     () => brushRangeForPreset(initialPreset, categories),
@@ -104,6 +108,7 @@ export function ChartNavigator({
         active={activePreset}
         onSelect={handlePresetSelect}
         theme={theme}
+        overviewId={overviewId}
       />
       <UPlotRangeOverview
         width={width}
@@ -112,6 +117,8 @@ export function ChartNavigator({
         theme={theme}
         range={effectiveRange ?? { start: 0, end: 100 }}
         onRangeChange={handleRangeChange}
+        minRangePercent={minRangePercent}
+        overviewId={overviewId}
       />
     </div>
   );
