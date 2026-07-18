@@ -1,18 +1,8 @@
 "use client";
 
 import type { ReactElement } from "react";
-import { listTemplates } from "@axicharts/charts-spec";
+import { listTemplateMeta } from "@axicharts/charts-spec";
 import type { TemplateId } from "@axicharts/charts-spec";
-
-const TEMPLATE_LABELS: Record<TemplateId, string> = {
-  "finance-pnl": "Finance P&L",
-  "trading-blotter": "Trading blotter",
-  "capacity-grid": "Capacity grid",
-  "ops-2x2": "Ops 2×2",
-  "line-overview": "Line overview",
-  "plugins-wall": "Plugins wall",
-  "program-dashboard": "Program dashboard",
-};
 
 export type TemplatePickerProps = {
   value: TemplateId;
@@ -24,9 +14,18 @@ export type TemplatePickerProps = {
 export function TemplatePicker({
   value,
   onChange,
-  templates = listTemplates(),
+  templates,
   label = "Template",
 }: TemplatePickerProps): ReactElement {
+  const meta = listTemplateMeta();
+  const options = (templates ?? meta.map((entry) => entry.id as TemplateId)).map((id) => {
+    const entry = meta.find((item) => item.id === id);
+    return {
+      id,
+      label: entry?.label ?? id,
+    };
+  });
+
   return (
     <label
       style={{
@@ -49,9 +48,9 @@ export function TemplatePicker({
           background: "#fff",
         }}
       >
-        {templates.map((template) => (
-          <option key={template} value={template}>
-            {TEMPLATE_LABELS[template] ?? template}
+        {options.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.label}
           </option>
         ))}
       </select>

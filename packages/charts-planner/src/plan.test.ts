@@ -149,6 +149,30 @@ describe("planFromIntent", () => {
     expect(plan.template).toBe("ops-2x2");
     expect(plan.panels[0]?.type).toBe("alert");
   });
+
+  it("sre vertical: maps incident intent to sre-incident template", () => {
+    const plan = planFromIntent(
+      {
+        metrics: [{ name: "mttr", unit: "min", tags: { vertical: "sre" } }],
+        fields: ["service", "severity", "error_rate"],
+      },
+      "SRE incident dashboard with MTTR and open alerts",
+    );
+
+    expect(plan.template).toBe("sre-incident");
+  });
+
+  it("saas vertical: maps growth intent to saas-growth template", () => {
+    const plan = planFromIntent(
+      {
+        metrics: [{ name: "mrr", unit: "USD", tags: { vertical: "saas" } }],
+        fields: ["week", "signups", "churn"],
+      },
+      "SaaS growth dashboard with MRR funnel",
+    );
+
+    expect(plan.template).toBe("saas-growth");
+  });
 });
 
 describe("planFromProfile", () => {

@@ -6,6 +6,7 @@ import {
   ChartContainer,
   ChartSyncGroup,
   DataTable,
+  FunnelChart,
   Gauge,
   HeatmapChart,
   LineChart,
@@ -24,6 +25,11 @@ import {
   PROGRAM_DASHBOARD_PANELS,
 } from "./programDashboardData";
 import { resolveTheme } from "./themes";
+import {
+  getTemplateRenderer,
+  listTemplates as listRegisteredTemplates,
+  registerBuiltinDashboardTemplate,
+} from "./templateRegistry";
 
 type KpiSpec = {
   value: string;
@@ -611,24 +617,309 @@ export function programDashboardTemplate(
   );
 }
 
-const TEMPLATE_RENDERERS: Record<
-  TemplateId,
-  (
-    data: Record<string, unknown>,
-    theme: ThemeName,
-    mode?: ChartMode,
-    chartConfig?: ChartConfigSpec,
-  ) => ReactElement
-> = {
-  "finance-pnl": (data, theme) => financePnlTemplate(data, theme),
-  "ops-2x2": (data, theme, mode, chartConfig) => ops2x2Template(data, theme, mode, chartConfig),
-  "line-overview": (data, theme) => lineOverviewTemplate(data, theme),
-  "capacity-grid": (data, theme) => capacityGridTemplate(data, theme),
-  "trading-blotter": (data, theme) => tradingBlotterTemplate(data, theme),
-  "plugins-wall": (data, theme, mode) => pluginsWallTemplate(data, theme, mode),
-  "program-dashboard": (data, theme, mode) =>
-    programDashboardTemplate(data, theme, mode),
-};
+const DEFAULT_SRE_KPIS: KpiSpec[] = [
+  { value: "18m", label: "MTTR", tone: "warning" },
+  { value: "3", label: "Active incidents", tone: "critical" },
+  { value: "99.92%", label: "SLO compliance", tone: "success" },
+];
+
+const DEFAULT_SRE_ALERTS = [
+  {
+    service: "payments-api",
+    severity: "P1",
+    message: "Elevated 5xx rate",
+    since: "12m",
+    severityTone: "critical" as const,
+  },
+  {
+    service: "checkout-web",
+    severity: "P2",
+    message: "p95 latency breach",
+    since: "34m",
+    severityTone: "warning" as const,
+  },
+  {
+    service: "search-index",
+    severity: "P3",
+    message: "Replication lag",
+    since: "1h 12m",
+    severityTone: "default" as const,
+  },
+];
+
+const SRE_ALERT_COLUMNS = [
+  { key: "service", label: "Service", monospace: true },
+  { key: "severity", label: "Sev" },
+  { key: "message", label: "Summary" },
+  { key: "since", label: "Since", align: "right" as const, monospace: true },
+];
+
+const DEFAULT_SAAS_KPIS: KpiSpec[] = [
+  { value: "$284k", label: "MRR", tone: "success" },
+  { value: "12.4k", label: "Active users" },
+  { value: "2.1%", label: "Churn", tone: "warning" },
+];
+
+const DEFAULT_SAAS_FUNNEL = [
+  { name: "Visitors", value: 42000 },
+  { name: "Signups", value: 8400 },
+  { name: "Activated", value: 5100 },
+  { name: "Paid", value: 1240 },
+];
+
+export function sreIncidentTemplate(
+  data: Record<string, unknown>,
+  theme: ThemeName = "live",
+): ReactElement {
+  const kpis = (data.kpis as KpiSpec[]) ?? DEFAULT_SRE_KPIS;
+  const categories = (data.categories as string[]) ?? [
+    "00:00",
+    "04:00",
+    "08:00",
+    "12:00",
+    "16:00",
+    "20:00",
+    "24:00",
+  ];
+  const errorRate = (data.errorRate as number[]) ?? [0.8, 1.2, 2.4, 1.8, 3.1, 2.2, 1.4];
+  const heatmap = (data.heatmap as Parameters<typeof HeatmapChart>[0]["matrix"]) ?? {
+    xCategories: ["api", "web", "worker", "db"],
+    yCategories: ["p50", "p95", "p99", "errors"],
+    values: [
+      [42, 88, 120, 0.4],
+      [38, 95, 140, 0.8],
+      [55, 110, 180, 1.2],
+      [48, 102, 160, 0.6],
+    ],
+  };
+  const alerts = (data.alerts as typeof DEFAULT_SRE_ALERTS | undefined) ?? DEFAULT_SRE_ALERTS;
+
+  return createElement(
+    "div",
+    {
+      style: {
+        maxWidth: 820,
+        padding: 16,
+        background: "#0f172a",
+        borderRadius: 8,
+        border: "1px solid #334155",
+      },
+    },
+    createElement(
+      "div",
+      {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          gap: 12,
+        },
+      },
+      ...kpis.map((kpi) =>
+        createElement(Stat, {
+          key: kpi.label,
+          value: kpi.value,
+          label: kpi.label,
+          tone: kpi.tone,
+          surface: "dark",
+        }),
+      ),
+    ),
+    createElement(
+      ChartSyncGroup,
+      null,
+      createElement(
+        "div",
+        { style: { marginTop: 16 } },
+        shell(
+          theme,
+          "live",
+          180,
+          createElement(LineChart, {
+            categories,
+            series: [{ name: "Error rate", data: errorRate, tone: "critical" }],
+            fill: true,
+            valueSuffix: "%",
+          }),
+          "error-rate",
+        ),
+      ),
+    ),
+    createElement(
+      "div",
+      { style: { marginTop: 16 } },
+      shell(
+        theme,
+        "interactive",
+        200,
+        createElement(HeatmapChart, { matrix: heatmap }),
+      ),
+    ),
+    createElement(
+      "div",
+      { style: { marginTop: 16 } },
+      createElement(DataTable, {
+        columns: SRE_ALERT_COLUMNS,
+        rows: alerts,
+        surface: "dark",
+        compact: true,
+        caption: "Open incidents",
+      }),
+    ),
+  );
+}
+
+export function saasGrowthTemplate(
+  data: Record<string, unknown>,
+  theme: ThemeName = "clean",
+): ReactElement {
+  const kpis = (data.kpis as KpiSpec[]) ?? DEFAULT_SAAS_KPIS;
+  const categories = (data.categories as string[]) ?? [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+  ];
+  const signups = (data.signups as number[]) ?? [820, 932, 901, 1034, 1290, 1330];
+  const funnel = (data.funnel as Parameters<typeof FunnelChart>[0]["stages"]) ?? DEFAULT_SAAS_FUNNEL;
+  const weekly = data.weekly as { categories: string[]; values: number[] } | undefined;
+
+  return createElement(
+    "div",
+    {
+      style: {
+        maxWidth: 760,
+        padding: 16,
+        background: "#ffffff",
+        borderRadius: 8,
+        border: "1px solid #e2e8f0",
+      },
+    },
+    createElement(
+      "div",
+      {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          gap: 12,
+        },
+      },
+      ...kpis.map((kpi) =>
+        createElement(Stat, {
+          key: kpi.label,
+          value: kpi.value,
+          label: kpi.label,
+          tone: kpi.tone,
+          surface: "light",
+        }),
+      ),
+    ),
+    createElement(
+      "div",
+      {
+        style: {
+          marginTop: 16,
+          display: "grid",
+          gridTemplateColumns: "1.4fr 1fr",
+          gap: 16,
+        },
+      },
+      shell(
+        theme,
+        "interactive",
+        200,
+        createElement(AreaChart, {
+          categories,
+          series: [{ name: "Signups", data: signups, tone: "success" }],
+        }),
+      ),
+      shell(
+        theme,
+        "interactive",
+        200,
+        createElement(FunnelChart, { stages: funnel }),
+      ),
+    ),
+    weekly
+      ? createElement(
+          "div",
+          { style: { marginTop: 16 } },
+          shell(
+            theme,
+            "interactive",
+            140,
+            createElement(BarChart, {
+              categories: weekly.categories,
+              series: [{ name: "MRR", data: weekly.values }],
+              showValues: true,
+              valueSuffix: "k",
+            }),
+          ),
+        )
+      : null,
+  );
+}
+
+function registerBuiltinTemplates(): void {
+  registerBuiltinDashboardTemplate({
+    id: "finance-pnl",
+    label: "Finance P&L",
+    vertical: "finance",
+    render: (data, theme) => financePnlTemplate(data, theme),
+  });
+  registerBuiltinDashboardTemplate({
+    id: "ops-2x2",
+    label: "Ops 2×2",
+    vertical: "ops",
+    render: (data, theme, mode, chartConfig) =>
+      ops2x2Template(data, theme, mode, chartConfig),
+  });
+  registerBuiltinDashboardTemplate({
+    id: "line-overview",
+    label: "Line overview",
+    vertical: "saas",
+    render: (data, theme) => lineOverviewTemplate(data, theme),
+  });
+  registerBuiltinDashboardTemplate({
+    id: "capacity-grid",
+    label: "Capacity grid",
+    vertical: "resources",
+    render: (data, theme) => capacityGridTemplate(data, theme),
+  });
+  registerBuiltinDashboardTemplate({
+    id: "trading-blotter",
+    label: "Trading blotter",
+    vertical: "trading",
+    render: (data, theme) => tradingBlotterTemplate(data, theme),
+  });
+  registerBuiltinDashboardTemplate({
+    id: "plugins-wall",
+    label: "Plugins wall",
+    vertical: "plugins",
+    render: (data, theme, mode) => pluginsWallTemplate(data, theme, mode),
+  });
+  registerBuiltinDashboardTemplate({
+    id: "program-dashboard",
+    label: "Program dashboard",
+    vertical: "program",
+    render: (data, theme, mode) => programDashboardTemplate(data, theme, mode),
+  });
+  registerBuiltinDashboardTemplate({
+    id: "sre-incident",
+    label: "SRE incident",
+    vertical: "sre",
+    render: (data, theme) => sreIncidentTemplate(data, theme),
+  });
+  registerBuiltinDashboardTemplate({
+    id: "saas-growth",
+    label: "SaaS growth",
+    vertical: "saas",
+    render: (data, theme) => saasGrowthTemplate(data, theme),
+  });
+}
+
+registerBuiltinTemplates();
 
 export type TemplateCompileOptions = {
   theme?: ThemeName;
@@ -642,7 +933,10 @@ export function compileTemplate(
   options: TemplateCompileOptions = {},
 ): ReactElement {
   const theme = options.theme ?? (data.theme as ThemeName | undefined) ?? "clean";
-  const render = TEMPLATE_RENDERERS[template];
+  const render = getTemplateRenderer(template);
+  if (!render) {
+    throw new Error(`[AxiCharts] Unknown dashboard template "${template}"`);
+  }
   return render(data, theme, options.mode, options.chartConfig);
 }
 
@@ -675,5 +969,5 @@ export function compileDashboard(spec: DashboardSpec): ReactElement {
 }
 
 export function listTemplates(): TemplateId[] {
-  return Object.keys(TEMPLATE_RENDERERS) as TemplateId[];
+  return listRegisteredTemplates() as TemplateId[];
 }

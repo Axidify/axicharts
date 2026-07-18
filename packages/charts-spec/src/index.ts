@@ -16,6 +16,7 @@ export type {
   PanelStyleSpec,
   SizeEncoding,
   SpecData,
+  BuiltinTemplateId,
   TemplateId,
   ThemeName,
 } from "./types";
@@ -32,6 +33,8 @@ export {
   ops2x2Template,
   pluginsWallTemplate,
   tradingBlotterTemplate,
+  sreIncidentTemplate,
+  saasGrowthTemplate,
 } from "./templates";
 export { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 export { Chart, Dashboard, type ChartProps, type DashboardProps } from "./Chart";
@@ -77,6 +80,18 @@ export {
 } from "./specCompiler";
 export { normalizePanelSpec, parseDashboardSpecFile, parseDataProfileFile, parsePanelSpecFile } from "./parseSpec";
 export { resolveTheme } from "./themes";
+export {
+  clearBuiltinTemplates,
+  clearCommunityTemplates,
+  getTemplateRenderer,
+  isRegisteredTemplate,
+  listTemplateMeta,
+  registerBuiltinDashboardTemplate,
+  registerDashboardTemplate,
+  type DashboardTemplateMeta,
+  type DashboardTemplateRegistration,
+  type DashboardTemplateRenderer,
+} from "./templateRegistry";
 export { registerPluginChartTypes } from "./registerPluginChartTypes";
 export {
   compileFinancePnlDeckSlide,

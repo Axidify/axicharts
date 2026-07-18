@@ -130,14 +130,19 @@ export type DataProfile = {
 
 export type SpecData = Record<string, unknown>[] | Record<string, unknown>;
 
-export type TemplateId =
+export type BuiltinTemplateId =
   | "finance-pnl"
   | "trading-blotter"
   | "capacity-grid"
   | "ops-2x2"
   | "line-overview"
   | "plugins-wall"
-  | "program-dashboard";
+  | "program-dashboard"
+  | "sre-incident"
+  | "saas-growth";
+
+/** Builtin ids plus any id registered via `registerDashboardTemplate`. */
+export type TemplateId = BuiltinTemplateId | (string & {});
 
 export type DashboardSpec = {
   specVersion?: number;

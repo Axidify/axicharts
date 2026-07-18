@@ -183,6 +183,8 @@ export function suggestTemplate(profile: DataProfile): string {
   if (tags.some((tag) => tag.includes("vertical:finance"))) return "finance-pnl";
   if (tags.some((tag) => tag.includes("vertical:trading"))) return "trading-blotter";
   if (tags.some((tag) => tag.includes("vertical:resources"))) return "capacity-grid";
+  if (tags.some((tag) => tag.includes("vertical:sre"))) return "sre-incident";
+  if (tags.some((tag) => tag.includes("vertical:saas"))) return "saas-growth";
   if (profile.metrics.length >= 4 && profile.metrics.every((m) => m.kind !== "ohlc")) {
     return "ops-2x2";
   }

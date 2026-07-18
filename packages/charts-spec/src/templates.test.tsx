@@ -5,8 +5,10 @@ import { registerTankChart } from "@axicharts/charts-tank";
 import { compileTemplate, listTemplates } from "./templates";
 
 describe("listTemplates", () => {
-  it("includes program-dashboard", () => {
+  it("includes program-dashboard and C91 vertical templates", () => {
     expect(listTemplates()).toContain("program-dashboard");
+    expect(listTemplates()).toContain("sre-incident");
+    expect(listTemplates()).toContain("saas-growth");
   });
 });
 
@@ -19,6 +21,30 @@ describe("programDashboardTemplate", () => {
     expect(container.textContent).toContain("Points left");
     expect(container.textContent).toContain("Velocity");
     expect(container.textContent).toContain("On-time");
+  });
+});
+
+describe("sreIncidentTemplate", () => {
+  it("renders incident KPIs and alert table", () => {
+    registerBuiltinChartTypes();
+    const view = compileTemplate("sre-incident", {});
+    const { container } = render(view);
+    expect(container.textContent).toContain("MTTR");
+    expect(container.textContent).toContain("Open incidents");
+    expect(container.textContent).toContain("payments-api");
+  });
+});
+
+describe("saasGrowthTemplate", () => {
+  it("renders growth KPIs and funnel", () => {
+    registerBuiltinChartTypes();
+    const view = compileTemplate("saas-growth", {
+      weekly: { categories: ["W1", "W2", "W3", "W4"], values: [62000, 68000, 71000, 74000] },
+    });
+    const { container } = render(view);
+    expect(container.textContent).toContain("MRR");
+    expect(container.textContent).toContain("Active users");
+    expect(container.textContent).toContain("Churn");
   });
 });
 

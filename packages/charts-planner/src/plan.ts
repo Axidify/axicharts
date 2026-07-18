@@ -45,6 +45,8 @@ export function inferTemplateFromIntent(intent: string): TemplateId | undefined 
   if (/program|burndown|sprint/.test(lower)) return "program-dashboard";
   if (/plugin|extension/.test(lower)) return "plugins-wall";
   if (/capacity|resource|utilization/.test(lower)) return "capacity-grid";
+  if (/incident|sre|mttr|on-?call|outage|postmortem/.test(lower)) return "sre-incident";
+  if (/saas|mrr|arr|churn|signup|growth|funnel/.test(lower)) return "saas-growth";
   if (/line\s*\d+|ops|shift|plant|telemetry|2x2|wall/.test(lower)) return "ops-2x2";
   if (/overview|single|kpi/.test(lower)) return "line-overview";
   return undefined;
@@ -147,7 +149,7 @@ export function buildPlannerPrompt(profile: DataProfile, intent: string): string
   return [
     "You are a dashboard planner. Return ONLY JSON matching this shape:",
     "{",
-    '  "template": "ops-2x2|finance-pnl|trading-blotter|capacity-grid|line-overview|plugins-wall|program-dashboard",',
+    '  "template": "ops-2x2|finance-pnl|trading-blotter|capacity-grid|line-overview|plugins-wall|program-dashboard|sre-incident|saas-growth|<community-id>",',
     '  "title": "string",',
     '  "subtitle": "string",',
     '  "theme": "clean|live|industrial|presentation",',

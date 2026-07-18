@@ -45,6 +45,22 @@ describe("plan", () => {
     expect(template).toBe("plugins-wall");
   });
 
+  it("suggests sre-incident for SRE vertical tags", () => {
+    const template = suggestTemplate({
+      metrics: [{ name: "mttr", tags: { vertical: "sre" } }],
+    });
+
+    expect(template).toBe("sre-incident");
+  });
+
+  it("suggests saas-growth for SaaS vertical tags", () => {
+    const template = suggestTemplate({
+      metrics: [{ name: "mrr", tags: { vertical: "saas" } }],
+    });
+
+    expect(template).toBe("saas-growth");
+  });
+
   it("maps share metrics to donut panels", () => {
     const panel = planPanelFromMetric({
       name: "revenue_share",

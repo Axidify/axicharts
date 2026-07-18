@@ -1,5 +1,5 @@
 import type { PanelSpec, TemplateId } from "@axicharts/charts-spec";
-import { SPEC_VERSION } from "@axicharts/charts-spec";
+import { SPEC_VERSION, isRegisteredTemplate } from "@axicharts/charts-spec";
 import type { DashboardPlan } from "./types";
 
 const MOSAIC_PRESET_IDS = new Set<string>([
@@ -17,6 +17,8 @@ const TEMPLATE_IDS = new Set<string>([
   "line-overview",
   "plugins-wall",
   "program-dashboard",
+  "sre-incident",
+  "saas-growth",
 ]);
 
 const PANEL_TYPES = new Set([
@@ -45,7 +47,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export function isTemplateId(value: string): value is TemplateId {
-  return TEMPLATE_IDS.has(value);
+  return TEMPLATE_IDS.has(value) || isRegisteredTemplate(value);
 }
 
 export function validatePanelSpec(raw: unknown): PanelSpec | null {

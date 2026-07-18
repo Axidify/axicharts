@@ -21,6 +21,8 @@ const TEMPLATE_IDS = new Set([
   "line-overview",
   "plugins-wall",
   "program-dashboard",
+  "sre-incident",
+  "saas-growth",
 ]);
 const THEMES = new Set(["clean", "live", "industrial", "presentation"]);
 const MODES = new Set(["static", "interactive", "live", "presentation"]);
