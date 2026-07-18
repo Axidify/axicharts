@@ -1,4 +1,6 @@
 import type { PanelSpec } from "./types";
+import { readPanelAnimation, animationToSpecField } from "./panelAnimation";
+import { readPanelLiveAnimate } from "./panelLiveAnimate";
 
 function comboSeriesBlock(spec: PanelSpec, dataVar: string): string {
   const encoding = spec.encoding;
@@ -31,6 +33,10 @@ function comboFlags(spec: PanelSpec): string[] {
   if (dualAxis === true) flags.push("dualAxis");
   else if (dualAxis === false) flags.push("dualAxis={false}");
   else if (dualAxis === "auto") flags.push('dualAxis="auto"');
+  const animation = animationToSpecField(readPanelAnimation(spec));
+  if (animation) flags.push(`animate={${JSON.stringify(animation)}}`);
+  const liveAnimate = readPanelLiveAnimate(spec);
+  if (liveAnimate) flags.push(`liveAnimate="${liveAnimate}"`);
   return flags;
 }
 
