@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
+import { treePathToDrillPath } from "./treemapDrill";
 
 export type EChartItemHoverEvent = {
   title: string;
@@ -34,6 +35,7 @@ type UseEChartOptions = {
   onCursor?: (event: EChartCursorEvent) => void;
   onBrushRange?: (range: EChartBrushRange | null) => void;
   onItemHover?: (event: EChartItemHoverEvent) => void;
+  onTreemapDrill?: (path: string[]) => void;
   mergeOption?: boolean;
   formatItemHover?: (params: {
     name?: string;
@@ -68,6 +70,7 @@ export function useEChart({
   onCursor,
   onBrushRange,
   onItemHover,
+  onTreemapDrill,
   mergeOption = false,
   formatItemHover,
 }: UseEChartOptions) {
@@ -77,6 +80,7 @@ export function useEChart({
   const onCursorRef = useRef(onCursor);
   const onBrushRangeRef = useRef(onBrushRange);
   const onItemHoverRef = useRef(onItemHover);
+  const onTreemapDrillRef = useRef(onTreemapDrill);
   const formatItemHoverRef = useRef(formatItemHover);
   const categoriesRef = useRef(categories);
   const applyingSyncRef = useRef(false);
@@ -84,6 +88,7 @@ export function useEChart({
   onCursorRef.current = onCursor;
   onBrushRangeRef.current = onBrushRange;
   onItemHoverRef.current = onItemHover;
+  onTreemapDrillRef.current = onTreemapDrill;
   formatItemHoverRef.current = formatItemHover;
   categoriesRef.current = categories;
 
@@ -186,11 +191,31 @@ export function useEChart({
       }
     };
 
+    const handleTreemapDrill = (...args: unknown[]) => {
+      if (!onTreemapDrillRef.current) return;
+      const params = args[0] as {
+        treePathInfo?: Array<{ name?: string }>;
+      };
+      onTreemapDrillRef.current(treePathToDrillPath(params.treePathInfo));
+    };
+
+    const handleClick = (...args: unknown[]) => {
+      if (!onTreemapDrillRef.current) return;
+      const params = args[0] as {
+        componentType?: string;
+        treePathInfo?: Array<{ name?: string }>;
+      };
+      if (params.componentType !== "series") return;
+      handleTreemapDrill(...args);
+    };
+
     chart.on("updateAxisPointer", handleAxisPointer);
     chart.getZr().on("globalout", handleGlobalOut);
     chart.on("mouseover", handleMouseOver);
     chart.on("mouseout", handleMouseOut);
     chart.on("datazoom", handleDataZoom);
+    chart.on("click", handleClick);
+    chart.on("treemapRootToNode", handleTreemapDrill);
 
     return () => {
       chart.off("updateAxisPointer", handleAxisPointer);
@@ -198,6 +223,8 @@ export function useEChart({
       chart.off("mouseover", handleMouseOver);
       chart.off("mouseout", handleMouseOut);
       chart.off("datazoom", handleDataZoom);
+      chart.off("click", handleClick);
+      chart.off("treemapRootToNode", handleTreemapDrill);
       chart.dispose();
       chartRef.current = null;
     };

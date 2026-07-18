@@ -2,50 +2,41 @@
 
 import type { ReactElement } from "react";
 import {
-  EChartsTreemap,
-  type TreemapDrillChange,
-  type TreemapNode,
+  EChartsSunburst,
+  type HierarchyNode,
 } from "@axicharts/charts-echarts";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { EChartsInteractionShell } from "../chrome/EChartsInteractionShell";
 import { useEChartsInteraction } from "../sync/useEChartsInteraction";
 
-export type TreemapChartProps = {
-  nodes: TreemapNode[];
+export type SunburstChartProps = {
+  nodes: HierarchyNode[];
   showLabels?: boolean;
-  drilldown?: boolean;
-  onDrillChange?: (state: TreemapDrillChange) => void;
 };
 
-function TreemapPlot({
+function SunburstPlot({
   nodes,
   showLabels,
-  drilldown,
-  onDrillChange,
-}: TreemapChartProps): ReactElement {
+}: SunburstChartProps): ReactElement {
   const { size, theme } = useChartLayout();
   const interaction = useEChartsInteraction();
 
   return (
-    <EChartsTreemap
+    <EChartsSunburst
       width={Math.floor(size.width)}
       height={Math.floor(size.height)}
       nodes={nodes}
       theme={theme}
       showLabels={showLabels}
-      drilldown={drilldown}
-      onDrillChange={onDrillChange}
       onItemHover={interaction.onItemHover}
     />
   );
 }
 
-export function TreemapChart({
+export function SunburstChart({
   nodes,
   showLabels = true,
-  drilldown = false,
-  onDrillChange,
-}: TreemapChartProps): ReactElement | null {
+}: SunburstChartProps): ReactElement | null {
   const { size, ready } = useChartLayout();
 
   if (!ready || size.width < 1 || size.height < 1) {
@@ -54,16 +45,9 @@ export function TreemapChart({
 
   return (
     <EChartsInteractionShell
-      plot={
-        <TreemapPlot
-          nodes={nodes}
-          showLabels={showLabels}
-          drilldown={drilldown}
-          onDrillChange={onDrillChange}
-        />
-      }
+      plot={<SunburstPlot nodes={nodes} showLabels={showLabels} />}
     />
   );
 }
 
-export type { TreemapDrillChange, TreemapNode } from "@axicharts/charts-echarts";
+export type { HierarchyNode } from "@axicharts/charts-echarts";

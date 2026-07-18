@@ -34,6 +34,7 @@ const PANEL_TYPES = new Set([
   "radar",
   "scatter",
   "treemap",
+  "sunburst",
   "stat",
   "gauge",
   "table",

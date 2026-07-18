@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { useState } from "react";
 import { ChartContainer, TreemapChart } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
 
@@ -60,4 +61,28 @@ type Story = StoryObj<typeof meta>;
 
 export const CloudCosts: Story = {
   render: () => <CloudCostTreemap />,
+};
+
+function DrilldownTreemap(): ReactElement {
+  const [path, setPath] = useState<string[]>([]);
+
+  return (
+    <div style={{ maxWidth: 560 }}>
+      <ChartContainer theme={cleanTheme} height={320} width="100%">
+        <TreemapChart
+          nodes={CLOUD_COSTS}
+          drilldown
+          onDrillChange={({ path: nextPath }) => setPath(nextPath)}
+        />
+      </ChartContainer>
+      <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
+        Click tiles to zoom in; use the breadcrumb trail to navigate back.
+        {path.length > 0 ? ` Current path: ${path.join(" / ")}` : ""}
+      </p>
+    </div>
+  );
+}
+
+export const Drilldown: Story = {
+  render: () => <DrilldownTreemap />,
 };

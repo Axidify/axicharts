@@ -8,6 +8,7 @@ import {
   PieChart,
   RadarChart,
   ScatterChart,
+  SunburstChart,
   TreemapChart,
 } from "echarts/charts";
 import {
@@ -30,6 +31,7 @@ echarts.use([
   PieChart,
   RadarChart,
   ScatterChart,
+  SunburstChart,
   TreemapChart,
   GridComponent,
   DataZoomComponent,
@@ -43,8 +45,15 @@ export { buildDataZoom, type BuildDataZoomInput } from "./dataZoom";
 export { buildWaterfallBridge, type WaterfallBridge, type WaterfallConnector } from "./waterfallBridge";
 export { EChartsCandlestick, type EChartsCandlestickProps } from "./EChartsCandlestick";
 export { EChartsFunnel, type EChartsFunnelProps } from "./EChartsFunnel";
+export { EChartsSunburst, type EChartsSunburstProps } from "./EChartsSunburst";
 export { EChartsTreemap, type EChartsTreemapProps } from "./EChartsTreemap";
+export type { HierarchyNode } from "./hierarchyTypes";
 export type { FunnelStage } from "./funnelTypes";
+export {
+  buildTreemapDrillOptions,
+  treePathToDrillPath,
+  type TreemapDrillChange,
+} from "./treemapDrill";
 export { EChartsBoxplot, type EChartsBoxplotProps } from "./EChartsBoxplot";
 export { EChartsHistogram, type EChartsHistogramProps } from "./EChartsHistogram";
 export type { BoxplotItem, BoxplotSeries } from "./boxplotTypes";

@@ -61,7 +61,9 @@ function resolveChartName(spec: PanelSpec): string {
                   ? "ScatterChart"
                   : spec.type === "treemap"
                     ? "TreemapChart"
-                    : spec.type === "stat"
+                    : spec.type === "sunburst"
+                      ? "SunburstChart"
+                      : spec.type === "stat"
                       ? "Stat"
                       : spec.type === "table"
                       ? "DataTable"
@@ -175,6 +177,13 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       })),
     }]}`;
   } else if (spec.type === "treemap") {
+    chartBody = `nodes={${dataVar}.nodes ?? ${dataVar}.map((row) => ({
+      name: String(row.name),
+      value: Number(row.value),
+    }))}${
+      spec.props?.drilldown ? "\n    drilldown" : ""
+    }`;
+  } else if (spec.type === "sunburst") {
     chartBody = `nodes={${dataVar}.nodes ?? ${dataVar}.map((row) => ({
       name: String(row.name),
       value: Number(row.value),

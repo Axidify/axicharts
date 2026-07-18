@@ -11,6 +11,7 @@ import { PieChart } from "../pie/PieChart";
 import { RadarChart } from "../radar/RadarChart";
 import { ScatterChart } from "../scatter/ScatterChart";
 import { TreemapChart } from "../treemap/TreemapChart";
+import { SunburstChart } from "../sunburst/SunburstChart";
 import { WaterfallChart } from "../waterfall/WaterfallChart";
 import { registerChartType } from "./registry";
 
@@ -34,6 +35,11 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "treemap",
     Chart: TreemapChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "sunburst",
+    Chart: SunburstChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
   {

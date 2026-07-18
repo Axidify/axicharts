@@ -17,6 +17,7 @@ import {
   RadarChart,
   ScatterChart,
   Stat,
+  SunburstChart,
   TreemapChart,
   WaterfallChart,
   AlertPanel,
@@ -356,6 +357,23 @@ export function compilePanel(
         }));
       return wrap(
         createElement(TreemapChart, {
+          nodes,
+          ...props,
+        }),
+      );
+    }
+
+    case "sunburst": {
+      const nameField = resolved.encoding?.name?.field ?? "name";
+      const valueField = resolved.encoding?.value?.field ?? "value";
+      const nodes =
+        (props.nodes as Parameters<typeof SunburstChart>[0]["nodes"]) ??
+        rows.map((row) => ({
+          name: String(row[nameField]),
+          value: Number(row[valueField]),
+        }));
+      return wrap(
+        createElement(SunburstChart, {
           nodes,
           ...props,
         }),

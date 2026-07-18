@@ -1,8 +1,6 @@
-import type { SeriesTone } from "./types";
+import type { HierarchyNode } from "./hierarchyTypes";
 
-export type TreemapNode = {
-  name: string;
-  value?: number;
-  tone?: SeriesTone;
-  children?: TreemapNode[];
-};
+export type { HierarchyNode } from "./hierarchyTypes";
+
+/** @alias HierarchyNode */
+export type TreemapNode = HierarchyNode;

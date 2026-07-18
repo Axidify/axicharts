@@ -75,6 +75,7 @@ export type PanelChartType =
   | "radar"
   | "scatter"
   | "treemap"
+  | "sunburst"
   | "boxplot"
   | "histogram"
   | "stat"

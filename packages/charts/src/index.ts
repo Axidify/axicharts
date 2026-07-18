@@ -24,8 +24,14 @@ export {
 export {
   TreemapChart,
   type TreemapChartProps,
+  type TreemapDrillChange,
   type TreemapNode,
 } from "./treemap/TreemapChart";
+export {
+  SunburstChart,
+  type SunburstChartProps,
+  type HierarchyNode,
+} from "./sunburst/SunburstChart";
 export {
   CandlestickChart,
   type CandlestickChartProps,

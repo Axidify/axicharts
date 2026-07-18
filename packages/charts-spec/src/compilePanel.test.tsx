@@ -426,3 +426,34 @@ describe("compilePanel brush sync", () => {
     expect(container.props.syncFollower).toBe("ohlc");
   });
 });
+
+describe("compilePanel sunburst", () => {
+  it("compiles sunburst panels from nested nodes", async () => {
+    const panel = compilePanel(
+      {
+        type: "sunburst",
+        title: "Portfolio mix",
+        height: 240,
+        width: 360,
+        props: {
+          nodes: [
+            {
+              name: "Equities",
+              children: [
+                { name: "US", value: 40 },
+                { name: "Intl", value: 20 },
+              ],
+            },
+          ],
+        },
+      },
+      {},
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Portfolio mix");
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+});

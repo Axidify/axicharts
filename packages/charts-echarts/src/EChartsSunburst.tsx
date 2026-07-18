@@ -6,17 +6,14 @@ import type { ChartTheme } from "@axicharts/charts-theme";
 import { hiddenTooltip } from "./themeBridge";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { flattenTreemapValues, mapTreemapData } from "./treemapData";
-import type { TreemapNode } from "./treemapTypes";
-import { buildTreemapDrillOptions, type TreemapDrillChange } from "./treemapDrill";
+import type { HierarchyNode } from "./hierarchyTypes";
 
-export type EChartsTreemapProps = {
+export type EChartsSunburstProps = {
   width: number;
   height: number;
-  nodes: TreemapNode[];
+  nodes: HierarchyNode[];
   theme: ChartTheme;
   showLabels?: boolean;
-  drilldown?: boolean;
-  onDrillChange?: (state: TreemapDrillChange) => void;
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
 
@@ -25,59 +22,52 @@ function formatShare(value: number, total: number): string {
   return `${((value / total) * 100).toFixed(1)}%`;
 }
 
-export function EChartsTreemap({
+export function EChartsSunburst({
   width,
   height,
   nodes,
   theme,
   showLabels = true,
-  drilldown = false,
-  onDrillChange,
   onItemHover,
-}: EChartsTreemapProps): ReactElement {
+}: EChartsSunburstProps): ReactElement {
   const data = mapTreemapData(nodes, theme);
   const leafValues = flattenTreemapValues(nodes);
   const total = leafValues.reduce((sum, value) => sum + value, 0);
-  const drillOptions = buildTreemapDrillOptions({ drilldown });
 
   const option: EChartsOption = {
     tooltip: hiddenTooltip(),
     series: [
       {
-        type: "treemap",
-        width: "100%",
-        height: "100%",
-        roam: false,
-        ...drillOptions,
+        type: "sunburst",
+        radius: ["12%", "92%"],
+        sort: undefined,
+        emphasis: {
+          focus: "ancestor",
+        },
         label: {
           show: showLabels,
+          rotate: "radial",
           fontSize: 11,
           color: "#0f172a",
-        },
-        upperLabel: {
-          show: showLabels,
-          height: 22,
-          color: "#0f172a",
-          fontSize: 11,
         },
         itemStyle: {
-          borderColor: theme.name === "live" || theme.name === "industrial"
-            ? "#0f172a"
-            : "#ffffff",
+          borderColor:
+            theme.name === "live" || theme.name === "industrial"
+              ? "#0f172a"
+              : "#ffffff",
           borderWidth: 1,
-          gapWidth: 1,
         },
         levels: [
+          {},
           {
-            itemStyle: {
-              borderWidth: 0,
-              gapWidth: 2,
-            },
+            r0: "12%",
+            r: "42%",
+            label: { rotate: "tangential" },
           },
           {
-            itemStyle: {
-              gapWidth: 1,
-            },
+            r0: "42%",
+            r: "92%",
+            label: { rotate: "radial" },
           },
         ],
         data,
@@ -90,9 +80,6 @@ export function EChartsTreemap({
     width,
     height,
     onItemHover,
-    onTreemapDrill: onDrillChange
-      ? (path) => onDrillChange({ path })
-      : undefined,
     formatItemHover: (params) => {
       const mouse = params.event?.event;
       if (!mouse || params.name == null) return null;
