@@ -1,0 +1,20 @@
+{
+  "specVersion": 1,
+  "type": "cartesian",
+  "title": "Weekly revenue",
+  "theme": "studio",
+  "mode": "static",
+  "height": 200,
+  "encoding": {
+    "x": {
+      "field": "week"
+    }
+  },
+  "marks": [
+    {
+      "type": "bar",
+      "field": "revenue",
+      "label": "Revenue"
+    }
+  ]
+}

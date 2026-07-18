@@ -102,6 +102,10 @@ export function SpecPage(): ReactElement {
       </p>
 
       <Section title="Cartesian building blocks" subtitle="RFC-002 — agent-safe marks[]">
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
+          <Link to="/spec/blocks">Open Blocks Playground →</Link> — three-pane spec, chart, and JSX
+          editor with live validation (C138).
+        </p>
         <pre
           style={{
             margin: 0,

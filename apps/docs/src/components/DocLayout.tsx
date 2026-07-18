@@ -10,6 +10,7 @@ const topLinks = [
   { to: "/templates/community", label: "Community templates" },
   { to: "/verticals", label: "Verticals" },
   { to: "/spec", label: "Spec layer" },
+  { to: "/spec/blocks", label: "Blocks Playground" },
 ] as const;
 
 const runtimeLinks = [

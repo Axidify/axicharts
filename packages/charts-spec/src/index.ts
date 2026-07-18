@@ -42,6 +42,16 @@ export {
 } from "./cartesianValidation";
 export { normalizeToCartesian, normalizeRawCartesianPanel, type NormalizedCartesianSpec } from "./normalizeToCartesian";
 export { suggestField, levenshtein } from "./fieldSuggest";
+export {
+  BlocksPlayground,
+  BLOCKS_PLAYGROUND_PRESETS,
+  evaluatePlaygroundSpec,
+  findPlaygroundPreset,
+  presetSpecJson,
+  type BlocksPlaygroundProps,
+  type BlocksPlaygroundPreset,
+  type PlaygroundEvaluation,
+} from "./blocksPlayground";
 export { compilePanel, type CompileOptions } from "./compilePanel";
 export {
   compileDashboard,

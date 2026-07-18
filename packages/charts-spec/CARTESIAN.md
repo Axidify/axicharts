@@ -137,9 +137,30 @@ Empirical simulation: 24 scenarios in `src/compositionSimulation.ts` — run `pn
 |-------|--------|-------------|
 | C136 | ✅ branch `feat/rfc-002-c136-cartesian` | `validateCartesianSpec`, `normalizeToCartesian`, `type: "cartesian"` |
 | C137 | ✅ branch `feat/rfc-002-c136-cartesian` | Public `CartesianChart` shell; composable eject |
-| C138 | Planned | Blocks Playground (spec ↔ chart ↔ JSX) |
+| C138 | ✅ branch | Blocks Playground — spec ↔ chart ↔ JSX; presets + agent skill |
 | C139 | Planned | `createCartesianPanel` in charts-planner |
 | C140 | Planned | `@axicharts/charts-mcp` |
+
+## Blocks Playground (C138)
+
+Three-pane editor exported as `BlocksPlayground` from `@axicharts/charts-spec`:
+
+| Pane | Content |
+|------|---------|
+| **Spec** | Editable JSON + validation errors/warnings |
+| **Chart** | Live `compilePanel` preview |
+| **Code** | Composable `ejectPanel` JSX + copy |
+
+```tsx
+import { BlocksPlayground } from "@axicharts/charts-spec";
+
+<BlocksPlayground initialPresetId="revenue-target" />
+```
+
+- **Storybook:** `Spec/Blocks Playground`
+- **Docs site:** `/spec/blocks`
+- **Presets:** `examples/playground/*.panel.json`
+- **Agent skill:** `agent-skills/cartesian/SKILL.md`
 
 ## CLI
 
@@ -151,4 +172,4 @@ npx @axicharts/charts-spec eject examples/cartesian-revenue-target.panel.json
 
 - [examples/README.md](./examples/README.md) — fixture catalog
 - [charts-planner README](../charts-planner/README.md) — server intent → panels
-- Storybook: **Charts/Blocks**, **Charts/Studio**
+- Storybook: **Spec/Blocks Playground**, **Charts/Blocks**, **Charts/Studio**

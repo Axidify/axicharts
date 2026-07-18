@@ -21,6 +21,19 @@ pnpm --filter @axicharts/charts-spec test compositionSimulation
 
 Guide: [../CARTESIAN.md](../CARTESIAN.md) · Planning: [RFC-002](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/rfcs/RFC-002-cartesian-building-blocks.md)
 
+## Blocks Playground presets (C138)
+
+Agent few-shot fixtures — also loaded by `BlocksPlayground` and `BLOCKS_PLAYGROUND_PRESETS`:
+
+| File | Intent |
+|------|--------|
+| [playground/revenue-target.panel.json](./playground/revenue-target.panel.json) | Bar + line + quota + band |
+| [playground/ops-slo.panel.json](./playground/ops-slo.panel.json) | Latency + SLO + healthy band |
+| [playground/studio-cell.panel.json](./playground/studio-cell.panel.json) | Studio single-bar cell |
+| [playground/dual-metric.panel.json](./playground/dual-metric.panel.json) | Bar + line dual magnitude |
+
+Storybook: **Spec/Blocks Playground** · Docs: `/spec/blocks`
+
 ## Granular styling (C68–C74)
 
 | File | shadcn / Recharts parity |
