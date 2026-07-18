@@ -87,6 +87,21 @@ export function HomePage(): ReactElement {
             Live vs Recharts
           </Link>
           <Link
+            to="/shadcn"
+            style={{
+              padding: "10px 16px",
+              borderRadius: docRadii.md,
+              border: `1px solid ${docColors.border}`,
+              color: docColors.text,
+              textDecoration: "none",
+              fontSize: 14,
+              fontWeight: 500,
+              background: docColors.surface,
+            }}
+          >
+            shadcn gallery
+          </Link>
+          <Link
             to="/verticals#storybook-round3"
             style={{
               padding: "10px 16px",

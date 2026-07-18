@@ -1,7 +1,18 @@
 {
   "name": "@axicharts/charts",
-  "version": "0.3.13",
-  "description": "Full-spectrum React charts — line, bar, area, pie, candlestick, waterfall, heatmap, industrial primitives, and extension registry.",
+  "version": "0.3.14",
+  "description": "Composable React charts for dashboards — Recharts/shadcn alternative with live canvas, spec JSON, and industrial primitives.",
+  "keywords": [
+    "react",
+    "charts",
+    "dashboard",
+    "recharts",
+    "shadcn",
+    "uplot",
+    "echarts",
+    "live-charts",
+    "typescript"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

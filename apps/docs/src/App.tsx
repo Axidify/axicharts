@@ -13,6 +13,7 @@ import { SpecPage } from "./pages/SpecPage";
 import { StartPage } from "./pages/StartPage";
 import { VerticalsPage } from "./pages/VerticalsPage";
 import { ComparePage } from "./pages/ComparePage";
+import { ShadcnPage } from "./pages/ShadcnPage";
 
 export function App(): ReactElement {
   return (
@@ -23,6 +24,7 @@ export function App(): ReactElement {
           <Route path="start" element={<StartPage />} />
           <Route path="verticals" element={<VerticalsPage />} />
           <Route path="compare" element={<ComparePage />} />
+          <Route path="shadcn" element={<ShadcnPage />} />
           <Route path="spec" element={<SpecPage />} />
           <Route path="runtime" element={<RuntimePage />} />
           <Route path="runtime/adapters" element={<RuntimeAdaptersPage />} />

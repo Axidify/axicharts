@@ -43,4 +43,4 @@ Panels with `props.style` eject to `createTheme(cleanTheme, { … })`. Chrome va
 | Theme tokens | `props.style` | `createTheme(base, overrides)` |
 | Tooltip / legend chrome | `props.tooltipVariant` / `legendVariant` | `ChartContainer` props |
 
-Storybook: **Charts/ShadcnParity**, **Compare/Recharts vs AxiCharts**.
+Storybook: **Charts/ShadcnParity**, **Compare/Recharts vs AxiCharts**. Docs gallery: `/shadcn` on the docs site (GTM-1).
