@@ -30,7 +30,7 @@ export function EChartsTreemap({
   showLabels = true,
   onItemHover,
 }: EChartsTreemapProps): ReactElement {
-  const data = mapTreemapData(nodes);
+  const data = mapTreemapData(nodes, theme);
   const leafValues = flattenTreemapValues(nodes);
   const total = leafValues.reduce((sum, value) => sum + value, 0);
 

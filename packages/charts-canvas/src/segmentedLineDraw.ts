@@ -3,6 +3,7 @@ import type { LineCurve } from "@axicharts/charts-theme";
 import { createAreaGradient } from "./colors";
 import { fillAreaUnderSegment, monotoneTangents, strokeSegment } from "./monotoneSegment";
 import { resolveSeriesColor } from "./seriesColor";
+import type { ChartTheme } from "@axicharts/charts-theme";
 import type { PlotSeries } from "./types";
 
 const EMPTY_PATHS = (): null => null;
@@ -131,12 +132,13 @@ function drawSegmentedSeries(
 export function createSegmentedLineDrawHook(
   series: PlotSeries[],
   config: SegmentedDrawConfig,
+  theme?: Pick<ChartTheme, "tokens">,
 ): (u: uPlot) => void {
   const segmented = series
     .map((item, index) => ({
       seriesIdx: index + 1,
       item,
-      color: item.color ?? resolveSeriesColor(item.tone, index),
+      color: item.color ?? resolveSeriesColor(item.tone, index, theme),
     }))
     .filter(
       (entry) =>
@@ -160,12 +162,13 @@ export function createSegmentedLineDrawHook(
 export function createVariablePointDrawHook(
   series: PlotSeries[],
   defaultRadius: number,
+  theme?: Pick<ChartTheme, "tokens">,
 ): (u: uPlot) => void {
   const sized = series
     .map((item, index) => ({
       seriesIdx: index + 1,
       item,
-      color: item.color ?? resolveSeriesColor(item.tone, index),
+      color: item.color ?? resolveSeriesColor(item.tone, index, theme),
     }))
     .filter((entry) => Boolean(entry.item.sizes?.length));
 

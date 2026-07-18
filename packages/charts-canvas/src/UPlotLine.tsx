@@ -75,17 +75,21 @@ function buildOptions({
     hasCustomLineDraw(series) && !shouldStackSeries(stacked, series.length);
   const defaultPointRadius = compact ? 3 : 4;
   const segmentedDraw = useCustomLineDraw
-    ? createSegmentedLineDrawHook(series, {
-        strokeWidth: theme.line.strokeWidth,
-        areaFill: Boolean(fill && theme.area.show),
-        fillOpacity,
-        pointRadius: defaultPointRadius,
-        curve,
-      })
+    ? createSegmentedLineDrawHook(
+        series,
+        {
+          strokeWidth: theme.line.strokeWidth,
+          areaFill: Boolean(fill && theme.area.show),
+          fillOpacity,
+          pointRadius: defaultPointRadius,
+          curve,
+        },
+        theme,
+      )
     : undefined;
   const variablePointDraw =
     useCustomLineDraw && !useSegmentedFills
-      ? createVariablePointDrawHook(series, defaultPointRadius)
+      ? createVariablePointDrawHook(series, defaultPointRadius, theme)
       : undefined;
 
   const useDualAxis = shouldStackSeries(stacked, series.length)
@@ -183,7 +187,7 @@ function buildOptions({
     series: [
       {},
       ...series.map((item, index) => {
-        const color = item.color ?? resolveSeriesColor(item.tone, index);
+        const color = item.color ?? resolveSeriesColor(item.tone, index, theme);
         const stackSeries = shouldStackSeries(stacked, series.length);
         const hasPointFills =
           useSegmentedFills && Boolean(item.fills && item.fills.length > 0);

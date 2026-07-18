@@ -158,7 +158,7 @@ function buildOptions({
     series: [
       {},
       ...series.map((item, index) => {
-        const color = item.color ?? resolveSeriesColor(item.tone, index);
+        const color = item.color ?? resolveSeriesColor(item.tone, index, theme);
         const paintCustom =
           customMarks &&
           Boolean(item.fills?.length || item.sizes?.length);
@@ -178,7 +178,7 @@ function buildOptions({
               const fill =
                 item.fills?.[idx] ??
                 item.color ??
-                resolveSeriesColor(item.tone, seriesIndex);
+                resolveSeriesColor(item.tone, seriesIndex, theme);
               const sizeMul = item.sizes?.[idx] ?? 1;
               const width = barWidth * sizeMul;
               const adjustedLeft = left + (barWidth - width) / 2;

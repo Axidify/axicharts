@@ -1,4 +1,5 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
+import { resolveChartChrome } from "@axicharts/charts-theme";
 import type { SeriesTone } from "./types";
 
 /** shadcn-inspired series palette — modern, saturated but not harsh */
@@ -38,14 +39,28 @@ export function isDarkChartTheme(themeName: string): boolean {
   return themeName === "live" || themeName === "industrial";
 }
 
-export function resolveChromeColors(theme: Pick<ChartTheme, "name">): ChromeColors {
+export function resolveChromeColors(
+  theme: Pick<ChartTheme, "name" | "tokens">,
+): ChromeColors {
+  const chrome = resolveChartChrome(theme);
+  if (theme.tokens) {
+    return {
+      gridRgb: chrome.grid,
+      axis: chrome.axis,
+    };
+  }
+
   return isDarkChartTheme(theme.name) ? DARK_CHROME : LIGHT_CHROME;
 }
 
 export function chromeGridStroke(
-  theme: Pick<ChartTheme, "name" | "grid">,
+  theme: Pick<ChartTheme, "name" | "grid" | "tokens">,
   compact = false,
 ): string {
+  if (theme.tokens?.grid) {
+    return theme.tokens.grid;
+  }
+
   const { gridRgb } = resolveChromeColors(theme);
   const opacity = compact
     ? Math.min(theme.grid.opacity + 0.12, 0.72)

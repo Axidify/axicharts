@@ -1,5 +1,8 @@
+import type { ChartColorTokens } from "./cssTokens";
+
 export type ChartTheme = {
   name: string;
+  tokens?: ChartColorTokens;
   grid: {
     show: boolean;
     horizontal: boolean;
@@ -31,6 +34,8 @@ export type ChartTheme = {
 };
 
 export type LineCurve = ChartTheme["line"]["curve"];
+
+export type { ChartColorTokens } from "./cssTokens";
 
 const baseGrid = {
   show: true,

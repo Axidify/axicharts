@@ -1,3 +1,4 @@
+import type { ChartTheme } from "@axicharts/charts-theme";
 import { toneColor } from "./themeBridge";
 import type { WaterfallItem } from "./types";
 
@@ -14,7 +15,10 @@ export type WaterfallBridge = {
   connectors: WaterfallConnector[];
 };
 
-export function buildWaterfallBridge(items: WaterfallItem[]): WaterfallBridge {
+export function buildWaterfallBridge(
+  items: WaterfallItem[],
+  theme?: Pick<ChartTheme, "tokens">,
+): WaterfallBridge {
   const placeholders: number[] = [];
   const values: number[] = [];
   const colors: string[] = [];
@@ -30,7 +34,7 @@ export function buildWaterfallBridge(items: WaterfallItem[]): WaterfallBridge {
       const displayValue = running === 0 ? item.value : running;
       placeholders.push(0);
       values.push(displayValue);
-      colors.push(toneColor(item.tone ?? "default"));
+      colors.push(toneColor(item.tone ?? "default", theme));
       levels.push(displayValue);
       running = item.value;
       continue;
@@ -40,12 +44,12 @@ export function buildWaterfallBridge(items: WaterfallItem[]): WaterfallBridge {
     if (delta >= 0) {
       placeholders.push(running);
       values.push(delta);
-      colors.push(toneColor(item.tone ?? "success"));
+      colors.push(toneColor(item.tone ?? "success", theme));
       running += delta;
     } else {
       placeholders.push(running + delta);
       values.push(Math.abs(delta));
-      colors.push(toneColor(item.tone ?? "critical"));
+      colors.push(toneColor(item.tone ?? "critical", theme));
       running += delta;
     }
     levels.push(running);

@@ -1,5 +1,9 @@
+import type { ChartTheme } from "@axicharts/charts-theme";
+import {
+  resolveChartPalette,
+  resolveToneColors,
+} from "@axicharts/charts-theme";
 import type { SeriesTone } from "./types";
-import { SERIES_COLORS, SERIES_PALETTE } from "./colors";
 
 const SERIES_TONE_CYCLE: SeriesTone[] = [
   "default",
@@ -19,9 +23,12 @@ export function resolveSeriesTone(
 export function resolveSeriesColor(
   tone: SeriesTone | undefined,
   index: number,
+  theme?: Pick<ChartTheme, "tokens">,
 ): string {
-  if (tone && tone !== "default" && tone in SERIES_COLORS) {
-    return SERIES_COLORS[tone];
+  const toneColors = resolveToneColors(theme);
+  if (tone && tone !== "default" && tone in toneColors) {
+    return toneColors[tone as SeriesTone];
   }
-  return SERIES_PALETTE[index % SERIES_PALETTE.length]!;
+  const palette = resolveChartPalette(theme);
+  return palette[index % palette.length]!;
 }

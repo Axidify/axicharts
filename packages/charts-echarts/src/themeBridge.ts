@@ -1,9 +1,8 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
-import { SERIES_COLORS, type SeriesTone } from "./types";
+import { resolveChartChrome, resolveToneColors } from "@axicharts/charts-theme";
 
-export function toneColor(tone: SeriesTone = "default"): string {
-  return SERIES_COLORS[tone];
-}
+export { toneColor, seriesPalette } from "./palette";
+export type { SeriesTone } from "./types";
 
 export function gridOptions(theme: ChartTheme) {
   return {
@@ -19,9 +18,9 @@ export function gridOptions(theme: ChartTheme) {
 }
 
 export function axisLabelStyle(theme: ChartTheme) {
-  const dark = theme.name === "live" || theme.name === "industrial";
+  const chrome = resolveChartChrome(theme);
   return {
-    color: dark ? "#94a3b8" : "#64748b",
+    color: chrome.axis,
     fontSize: 11,
     fontFamily: theme.values.monospace
       ? "ui-monospace, SFMono-Regular, Menlo, monospace"
@@ -30,11 +29,11 @@ export function axisLabelStyle(theme: ChartTheme) {
 }
 
 export function splitLineStyle(theme: ChartTheme) {
-  const dark = theme.name === "live" || theme.name === "industrial";
+  const chrome = resolveChartChrome(theme);
   return {
     show: theme.grid.horizontal,
     lineStyle: {
-      color: dark ? "rgba(51, 65, 85, 0.62)" : "rgba(226, 232, 240, 0.95)",
+      color: chrome.grid,
       width: theme.grid.strokeWidth,
     },
   };
@@ -77,6 +76,7 @@ export function reactAxisPointer() {
   };
 }
 
-export function upDownColors() {
-  return { up: SERIES_COLORS.success, down: SERIES_COLORS.critical };
+export function upDownColors(theme?: Pick<ChartTheme, "tokens">) {
+  const tones = resolveToneColors(theme);
+  return { up: tones.success, down: tones.critical };
 }

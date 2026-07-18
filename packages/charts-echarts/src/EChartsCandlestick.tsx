@@ -48,7 +48,7 @@ export function EChartsCandlestick({
   onCursor,
   onBrushRange,
 }: EChartsCandlestickProps): ReactElement {
-  const { up, down } = upDownColors();
+  const { up, down } = upDownColors(theme);
   const ohlc = data.map((point) => [point.open, point.close, point.low, point.high]);
   const mainGrid = {
     ...gridOptions(theme),

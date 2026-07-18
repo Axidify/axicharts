@@ -1,5 +1,5 @@
-import { SERIES_PALETTE } from "./types";
-import { toneColor } from "./themeBridge";
+import type { ChartTheme } from "@axicharts/charts-theme";
+import { seriesPalette, toneColor } from "./themeBridge";
 import type { TreemapNode } from "./treemapTypes";
 
 type EChartsTreemapDatum = {
@@ -11,12 +11,14 @@ type EChartsTreemapDatum = {
 
 export function mapTreemapData(
   nodes: TreemapNode[],
+  theme?: Pick<ChartTheme, "tokens">,
   paletteStart = 0,
 ): EChartsTreemapDatum[] {
+  const palette = seriesPalette(theme);
   return nodes.map((node, index) => {
     const color =
-      toneColor(node.tone) ??
-      SERIES_PALETTE[(paletteStart + index) % SERIES_PALETTE.length]!;
+      toneColor(node.tone, theme) ??
+      palette[(paletteStart + index) % palette.length]!;
     const mapped: EChartsTreemapDatum = {
       name: node.name,
       itemStyle: { color },
@@ -25,7 +27,7 @@ export function mapTreemapData(
       mapped.value = node.value;
     }
     if (node.children?.length) {
-      mapped.children = mapTreemapData(node.children, paletteStart + index + 1);
+      mapped.children = mapTreemapData(node.children, theme, paletteStart + index + 1);
     }
     return mapped;
   });

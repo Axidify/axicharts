@@ -8,10 +8,10 @@ import {
   gridOptions,
   hiddenTooltip,
   splitLineStyle,
+  seriesPalette,
   toneColor,
 } from "./themeBridge";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
-import { SERIES_PALETTE } from "./types";
 import type { ScatterSeries } from "./scatterTypes";
 
 export type EChartsScatterProps = {
@@ -47,13 +47,14 @@ export function EChartsScatter({
     top: showLegend ? 28 : gridOptions(theme).top,
   };
 
+  const palette = seriesPalette(theme);
   const option: EChartsOption = {
     grid,
     legend: showLegend
       ? {
           show: true,
           top: 0,
-          textStyle: { color: "#64748b", fontSize: 11 },
+          textStyle: { color: axisLabelStyle(theme).color, fontSize: 11 },
         }
       : { show: false },
     tooltip: hiddenTooltip(),
@@ -81,7 +82,7 @@ export function EChartsScatter({
       symbolSize: 9,
       itemStyle: {
         color:
-          toneColor(item.tone) ?? SERIES_PALETTE[index % SERIES_PALETTE.length],
+          toneColor(item.tone, theme) ?? palette[index % palette.length],
       },
       emphasis: {
         scale: 1.2,

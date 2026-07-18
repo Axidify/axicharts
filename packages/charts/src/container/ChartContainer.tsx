@@ -1,10 +1,11 @@
 "use client";
 
 import type { CSSProperties, ReactElement, ReactNode } from "react";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { resolveSize } from "@axicharts/charts-core";
 import {
   cleanTheme,
+  resolveThemeTokens,
   type ChartTheme,
 } from "@axicharts/charts-theme";
 import type { SeriesTone } from "@axicharts/charts-canvas";
@@ -84,6 +85,15 @@ export function ChartContainer({
   onResize,
 }: ChartContainerProps): ReactElement {
   const [ref, measured] = useResizeObserver(debounceMs);
+  const [resolvedTheme, setResolvedTheme] = useState(theme);
+
+  useLayoutEffect(() => {
+    if (!ref.current) {
+      setResolvedTheme(theme);
+      return;
+    }
+    setResolvedTheme(resolveThemeTokens(theme, ref.current));
+  }, [theme, measured.width, measured.height]);
   const isStale = useIsStale(
     lastUpdatedAt,
     staleAfterMs,
@@ -101,7 +111,7 @@ export function ChartContainer({
   });
 
   const ready = size.width >= 1 && size.height >= 1;
-  const dark = isDarkTheme(theme);
+  const dark = isDarkTheme(resolvedTheme);
   const showStale = isStale && dataState === "ready";
   const contentHeight = height ?? minHeight;
 
@@ -134,7 +144,7 @@ export function ChartContainer({
       value={{
         size,
         ready,
-        theme,
+        theme: resolvedTheme,
         config,
         mode,
         syncId,

@@ -162,7 +162,7 @@ export function buildComboOptions(
     series: [
       {},
       ...series.map((item, index) => {
-        const color = item.color ?? resolveSeriesColor(item.tone, index);
+        const color = item.color ?? resolveSeriesColor(item.tone, index, theme);
         const scale = useDualAxis && index > 0 ? "y2" : "y";
         if (item.kind === "bar") {
           return {

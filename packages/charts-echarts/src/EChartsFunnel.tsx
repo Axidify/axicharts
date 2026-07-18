@@ -3,9 +3,8 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
-import { hiddenTooltip, toneColor } from "./themeBridge";
+import { hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
-import { SERIES_PALETTE } from "./types";
 import type { FunnelStage } from "./funnelTypes";
 
 export type EChartsFunnelProps = {
@@ -26,14 +25,15 @@ export function EChartsFunnel({
   onItemHover,
 }: EChartsFunnelProps): ReactElement {
   const total = stages.reduce((sum, stage) => sum + stage.value, 0);
+  const palette = seriesPalette(theme);
   const data = stages.map((stage, index) => ({
     name: stage.name,
     value: stage.value,
     itemStyle: {
       color:
         stage.color ??
-        toneColor(stage.tone) ??
-        SERIES_PALETTE[index % SERIES_PALETTE.length],
+        toneColor(stage.tone, theme) ??
+        palette[index % palette.length],
     },
   }));
 

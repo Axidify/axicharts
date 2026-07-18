@@ -3,10 +3,10 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
-import { gridOptions, hiddenTooltip, toneColor } from "./themeBridge";
+import { gridOptions, hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
-import { SERIES_PALETTE, type PieSlice } from "./types";
+import type { PieSlice } from "./types";
 
 export type EChartsPieProps = {
   width: number;
@@ -31,14 +31,15 @@ export function EChartsPie({
 }: EChartsPieProps): ReactElement {
   const total = slices.reduce((sum, slice) => sum + slice.value, 0);
 
+  const palette = seriesPalette(theme);
   const data = slices.map((slice, index) => ({
     name: slice.name,
     value: slice.value,
     itemStyle: {
       color:
         slice.color ??
-        toneColor(slice.tone) ??
-        SERIES_PALETTE[index % SERIES_PALETTE.length],
+        toneColor(slice.tone, theme) ??
+        palette[index % palette.length],
     },
   }));
 

@@ -37,7 +37,7 @@ export function EChartsWaterfall({
   onCursor,
 }: EChartsWaterfallProps): ReactElement {
   const { placeholders, values, colors, labels, connectors } =
-    buildWaterfallBridge(items);
+    buildWaterfallBridge(items, theme);
 
   const option: EChartsOption = {
     grid: gridOptions(theme),
