@@ -48,6 +48,16 @@ export {
   intentWantsColorEncoding,
 } from "./colorEncodingPlan";
 export {
+  findProfileSizeField,
+  inferSizeEncodingForPanel,
+  intentWantsSizeEncoding,
+} from "./sizeEncodingPlan";
+export {
+  inferLineCurveForPanel,
+  intentWantsLinearCurve,
+  intentWantsMonotoneCurve,
+} from "./curveEncodingPlan";
+export {
   applySpecCompilers,
   clearSpecCompilers,
   listSpecCompilers,

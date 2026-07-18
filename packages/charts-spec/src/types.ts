@@ -114,7 +114,7 @@ export type MetricProfile = {
 
 export type DataProfile = {
   metrics: MetricProfile[];
-  /** Known row fields from data profiling — used to infer encoding.color. */
+  /** Known row fields from data profiling — used to infer encoding.color and encoding.size. */
   fields?: string[];
 };
 

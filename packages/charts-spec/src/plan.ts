@@ -1,6 +1,8 @@
 import type { DataProfile, MetricProfile, PanelSpec } from "./types";
 import { applySpecCompilers } from "./specCompiler";
 import { inferColorEncodingForPanel } from "./colorEncodingPlan";
+import { inferLineCurveForPanel } from "./curveEncodingPlan";
+import { inferSizeEncodingForPanel } from "./sizeEncodingPlan";
 
 export type PlanPanelsOptions = {
   intent?: string;
@@ -112,6 +114,35 @@ export function planPanelFromMetric(
   });
   if (colorEncoding && panel.encoding) {
     panel.encoding = { ...panel.encoding, color: colorEncoding };
+  }
+
+  const sizeEncoding = inferSizeEncodingForPanel({
+    type,
+    metric,
+    intent: options.intent,
+    profileFields: options.profileFields,
+  });
+  if (sizeEncoding && panel.encoding) {
+    panel.encoding = { ...panel.encoding, size: sizeEncoding };
+  }
+
+  const lineCurve = inferLineCurveForPanel({
+    type,
+    metric,
+    intent: options.intent,
+  });
+  if (lineCurve) {
+    const existingStyle =
+      panel.props?.style && typeof panel.props.style === "object"
+        ? (panel.props.style as Record<string, unknown>)
+        : {};
+    panel.props = {
+      ...panel.props,
+      style: {
+        ...existingStyle,
+        line: { curve: lineCurve },
+      },
+    };
   }
 
   return panel;

@@ -100,4 +100,42 @@ describe("plan", () => {
 
     expect(panels[0]?.encoding?.color?.field).toBe("meets_slo");
   });
+
+  it("infers encoding.size for volume bar metrics from profile fields", () => {
+    const panel = planPanelFromMetric(
+      { name: "volume", unit: "units" },
+      {
+        profileFields: ["week", "volume", "weight"],
+      },
+    );
+
+    expect(panel.type).toBe("bar");
+    expect(panel.encoding?.size).toEqual({
+      field: "weight",
+      type: "quantitative",
+    });
+  });
+
+  it("infers props.style.line.curve from intent on line panels", () => {
+    const panel = planPanelFromMetric(
+      { name: "latency", unit: "ms" },
+      { intent: "Linear latency trend by hour" },
+    );
+
+    expect(panel.type).toBe("line");
+    expect(panel.props?.style).toEqual({ line: { curve: "linear" } });
+  });
+
+  it("infers encoding.size and line curve across profile planning", () => {
+    const panels = planPanelsFromProfile(
+      {
+        metrics: [{ name: "throughput", unit: "req/min" }],
+        fields: ["week", "throughput", "volume", "aboveTarget"],
+      },
+      { intent: "Throughput sized by volume with smooth curve" },
+    );
+
+    expect(panels[0]?.encoding?.size?.field).toBe("volume");
+    expect(panels[0]?.props?.style).toEqual({ line: { curve: "monotone" } });
+  });
 });

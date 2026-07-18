@@ -81,6 +81,33 @@ describe("planFromIntent", () => {
       type: "semantic",
     });
   });
+
+  it("infers encoding.size when intent requests proportional bars", () => {
+    const plan = planFromIntent(
+      {
+        metrics: [{ name: "throughput", unit: "req/min" }],
+        fields: ["week", "throughput", "volume"],
+      },
+      "Weekly throughput sized by volume",
+    );
+
+    expect(plan.panels[0]?.encoding?.size).toEqual({
+      field: "volume",
+      type: "quantitative",
+    });
+  });
+
+  it("infers props.style.line.curve when intent requests linear lines", () => {
+    const plan = planFromIntent(
+      {
+        metrics: [{ name: "latency", unit: "ms" }],
+        fields: ["time", "latency"],
+      },
+      "Linear latency trend",
+    );
+
+    expect(plan.panels[0]?.props?.style).toEqual({ line: { curve: "linear" } });
+  });
 });
 
 describe("planFromProfile", () => {
