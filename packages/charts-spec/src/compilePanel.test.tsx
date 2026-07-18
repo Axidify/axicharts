@@ -734,6 +734,43 @@ describe("compilePanel presentation mode", () => {
     registerBuiltinChartTypes();
     expect(getChartType("pictorial-bar")?.Chart).toBeTypeOf("function");
   });
+
+  it("compiles liquid-fill panels from encoding rows", async () => {
+    const panel = compilePanel(
+      {
+        type: "liquid-fill",
+        encoding: {
+          value: { field: "level" },
+        },
+        props: { label: "Tank A", shape: "circle" },
+      },
+      [{ level: 0.72 }],
+    );
+
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+
+  it("round-trips liquid-fill through ejectPanel", () => {
+    const spec = {
+      type: "liquid-fill" as const,
+      encoding: {
+        value: { field: "level" },
+      },
+      props: { label: "Tank A", shape: "circle" },
+    };
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain("LiquidFillChart");
+    expect(jsx).toContain("level");
+    expect(jsx).toContain("Tank A");
+  });
+
+  it("registers liquid-fill builtin chart type", () => {
+    registerBuiltinChartTypes();
+    expect(getChartType("liquid-fill")?.Chart).toBeTypeOf("function");
+  });
 });
 
 describe("compilePanel echarts escape hatch", () => {

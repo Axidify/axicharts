@@ -53,6 +53,13 @@ export { EChartsThemeRiver, type EChartsThemeRiverProps } from "./EChartsThemeRi
 export type { ThemeRiverPoint } from "./themeRiverTypes";
 export { EChartsWordCloud, type EChartsWordCloudProps } from "./EChartsWordCloud";
 export type { WordCloudWord } from "./wordCloudTypes";
+export {
+  EChartsLiquidFill,
+  normalizeLiquidFillValue,
+  type EChartsLiquidFillProps,
+  type LiquidFillShape,
+} from "./EChartsLiquidFill";
+export { useLiquidFillExtension } from "./useLiquidFillExtension";
 export { EChartsPie, type EChartsPieProps } from "./EChartsPie";
 export { EChartsWaterfall, type EChartsWaterfallProps } from "./EChartsWaterfall";
 export type { TreemapNode } from "./treemapTypes";

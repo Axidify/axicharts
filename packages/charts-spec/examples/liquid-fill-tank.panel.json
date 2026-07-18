@@ -1,0 +1,13 @@
+{
+  "type": "liquid-fill",
+  "title": "Tank utilization",
+  "height": 280,
+  "width": 320,
+  "encoding": {
+    "value": { "field": "level", "type": "quantitative" }
+  },
+  "props": {
+    "label": "Tank A",
+    "shape": "circle"
+  }
+}

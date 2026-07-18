@@ -16,7 +16,7 @@ const config: StorybookConfig = {
   async viteFinal(config) {
     return mergeConfig(config, {
       optimizeDeps: {
-        exclude: ["echarts-wordcloud"],
+        exclude: ["echarts-wordcloud", "echarts-liquidfill"],
       },
       resolve: {
         alias: {
@@ -31,6 +31,10 @@ const config: StorybookConfig = {
           "@axicharts/charts/pictorial-bar": path.resolve(
             root,
             "packages/charts/src/entry/pictorial-bar.ts",
+          ),
+          "@axicharts/charts/liquid-fill": path.resolve(
+            root,
+            "packages/charts/src/entry/liquid-fill.ts",
           ),
           "@axicharts/charts": path.resolve(root, "packages/charts/src"),
           "@axicharts/charts-canvas": path.resolve(

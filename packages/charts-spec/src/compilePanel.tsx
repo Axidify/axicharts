@@ -16,6 +16,7 @@ import {
   PieChart,
   FunnelChart,
   PictorialBarChart,
+  LiquidFillChart,
   RadarChart,
   ParallelChart,
   ThemeRiverChart,
@@ -78,6 +79,7 @@ import { assertPanelCategoryEnabled } from "./panelCategories";
 import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
 import { resolveCalendarHeatmapData } from "./calendarEncoding";
 import { resolvePictorialBarData } from "./pictorialBarEncoding";
+import { resolveLiquidFillValue } from "./liquidFillEncoding";
 import { resolveMapDrillProps } from "./mapEncoding";
 import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
 import { wordCloudFromRows } from "./wordCloudEncoding";
@@ -700,6 +702,31 @@ export function compilePanel(
           tone:
             (props.tone as StatTone | undefined) ??
             resolveTagStatTone(tagTones, label),
+        }),
+      );
+    }
+
+    case "liquid-fill":
+    case "liquidFill": {
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
+      const value = resolveLiquidFillValue(rows, chartProps, resolved.encoding);
+      const label = String(chartProps.label ?? resolved.title ?? "");
+      return wrap(
+        createElement(LiquidFillChart, {
+          value,
+          label,
+          waves: chartProps.waves as number[] | undefined,
+          color: chartProps.color as string | undefined,
+          tone: chartProps.tone as SeriesTone | undefined,
+          shape: chartProps.shape as
+            | "circle"
+            | "rect"
+            | "roundRect"
+            | "triangle"
+            | "diamond"
+            | "pin"
+            | undefined,
+          waveAnimation: chartProps.waveAnimation as boolean | undefined,
         }),
       );
     }

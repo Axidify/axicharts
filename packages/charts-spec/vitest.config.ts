@@ -11,6 +11,10 @@ export default defineConfig({
         dirname,
         "test/mocks/echarts-wordcloud.ts",
       ),
+      "echarts-liquidfill": path.resolve(
+        dirname,
+        "test/mocks/echarts-liquidfill.ts",
+      ),
     },
   },
   test: {

@@ -16,6 +16,10 @@ vi.mock("./useWordCloudExtension", () => ({
   useWordCloudExtension: () => true,
 }));
 
+vi.mock("./useLiquidFillExtension", () => ({
+  useLiquidFillExtension: () => true,
+}));
+
 import { EChartsCandlestick } from "./EChartsCandlestick";
 import { EChartsFunnel } from "./EChartsFunnel";
 import { EChartsParallel } from "./EChartsParallel";
@@ -25,6 +29,7 @@ import { EChartsOptionChart } from "./EChartsOptionChart";
 import { EChartsScatter } from "./EChartsScatter";
 import { EChartsThemeRiver } from "./EChartsThemeRiver";
 import { EChartsWordCloud } from "./EChartsWordCloud";
+import { EChartsLiquidFill } from "./EChartsLiquidFill";
 import { EChartsTreemap } from "./EChartsTreemap";
 import { withPresentationAnimation } from "./presentationAnimation";
 
@@ -262,6 +267,26 @@ describe("live merge adapters", () => {
     const call = useEChartCalls.at(-1);
     expect(call?.mergeOption).toBe(true);
     expect(call?.replaceMerge).toBeNull();
+  });
+
+  it("passes mergeOption to useEChart for liquid fill in live mode", () => {
+    renderAdapter(
+      <EChartsLiquidFill
+        width={320}
+        height={280}
+        value={0.72}
+        theme={cleanTheme}
+        mergeOption
+        waveAnimation={false}
+      />,
+    );
+
+    const call = useEChartCalls.at(-1);
+    expect(call?.mergeOption).toBe(true);
+    expect(
+      (call?.option as { series?: Array<{ waveAnimation?: boolean }> })?.series?.[0]
+        ?.waveAnimation,
+    ).toBe(false);
   });
 });
 

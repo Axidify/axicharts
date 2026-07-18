@@ -34,6 +34,8 @@ export const PANEL_TYPE_CATEGORY: Record<string, PanelCategory> = {
   treemap: "matrix",
   sunburst: "matrix",
   gauge: "industrial",
+  "liquid-fill": "industrial",
+  liquidFill: "industrial",
   digital: "industrial",
   stat: "kpi",
   table: "platform",

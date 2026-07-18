@@ -63,6 +63,8 @@ function resolveChartName(spec: PanelSpec): string {
           ? "FunnelChart"
           : spec.type === "pictorial-bar" || spec.type === "pictorialBar"
             ? "PictorialBarChart"
+          : spec.type === "liquid-fill" || spec.type === "liquidFill"
+            ? "LiquidFillChart"
           : spec.type === "waterfall"
             ? "WaterfallChart"
             : spec.type === "candlestick"
@@ -150,6 +152,15 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     return `<${chartName}\n  ${serializeProps(merged, "  ")}\n/>`;
   }
 
+  if (
+    (spec.type === "liquid-fill" || spec.type === "liquidFill") &&
+    !spec.encoding?.value?.field
+  ) {
+    const props = chartPropsFromPanel(spec.props ?? {});
+    const merged = { ...props, label: props.label ?? spec.title };
+    return `<LiquidFillChart\n  ${serializeProps(merged, "  ")}\n/>`;
+  }
+
   const encoding = spec.encoding;
   let chartBody = "";
   let preamble = "";
@@ -194,6 +205,9 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       chartBody = `data={${dataVar}.data ?? { items: ${dataVar}.items ?? [] }}
     symbol={${dataVar}.symbol}`;
     }
+  } else if (spec.type === "liquid-fill" || spec.type === "liquidFill") {
+    const valueField = encoding?.value?.field ?? "value";
+    chartBody = `value={Number(${dataVar}[0]?.${valueField} ?? 0)}`;
   } else if (spec.type === "waterfall") {
     const valueFormat = (spec.props?.valueFormat as string | undefined) ?? "currency";
     const showSigns = spec.props?.showSigns !== false;

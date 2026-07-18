@@ -1,5 +1,10 @@
 export * from "./_container";
 export { Gauge, type GaugeProps } from "../gauge/Gauge";
+export {
+  LiquidFillChart,
+  type LiquidFillChartProps,
+  type LiquidFillShape,
+} from "../liquidFill/LiquidFillChart";
 export { Digital, type DigitalProps } from "../digital/Digital";
 export {
   StatusLamp,

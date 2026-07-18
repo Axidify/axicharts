@@ -22,6 +22,11 @@ export {
   type PictorialBarItem,
 } from "../pictorialBar/PictorialBarChart";
 export {
+  LiquidFillChart,
+  type LiquidFillChartProps,
+  type LiquidFillShape,
+} from "../liquidFill/LiquidFillChart";
+export {
   ScatterChart,
   type ScatterChartProps,
   type ScatterPoint,

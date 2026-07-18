@@ -90,6 +90,8 @@ export type PanelChartType =
   | "histogram"
   | "stat"
   | "gauge"
+  | "liquid-fill"
+  | "liquidFill"
   | "table"
   | "markdown"
   | "text"
