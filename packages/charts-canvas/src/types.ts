@@ -20,6 +20,12 @@ export type PlotSeries = {
   sizes?: number[];
 };
 
+export type ComboSeriesKind = "line" | "bar";
+
+export type ComboSeries = PlotSeries & {
+  kind: ComboSeriesKind;
+};
+
 export type ReferenceLine = {
   value: number;
   label?: string;
@@ -75,6 +81,28 @@ export type UPlotBarProps = {
   valueSuffix?: string;
   referenceLines?: ReferenceLine[];
   stacked?: boolean;
+  thresholdBands?: ThresholdBand[];
+  showCursor?: boolean;
+  useNativeLegend?: boolean;
+  onCursor?: (event: PlotCursorEvent) => void;
+  onSyncIndex?: (index: number | null) => void;
+  syncIndex?: number | null;
+  syncSourceId?: string | null;
+  chartId?: string;
+};
+
+export type UPlotComboProps = {
+  width: number;
+  height: number;
+  categories: string[];
+  series: ComboSeries[];
+  theme: ChartTheme;
+  curve?: LineCurve;
+  fill?: boolean;
+  showAxes?: boolean;
+  showValues?: boolean;
+  valueSuffix?: string;
+  referenceLines?: ReferenceLine[];
   thresholdBands?: ThresholdBand[];
   showCursor?: boolean;
   useNativeLegend?: boolean;

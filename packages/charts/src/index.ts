@@ -8,6 +8,7 @@ export { useOptionalChartLayout } from "./container/useOptionalChartLayout";
 export { LineChart, type LineChartProps } from "./line/LineChart";
 export { AreaChart, type AreaChartProps } from "./area/AreaChart";
 export { BarChart, type BarChartProps } from "./bar/BarChart";
+export { ComboChart, type ComboChartProps } from "./combo/ComboChart";
 export { PieChart, type PieChartProps, type PieSlice } from "./pie/PieChart";
 export {
   FunnelChart,
