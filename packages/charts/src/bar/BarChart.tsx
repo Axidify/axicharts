@@ -30,6 +30,11 @@ import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
 import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
+import type { ChartAnimate } from "../motion/types";
+import {
+  seriesDataSignature,
+  useCartesianAnimate,
+} from "../motion";
 import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
 
@@ -52,6 +57,7 @@ export type BarChartProps = {
   brush?: boolean;
   brushEnd?: number;
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
+  animate?: ChartAnimate;
 };
 
 type BarPlotProps = {
@@ -181,6 +187,7 @@ export function BarChart({
   brush = false,
   brushEnd = 100,
   onMarkerDragEnd,
+  animate,
 }: BarChartProps): ReactElement | null {
   const { size, ready, theme, config, tagTones } = useChartLayout();
   const annotationProps = useCartesianAnnotations({
@@ -222,6 +229,15 @@ export function BarChart({
     () => preparePlotData(brushed.categories, brushed.series, maxPoints),
     [brushed.categories, brushed.series, maxPoints],
   );
+  const dataSignature = useMemo(
+    () => seriesDataSignature(categories, series),
+    [categories, series],
+  );
+  const motion = useCartesianAnimate({
+    animate,
+    kind: "bar",
+    dataSignature,
+  });
 
   if (!ready || size.width < 1 || size.height < 1 || categories.length === 0 || series.length === 0) {
     return null;
@@ -248,6 +264,9 @@ export function BarChart({
         categories={plotCategories}
         series={plotSeries}
         valueSuffix={valueSuffix}
+        plotMotionStyle={motion.plotStyle}
+        plotKey={motion.plotKey}
+        skipPresentationPlotEnter={motion.skipPresentationPlotEnter}
         plot={
           <BarPlot
             categories={plotCategories}

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactElement, ReactNode } from "react";
+import type { CSSProperties, ReactElement, ReactNode } from "react";
 import { useEffect } from "react";
 import type { PlotSeries } from "@axicharts/charts-canvas";
 import { useChartLayout } from "../container/ChartLayoutContext";
@@ -27,6 +27,9 @@ export type CartesianChromeProps = {
   compact?: boolean;
   getRows?: (index: number) => TooltipRow[] | null;
   plot: ReactNode;
+  plotMotionStyle?: CSSProperties;
+  plotKey?: string;
+  skipPresentationPlotEnter?: boolean;
 };
 
 function CartesianChromeInner({
@@ -36,6 +39,9 @@ function CartesianChromeInner({
   compact = false,
   getRows,
   plot,
+  plotMotionStyle,
+  plotKey,
+  skipPresentationPlotEnter = false,
 }: CartesianChromeProps): ReactElement {
   const { mode, legendVariant } = useChartLayout();
   const chrome = getInteractionChrome(mode);
@@ -57,13 +63,17 @@ function CartesianChromeInner({
         </div>
       ) : null}
       <div
+        key={plotKey}
         style={{
           position: "absolute",
           top: legendHeight,
           left: 0,
           right: 0,
           bottom: 0,
-          ...presentationEnterStyle(mode === "presentation"),
+          ...presentationEnterStyle(
+            mode === "presentation" && !skipPresentationPlotEnter,
+          ),
+          ...plotMotionStyle,
         }}
       >
         {plot}

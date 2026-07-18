@@ -24,6 +24,11 @@ import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
 import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
+import type { ChartAnimate } from "../motion/types";
+import {
+  seriesDataSignature,
+  useCartesianAnimate,
+} from "../motion";
 import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
 
@@ -42,6 +47,7 @@ export type ComboChartProps = {
   renderer?: RendererPreference;
   refreshHz?: number;
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
+  animate?: ChartAnimate;
 };
 
 type ComboPlotProps = ComboChartProps;
@@ -132,6 +138,7 @@ export function ComboChart({
   renderer = "auto",
   refreshHz,
   onMarkerDragEnd,
+  animate,
 }: ComboChartProps): ReactElement | null {
   const { size, ready, theme, config, tagTones } = useChartLayout();
   const annotationProps = useCartesianAnnotations({
@@ -152,6 +159,15 @@ export function ComboChart({
     () => preparePlotData(categories, series, maxPoints),
     [categories, series, maxPoints],
   );
+  const dataSignature = useMemo(
+    () => seriesDataSignature(categories, series),
+    [categories, series],
+  );
+  const motion = useCartesianAnimate({
+    animate,
+    kind: "combo",
+    dataSignature,
+  });
 
   if (
     !ready ||
@@ -184,6 +200,9 @@ export function ComboChart({
         series={prepared.series}
         valueSuffix={valueSuffix}
         compact={compact}
+        plotMotionStyle={motion.plotStyle}
+        plotKey={motion.plotKey}
+        skipPresentationPlotEnter={motion.skipPresentationPlotEnter}
         plot={
           <ComboPlot
             categories={prepared.categories}

@@ -58,6 +58,10 @@ import {
   toChartConfig,
 } from "./panelChartConfig";
 import {
+  chartPropsWithoutAnimation,
+  readPanelAnimation,
+} from "./panelAnimation";
+import {
   chartPropsWithoutStyle,
   readPanelStyle,
   themeWithPanelStyle,
@@ -71,8 +75,10 @@ import { wordCloudFromRows } from "./wordCloudEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
-  return chartPropsWithoutChartConfig(
-    chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props)),
+  return chartPropsWithoutAnimation(
+    chartPropsWithoutChartConfig(
+      chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props)),
+    ),
   );
 }
 
@@ -279,6 +285,7 @@ export function compilePanel(
         fill: resolved.fill,
         stacked: resolved.stacked,
         valueSuffix: resolved.valueSuffix,
+        animate: readPanelAnimation(resolved),
       });
 
       const Chart =
@@ -307,6 +314,7 @@ export function compilePanel(
         series: applyTagTonesToSeries(baseSeries, tagTones) as ComboSeries[],
         fill: resolved.fill,
         valueSuffix: resolved.valueSuffix,
+        animate: readPanelAnimation(resolved),
       });
 
       return wrap(createElement(ComboChart, chartProps));

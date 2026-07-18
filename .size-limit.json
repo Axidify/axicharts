@@ -132,6 +132,12 @@
     "gzip": true
   },
   {
+    "name": "@axicharts/charts/motion",
+    "path": "packages/charts/dist/entry/motion.js",
+    "limit": "2 KB",
+    "gzip": true
+  },
+  {
     "name": "@axicharts/charts/full",
     "path": "packages/charts/dist/entry/full.js",
     "limit": "14 KB",

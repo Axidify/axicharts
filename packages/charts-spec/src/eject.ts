@@ -10,6 +10,7 @@ import { ejectComboBody } from "./ejectCombo";
 import { chartPropsWithoutChromeMeta, readPanelChrome } from "./panelChrome";
 import { chartPropsWithoutChartConfig, readPanelChartConfig } from "./panelChartConfig";
 import { chartPropsWithoutStyle, readPanelStyle } from "./panelStyle";
+import { chartPropsWithoutAnimation, readPanelAnimation } from "./panelAnimation";
 import { mapDrillEjectProps } from "./mapEncoding";
 import {
   SIZE_SCALE_HELPER,
@@ -21,8 +22,10 @@ function quote(value: string): string {
 }
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
-  return chartPropsWithoutChartConfig(
-    chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props)),
+  return chartPropsWithoutAnimation(
+    chartPropsWithoutChartConfig(
+      chartPropsWithoutChromeMeta(chartPropsWithoutStyle(props)),
+    ),
   );
 }
 

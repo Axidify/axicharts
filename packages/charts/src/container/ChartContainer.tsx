@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactElement, ReactNode } from "react";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { resolveSize } from "@axicharts/charts-core";
 import {
   cleanTheme,
@@ -21,10 +21,12 @@ import {
   useIsStale,
   type ChartDataState,
 } from "../state";
+import type { ChartAnimate } from "../motion/types";
 import {
   ensurePresentationStyles,
   presentationEnterStyle,
 } from "../presentation/motion";
+import { resolveChartAnimate } from "../motion/resolve";
 import "../chrome/chartChrome.css";
 
 export type { ChartDataState };
@@ -53,6 +55,8 @@ export type ChartContainerProps = {
   tagTones?: Record<string, SeriesTone>;
   legendVariant?: LegendVariant;
   tooltipVariant?: TooltipVariant;
+  /** Chart-level animation default — cartesian charts may override. */
+  animate?: ChartAnimate;
   onResize?: (size: { width: number; height: number }) => void;
 };
 
@@ -84,6 +88,7 @@ export function ChartContainer({
   tagTones,
   legendVariant,
   tooltipVariant,
+  animate,
   onResize,
 }: ChartContainerProps): ReactElement {
   const [ref, measured] = useResizeObserver(debounceMs);
@@ -116,6 +121,15 @@ export function ChartContainer({
   const dark = isDarkTheme(resolvedTheme);
   const showStale = isStale && dataState === "ready";
   const contentHeight = height ?? minHeight;
+  const resolvedAnimate = useMemo(
+    () => resolveChartAnimate(mode, animate),
+    [animate, mode],
+  );
+  const presentationEnterEnabled =
+    mode === "presentation" &&
+    dataState === "ready" &&
+    animate !== "none" &&
+    (animate == null || resolvedAnimate.enter != null);
 
   useEffect(() => {
     if (mode === "presentation") {
@@ -189,7 +203,10 @@ export function ChartContainer({
                 opacity: showStale ? 0.55 : dataState === "ready" ? 1 : 0.35,
                 filter: showStale ? "saturate(0.65)" : undefined,
                 transition: "opacity 180ms ease",
-                ...presentationEnterStyle(mode === "presentation" && dataState === "ready"),
+                ...presentationEnterStyle(
+                  presentationEnterEnabled,
+                  animate != null ? resolvedAnimate.enter : null,
+                ),
               }}
             >
               {children}

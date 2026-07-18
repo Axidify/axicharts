@@ -1,0 +1,70 @@
+import { describe, expect, it } from "vitest";
+import { render } from "@testing-library/react";
+import { compilePanel } from "./compilePanel";
+import { ejectPanel } from "./eject";
+import { readPanelAnimation } from "./panelAnimation";
+
+const ROWS = [
+  { month: "Jan", revenue: 120 },
+  { month: "Feb", revenue: 140 },
+];
+
+describe("animation spec round-trip", () => {
+  it("reads top-level animation", () => {
+    expect(
+      readPanelAnimation({
+        animation: "enter",
+      }),
+    ).toBe("enter");
+  });
+
+  it("reads props.animation fallback", () => {
+    expect(
+      readPanelAnimation({
+        props: { animation: { enter: { duration: 400 } } },
+      }),
+    ).toEqual({ enter: { duration: 400 } });
+  });
+
+  it("compiles line panel with animation and ejects animate prop", () => {
+    const spec = {
+      type: "line" as const,
+      animation: "enter" as const,
+      encoding: {
+        x: { field: "month" },
+        y: { field: "revenue" },
+      },
+      height: 200,
+    };
+
+    const panel = compilePanel(spec, ROWS);
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain('animate={"enter"}');
+  });
+
+  it("compiles bar panel with props.animation object", () => {
+    const spec = {
+      type: "bar" as const,
+      props: {
+        animation: {
+          enter: { duration: 500 },
+          update: { duration: 250 },
+        },
+      },
+      encoding: {
+        x: { field: "month" },
+        y: { field: "revenue" },
+      },
+    };
+
+    const panel = compilePanel(spec, ROWS);
+    expect(render(panel).container.innerHTML.length).toBeGreaterThan(0);
+
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain('"enter":{"duration":500}');
+    expect(jsx).toContain('"update":{"duration":250}');
+  });
+});

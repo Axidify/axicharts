@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts",
-  "version": "0.3.34",
+  "version": "0.3.35",
   "description": "Composable React charts for dashboards — Recharts/shadcn alternative with live canvas, spec JSON, and industrial primitives.",
   "keywords": [
     "react",
@@ -109,11 +109,15 @@
     "./quick": {
       "types": "./dist/entry/quick.d.ts",
       "import": "./dist/entry/quick.js"
+    },
+    "./motion": {
+      "types": "./dist/entry/motion.d.ts",
+      "import": "./dist/entry/motion.js"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/registry/index.ts src/entry/line.ts src/entry/bar.ts src/entry/pie.ts src/entry/area.ts src/entry/candlestick.ts src/entry/waterfall.ts src/entry/heatmap.ts src/entry/export.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/quick.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --external jspdf --clean",
-    "dev": "tsup src/index.ts src/registry/index.ts src/entry/line.ts src/entry/bar.ts src/entry/pie.ts src/entry/area.ts src/entry/candlestick.ts src/entry/waterfall.ts src/entry/heatmap.ts src/entry/export.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/quick.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --external jspdf --watch",
+    "build": "tsup src/index.ts src/registry/index.ts src/entry/line.ts src/entry/bar.ts src/entry/pie.ts src/entry/area.ts src/entry/candlestick.ts src/entry/waterfall.ts src/entry/heatmap.ts src/entry/export.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/quick.ts src/entry/motion.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --external jspdf --clean",
+    "dev": "tsup src/index.ts src/registry/index.ts src/entry/line.ts src/entry/bar.ts src/entry/pie.ts src/entry/area.ts src/entry/candlestick.ts src/entry/waterfall.ts src/entry/heatmap.ts src/entry/export.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/quick.ts src/entry/motion.ts --format esm --dts --external react --external react-dom --external uplot --external echarts --external jspdf --watch",
     "create-dashboard": "node scripts/create-dashboard.mjs",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"

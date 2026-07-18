@@ -91,6 +91,27 @@ export {
   ensurePresentationStyles,
   presentationEnterStyle,
 } from "../presentation/motion";
+export type {
+  CartesianMotionKind,
+  ChartAnimate,
+  ChartAnimateConfig,
+  ChartAnimateEnterConfig,
+  ChartAnimatePreset,
+  ChartAnimateUpdateConfig,
+  ResolvedChartAnimate,
+} from "../motion/types";
+export {
+  cartesianEnterStyle,
+  cartesianUpdateStyle,
+  ensureCartesianMotionStyles,
+  resolveChartAnimate,
+  seriesDataSignature,
+  shouldAnimateEnter,
+  shouldAnimateUpdate,
+  useCartesianAnimate,
+  type UseCartesianAnimateInput,
+  type UseCartesianAnimateResult,
+} from "../motion";
 export {
   DataTable,
   type DataTableProps,

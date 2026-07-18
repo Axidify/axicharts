@@ -35,6 +35,11 @@ import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations"
 import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
 import { seriesValueBounds } from "../annotations/seriesValueBounds";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
+import type { ChartAnimate } from "../motion/types";
+import {
+  seriesDataSignature,
+  useCartesianAnimate,
+} from "../motion";
 
 const LINE_SERIES_KINDS = ["line", "area"] as const;
 
@@ -57,6 +62,7 @@ export type LineChartProps = {
   brush?: boolean;
   brushEnd?: number;
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
+  animate?: ChartAnimate;
 };
 
 type LinePlotProps = {
@@ -203,6 +209,7 @@ export function LineChart({
   brush = false,
   brushEnd = 100,
   onMarkerDragEnd,
+  animate,
 }: LineChartProps): ReactElement | null {
   const { size, ready, theme, mode, config, tagTones } = useChartLayout();
   const annotationProps = useCartesianAnnotations({
@@ -245,6 +252,15 @@ export function LineChart({
     () => preparePlotData(brushed.categories, brushed.series, maxPoints),
     [brushed.categories, brushed.series, maxPoints],
   );
+  const dataSignature = useMemo(
+    () => seriesDataSignature(categories, series),
+    [categories, series],
+  );
+  const motion = useCartesianAnimate({
+    animate,
+    kind: fill ? "area" : "line",
+    dataSignature,
+  });
 
   if (!ready || size.width < 1 || size.height < 1 || categories.length === 0 || series.length === 0) {
     return null;
@@ -274,6 +290,9 @@ export function LineChart({
         series={plotSeries}
         valueSuffix={valueSuffix}
         compact={compact}
+        plotMotionStyle={motion.plotStyle}
+        plotKey={motion.plotKey}
+        skipPresentationPlotEnter={motion.skipPresentationPlotEnter}
         plot={
           <LinePlot
             categories={plotCategories}

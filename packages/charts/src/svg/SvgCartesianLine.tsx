@@ -82,6 +82,7 @@ export function SvgCartesianLine({
         return (
           <path
             key={item.name}
+            data-series-line={fill ? undefined : ""}
             d={path}
             fill={fill ? color : "none"}
             fillOpacity={fill ? theme.area.fillOpacity : undefined}

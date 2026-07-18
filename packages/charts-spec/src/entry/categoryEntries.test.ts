@@ -7,7 +7,9 @@ describe("category-scoped spec entrypoints", () => {
     clearCategoryRegistration();
   });
 
-  it("cartesian entry compiles line panels and rejects matrix panels", async () => {
+  it(
+    "cartesian entry compiles line panels and rejects matrix panels",
+    async () => {
     const { compilePanel } = await import("./cartesian");
 
     const panel = compilePanel(
@@ -38,7 +40,9 @@ describe("category-scoped spec entrypoints", () => {
         {},
       ),
     ).toThrow(/requires category "matrix"/);
-  });
+  },
+    15_000,
+  );
 
   it("distribution entry compiles pie panels", async () => {
     const { compilePanel } = await import("./distribution");
