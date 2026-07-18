@@ -10,7 +10,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Live ops wall stress demo — AxiCharts (uPlot canvas) vs Recharts (SVG) on a synthetic load generator. Isolated flushSync calibration (bench-harness methodology) plus alternating live ticks for fair per-library timing. CI reference numbers shown separately from device-measured p95.",
+          "Live ops wall stress demo — AxiCharts (uPlot canvas) vs Recharts (SVG) vs ECharts (canvas) on a synthetic load generator. Isolated flushSync calibration (bench-harness methodology) plus alternating live ticks for fair per-library timing. CI reference numbers shown separately from device-measured p95.",
       },
     },
   },
@@ -25,17 +25,33 @@ const meta = {
     panelHeight: { control: { type: "number", min: 56, max: 160, step: 4 } },
     showControls: { control: "boolean" },
     autoThrottleRecharts: { control: "boolean" },
+    threeWay: { control: "boolean" },
   },
 } satisfies Meta<typeof LiveOpsCompareDemo>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Published benchmark fixture: 6 panels × 2000 pts @ 5 Hz */
+/** Published benchmark fixture: 6 panels × 2000 pts @ 5 Hz — 3-way compare */
 export const BenchmarkFixture: Story = {
   args: {
     preset: "standard",
     showControls: true,
+    threeWay: true,
+  },
+};
+
+/** Default 3-way wall — alias for BenchmarkFixture */
+export const ThreeWay: Story = {
+  ...BenchmarkFixture,
+};
+
+/** Legacy 2-way compare (AxiCharts vs Recharts only) */
+export const TwoWay: Story = {
+  args: {
+    preset: "standard",
+    showControls: true,
+    threeWay: false,
   },
 };
 
@@ -46,6 +62,7 @@ export const LightFixture: Story = {
     pointCount: 500,
     panelHeight: 96,
     showControls: false,
+    threeWay: true,
   },
 };
 
@@ -54,6 +71,7 @@ export const HeavyFixture: Story = {
   args: {
     preset: "heavy",
     showControls: true,
+    threeWay: true,
   },
 };
 
@@ -63,6 +81,7 @@ export const ExtremeFixture: Story = {
     preset: "extreme",
     showControls: true,
     autoThrottleRecharts: false,
+    threeWay: true,
   },
   parameters: {
     docs: {

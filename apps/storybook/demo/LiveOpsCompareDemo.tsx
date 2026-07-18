@@ -2,9 +2,11 @@ import {
   Profiler,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactElement,
 } from "react";
+import * as echarts from "echarts";
 import { ChartContainer, LineChart } from "@axicharts/charts";
 import { industrialTheme } from "@axicharts/charts-theme";
 import {
@@ -22,6 +24,7 @@ import {
   getPanelGridColumns,
   getPanelSpecs,
   isStruggling,
+  libraryDisplayName,
   lookupCiReference,
   type BenchPresetId,
   type LiveBenchState,
@@ -108,6 +111,65 @@ function AxiPanel({ panel, height }: { panel: LivePanelState; height: number }):
           fill
         />
       </ChartContainer>
+    </PanelShell>
+  );
+}
+
+function EChartsPanel({
+  panel,
+  height,
+  width,
+}: {
+  panel: LivePanelState;
+  height: number;
+  width: number;
+}): ReactElement {
+  const last = panel.values[panel.values.length - 1] ?? 0;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<echarts.ECharts | null>(null);
+
+  useEffect(() => {
+    if (!rootRef.current) return;
+    const chart = echarts.init(rootRef.current, undefined, {
+      renderer: "canvas",
+      width,
+      height,
+    });
+    chartRef.current = chart;
+
+    return () => {
+      chart.dispose();
+      chartRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    chartRef.current?.resize({ width, height });
+  }, [width, height]);
+
+  useEffect(() => {
+    chartRef.current?.setOption(
+      {
+        animation: false,
+        grid: { left: 0, right: 0, top: 0, bottom: 0 },
+        xAxis: { type: "category", data: panel.categories, show: false },
+        yAxis: { type: "value", show: false },
+        series: [
+          {
+            type: "line",
+            data: panel.values,
+            showSymbol: false,
+            lineStyle: { width: 2, color: panel.spec.stroke },
+          },
+        ],
+      },
+      { notMerge: true },
+    );
+  }, [panel.categories, panel.values, panel.spec.stroke]);
+
+  return (
+    <PanelShell label={panel.spec.label} value={formatSeriesValue(last)}>
+      <div ref={rootRef} style={{ width, height }} />
     </PanelShell>
   );
 }
@@ -254,8 +316,8 @@ function TimingRow({
   );
 }
 
-function formatRatio(axiP95: number, rechartsP95: number): string {
-  if (axiP95 > 0 && rechartsP95 > 0) return formatMultiplier(rechartsP95 / axiP95);
+function formatRatio(axiP95: number, otherP95: number): string {
+  if (axiP95 > 0 && otherP95 > 0) return formatMultiplier(otherP95 / axiP95);
   return "—";
 }
 
@@ -295,6 +357,8 @@ export type LiveOpsCompareDemoProps = {
   panelHeight?: number;
   showControls?: boolean;
   autoThrottleRecharts?: boolean;
+  /** When true (default), compare AxiCharts vs Recharts vs ECharts. */
+  threeWay?: boolean;
 };
 
 function resolveBenchConfig(
@@ -331,6 +395,7 @@ export function LiveOpsCompareDemo({
   panelHeight: panelHeightProp,
   showControls = true,
   autoThrottleRecharts: autoThrottleProp = false,
+  threeWay = true,
 }: LiveOpsCompareDemoProps): ReactElement {
   const [presetId, setPresetId] = useState<BenchPresetId>(presetProp);
   const [customPanelCount, setCustomPanelCount] = useState(
@@ -382,6 +447,7 @@ export function LiveOpsCompareDemo({
     hz,
     panelSpecs,
     autoThrottleRecharts: autoThrottle,
+    threeWay,
   });
 
   const {
@@ -396,42 +462,71 @@ export function LiveOpsCompareDemo({
     reset: resetRecharts,
     onProfilerRender: onRechartsProfiler,
   } = useTimingMetrics();
+  const {
+    metrics: echartsMetrics,
+    flush: flushEcharts,
+    reset: resetEcharts,
+    onProfilerRender: onEchartsProfiler,
+  } = useTimingMetrics();
 
-  const configKey = `${panelCount}-${pointCount}-${hz}-${autoThrottle}`;
+  const configKey = `${panelCount}-${pointCount}-${hz}-${autoThrottle}-${threeWay}`;
   useEffect(() => {
     resetAxi();
     resetRecharts();
-  }, [configKey, resetAxi, resetRecharts]);
+    resetEcharts();
+  }, [configKey, resetAxi, resetRecharts, resetEcharts]);
 
   useEffect(() => {
     flushAxi();
     flushRecharts();
-  }, [bench.axiLive.frameMs, bench.rechartsLive.frameMs, flushAxi, flushRecharts]);
+    flushEcharts();
+  }, [
+    bench.axiLive.frameMs,
+    bench.rechartsLive.frameMs,
+    bench.echartsLive.frameMs,
+    flushAxi,
+    flushRecharts,
+    flushEcharts,
+  ]);
 
   const isolated = bench.isolatedBench;
   const primaryAxiP95 =
     isolated.status === "done" ? isolated.axiP95Ms : bench.axiLive.p95Ms;
   const primaryRechartsP95 =
     isolated.status === "done" ? isolated.rechartsP95Ms : bench.rechartsLive.p95Ms;
-  const ratioLabel = formatRatio(primaryAxiP95, primaryRechartsP95);
+  const primaryEchartsP95 =
+    isolated.status === "done" ? isolated.echartsP95Ms : bench.echartsLive.p95Ms;
+  const rechartsRatioLabel = formatRatio(primaryAxiP95, primaryRechartsP95);
+  const echartsRatioLabel = threeWay ? formatRatio(primaryAxiP95, primaryEchartsP95) : "—";
 
   const rechartsStruggling =
     isStruggling(bench.rechartsLive) || primaryRechartsP95 > FRAME_BUDGET_MS;
+  const echartsStruggling =
+    threeWay &&
+    (isStruggling(bench.echartsLive) || primaryEchartsP95 > FRAME_BUDGET_MS);
   const axiStruggling = isStruggling(bench.axiLive) || primaryAxiP95 > FRAME_BUDGET_MS;
 
-  const panelWidth = Math.max(160, Math.floor(720 / gridColumns) - 24);
+  const panelWidth = Math.max(120, Math.floor((threeWay ? 1080 : 720) / gridColumns) - 24);
   const showAxiColumn =
-    bench.calibrationView === "both" || bench.calibrationView === "axicharts";
+    bench.calibrationView === "all" || bench.calibrationView === "axicharts";
   const showRechartsColumn =
-    bench.calibrationView === "both" || bench.calibrationView === "recharts";
+    bench.calibrationView === "all" || bench.calibrationView === "recharts";
+  const showEchartsColumn =
+    threeWay &&
+    (bench.calibrationView === "all" || bench.calibrationView === "echarts");
+  const visibleColumnCount =
+    (showAxiColumn ? 1 : 0) + (showRechartsColumn ? 1 : 0) + (showEchartsColumn ? 1 : 0);
   const calibrationLabel = bench.calibrationProgress
-    ? `Calibrating ${bench.calibrationProgress.library === "axicharts" ? "AxiCharts" : "Recharts"} ${bench.calibrationProgress.step}/${bench.calibrationProgress.total}…`
+    ? `Calibrating ${libraryDisplayName(bench.calibrationProgress.library)} ${bench.calibrationProgress.step}/${bench.calibrationProgress.total}…`
     : bench.calibrating
       ? "Calibrating…"
       : "Re-run calibration";
+  const compareTitle = threeWay
+    ? "AxiCharts · Recharts · ECharts"
+    : "AxiCharts · Recharts";
 
   return (
-    <div style={{ display: "grid", gap: 20, maxWidth: 1200 }}>
+    <div style={{ display: "grid", gap: 20, maxWidth: threeWay ? 1440 : 1200 }}>
       <header
         style={{
           display: "flex",
@@ -443,7 +538,8 @@ export function LiveOpsCompareDemo({
       >
         <div>
           <h2 style={{ margin: "0 0 6px", fontSize: 22, color: "#f8fafc" }}>
-            Live ops wall — {panelCount} panels × {pointCount.toLocaleString()} pts @ {hz} Hz
+            Live ops wall — {compareTitle} — {panelCount} panels ×{" "}
+            {pointCount.toLocaleString()} pts @ {hz} Hz
           </h2>
           <p style={{ margin: 0, fontSize: 13, color: "#94a3b8", maxWidth: 760 }}>
             Synthetic load generator drives chart updates — not real CPU/memory telemetry.
@@ -461,9 +557,20 @@ export function LiveOpsCompareDemo({
               <strong style={{ color: "#60a5fa" }}>{ciReference.axichartsP95Ms} ms</strong> ·
               Recharts{" "}
               <strong style={{ color: "#f87171" }}>{ciReference.rechartsP95Ms} ms</strong>
-              {ciReference.echartsP95Ms != null
-                ? ` · ECharts ${ciReference.echartsP95Ms} ms`
-                : ""}
+              {ciReference.echartsP95Ms != null ? (
+                <>
+                  {" "}
+                  · ECharts{" "}
+                  <strong style={{ color: "#a78bfa" }}>{ciReference.echartsP95Ms} ms</strong>
+                </>
+              ) : null}
+              {threeWay && ciReference.echartsP95Ms != null && primaryAxiP95 > 0 ? (
+                <span style={{ marginLeft: 8 }}>
+                  (Recharts {formatRatio(ciReference.axichartsP95Ms, ciReference.rechartsP95Ms)} ·
+                  ECharts {formatRatio(ciReference.axichartsP95Ms, ciReference.echartsP95Ms)} vs
+                  Axi)
+                </span>
+              ) : null}
             </p>
           ) : (
             <p style={{ margin: "8px 0 0", fontSize: 12, color: "#64748b" }}>
@@ -563,7 +670,7 @@ export function LiveOpsCompareDemo({
         >
           Running isolated benchmark — one library at a time so measurements stay fair.
           {bench.calibrationProgress
-            ? ` ${bench.calibrationProgress.library === "axicharts" ? "AxiCharts" : "Recharts"}: ${bench.calibrationProgress.step}/${bench.calibrationProgress.total} updates.`
+            ? ` ${libraryDisplayName(bench.calibrationProgress.library)}: ${bench.calibrationProgress.step}/${bench.calibrationProgress.total} updates.`
             : " Preparing…"}
           {" "}Click <strong>Skip calibration</strong> to jump straight to the live stream.
         </div>
@@ -613,7 +720,7 @@ export function LiveOpsCompareDemo({
       >
         <MetricPill
           label="Speed ratio (Recharts / Axi)"
-          value={ratioLabel}
+          value={rechartsRatioLabel}
           accent="#fbbf24"
           sub={
             isolated.status === "done"
@@ -621,6 +728,18 @@ export function LiveOpsCompareDemo({
               : "From live alternating ticks on this device"
           }
         />
+        {threeWay ? (
+          <MetricPill
+            label="Speed ratio (ECharts / Axi)"
+            value={echartsRatioLabel}
+            accent="#c4b5fd"
+            sub={
+              isolated.status === "done"
+                ? "From isolated calibration on this device"
+                : "From live alternating ticks on this device"
+            }
+          />
+        ) : null}
         <MetricPill
           label="AxiCharts p95 (isolated)"
           value={
@@ -658,14 +777,45 @@ export function LiveOpsCompareDemo({
               : `Live estimate · calibrate for ${benchPlan.updates} updates`
           }
         />
+        {threeWay ? (
+          <MetricPill
+            label="ECharts p95 (isolated)"
+            value={
+              isolated.status === "done"
+                ? `${isolated.echartsP95Ms.toFixed(2)} ms`
+                : isolated.status === "running"
+                  ? "…"
+                  : primaryEchartsP95 > 0
+                    ? `${primaryEchartsP95.toFixed(2)} ms`
+                    : "—"
+            }
+            accent="#a78bfa"
+            warn={primaryEchartsP95 > FRAME_BUDGET_MS}
+            sub={
+              isolated.status === "done"
+                ? `Isolated · ${isolated.updates} updates`
+                : `Live estimate · calibrate for ${benchPlan.updates} updates`
+            }
+          />
+        ) : null}
         <MetricPill
           label="Active library"
-          value={bench.activeLibrary === "axicharts" ? "AxiCharts" : "Recharts"}
-          sub="Alternating ticks — one library per update"
+          value={libraryDisplayName(bench.activeLibrary)}
+          sub={
+            threeWay
+              ? "Alternating ticks — one library per update (3-way)"
+              : "Alternating ticks — one library per update"
+          }
         />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: threeWay ? "1fr 1fr 1fr" : "1fr 1fr",
+          gap: 12,
+        }}
+      >
         <TimingRow
           title="AxiCharts — live flushSync"
           metrics={bench.axiLive}
@@ -680,17 +830,26 @@ export function LiveOpsCompareDemo({
           struggling={rechartsStruggling}
           throttleNote={
             bench.rechartsThrottled
-              ? `Throttled: 1 update per ${bench.rechartsSkipRatio * 2} ticks (~${bench.effectiveRechartsHz.toFixed(1)} Hz)`
+              ? `Throttled: 1 update per ${bench.rechartsSkipRatio * (threeWay ? 3 : 2)} ticks (~${bench.effectiveRechartsHz.toFixed(1)} Hz)`
               : undefined
           }
           footnote="Alternating tick samples on this device"
         />
+        {threeWay ? (
+          <TimingRow
+            title="ECharts — live flushSync"
+            metrics={bench.echartsLive}
+            accent="#a78bfa"
+            struggling={echartsStruggling}
+            footnote="Alternating tick samples on this device"
+          />
+        ) : null}
       </div>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: threeWay ? "1fr 1fr 1fr" : "1fr 1fr",
           gap: 12,
           opacity: 0.85,
         }}
@@ -707,13 +866,20 @@ export function LiveOpsCompareDemo({
           accent="#f87171"
           footnote="Profiler commit time — not used for primary ratio"
         />
+        {threeWay ? (
+          <TimingRow
+            title="ECharts — React Profiler (supplementary)"
+            metrics={echartsMetrics}
+            accent="#a78bfa"
+            footnote="Profiler commit time — not used for primary ratio"
+          />
+        ) : null}
       </div>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns:
-            showAxiColumn && showRechartsColumn ? "1fr 1fr" : "1fr",
+          gridTemplateColumns: `repeat(${Math.max(visibleColumnCount, 1)}, minmax(0, 1fr))`,
           gap: 20,
           alignItems: "start",
         }}
@@ -748,6 +914,28 @@ export function LiveOpsCompareDemo({
           struggling={rechartsStruggling}
           renderPanel={(panel) => (
             <RechartsPanel
+              key={panel.spec.id}
+              panel={panel}
+              height={panelHeight}
+              width={panelWidth}
+            />
+          )}
+        />
+        ) : null}
+        {showEchartsColumn ? (
+        <CompareColumn
+          title="ECharts"
+          subtitle="Canvas line · animation=false"
+          accent="#7c3aed"
+          bench={bench}
+          panelHeight={panelHeight}
+          gridColumns={gridColumns}
+          profilerId="echarts-live-ops"
+          onProfilerRender={onEchartsProfiler}
+          panels={bench.echartsPanels}
+          struggling={echartsStruggling}
+          renderPanel={(panel) => (
+            <EChartsPanel
               key={panel.spec.id}
               panel={panel}
               height={panelHeight}

@@ -308,18 +308,21 @@ export function lookupCiReference(
   );
 }
 
+export type BenchLibrary = "axicharts" | "recharts" | "echarts";
+
 export type CalibrationProgress = {
-  library: "axicharts" | "recharts";
+  library: BenchLibrary;
   step: number;
   total: number;
 };
 
-export type CalibrationView = "both" | "axicharts" | "recharts";
+export type CalibrationView = "all" | BenchLibrary;
 
 export type IsolatedBenchResult = {
   status: "pending" | "running" | "done" | "skipped";
   axiP95Ms: number;
   rechartsP95Ms: number;
+  echartsP95Ms: number;
   updates: number;
 };
 
@@ -329,15 +332,18 @@ export type LiveBenchConfig = {
   hz: number;
   panelSpecs?: LivePanelSpec[];
   autoThrottleRecharts?: boolean;
+  threeWay?: boolean;
 };
 
 export type LiveBenchState = {
   panels: LivePanelState[];
   rechartsPanels: LivePanelState[];
+  echartsPanels: LivePanelState[];
   axiLive: TimingMetrics;
   rechartsLive: TimingMetrics;
+  echartsLive: TimingMetrics;
   isolatedBench: IsolatedBenchResult;
-  activeLibrary: "axicharts" | "recharts";
+  activeLibrary: BenchLibrary;
   hz: number;
   effectiveRechartsHz: number;
   pointCount: number;
@@ -348,10 +354,22 @@ export type LiveBenchState = {
   calibrationProgress: CalibrationProgress | null;
   rechartsThrottled: boolean;
   rechartsSkipRatio: number;
+  threeWay: boolean;
   toggle: () => void;
   rerunIsolatedBench: () => void;
   skipCalibration: () => void;
 };
+
+export function libraryDisplayName(library: BenchLibrary): string {
+  switch (library) {
+    case "axicharts":
+      return "AxiCharts";
+    case "recharts":
+      return "Recharts";
+    case "echarts":
+      return "ECharts";
+  }
+}
 
 function yieldToBrowser(): Promise<void> {
   return new Promise((resolve) => {
@@ -402,12 +420,17 @@ async function runIsolatedUpdatesAsync(
   return percentile(times, 0.95);
 }
 
+function clonePanelStates(panels: LivePanelState[]): LivePanelState[] {
+  return panels.map((panel) => ({ ...panel, values: [...panel.values] }));
+}
+
 export function useLiveOpsBench({
   panelCount,
   pointCount,
   hz,
   panelSpecs,
   autoThrottleRecharts = false,
+  threeWay = true,
 }: LiveBenchConfig): LiveBenchState {
   const specs = useMemo(
     () => panelSpecs ?? getPanelSpecs(panelCount),
@@ -415,7 +438,7 @@ export function useLiveOpsBench({
   );
   const [running, setRunning] = useState(true);
   const [calibrating, setCalibrating] = useState(false);
-  const [calibrationView, setCalibrationView] = useState<CalibrationView>("both");
+  const [calibrationView, setCalibrationView] = useState<CalibrationView>("all");
   const [calibrationProgress, setCalibrationProgress] =
     useState<CalibrationProgress | null>(null);
   const [panels, setPanels] = useState<LivePanelState[]>(() =>
@@ -424,19 +447,25 @@ export function useLiveOpsBench({
   const [rechartsPanels, setRechartsPanels] = useState<LivePanelState[]>(() =>
     specs.map((spec) => createPanelState(spec, pointCount)),
   );
+  const [echartsPanels, setEchartsPanels] = useState<LivePanelState[]>(() =>
+    specs.map((spec) => createPanelState(spec, pointCount)),
+  );
   const [axiLive, setAxiLive] = useState<TimingMetrics>(createEmptyTimingMetrics);
   const [rechartsLive, setRechartsLive] = useState<TimingMetrics>(createEmptyTimingMetrics);
+  const [echartsLive, setEchartsLive] = useState<TimingMetrics>(createEmptyTimingMetrics);
   const [isolatedBench, setIsolatedBench] = useState<IsolatedBenchResult>({
     status: "pending",
     axiP95Ms: 0,
     rechartsP95Ms: 0,
+    echartsP95Ms: 0,
     updates: ISOLATED_BENCH_UPDATES,
   });
-  const [activeLibrary, setActiveLibrary] = useState<"axicharts" | "recharts">("axicharts");
+  const [activeLibrary, setActiveLibrary] = useState<BenchLibrary>("axicharts");
   const [rechartsSkipRatio, setRechartsSkipRatio] = useState(1);
 
   const panelsRef = useRef(panels);
   const rechartsPanelsRef = useRef(rechartsPanels);
+  const echartsPanelsRef = useRef(echartsPanels);
   const tickRef = useRef(0);
   const rechartsSkipRef = useRef(1);
   const axiSamplesRef = useRef<number[]>([]);
@@ -447,6 +476,10 @@ export function useLiveOpsBench({
   const rechartsCumulativeRef = useRef(0);
   const rechartsOverBudgetRef = useRef(0);
   const rechartsSevereRef = useRef(0);
+  const echartsSamplesRef = useRef<number[]>([]);
+  const echartsCumulativeRef = useRef(0);
+  const echartsOverBudgetRef = useRef(0);
+  const echartsSevereRef = useRef(0);
   const [isolatedGeneration, setIsolatedGeneration] = useState(0);
   const calibrationTokenRef = useRef(0);
   const mountedRef = useRef(false);
@@ -461,6 +494,7 @@ export function useLiveOpsBench({
 
   panelsRef.current = panels;
   rechartsPanelsRef.current = rechartsPanels;
+  echartsPanelsRef.current = echartsPanels;
 
   const resetLiveMetrics = useCallback(() => {
     axiSamplesRef.current = [];
@@ -471,8 +505,13 @@ export function useLiveOpsBench({
     rechartsCumulativeRef.current = 0;
     rechartsOverBudgetRef.current = 0;
     rechartsSevereRef.current = 0;
+    echartsSamplesRef.current = [];
+    echartsCumulativeRef.current = 0;
+    echartsOverBudgetRef.current = 0;
+    echartsSevereRef.current = 0;
     setAxiLive(createEmptyTimingMetrics());
     setRechartsLive(createEmptyTimingMetrics());
+    setEchartsLive(createEmptyTimingMetrics());
   }, []);
 
   const rerunIsolatedBench = useCallback(() => {
@@ -483,7 +522,7 @@ export function useLiveOpsBench({
   const skipCalibration = useCallback(() => {
     calibrationTokenRef.current += 1;
     setCalibrating(false);
-    setCalibrationView("both");
+    setCalibrationView("all");
     setCalibrationProgress(null);
     setIsolatedBench((current) =>
       current.status === "done"
@@ -496,25 +535,23 @@ export function useLiveOpsBench({
     const seeded = specs.map((spec) => createPanelState(spec, pointCount));
     calibrationTokenRef.current += 1;
     setPanels(seeded);
-    setRechartsPanels(
-      seeded.map((panel) => ({ ...panel, values: [...panel.values] })),
-    );
+    setRechartsPanels(clonePanelStates(seeded));
+    setEchartsPanels(clonePanelStates(seeded));
     panelsRef.current = seeded;
-    rechartsPanelsRef.current = seeded.map((panel) => ({
-      ...panel,
-      values: [...panel.values],
-    }));
+    rechartsPanelsRef.current = clonePanelStates(seeded);
+    echartsPanelsRef.current = clonePanelStates(seeded);
     tickRef.current = 0;
     rechartsSkipRef.current = 1;
     setRechartsSkipRatio(1);
     resetLiveMetrics();
     setCalibrating(false);
-    setCalibrationView("both");
+    setCalibrationView("all");
     setCalibrationProgress(null);
     setIsolatedBench({
       status: "pending",
       axiP95Ms: 0,
       rechartsP95Ms: 0,
+      echartsP95Ms: 0,
       updates: benchPlan.updates,
     });
   }, [benchPlan.updates, pointCount, resetLiveMetrics, specs]);
@@ -548,6 +585,7 @@ export function useLiveOpsBench({
         status: "running",
         axiP95Ms: 0,
         rechartsP95Ms: 0,
+        echartsP95Ms: 0,
         updates,
       });
 
@@ -600,14 +638,46 @@ export function useLiveOpsBench({
 
       if (isCancelled()) return;
 
-      if (axiP95Ms == null || rechartsP95Ms == null) {
+      let echartsP95Ms: number | null = null;
+      if (threeWay) {
+        setCalibrationView("echarts");
+        setCalibrationProgress({
+          library: "echarts",
+          step: 0,
+          total: updates,
+        });
+
+        echartsP95Ms = await runIsolatedUpdatesAsync(
+          warmup,
+          updates,
+          () => {
+            const next = shiftPanels(echartsPanelsRef.current);
+            echartsPanelsRef.current = next;
+            setEchartsPanels(next);
+          },
+          {
+            onProgress: (step, total) => {
+              if (!isCancelled()) {
+                setCalibrationProgress({ library: "echarts", step, total });
+              }
+            },
+            isCancelled,
+            maxDurationMs: maxMsPerLibrary,
+          },
+        );
+
+        if (isCancelled()) return;
+      }
+
+      if (axiP95Ms == null || rechartsP95Ms == null || (threeWay && echartsP95Ms == null)) {
         setIsolatedBench({
           status: "skipped",
           axiP95Ms: axiP95Ms ?? 0,
           rechartsP95Ms: rechartsP95Ms ?? 0,
+          echartsP95Ms: echartsP95Ms ?? 0,
           updates,
         });
-        setCalibrationView("both");
+        setCalibrationView("all");
         setCalibrationProgress(null);
         setCalibrating(false);
         return;
@@ -617,16 +687,18 @@ export function useLiveOpsBench({
         status: "done",
         axiP95Ms,
         rechartsP95Ms,
+        echartsP95Ms: echartsP95Ms ?? 0,
         updates,
       });
 
-      const synced = panelsRef.current.map((panel) => ({
-        ...panel,
-        values: [...panel.values],
-      }));
+      const synced = clonePanelStates(panelsRef.current);
       rechartsPanelsRef.current = synced;
       setRechartsPanels(synced);
-      setCalibrationView("both");
+      if (threeWay) {
+        echartsPanelsRef.current = synced;
+        setEchartsPanels(synced);
+      }
+      setCalibrationView("all");
       setCalibrationProgress(null);
       setCalibrating(false);
     })();
@@ -634,108 +706,210 @@ export function useLiveOpsBench({
     return () => {
       cancelled = true;
     };
-  }, [benchPlan, isolatedGeneration]);
+  }, [benchPlan, isolatedGeneration, threeWay]);
 
   useEffect(() => {
     if (!running) return;
+
+    const libraryCycle = threeWay ? 3 : 2;
 
     const id = window.setInterval(() => {
       if (calibratingRef.current) return;
       tickRef.current += 1;
       const tick = tickRef.current;
-      const updateAxi = tick % 2 === 1;
-
       const nextPanels = shiftPanels(panelsRef.current);
       panelsRef.current = nextPanels;
 
       const start = performance.now();
       flushSync(() => {
-        if (updateAxi) {
-          setActiveLibrary("axicharts");
-          setPanels(nextPanels);
+        if (threeWay) {
+          const phase = tick % libraryCycle;
+          if (phase === 1) {
+            setActiveLibrary("axicharts");
+            setPanels(nextPanels);
+          } else if (phase === 2) {
+            const skip = rechartsSkipRef.current;
+            if (tick % (libraryCycle * skip) === 2) {
+              setActiveLibrary("recharts");
+              const nextRecharts = clonePanelStates(nextPanels);
+              rechartsPanelsRef.current = nextRecharts;
+              setRechartsPanels(nextRecharts);
+            }
+          } else {
+            setActiveLibrary("echarts");
+            const nextEcharts = clonePanelStates(nextPanels);
+            echartsPanelsRef.current = nextEcharts;
+            setEchartsPanels(nextEcharts);
+          }
         } else {
-          const skip = rechartsSkipRef.current;
-          if (tick % (2 * skip) === 0) {
-            setActiveLibrary("recharts");
-            const nextRecharts = nextPanels.map((panel) => ({
-              ...panel,
-              values: [...panel.values],
-            }));
-            rechartsPanelsRef.current = nextRecharts;
-            setRechartsPanels(nextRecharts);
+          const updateAxi = tick % 2 === 1;
+          if (updateAxi) {
+            setActiveLibrary("axicharts");
+            setPanels(nextPanels);
+          } else {
+            const skip = rechartsSkipRef.current;
+            if (tick % (2 * skip) === 0) {
+              setActiveLibrary("recharts");
+              const nextRecharts = clonePanelStates(nextPanels);
+              rechartsPanelsRef.current = nextRecharts;
+              setRechartsPanels(nextRecharts);
+            }
           }
         }
       });
       const elapsed = performance.now() - start;
 
-      if (updateAxi) {
-        axiCumulativeRef.current += elapsed;
-        const recorded = recordSample(
-          axiSamplesRef.current,
-          elapsed,
-          FRAME_BUDGET_MS,
-          60,
-        );
-        axiSamplesRef.current = recorded.samples;
-        if (recorded.overBudget) axiOverBudgetRef.current += 1;
-        if (recorded.severeJank) axiSevereRef.current += 1;
-        setAxiLive(
-          buildTimingMetrics(
+      if (threeWay) {
+        const phase = tick % libraryCycle;
+        if (phase === 1) {
+          axiCumulativeRef.current += elapsed;
+          const recorded = recordSample(
             axiSamplesRef.current,
-            axiCumulativeRef.current,
-            axiOverBudgetRef.current,
-            axiSevereRef.current,
-          ),
-        );
-      } else if (tick % (2 * rechartsSkipRef.current) === 0) {
-        rechartsCumulativeRef.current += elapsed;
-        const recorded = recordSample(
-          rechartsSamplesRef.current,
-          elapsed,
-          FRAME_BUDGET_MS,
-          60,
-        );
-        rechartsSamplesRef.current = recorded.samples;
-        if (recorded.overBudget) rechartsOverBudgetRef.current += 1;
-        if (recorded.severeJank) rechartsSevereRef.current += 1;
-        setRechartsLive(
-          buildTimingMetrics(
+            elapsed,
+            FRAME_BUDGET_MS,
+            60,
+          );
+          axiSamplesRef.current = recorded.samples;
+          if (recorded.overBudget) axiOverBudgetRef.current += 1;
+          if (recorded.severeJank) axiSevereRef.current += 1;
+          setAxiLive(
+            buildTimingMetrics(
+              axiSamplesRef.current,
+              axiCumulativeRef.current,
+              axiOverBudgetRef.current,
+              axiSevereRef.current,
+            ),
+          );
+        } else if (phase === 2 && tick % (libraryCycle * rechartsSkipRef.current) === 2) {
+          rechartsCumulativeRef.current += elapsed;
+          const recorded = recordSample(
             rechartsSamplesRef.current,
-            rechartsCumulativeRef.current,
-            rechartsOverBudgetRef.current,
-            rechartsSevereRef.current,
-          ),
-        );
+            elapsed,
+            FRAME_BUDGET_MS,
+            60,
+          );
+          rechartsSamplesRef.current = recorded.samples;
+          if (recorded.overBudget) rechartsOverBudgetRef.current += 1;
+          if (recorded.severeJank) rechartsSevereRef.current += 1;
+          setRechartsLive(
+            buildTimingMetrics(
+              rechartsSamplesRef.current,
+              rechartsCumulativeRef.current,
+              rechartsOverBudgetRef.current,
+              rechartsSevereRef.current,
+            ),
+          );
 
-        if (autoThrottleRecharts && elapsed > FRAME_BUDGET_MS) {
-          const nextSkip = Math.min(8, rechartsSkipRef.current * 2);
-          if (nextSkip !== rechartsSkipRef.current) {
+          if (autoThrottleRecharts && elapsed > FRAME_BUDGET_MS) {
+            const nextSkip = Math.min(8, rechartsSkipRef.current * 2);
+            if (nextSkip !== rechartsSkipRef.current) {
+              rechartsSkipRef.current = nextSkip;
+              setRechartsSkipRatio(nextSkip);
+            }
+          } else if (
+            autoThrottleRecharts &&
+            elapsed < FRAME_BUDGET_MS * 0.75 &&
+            rechartsSkipRef.current > 1
+          ) {
+            const nextSkip = Math.max(1, Math.floor(rechartsSkipRef.current / 2));
             rechartsSkipRef.current = nextSkip;
             setRechartsSkipRatio(nextSkip);
           }
-        } else if (
-          autoThrottleRecharts &&
-          elapsed < FRAME_BUDGET_MS * 0.75 &&
-          rechartsSkipRef.current > 1
-        ) {
-          const nextSkip = Math.max(1, Math.floor(rechartsSkipRef.current / 2));
-          rechartsSkipRef.current = nextSkip;
-          setRechartsSkipRatio(nextSkip);
+        } else if (phase === 0) {
+          echartsCumulativeRef.current += elapsed;
+          const recorded = recordSample(
+            echartsSamplesRef.current,
+            elapsed,
+            FRAME_BUDGET_MS,
+            60,
+          );
+          echartsSamplesRef.current = recorded.samples;
+          if (recorded.overBudget) echartsOverBudgetRef.current += 1;
+          if (recorded.severeJank) echartsSevereRef.current += 1;
+          setEchartsLive(
+            buildTimingMetrics(
+              echartsSamplesRef.current,
+              echartsCumulativeRef.current,
+              echartsOverBudgetRef.current,
+              echartsSevereRef.current,
+            ),
+          );
+        }
+      } else {
+        const updateAxi = tick % 2 === 1;
+        if (updateAxi) {
+          axiCumulativeRef.current += elapsed;
+          const recorded = recordSample(
+            axiSamplesRef.current,
+            elapsed,
+            FRAME_BUDGET_MS,
+            60,
+          );
+          axiSamplesRef.current = recorded.samples;
+          if (recorded.overBudget) axiOverBudgetRef.current += 1;
+          if (recorded.severeJank) axiSevereRef.current += 1;
+          setAxiLive(
+            buildTimingMetrics(
+              axiSamplesRef.current,
+              axiCumulativeRef.current,
+              axiOverBudgetRef.current,
+              axiSevereRef.current,
+            ),
+          );
+        } else if (tick % (2 * rechartsSkipRef.current) === 0) {
+          rechartsCumulativeRef.current += elapsed;
+          const recorded = recordSample(
+            rechartsSamplesRef.current,
+            elapsed,
+            FRAME_BUDGET_MS,
+            60,
+          );
+          rechartsSamplesRef.current = recorded.samples;
+          if (recorded.overBudget) rechartsOverBudgetRef.current += 1;
+          if (recorded.severeJank) rechartsSevereRef.current += 1;
+          setRechartsLive(
+            buildTimingMetrics(
+              rechartsSamplesRef.current,
+              rechartsCumulativeRef.current,
+              rechartsOverBudgetRef.current,
+              rechartsSevereRef.current,
+            ),
+          );
+
+          if (autoThrottleRecharts && elapsed > FRAME_BUDGET_MS) {
+            const nextSkip = Math.min(8, rechartsSkipRef.current * 2);
+            if (nextSkip !== rechartsSkipRef.current) {
+              rechartsSkipRef.current = nextSkip;
+              setRechartsSkipRatio(nextSkip);
+            }
+          } else if (
+            autoThrottleRecharts &&
+            elapsed < FRAME_BUDGET_MS * 0.75 &&
+            rechartsSkipRef.current > 1
+          ) {
+            const nextSkip = Math.max(1, Math.floor(rechartsSkipRef.current / 2));
+            rechartsSkipRef.current = nextSkip;
+            setRechartsSkipRatio(nextSkip);
+          }
         }
       }
     }, 1000 / hz);
 
     return () => window.clearInterval(id);
-  }, [autoThrottleRecharts, hz, running]);
+  }, [autoThrottleRecharts, hz, running, threeWay]);
 
-  const effectiveRechartsHz = hz / (2 * rechartsSkipRatio);
+  const effectiveRechartsHz = threeWay
+    ? hz / (3 * rechartsSkipRatio)
+    : hz / (2 * rechartsSkipRatio);
 
   return useMemo(
     () => ({
       panels,
       rechartsPanels,
+      echartsPanels,
       axiLive,
       rechartsLive,
+      echartsLive,
       isolatedBench,
       activeLibrary,
       hz,
@@ -748,6 +922,7 @@ export function useLiveOpsBench({
       calibrationProgress,
       rechartsThrottled: rechartsSkipRatio > 1,
       rechartsSkipRatio,
+      threeWay,
       toggle: () => setRunning((value) => !value),
       rerunIsolatedBench,
       skipCalibration,
@@ -755,8 +930,10 @@ export function useLiveOpsBench({
     [
       panels,
       rechartsPanels,
+      echartsPanels,
       axiLive,
       rechartsLive,
+      echartsLive,
       isolatedBench,
       activeLibrary,
       hz,
@@ -768,6 +945,7 @@ export function useLiveOpsBench({
       calibrationView,
       calibrationProgress,
       rechartsSkipRatio,
+      threeWay,
       rerunIsolatedBench,
       skipCalibration,
     ],
