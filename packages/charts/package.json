@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Full-spectrum React charts — line, bar, area, pie, candlestick, waterfall, heatmap, industrial primitives, and extension registry.",
   "license": "MIT",
   "repository": {
