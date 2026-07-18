@@ -7,6 +7,7 @@ import { ChartInteractionProvider } from "./interaction/ChartInteractionContext"
 import { CandlestickChart } from "./candlestick/CandlestickChart";
 import { FunnelChart } from "./funnel/FunnelChart";
 import { PieChart } from "./pie/PieChart";
+import { TreemapChart } from "./treemap/TreemapChart";
 
 type CapturedProps = Record<string, unknown>;
 
@@ -14,6 +15,7 @@ const captured = {
   pie: null as CapturedProps | null,
   candlestick: null as CapturedProps | null,
   funnel: null as CapturedProps | null,
+  treemap: null as CapturedProps | null,
 };
 
 vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
@@ -30,6 +32,10 @@ vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
     },
     EChartsFunnel: (props: CapturedProps) => {
       captured.funnel = props;
+      return null;
+    },
+    EChartsTreemap: (props: CapturedProps) => {
+      captured.treemap = props;
       return null;
     },
   };
@@ -104,5 +110,23 @@ describe("live mode merge wiring", () => {
 
     expect(captured.funnel?.mergeOption).toBe(true);
     expect(captured.funnel?.animate).toBe(false);
+  });
+
+  it("passes mergeOption to treemap adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <TreemapChart
+          nodes={[
+            {
+              name: "Compute",
+              children: [{ name: "EC2", value: 42_000 }],
+            },
+          ]}
+        />
+      </TestShell>,
+    );
+
+    expect(captured.treemap?.mergeOption).toBe(true);
+    expect(captured.treemap?.animate).toBe(false);
   });
 });

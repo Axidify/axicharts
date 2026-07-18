@@ -5,7 +5,9 @@ import {
   ChartContainer,
   FunnelChart,
   PieChart,
+  TreemapChart,
   type OhlcPoint,
+  type TreemapNode,
 } from "@axicharts/charts";
 import { liveTheme } from "@axicharts/charts-theme";
 
@@ -24,6 +26,51 @@ const INITIAL_STAGES = [
   { name: "Proposal", value: 92, tone: "warning" as const },
   { name: "Won", value: 48, tone: "success" as const },
 ];
+
+const INITIAL_TREEMAP: TreemapNode[] = [
+  {
+    name: "Compute",
+    children: [
+      { name: "EC2", value: 42_000, tone: "info" as const },
+      { name: "Lambda", value: 12_500 },
+      { name: "EKS", value: 18_200, tone: "success" as const },
+    ],
+  },
+  {
+    name: "Storage",
+    children: [
+      { name: "S3", value: 9_800, tone: "warning" as const },
+      { name: "EBS", value: 6_400 },
+    ],
+  },
+  {
+    name: "Data",
+    children: [
+      { name: "RDS", value: 15_600 },
+      { name: "Redshift", value: 11_300, tone: "critical" as const },
+    ],
+  },
+];
+
+function bumpTreemap(nodes: TreemapNode[], tick: number): TreemapNode[] {
+  const drift = Math.round(Math.sin(tick / 4) * 200);
+  return nodes.map((group, groupIndex) => ({
+    ...group,
+    children: group.children?.map((leaf, leafIndex) => ({
+      ...leaf,
+      value: Math.max(
+        1_000,
+        (leaf.value ?? 0) +
+          drift +
+          (groupIndex === 0 && leafIndex === 0
+            ? 800
+            : groupIndex === 2 && leafIndex === 1
+              ? -400
+              : 0),
+      ),
+    })),
+  }));
+}
 
 const BAR_COUNT = 32;
 const SESSIONS = Array.from({ length: BAR_COUNT }, (_, index) => {
@@ -63,6 +110,7 @@ function LiveEChartsBreadthDemo(): ReactElement {
   const [tick, setTick] = useState(0);
   const [slices, setSlices] = useState(INITIAL_SLICES);
   const [stages, setStages] = useState(INITIAL_STAGES);
+  const [nodes, setNodes] = useState(INITIAL_TREEMAP);
   const [ohlc, setOhlc] = useState(INITIAL_OHLC);
   const lastFrameRef = useRef(performance.now());
   const [frameMs, setFrameMs] = useState(0);
@@ -94,6 +142,7 @@ function LiveEChartsBreadthDemo(): ReactElement {
           })),
         );
         setOhlc(buildOhlc(next));
+        setNodes((currentNodes) => bumpTreemap(currentNodes, next));
         return next;
       });
     }, TICK_MS);
@@ -105,7 +154,7 @@ function LiveEChartsBreadthDemo(): ReactElement {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
           gap: 12,
         }}
       >
@@ -122,9 +171,12 @@ function LiveEChartsBreadthDemo(): ReactElement {
         <ChartContainer theme={liveTheme} mode="live" height={240} width="100%">
           <FunnelChart stages={stages} />
         </ChartContainer>
+        <ChartContainer theme={liveTheme} mode="live" height={240} width="100%">
+          <TreemapChart nodes={nodes} />
+        </ChartContainer>
       </div>
       <p style={{ marginTop: 10, fontSize: 12, color: "#94a3b8" }}>
-        C101 — ECharts exotic <code>mode: live</code> merge path @ 5 Hz · tick{" "}
+        C106 — ECharts exotic <code>mode: live</code> merge path @ 5 Hz · tick{" "}
         {tick} · last frame {frameMs.toFixed(1)} ms (target {TICK_MS} ms)
       </p>
     </div>
@@ -139,7 +191,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C101 — pie, candlestick, and funnel panels share the Heatmap-style `mergeOption` live update path at 5 Hz without full chart rebuilds.",
+          "C106 — pie, candlestick, funnel, and treemap panels share the Heatmap-style `mergeOption` live update path at 5 Hz without full chart rebuilds.",
       },
     },
   },

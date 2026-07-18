@@ -15,6 +15,7 @@ vi.mock("./useEChart", () => ({
 import { EChartsCandlestick } from "./EChartsCandlestick";
 import { EChartsFunnel } from "./EChartsFunnel";
 import { EChartsPie } from "./EChartsPie";
+import { EChartsTreemap } from "./EChartsTreemap";
 import { withPresentationAnimation } from "./presentationAnimation";
 
 function renderAdapter(element: ReactElement): void {
@@ -80,6 +81,27 @@ describe("live merge adapters", () => {
         data={[
           { open: 10, high: 12, low: 9, close: 11 },
           { open: 11, high: 13, low: 10, close: 12 },
+        ]}
+        theme={cleanTheme}
+        mergeOption
+      />,
+    );
+
+    const call = useEChartCalls.at(-1);
+    expect(call?.mergeOption).toBe(true);
+    expect((call?.option as { animation?: boolean }).animation).toBe(false);
+  });
+
+  it("passes mergeOption to useEChart for treemap in live mode", () => {
+    renderAdapter(
+      <EChartsTreemap
+        width={320}
+        height={240}
+        nodes={[
+          {
+            name: "Compute",
+            children: [{ name: "EC2", value: 42_000 }],
+          },
         ]}
         theme={cleanTheme}
         mergeOption

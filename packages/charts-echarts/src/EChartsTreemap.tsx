@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import { hiddenTooltip } from "./themeBridge";
+import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { flattenTreemapValues, mapTreemapData } from "./treemapData";
 import type { TreemapNode } from "./treemapTypes";
@@ -18,6 +19,8 @@ export type EChartsTreemapProps = {
   drilldown?: boolean;
   onDrillChange?: (state: TreemapDrillChange) => void;
   onItemHover?: (event: EChartItemHoverEvent) => void;
+  mergeOption?: boolean;
+  animate?: boolean;
 };
 
 function formatShare(value: number, total: number): string {
@@ -34,13 +37,16 @@ export function EChartsTreemap({
   drilldown = false,
   onDrillChange,
   onItemHover,
+  mergeOption = false,
+  animate = false,
 }: EChartsTreemapProps): ReactElement {
   const data = mapTreemapData(nodes, theme);
   const leafValues = flattenTreemapValues(nodes);
   const total = leafValues.reduce((sum, value) => sum + value, 0);
   const drillOptions = buildTreemapDrillOptions({ drilldown });
 
-  const option: EChartsOption = {
+  const option: EChartsOption = withPresentationAnimation(
+    {
     tooltip: hiddenTooltip(),
     series: [
       {
@@ -83,13 +89,16 @@ export function EChartsTreemap({
         data,
       },
     ],
-  };
+    },
+    animate,
+  );
 
   const rootRef = useEChart({
     option,
     width,
     height,
     onItemHover,
+    mergeOption,
     onTreemapDrill: onDrillChange
       ? (path) => onDrillChange({ path })
       : undefined,

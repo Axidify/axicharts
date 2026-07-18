@@ -26,7 +26,7 @@ function TreemapPlot({
   drilldown,
   onDrillChange,
 }: TreemapChartProps): ReactElement {
-  const { size, theme } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const interaction = useEChartsInteraction();
 
   return (
@@ -39,6 +39,8 @@ function TreemapPlot({
       drilldown={drilldown}
       onDrillChange={onDrillChange}
       onItemHover={interaction.onItemHover}
+      mergeOption={mode === "live"}
+      animate={mode === "presentation"}
     />
   );
 }
