@@ -9,6 +9,7 @@ import {
   buildHierarchyA11yDescriptor,
   buildPieA11yDescriptor,
 } from "./echartsDescriptor";
+import { buildSingleValueA11yDescriptor } from "./singleValueDescriptor";
 import { buildChartA11yTable, chartA11yTableToHtml } from "./a11yTable";
 import { parseA11yDescriptor, serializeA11yDescriptor } from "./serialize";
 import { enhanceSvgMarkup } from "./enhanceSvgA11y";
@@ -133,5 +134,33 @@ describe("chart a11y", () => {
     });
     const table = buildChartA11yTable(hierarchy);
     expect(table.rows).toEqual([{ path: "Root > Leaf", value: 5 }]);
+  });
+
+  it("builds single-value a11y table for stat/gauge panels", () => {
+    const singleValue = buildSingleValueA11yDescriptor({
+      title: "Uptime",
+      value: "98.4%",
+      description: "Tone: success; Range 0–100",
+    });
+    const table = buildChartA11yTable(singleValue);
+    expect(table.rows).toEqual([{ label: "Uptime", value: "98.4%" }]);
+    expect(table.caption).toBe("Tone: success; Range 0–100");
+    expect(parseA11yDescriptor(serializeA11yDescriptor(singleValue))).toEqual(
+      singleValue,
+    );
+  });
+
+  it("enhances single-value SVG exports with metric table", () => {
+    const singleValue = buildSingleValueA11yDescriptor({
+      title: "CPU",
+      value: "72%",
+    });
+    const markup =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80"><circle cx="60" cy="40" r="30"/></svg>';
+    const enhanced = enhanceSvgMarkup(markup, singleValue);
+    expect(enhanced).toContain("<title");
+    expect(enhanced).toContain("CPU");
+    expect(enhanced).toContain("72%");
+    expect(enhanced).toContain("<table>");
   });
 });

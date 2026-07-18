@@ -8,7 +8,9 @@ import type {
   HierarchyA11yDescriptor,
   HierarchyA11yItem,
   PieA11yDescriptor,
+  SingleValueA11yDescriptor,
 } from "./types";
+import { singleValueA11ySummary } from "./singleValueDescriptor";
 
 export function flattenHierarchyNodes(
   nodes: HierarchyNode[],
@@ -165,7 +167,7 @@ export function chartA11ySummary(descriptor: {
     case "cartesian":
       return (descriptor as { title?: string }).title ?? "Chart";
     case "single-value":
-      return (descriptor as { title: string }).title;
+      return singleValueA11ySummary(descriptor as SingleValueA11yDescriptor);
     case "pie":
       return pieA11ySummary(descriptor as PieA11yDescriptor);
     case "candlestick":

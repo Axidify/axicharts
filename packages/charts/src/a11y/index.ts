@@ -16,6 +16,11 @@ export {
   type BuildCartesianA11yInput,
 } from "./cartesianDescriptor";
 export {
+  buildSingleValueA11yDescriptor,
+  singleValueA11ySummary,
+  type BuildSingleValueA11yInput,
+} from "./singleValueDescriptor";
+export {
   buildCandlestickA11yDescriptor,
   buildFunnelA11yDescriptor,
   buildHeatmapA11yDescriptor,
@@ -41,4 +46,8 @@ export {
   EChartsChartA11yRoot,
   type EChartsChartA11yRootProps,
 } from "./EChartsChartA11yRoot";
+export {
+  SingleValueChartA11yRoot,
+  type SingleValueChartA11yRootProps,
+} from "./SingleValueChartA11yRoot";
 export { SvgA11yHead, SVG_A11Y_DESC_ID, SVG_A11Y_TITLE_ID, type SvgA11yHeadProps } from "./SvgA11yHead";

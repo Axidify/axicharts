@@ -8,6 +8,8 @@ import {
   CandlestickChart,
   HeatmapChart,
   FunnelChart,
+  Stat,
+  Gauge,
   downloadAccessibleTable,
   downloadExport,
   exportAccessibleChart,
@@ -52,6 +54,7 @@ function AccessibilityExportDemo(): ReactElement {
   const canvasRef = useRef<HTMLDivElement>(null);
   const staticRef = useRef<HTMLDivElement>(null);
   const echartsRef = useRef<HTMLDivElement>(null);
+  const hmiRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState(
     "Export accessible SVG or download the screen-reader data table fallback.",
   );
@@ -109,6 +112,15 @@ function AccessibilityExportDemo(): ReactElement {
         <button type="button" onClick={() => void downloadTable(echartsRef.current)}>
           Download ECharts data table
         </button>
+        <button
+          type="button"
+          onClick={() => exportAccessible(hmiRef.current, "svg", "gauge-accessible.svg")}
+        >
+          Export HMI panels (SVG + a11y)
+        </button>
+        <button type="button" onClick={() => void downloadTable(hmiRef.current)}>
+          Download HMI data table
+        </button>
       </div>
       <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>{status}</p>
       <div ref={canvasRef}>
@@ -142,6 +154,21 @@ function AccessibilityExportDemo(): ReactElement {
           <FunnelChart stages={FUNNEL_STAGES} />
         </ChartContainer>
       </div>
+      <div
+        ref={hmiRef}
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 12,
+        }}
+      >
+        <ChartContainer theme={cleanTheme} height={140} width="100%">
+          <Stat value="98.4%" label="Uptime" tone="success" />
+        </ChartContainer>
+        <ChartContainer theme={cleanTheme} height={140} width="100%">
+          <Gauge value={72} label="Tank level" unit="%" warningAt={70} criticalAt={90} />
+        </ChartContainer>
+      </div>
       {tablePreview ? (
         <div
           style={{
@@ -165,7 +192,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C102–C103 accessibility export — SVG a11y tree on export, screen-reader data table fallback for canvas charts (cartesian + ECharts breadth).",
+          "C102–C105 accessibility export — SVG a11y tree on export, screen-reader data table fallback for canvas charts (cartesian + ECharts breadth) and single-value HMI panels (Stat, Gauge, Digital, StatusLamp).",
       },
     },
   },

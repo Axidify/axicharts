@@ -1,5 +1,7 @@
-import type { ReactElement } from "react";
+import { useMemo, type ReactElement } from "react";
 import type { StatTone } from "../stat/Stat";
+import { buildSingleValueA11yDescriptor } from "../a11y/singleValueDescriptor";
+import { SingleValueChartA11yRoot } from "../a11y/SingleValueChartA11yRoot";
 import { useOptionalChartLayout } from "../container/useOptionalChartLayout";
 import { resolveTagStatTone } from "../alarm/tagTones";
 
@@ -84,57 +86,74 @@ export function Gauge({
   const track = "#334155";
   const display =
     unit === "%" ? `${clamped.toFixed(0)}%` : `${clamped.toFixed(0)}${unit}`;
+  const descriptor = useMemo(
+    () =>
+      buildSingleValueA11yDescriptor({
+        title: label ?? "Gauge",
+        value: display,
+        description: [
+          `Range ${min}–${max}`,
+          `Tone: ${resolvedTone}`,
+          warningAt != null ? `Warning at ${warningAt}` : null,
+          criticalAt != null ? `Critical at ${criticalAt}` : null,
+        ]
+          .filter(Boolean)
+          .join("; "),
+      }),
+    [criticalAt, display, label, max, min, resolvedTone, warningAt],
+  );
 
   return (
-    <svg
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      role="img"
-      aria-label={label ? `${label}: ${display}` : display}
-    >
-      <path
-        d={arcPath(cx, cy, r, start, end)}
-        fill="none"
-        stroke={track}
-        strokeWidth={10}
-        strokeLinecap="round"
-      />
-      <path
-        d={arcPath(cx, cy, r, start, valueEnd)}
-        fill="none"
-        stroke={stroke}
-        strokeWidth={10}
-        strokeLinecap="round"
-      />
-      <text
-        x={cx}
-        y={cy - r * 0.15}
-        textAnchor="middle"
-        fill="#e2e8f0"
-        fontSize={Math.max(14, width * 0.14)}
-        fontWeight={600}
-        fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+    <SingleValueChartA11yRoot descriptor={descriptor}>
+      <svg
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        aria-hidden="true"
       >
-        {display}
-      </text>
-      {label ? (
+        <path
+          d={arcPath(cx, cy, r, start, end)}
+          fill="none"
+          stroke={track}
+          strokeWidth={10}
+          strokeLinecap="round"
+        />
+        <path
+          d={arcPath(cx, cy, r, start, valueEnd)}
+          fill="none"
+          stroke={stroke}
+          strokeWidth={10}
+          strokeLinecap="round"
+        />
         <text
           x={cx}
-          y={cy + 8}
+          y={cy - r * 0.15}
           textAnchor="middle"
-          fill="#94a3b8"
-          fontSize={11}
+          fill="#e2e8f0"
+          fontSize={Math.max(14, width * 0.14)}
+          fontWeight={600}
+          fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
         >
-          {label}
+          {display}
         </text>
-      ) : null}
-      <text x={cx - r} y={cy + 14} textAnchor="middle" fill="#64748b" fontSize={9}>
-        {min}
-      </text>
-      <text x={cx + r} y={cy + 14} textAnchor="middle" fill="#64748b" fontSize={9}>
-        {max}
-      </text>
-    </svg>
+        {label ? (
+          <text
+            x={cx}
+            y={cy + 8}
+            textAnchor="middle"
+            fill="#94a3b8"
+            fontSize={11}
+          >
+            {label}
+          </text>
+        ) : null}
+        <text x={cx - r} y={cy + 14} textAnchor="middle" fill="#64748b" fontSize={9}>
+          {min}
+        </text>
+        <text x={cx + r} y={cy + 14} textAnchor="middle" fill="#64748b" fontSize={9}>
+          {max}
+        </text>
+      </svg>
+    </SingleValueChartA11yRoot>
   );
 }

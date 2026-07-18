@@ -1,5 +1,7 @@
-import type { CSSProperties, ReactElement } from "react";
+import { useMemo, type CSSProperties, type ReactElement } from "react";
 import type { StatSurface, StatTone } from "../stat/Stat";
+import { buildSingleValueA11yDescriptor } from "../a11y/singleValueDescriptor";
+import { SingleValueChartA11yRoot } from "../a11y/SingleValueChartA11yRoot";
 import { useOptionalChartLayout } from "../container/useOptionalChartLayout";
 
 const TONE_COLORS: Record<StatSurface, Record<StatTone, string>> = {
@@ -45,6 +47,15 @@ export function Digital({
         ? `${value}${unit}`
         : String(value)
       : value;
+  const descriptor = useMemo(
+    () =>
+      buildSingleValueA11yDescriptor({
+        title: label ?? "Digital readout",
+        value: display,
+        description: `Tone: ${tone}`,
+      }),
+    [display, label, tone],
+  );
 
   const fontSize =
     height !== undefined
@@ -52,7 +63,8 @@ export function Digital({
       : 28;
 
   return (
-    <div
+    <SingleValueChartA11yRoot
+      descriptor={descriptor}
       style={{
         width: width ?? "100%",
         height: height ?? "auto",
@@ -63,7 +75,6 @@ export function Digital({
         textAlign: "center",
         ...style,
       }}
-      aria-label={label ? `${label}: ${display}` : display}
     >
       <div
         style={{
@@ -88,6 +99,6 @@ export function Digital({
           {label}
         </div>
       ) : null}
-    </div>
+    </SingleValueChartA11yRoot>
   );
 }

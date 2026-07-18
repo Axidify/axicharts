@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 import { buildCartesianA11yDescriptor } from "../a11y/cartesianDescriptor";
 import { buildPieA11yDescriptor } from "../a11y/echartsDescriptor";
+import { buildSingleValueA11yDescriptor } from "../a11y/singleValueDescriptor";
 import { serializeA11yDescriptor, CHART_A11Y_ATTR } from "../a11y/serialize";
 import { exportAccessibleChart } from "./exportAccessibleChart";
 
@@ -80,5 +81,32 @@ describe("exportAccessibleChart", () => {
       { segment: "Alpha", value: 30, share: "30.0%" },
       { segment: "Beta", value: 70, share: "70.0%" },
     ]);
+  });
+
+  it("resolves gauge a11y metadata from nested single-value root", async () => {
+    const container = document.createElement("div");
+    const descriptor = buildSingleValueA11yDescriptor({
+      title: "Tank level",
+      value: "72%",
+      description: "Range 0–100; Tone: warning",
+    });
+    const root = document.createElement("div");
+    root.setAttribute(CHART_A11Y_ATTR, serializeA11yDescriptor(descriptor));
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "120");
+    svg.setAttribute("height", "80");
+    root.appendChild(svg);
+    container.appendChild(root);
+    document.body.appendChild(container);
+
+    const result = await exportAccessibleChart(container, { format: "svg" });
+    expect(result.a11y?.table.rows).toEqual([
+      { label: "Tank level", value: "72%" },
+    ]);
+    const payload = result.dataUrl.slice(result.dataUrl.indexOf(",") + 1);
+    const markup = decodeURIComponent(payload);
+    expect(markup).toContain("Tank level");
+
+    container.remove();
   });
 });

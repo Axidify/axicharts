@@ -1,4 +1,6 @@
-import type { ReactElement } from "react";
+import { useMemo, type ReactElement } from "react";
+import { buildSingleValueA11yDescriptor } from "../a11y/singleValueDescriptor";
+import { SingleValueChartA11yRoot } from "../a11y/SingleValueChartA11yRoot";
 import { useOptionalChartLayout } from "../container/useOptionalChartLayout";
 
 export type LampStatus = "running" | "stopped" | "fault" | "idle" | "warning";
@@ -33,39 +35,49 @@ export function StatusLamp({ status, label }: StatusLampProps): ReactElement {
   const cy = height * 0.42;
   const r = Math.min(width, height) * 0.16;
   const text = label ?? STATUS_LABEL[status];
+  const descriptor = useMemo(
+    () =>
+      buildSingleValueA11yDescriptor({
+        title: text,
+        value: STATUS_LABEL[status],
+        description: `Status: ${status}`,
+      }),
+    [status, text],
+  );
 
   return (
-    <svg
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      role="img"
-      aria-label={`${text} — ${STATUS_LABEL[status]}`}
-    >
-      <circle cx={cx} cy={cy} r={r * 1.8} fill={colors.glow} />
-      <circle
-        cx={cx}
-        cy={cy}
-        r={r}
-        fill={colors.fill}
-        stroke="#0f172a"
-        strokeWidth={2}
-      />
-      <circle
-        cx={cx - r * 0.28}
-        cy={cy - r * 0.28}
-        r={r * 0.22}
-        fill="rgba(255,255,255,0.35)"
-      />
-      <text
-        x={cx}
-        y={cy + r + 18}
-        textAnchor="middle"
-        fill="#94a3b8"
-        fontSize={11}
+    <SingleValueChartA11yRoot descriptor={descriptor}>
+      <svg
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        aria-hidden="true"
       >
-        {text}
-      </text>
-    </svg>
+        <circle cx={cx} cy={cy} r={r * 1.8} fill={colors.glow} />
+        <circle
+          cx={cx}
+          cy={cy}
+          r={r}
+          fill={colors.fill}
+          stroke="#0f172a"
+          strokeWidth={2}
+        />
+        <circle
+          cx={cx - r * 0.28}
+          cy={cy - r * 0.28}
+          r={r * 0.22}
+          fill="rgba(255,255,255,0.35)"
+        />
+        <text
+          x={cx}
+          y={cy + r + 18}
+          textAnchor="middle"
+          fill="#94a3b8"
+          fontSize={11}
+        >
+          {text}
+        </text>
+      </svg>
+    </SingleValueChartA11yRoot>
   );
 }

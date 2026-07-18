@@ -1,4 +1,6 @@
-import type { CSSProperties, ReactElement } from "react";
+import { useMemo, type CSSProperties, type ReactElement } from "react";
+import { buildSingleValueA11yDescriptor } from "../a11y/singleValueDescriptor";
+import { SingleValueChartA11yRoot } from "../a11y/SingleValueChartA11yRoot";
 import { useOptionalChartLayout } from "../container/useOptionalChartLayout";
 import { resolveTagStatTone } from "../alarm/tagTones";
 import { usePresentationCountUp } from "./usePresentationCountUp";
@@ -52,32 +54,48 @@ export function Stat({
   const labelColor = surface === "light" ? "#64748b" : "#94a3b8";
   const staleColor = surface === "light" ? "#94a3b8" : "#64748b";
   const hero = layout?.mode === "presentation";
+  const descriptor = useMemo(
+    () =>
+      buildSingleValueA11yDescriptor({
+        title: label,
+        value: animatedValue,
+        description: [
+          `Tone: ${resolvedTone}`,
+          stale ? "Stale" : null,
+        ]
+          .filter(Boolean)
+          .join("; "),
+      }),
+    [animatedValue, label, resolvedTone, stale],
+  );
 
   return (
-    <div style={style}>
-      <div
-        style={{
-          fontSize: hero ? 28 : 20,
-          fontWeight: 600,
-          lineHeight: 1.2,
-          color: stale ? staleColor : colors[resolvedTone],
-          textDecoration: stale ? "line-through" : undefined,
-          fontFamily: monospace
-            ? "ui-monospace, SFMono-Regular, Menlo, monospace"
-            : undefined,
-        }}
-      >
-        {animatedValue}
+    <SingleValueChartA11yRoot descriptor={descriptor} style={style}>
+      <div>
+        <div
+          style={{
+            fontSize: hero ? 28 : 20,
+            fontWeight: 600,
+            lineHeight: 1.2,
+            color: stale ? staleColor : colors[resolvedTone],
+            textDecoration: stale ? "line-through" : undefined,
+            fontFamily: monospace
+              ? "ui-monospace, SFMono-Regular, Menlo, monospace"
+              : undefined,
+          }}
+        >
+          {animatedValue}
+        </div>
+        <div
+          style={{
+            marginTop: 4,
+            fontSize: 12,
+            color: labelColor,
+          }}
+        >
+          {label}
+        </div>
       </div>
-      <div
-        style={{
-          marginTop: 4,
-          fontSize: 12,
-          color: labelColor,
-        }}
-      >
-        {label}
-      </div>
-    </div>
+    </SingleValueChartA11yRoot>
   );
 }
