@@ -20,6 +20,7 @@ export const PANEL_TYPE_CATEGORY: Record<string, PanelCategory> = {
   "pictorial-bar": "distribution",
   pictorialBar: "distribution",
   boxplot: "distribution",
+  violin: "distribution",
   histogram: "distribution",
   waterfall: "financial",
   candlestick: "financial",

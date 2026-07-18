@@ -2,6 +2,7 @@ import {
   BarChart,
   BoxplotChart,
   CandlestickChart,
+  CustomChart,
   FunnelChart,
   GraphChart,
   HeatmapChart,
@@ -34,6 +35,7 @@ import { CanvasRenderer } from "echarts/renderers";
 echarts.use([
   BarChart,
   BoxplotChart,
+  CustomChart,
   CandlestickChart,
   DatasetComponent,
   FunnelChart,

@@ -15,6 +15,7 @@ import type {
   ThemeRiverA11yDescriptor,
   BumpA11yDescriptor,
   GraphA11yDescriptor,
+  ViolinA11yDescriptor,
   WordCloudA11yDescriptor,
 } from "./types";
 import { singleValueA11ySummary } from "./singleValueDescriptor";
@@ -252,6 +253,45 @@ export function buildBumpA11yDescriptor({
   };
 }
 
+export function buildViolinA11yDescriptor({
+  items,
+  series,
+  title,
+  description,
+}: {
+  items?: { category: string; samples?: number[] }[];
+  series?: { name: string; items: { category: string; samples?: number[] }[] }[];
+  title?: string;
+  description?: string;
+}): ViolinA11yDescriptor {
+  const groups =
+    series && series.length > 0
+      ? series
+      : items && items.length > 0
+        ? [{ name: "Distribution", items }]
+        : [];
+  const categories = groups[0]?.items.map((item) => item.category) ?? [];
+
+  return {
+    kind: "violin",
+    title:
+      title ??
+      groups
+        .map((group) => group.name)
+        .filter(Boolean)
+        .join(", "),
+    description,
+    categories: [...categories],
+    series: groups.map((group) => ({
+      name: group.name,
+      sampleCount: group.items.reduce(
+        (sum, item) => sum + (item.samples?.length ?? 0),
+        0,
+      ),
+    })),
+  };
+}
+
 export function buildGraphA11yDescriptor({
   data,
   title,
@@ -350,6 +390,10 @@ export function graphA11ySummary(descriptor: GraphA11yDescriptor): string {
   return `Network graph with ${descriptor.nodes.length} nodes and ${descriptor.edges.length} edges`;
 }
 
+export function violinA11ySummary(descriptor: ViolinA11yDescriptor): string {
+  return `Violin chart with ${descriptor.categories.length} categories and ${descriptor.series.length} series`;
+}
+
 export function wordCloudA11ySummary(descriptor: WordCloudA11yDescriptor): string {
   return `Word cloud with ${descriptor.words.length} terms`;
 }
@@ -385,6 +429,8 @@ export function chartA11ySummary(descriptor: {
       return bumpA11ySummary(descriptor as BumpA11yDescriptor);
     case "graph":
       return graphA11ySummary(descriptor as GraphA11yDescriptor);
+    case "violin":
+      return violinA11ySummary(descriptor as ViolinA11yDescriptor);
     case "word-cloud":
       return wordCloudA11ySummary(descriptor as WordCloudA11yDescriptor);
     default:

@@ -3,6 +3,7 @@ import { AreaChart } from "../area/AreaChart";
 import { BarChart } from "../bar/BarChart";
 import { CandlestickChart } from "../candlestick/CandlestickChart";
 import { BoxplotChart } from "../boxplot/BoxplotChart";
+import { ViolinChart } from "../violin/ViolinChart";
 import { FunnelChart } from "../funnel/FunnelChart";
 import { PictorialBarChart } from "../pictorialBar/PictorialBarChart";
 import { LiquidFillChart } from "../liquidFill/LiquidFillChart";
@@ -113,6 +114,11 @@ const builtins: ChartTypeRegistration[] = [
   {
     type: "boxplot",
     Chart: BoxplotChart as ChartTypeRegistration["Chart"],
+    defaultRenderer: "canvas",
+  },
+  {
+    type: "violin",
+    Chart: ViolinChart as ChartTypeRegistration["Chart"],
     defaultRenderer: "canvas",
   },
   {

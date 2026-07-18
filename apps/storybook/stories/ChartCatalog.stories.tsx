@@ -24,6 +24,7 @@ import {
   SunburstChart,
   ThemeRiverChart,
   TreemapChart,
+  ViolinChart,
   WaterfallChart,
   WordCloudChart,
   type ComboSeries,
@@ -202,6 +203,11 @@ const GRAPH_COMPACT: GraphChartData = {
     { source: "auth", target: "db", value: 18 },
   ],
 };
+
+const VIOLIN_COMPACT = [
+  { category: "API", samples: [12, 18, 22, 28, 35, 42, 55, 72] },
+  { category: "DB", samples: [8, 14, 20, 26, 34, 48, 60, 78] },
+];
 
 /** Compact catalog fixtures — strip panel chrome that duplicates card labels. */
 function catalogPanel(spec: PanelSpec): PanelSpec {
@@ -444,6 +450,11 @@ function ChartCatalogWall(): ReactElement {
           <CatalogCard label="Network graph">
             <ChartContainer theme={cleanTheme} height={140} width="100%">
               <GraphChart data={GRAPH_COMPACT} roam={false} />
+            </ChartContainer>
+          </CatalogCard>
+          <CatalogCard label="Violin">
+            <ChartContainer theme={cleanTheme} height={140} width="100%">
+              <ViolinChart items={VIOLIN_COMPACT} showAxes={false} />
             </ChartContainer>
           </CatalogCard>
           <CatalogCard label="Treemap">

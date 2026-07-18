@@ -137,6 +137,14 @@ export type GraphA11yDescriptor = {
   edges: { source: string; target: string; value?: number }[];
 };
 
+export type ViolinA11yDescriptor = {
+  kind: "violin";
+  title?: string;
+  description?: string;
+  categories: string[];
+  series: { name: string; sampleCount: number }[];
+};
+
 export type WordCloudA11yDescriptor = {
   kind: "word-cloud";
   title?: string;
@@ -158,6 +166,7 @@ export type ChartA11yDescriptor =
   | ThemeRiverA11yDescriptor
   | BumpA11yDescriptor
   | GraphA11yDescriptor
+  | ViolinA11yDescriptor
   | WordCloudA11yDescriptor;
 
 export type ChartA11yTable = {

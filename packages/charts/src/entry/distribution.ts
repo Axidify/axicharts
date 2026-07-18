@@ -18,6 +18,12 @@ export {
   type BoxplotSeries,
 } from "../boxplot/BoxplotChart";
 export {
+  ViolinChart,
+  type ViolinChartProps,
+  type ViolinItem,
+  type ViolinSeries,
+} from "../violin/ViolinChart";
+export {
   HistogramChart,
   type HistogramChartProps,
 } from "../histogram/HistogramChart";

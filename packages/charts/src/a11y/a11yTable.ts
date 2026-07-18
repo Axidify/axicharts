@@ -13,6 +13,7 @@ import {
   themeRiverA11ySummary,
   bumpA11ySummary,
   graphA11ySummary,
+  violinA11ySummary,
   wordCloudA11ySummary,
 } from "./echartsDescriptor";
 
@@ -228,6 +229,22 @@ export function buildChartA11yTable(descriptor: ChartA11yDescriptor): ChartA11yT
         value: edge.value ?? "",
       })),
       caption: descriptor.description ?? graphA11ySummary(descriptor),
+    };
+  }
+
+  if (descriptor.kind === "violin") {
+    return {
+      columns: [
+        { key: "series", label: "Series" },
+        { key: "category", label: "Category" },
+        { key: "samples", label: "Samples", align: "right" },
+      ],
+      rows: descriptor.series.map((item) => ({
+        series: item.name,
+        category: descriptor.categories.join(", "),
+        samples: item.sampleCount,
+      })),
+      caption: descriptor.description ?? violinA11ySummary(descriptor),
     };
   }
 

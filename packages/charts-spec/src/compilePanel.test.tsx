@@ -867,6 +867,51 @@ describe("compilePanel presentation mode", () => {
     registerBuiltinChartTypes();
     expect(getChartType("graph")?.Chart).toBeTypeOf("function");
   });
+
+  it("compiles violin panels from long-form rows", async () => {
+    const panel = compilePanel(
+      {
+        type: "violin",
+        title: "Latency distribution",
+        height: 360,
+        encoding: {
+          x: { field: "service", type: "nominal" },
+          y: { field: "latency_ms", type: "quantitative" },
+        },
+      },
+      [
+        { service: "API", latency_ms: 12 },
+        { service: "API", latency_ms: 18 },
+        { service: "DB", latency_ms: 30 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.textContent).toContain("Latency distribution");
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-echarts")).toBeTruthy();
+    });
+  });
+
+  it("round-trips violin through ejectPanel", () => {
+    const spec = {
+      type: "violin" as const,
+      encoding: {
+        x: { field: "service" },
+        y: { field: "latency_ms" },
+      },
+      props: { showBoxplot: true, valueSuffix: " ms" },
+    };
+    const jsx = ejectPanel(spec, "rows");
+    expect(jsx).toContain("ViolinChart");
+    expect(jsx).toContain("service");
+    expect(jsx).toContain("latency_ms");
+  });
+
+  it("registers violin builtin chart type", () => {
+    registerBuiltinChartTypes();
+    expect(getChartType("violin")?.Chart).toBeTypeOf("function");
+  });
 });
 
 describe("compilePanel echarts escape hatch", () => {

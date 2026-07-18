@@ -114,6 +114,12 @@
     "gzip": true
   },
   {
+    "name": "@axicharts/charts/violin",
+    "path": "packages/charts/dist/entry/violin.js",
+    "limit": "6 KB",
+    "gzip": true
+  },
+  {
     "name": "@axicharts/charts/export",
     "path": "packages/charts/dist/entry/export.js",
     "limit": "3 KB",

@@ -25,6 +25,21 @@ export {
   type TreemapDrillChange,
 } from "./treemapDrill";
 export { EChartsBoxplot, type EChartsBoxplotProps } from "./EChartsBoxplot";
+export { EChartsViolin, type EChartsViolinProps } from "./EChartsViolin";
+export type {
+  ViolinItem,
+  ViolinSeries,
+  KdePoint,
+  ViolinBoxStats,
+} from "./violinTypes";
+export {
+  computeBoxStats,
+  computeKde,
+  resolveViolinBoxStats,
+  resolveViolinDensity,
+  silvermanBandwidth,
+  violinCategories,
+} from "./violinTypes";
 export { EChartsHistogram, type EChartsHistogramProps } from "./EChartsHistogram";
 export type { BoxplotItem, BoxplotSeries } from "./boxplotTypes";
 export { EChartsScatter, type EChartsScatterProps } from "./EChartsScatter";

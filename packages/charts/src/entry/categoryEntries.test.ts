@@ -25,6 +25,7 @@ describe("category entrypoints", () => {
     expect(distribution.FunnelChart).toBeTypeOf("function");
     expect(distribution.PictorialBarChart).toBeTypeOf("function");
     expect(distribution.BoxplotChart).toBeTypeOf("function");
+    expect(distribution.ViolinChart).toBeTypeOf("function");
     expect(distribution.HistogramChart).toBeTypeOf("function");
   });
 

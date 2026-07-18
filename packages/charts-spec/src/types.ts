@@ -91,6 +91,7 @@ export type PanelChartType =
   | "treemap"
   | "sunburst"
   | "boxplot"
+  | "violin"
   | "histogram"
   | "stat"
   | "gauge"

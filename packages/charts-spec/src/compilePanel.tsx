@@ -3,6 +3,7 @@ import {
   AreaChart,
   BarChart,
   BoxplotChart,
+  ViolinChart,
   CandlestickChart,
   ChartContainer,
   ChartNavigator,
@@ -86,6 +87,7 @@ import { resolveMapDrillProps } from "./mapEncoding";
 import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
 import { bumpFromRows } from "./bumpEncoding";
 import { graphFromRows } from "./graphEncoding";
+import { violinFromRows } from "./violinEncoding";
 import { wordCloudFromRows } from "./wordCloudEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
 import { panelPropsWithGraphics } from "./panelGraphics";
@@ -700,6 +702,29 @@ export function compilePanel(
         createElement(BoxplotChart, {
           items,
           series,
+        }),
+      );
+    }
+
+    case "violin": {
+      const chartProps = chartPropsFromPanel(resolved.props ?? {});
+      const yEncoding = Array.isArray(resolved.encoding?.y)
+        ? resolved.encoding.y[0]
+        : resolved.encoding?.y;
+      const data = violinFromRows(rows, chartProps, {
+        x: resolved.encoding?.x,
+        y: yEncoding,
+        series: resolved.encoding?.series,
+      });
+      return wrap(
+        createElement(ViolinChart, {
+          items: data.items,
+          series: data.series,
+          showAxes: chartProps.showAxes as boolean | undefined,
+          valueSuffix: chartProps.valueSuffix as string | undefined,
+          bandwidth: chartProps.bandwidth as number | undefined,
+          showBoxplot: chartProps.showBoxplot as boolean | undefined,
+          showMedianLine: chartProps.showMedianLine as boolean | undefined,
         }),
       );
     }

@@ -5,6 +5,7 @@ import { cleanTheme } from "@axicharts/charts-theme";
 import { ChartLayoutContext } from "./container/ChartLayoutContext";
 import { ChartInteractionProvider } from "./interaction/ChartInteractionContext";
 import { BoxplotChart } from "./boxplot/BoxplotChart";
+import { ViolinChart } from "./violin/ViolinChart";
 import { CandlestickChart } from "./candlestick/CandlestickChart";
 import { FunnelChart } from "./funnel/FunnelChart";
 import { CalendarHeatmapChart } from "./calendar/CalendarHeatmapChart";
@@ -38,6 +39,7 @@ const captured = {
   wordCloud: null as CapturedProps | null,
   parallel: null as CapturedProps | null,
   themeRiver: null as CapturedProps | null,
+  violin: null as CapturedProps | null,
 };
 
 vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
@@ -102,6 +104,10 @@ vi.mock("@axicharts/charts-echarts", async (importOriginal) => {
     },
     EChartsThemeRiver: (props: CapturedProps) => {
       captured.themeRiver = props;
+      return null;
+    },
+    EChartsViolin: (props: CapturedProps) => {
+      captured.violin = props;
       return null;
     },
   };
@@ -302,6 +308,20 @@ describe("live mode merge wiring", () => {
     expectLiveMerge(captured.boxplot);
   });
 
+  it("passes mergeOption to violin adapter when mode is live", () => {
+    render(
+      <TestShell mode="live">
+        <ViolinChart
+          items={[
+            { category: "API", samples: [12, 18, 22, 28] },
+          ]}
+        />
+      </TestShell>,
+    );
+
+    expectLiveMerge(captured.violin);
+  });
+
   it("passes mergeOption to histogram adapter when mode is live", () => {
     render(
       <TestShell mode="live">
@@ -479,5 +499,20 @@ describe("presentation mode animation wiring", () => {
 
     expect(captured.histogram?.animate).toBe(true);
     expect(captured.histogram?.mergeOption).toBe(false);
+  });
+
+  it("enables presentation sweep on violin", () => {
+    render(
+      <TestShell mode="presentation">
+        <ViolinChart
+          items={[
+            { category: "API", samples: [12, 18, 22, 28, 35] },
+          ]}
+        />
+      </TestShell>,
+    );
+
+    expect(captured.violin?.animate).toBe(true);
+    expect(captured.violin?.mergeOption).toBe(false);
   });
 });
