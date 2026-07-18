@@ -11,6 +11,7 @@ export type {
   MetricProfile,
   PanelChartType,
   PanelSpec,
+  PanelStyleSpec,
   SpecData,
   TemplateId,
   ThemeName,
@@ -46,4 +47,9 @@ export {
 } from "./specCompiler";
 export { normalizePanelSpec, parseDashboardSpecFile, parseDataProfileFile, parsePanelSpecFile } from "./parseSpec";
 export { resolveTheme } from "./themes";
+export {
+  chartPropsWithoutStyle,
+  readPanelStyle,
+  themeWithPanelStyle,
+} from "./panelStyle";
 export { asRows, pluckField, readArray, readNumber } from "./data";

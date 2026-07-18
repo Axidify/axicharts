@@ -134,6 +134,35 @@ describe("compilePanel color encoding", () => {
   });
 });
 
+describe("compilePanel panel style", () => {
+  it("compiles bar panels with props.style theme overrides", () => {
+    const panel = compilePanel(
+      {
+        type: "bar",
+        encoding: {
+          x: { field: "week" },
+          y: { field: "throughput" },
+        },
+        props: {
+          style: {
+            bar: { radius: 10, gap: 0.4 },
+            grid: { opacity: 0.35 },
+          },
+        },
+        height: 180,
+      },
+      [
+        { week: "W1", throughput: 120 },
+        { week: "W2", throughput: 90 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+    expect(container.innerHTML).not.toContain('"style"');
+  });
+});
+
 describe("compilePanel table", () => {
   it("renders tabular rows from spec data", () => {
     const panel = compilePanel(

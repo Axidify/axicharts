@@ -21,6 +21,26 @@ export type ColorEncoding = {
   type?: "nominal" | "quantitative" | "semantic";
 };
 
+/** Per-panel style overrides — AI-tunable without forking the global theme. */
+export type PanelStyleSpec = {
+  grid?: {
+    opacity?: number;
+    strokeWidth?: number;
+    horizontal?: boolean;
+    vertical?: boolean;
+  };
+  line?: {
+    strokeWidth?: number;
+  };
+  area?: {
+    fillOpacity?: number;
+  };
+  bar?: {
+    radius?: number;
+    gap?: number;
+  };
+};
+
 export type PanelChartType =
   | "line"
   | "area"

@@ -75,4 +75,25 @@ describe("ejectPanel", () => {
     expect(jsx).toContain("compact={true}");
     expect(jsx).not.toContain("ChartContainer");
   });
+
+  it("emits createTheme when props.style overrides are present", () => {
+    const jsx = ejectPanel({
+      type: "bar",
+      theme: "clean",
+      encoding: {
+        x: { field: "week" },
+        y: { field: "throughput" },
+      },
+      props: {
+        style: {
+          bar: { radius: 10 },
+          grid: { opacity: 0.35 },
+        },
+      },
+    });
+
+    expect(jsx).toContain("createTheme");
+    expect(jsx).toContain('"radius":10');
+    expect(jsx).not.toContain("style=");
+  });
 });

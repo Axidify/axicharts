@@ -29,6 +29,11 @@ import { asRows, pluckField } from "./data";
 import { applySpecCompilers } from "./specCompiler";
 import { resolveTheme } from "./themes";
 import { fillsFromColorField } from "./colorEncoding";
+import {
+  chartPropsWithoutStyle,
+  readPanelStyle,
+  themeWithPanelStyle,
+} from "./panelStyle";
 
 export type CompileOptions = {
   theme?: ThemeName;
@@ -59,7 +64,10 @@ function wrapChart(
   options: CompileOptions,
   tagTones?: Record<string, SeriesTone>,
 ): ReactElement {
-  const theme = resolveTheme(options.theme ?? spec.theme);
+  const theme = themeWithPanelStyle(
+    resolveTheme(options.theme ?? spec.theme),
+    readPanelStyle(spec.props),
+  );
   const mode = options.mode ?? spec.mode;
   const height = options.height ?? spec.height ?? 240;
   const width = options.width ?? spec.width ?? "100%";
@@ -123,7 +131,7 @@ function compileRegisteredPanel(
   const chartProps = {
     ...objectDataFromSpec(data),
     ...(rows[0] ?? {}),
-    ...spec.props,
+    ...chartPropsWithoutStyle(spec.props ?? {}),
   };
 
   return wrapChart(
@@ -141,7 +149,7 @@ export function compilePanel(
 ): ReactElement {
   const resolved = applySpecCompilers(spec, data);
   const rows = asRows(data);
-  const props = resolved.props ?? {};
+  const props = chartPropsWithoutStyle(resolved.props ?? {});
   const objectData = objectDataFromSpec(data);
   const tagTones = options.tagTones ?? readTagTones(objectData);
   const wrap = (chart: ReactElement) =>

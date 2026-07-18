@@ -1,4 +1,5 @@
 import type { PanelSpec } from "./types";
+import { chartPropsWithoutStyle, readPanelStyle } from "./panelStyle";
 
 function quote(value: string): string {
   return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
@@ -21,6 +22,16 @@ function serializeProps(props: Record<string, unknown>, indent: string): string 
 
 export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
   const theme = spec.theme ?? "clean";
+  const panelStyle = readPanelStyle(spec.props);
+  const themeImport = panelStyle
+    ? `createTheme, ${theme}Theme`
+    : `${theme}Theme`;
+  const themeExpr = panelStyle
+    ? `createTheme(${theme}Theme, ${JSON.stringify({
+        name: `${theme}-panel`,
+        ...panelStyle,
+      })})`
+    : `${theme}Theme`;
   const mode = spec.mode ? `\n      mode="${spec.mode}"` : "";
   const height = spec.height ?? 240;
   const chartName =
@@ -53,7 +64,7 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
                     : "Gauge";
 
   if (spec.type === "stat" || spec.type === "gauge" || spec.type === "table") {
-    const props = spec.props ?? {};
+    const props = chartPropsWithoutStyle(spec.props ?? {});
     const merged =
       spec.type === "stat" || spec.type === "gauge"
         ? { ...props, label: props.label ?? spec.title }
@@ -124,12 +135,15 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
       max={${dataVar}.max}`;
   }
 
-  const extraProps = spec.props ? `\n      ${serializeProps(spec.props, "      ")}` : "";
+  const chartProps = chartPropsWithoutStyle(spec.props ?? {});
+  const extraProps = Object.keys(chartProps).length
+    ? `\n      ${serializeProps(chartProps, "      ")}`
+    : "";
 
   return `import { ChartContainer, ${chartName} } from "@axicharts/charts";
-import { ${theme}Theme } from "@axicharts/charts-theme";
+import { ${themeImport} } from "@axicharts/charts-theme";
 
-<ChartContainer theme={${theme}Theme}${mode} height={${height}} width="100%">
+<ChartContainer theme={${themeExpr}}${mode} height={${height}} width="100%">
   <${chartName}
     ${chartBody}${extraProps}
   />
