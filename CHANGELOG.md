@@ -10,6 +10,16 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.17] - 2026-07-19
+
+### Axiboard app (monorepo, not npm)
+
+- **C168** — Optional Postgres workspace persistence (`AXIBOARD_DATABASE_URL`); compose `--profile postgres`
+- **C169a** — Zod schemas for `/api/orchestrator/*` and workspace POST
+- **C169** — Token auth with signed cookies; per-user workspace + BYOK; `AuthGate` login UI
+
+See [RELEASE-v0.4.17.md](./RELEASE-v0.4.17.md).
+
 ## [0.4.16] - 2026-07-19
 
 ### Added
