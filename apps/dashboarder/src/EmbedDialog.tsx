@@ -63,7 +63,8 @@ export type EmbedDialogProps = {
 
 function runtimeTitle(spec: RuntimeDashboardSpec | undefined): string | undefined {
   if (!spec) return undefined;
-  return spec.layout === "embed" ? spec.dashboard?.title : spec.wall?.title;
+  if (spec.layout === "mosaic") return spec.wall?.title;
+  return spec.dashboard?.title;
 }
 
 export function EmbedDialog({
@@ -92,7 +93,9 @@ export function EmbedDialog({
     [bundle.specJson],
   );
 
-  const referencePreset = runtimeEmbedReferencePreset(spec.layout);
+  const referencePreset = runtimeEmbedReferencePreset(
+    spec.layout === "mosaic" ? "mosaic" : "embed",
+  );
   const feedRow = feed ? PLANNER_FEED_ROWS.find((row) => row.feed === feed) : undefined;
   const plannerFixtures =
     feed != null

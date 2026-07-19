@@ -106,7 +106,7 @@ export function PlannerPanel({
     setLoading(true);
     try {
       const next = await requestDashboardPlan({
-        profile: DEFAULT_OPS_PROFILE,
+        profile: { metrics: [...DEFAULT_OPS_PROFILE.metrics] },
         intent,
         serverUrl,
       });

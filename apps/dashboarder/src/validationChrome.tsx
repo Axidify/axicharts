@@ -108,9 +108,9 @@ export function importSummary(exported: ShareExport, shape: ImportShape | null =
 
   if (shape === "runtime") {
     const title =
-      exported.spec.layout === "embed"
-        ? exported.spec.dashboard?.title
-        : exported.spec.wall?.title;
+      exported.spec.layout === "mosaic"
+        ? exported.spec.wall?.title
+        : exported.spec.dashboard?.title;
     return `Runtime spec · ${title ?? exported.name}`;
   }
 

@@ -157,6 +157,8 @@ export function App(): ReactElement {
     const next = buildRuntimeSpec({ template, layout, feed, presentation, mosaicPreset });
     if (!store || layout !== "embed") return next;
 
+    if (next.layout === "mosaic") return next;
+
     const saved = parseDashboardSpec(getActiveDashboard(store));
     if (saved.layout === "mosaic" || !saved.dashboard.chartConfig) return next;
 

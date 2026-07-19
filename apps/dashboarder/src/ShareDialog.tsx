@@ -129,6 +129,7 @@ export function ShareDialog({
         })
       : [];
   const chartConfigCount = chartConfigKeyCount(meta?.chartConfig);
+  const workspaceMetaCount = workspace.dashboards.filter((item) => item.meta?.feed).length;
 
   if (!open) return null;
 
