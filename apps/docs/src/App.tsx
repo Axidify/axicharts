@@ -16,6 +16,11 @@ import { VerticalsPage } from "./pages/VerticalsPage";
 import { ComparePage } from "./pages/ComparePage";
 import { ShadcnPage } from "./pages/ShadcnPage";
 import { ShadcnRegistryPage } from "./pages/ShadcnRegistryPage";
+import { AgentCartesianGuidePage } from "./pages/AgentCartesianGuidePage";
+import { BenchmarksPage } from "./pages/BenchmarksPage";
+import { TroubleshootingPage } from "./pages/TroubleshootingPage";
+import { ChoosingPathPage } from "./pages/ChoosingPathPage";
+import { ImportsGuidePage } from "./pages/ImportsGuidePage";
 import { CommunityTemplatesPage } from "./pages/CommunityTemplatesPage";
 
 export function App(): ReactElement {
@@ -25,6 +30,11 @@ export function App(): ReactElement {
         <Route element={<DocLayout />}>
           <Route index element={<HomePage />} />
           <Route path="start" element={<StartPage />} />
+          <Route path="guides/choosing-your-path" element={<ChoosingPathPage />} />
+          <Route path="guides/imports" element={<ImportsGuidePage />} />
+          <Route path="benchmarks" element={<BenchmarksPage />} />
+          <Route path="guides/agent-cartesian" element={<AgentCartesianGuidePage />} />
+          <Route path="guides/troubleshooting" element={<TroubleshootingPage />} />
           <Route path="verticals" element={<VerticalsPage />} />
           <Route path="compare" element={<ComparePage />} />
           <Route path="shadcn" element={<ShadcnPage />} />

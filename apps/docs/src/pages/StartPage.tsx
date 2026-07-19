@@ -2,8 +2,8 @@ import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { ChartContainer, LineChart } from "@axicharts/charts";
 import { QuickLineChart } from "@axicharts/charts/quick";
-import { cleanTheme } from "@axicharts/charts-theme";
-import { PLANNER_CLI_CODE } from "../demos/runtimePlannerDemo";
+import { cleanTheme, createTheme } from "@axicharts/charts-theme";
+import { docBodyStyle } from "../styles/docTokens";
 
 const QUICK_CODE = `import { QuickLineChart } from "@axicharts/charts/quick";
 
@@ -17,12 +17,19 @@ export function LatencySparkline() {
   );
 }`;
 
-const CODE = `import { ChartContainer, LineChart } from "@axicharts/charts";
+const THEME_CODE = `import { cleanTheme, createTheme } from "@axicharts/charts-theme";
+
+export const brandTheme = createTheme(cleanTheme, {
+  name: "acme",
+  bar: { radius: 8 },
+});`;
+
+const GROW_CODE = `import { ChartContainer, LineChart } from "@axicharts/charts/cartesian";
 import { cleanTheme } from "@axicharts/charts-theme";
 
 export function LatencyPanel() {
   return (
-    <ChartContainer theme={cleanTheme} height={200}>
+    <ChartContainer theme={cleanTheme} minHeight={280}>
       <LineChart
         categories={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
         series={[{ name: "p95", data: [42, 38, 55, 49, 62, 58, 71] }]}
@@ -32,35 +39,35 @@ export function LatencyPanel() {
   );
 }`;
 
-const codeBlockStyle = {
+const codeBlock = (bg: string, color: string) => ({
   padding: 14,
   borderRadius: 8,
   fontSize: 11,
   lineHeight: 1.5,
   overflow: "auto" as const,
-};
+  background: bg,
+  color,
+});
 
 export function StartPage(): ReactElement {
   return (
     <div>
-      <h1 style={{ marginTop: 0 }}>Getting started</h1>
-      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 14 }}>
-        Migrating from Recharts or shadcn/ui Charts? Start with the{" "}
-        <Link to="/shadcn">shadcn migration gallery</Link> — <code>chartConfig</code>, Cell fills,
-        migration checklist, and live <code>/compare</code> demo.
+      <h1 style={{ marginTop: 0 }}>Start here</h1>
+      <p style={docBodyStyle()}>
+        One themed line chart in ~15 minutes. No spec layer, no planner, no ECharts peer.{" "}
+        <Link to="/guides/choosing-your-path">Not sure which path?</Link>
       </p>
-      <h2 style={{ fontSize: 16 }}>Install</h2>
-      <pre
-        style={{
-          ...codeBlockStyle,
-          background: "#0f172a",
-          color: "#e2e8f0",
-          fontSize: 12,
-        }}
-      >
-        {`npm install @axicharts/charts @axicharts/charts-theme echarts uplot`}
+
+      <h2 style={{ fontSize: 16 }}>1. Install (line-only)</h2>
+      <pre style={codeBlock("#0f172a", "#e2e8f0")}>
+        {`pnpm add @axicharts/charts @axicharts/charts-theme uplot`}
       </pre>
-      <h2 style={{ fontSize: 16, marginTop: 28 }}>Hello world (3 lines)</h2>
+      <p style={{ ...docBodyStyle(), fontSize: 13 }}>
+        Peers: <code>react</code>, <code>react-dom</code>, <code>uplot</code>. See{" "}
+        <Link to="/guides/imports">import cheat sheet</Link>.
+      </p>
+
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>2. Hello world</h2>
       <div
         style={{
           border: "1px solid #e2e8f0",
@@ -76,20 +83,15 @@ export function StartPage(): ReactElement {
           title="p95 latency"
         />
       </div>
-      <pre
-        style={{
-          ...codeBlockStyle,
-          background: "#f1f5f9",
-          marginTop: 12,
-        }}
-      >
-        {QUICK_CODE}
-      </pre>
-      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 13 }}>
-        Scaffold a Vite dashboard:{" "}
-        <code>npx @axicharts/charts create-dashboard my-app --category cartesian</code>
+      <pre style={{ ...codeBlock("#f1f5f9", "#0f172a"), marginTop: 12 }}>{QUICK_CODE}</pre>
+
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>3. Theme</h2>
+      <pre style={codeBlock("#f1f5f9", "#0f172a")}>{THEME_CODE}</pre>
+
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>4. Layout + grow</h2>
+      <p style={{ ...docBodyStyle(), fontSize: 13 }}>
+        <code>ChartContainer</code> needs <code>minHeight</code> or <code>height</code> in flex/grid.
       </p>
-      <h2 style={{ fontSize: 16, marginTop: 28 }}>Live example</h2>
       <div
         style={{
           border: "1px solid #e2e8f0",
@@ -99,7 +101,7 @@ export function StartPage(): ReactElement {
           maxWidth: 640,
         }}
       >
-        <ChartContainer theme={cleanTheme} height={200}>
+        <ChartContainer theme={cleanTheme} minHeight={200}>
           <LineChart
             categories={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
             series={[{ name: "p95", data: [42, 38, 55, 49, 62, 58, 71] }]}
@@ -107,71 +109,51 @@ export function StartPage(): ReactElement {
           />
         </ChartContainer>
       </div>
-      <h2 style={{ fontSize: 16, marginTop: 28 }}>Source</h2>
-      <pre
-        style={{
-          ...codeBlockStyle,
-          background: "#f1f5f9",
-        }}
-      >
-        {CODE}
-      </pre>
+      <pre style={{ ...codeBlock("#f1f5f9", "#0f172a"), marginTop: 12 }}>{GROW_CODE}</pre>
 
-      <h2 id="planner-cli" style={{ fontSize: 16, marginTop: 28 }}>Dashboarder + planner CLI</h2>
-      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 14 }}>
-        Layer 3 runtime dashboards use <code>@axicharts/charts-runtime</code> with live adapter
-        feeds. Phase 3 <code>@axicharts/charts-planner</code> maps natural-language intent to a{" "}
-        <code>DashboardPlan.feed</code> — use the CLI locally, HTTP server, or Dashboarder{" "}
-        <strong>Plan</strong>.
-      </p>
-      <pre
-        style={{
-          ...codeBlockStyle,
-          background: "#0f172a",
-          color: "#e2e8f0",
-        }}
-      >
-        {PLANNER_CLI_CODE}
-      </pre>
-      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 13 }}>
-        <Link to="/runtime">Runtime SDK</Link>
-        {" · "}
-        <Link to="/runtime#planner-http">Planner HTTP API</Link>
-        {" · "}
-        <Link to="/runtime/import#planner-feeds">Planner feed gallery index</Link>
+      <p style={{ ...docBodyStyle(), marginTop: 20, fontSize: 13 }}>
+        Scaffold:{" "}
+        <code>npx @axicharts/charts create-dashboard my-app --category cartesian</code>
       </p>
 
-      <h2 id="share-import" style={{ fontSize: 16, marginTop: 28 }}>
-        Share ↔ import round-trip
+      <hr style={{ margin: "40px 0", border: "none", borderTop: "1px solid #e2e8f0" }} />
+
+      <h2 id="advanced" style={{ fontSize: 16 }}>
+        Advanced
       </h2>
-      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 14 }}>
-        Dashboarder <strong>Share</strong> exports portable JSON with planner <code>meta</code>{" "}
-        (layout, feed, template, mosaic preset). <strong>Import</strong> validates the envelope and
-        restores builder state — portable runtime embed JSON omits <code>meta</code>. Shipped
-        fixtures: <code>ops-dashboard.share.json</code> and <code>ops-workspace.workspace.json</code>.
+      <p style={docBodyStyle()}>
+        Add these when you need agents, portable JSON, or chart breadth beyond cartesian.
       </p>
-      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 13 }}>
-        <Link to="/runtime#share-import">Runtime share ↔ import flow</Link>
-        {" · "}
-        <Link to="/runtime/schema#share-meta">Schema § meta</Link>
-        {" · "}
-        <Link to="/runtime/import#share-import-track">Import gallery track notes</Link>
-        {" · "}
-        <Link to="/runtime/links#share-import">Deep-link presets</Link>
-      </p>
+      <ul style={{ fontSize: 14, lineHeight: 1.8, color: "#475569" }}>
+        <li>
+          <Link to="/spec/blocks">Cartesian spec + validation</Link> — <code>marks[]</code>,{" "}
+          <code>validateCartesianSpec</code>, <code>ejectPanel</code>
+        </li>
+        <li>
+          <Link to="/shadcn">Recharts / shadcn migration</Link> — registry, <code>chartConfig</code>
+        </li>
+        <li>
+          <Link to="/compare">Live ops compare</Link> — 5–10 Hz canvas vs Recharts SVG
+        </li>
+        <li>
+          <Link to="/runtime">Dashboard runtime + embed</Link> — mosaic, adapters, share/import
+        </li>
+      </ul>
 
-      <h2 id="storybook-round3" style={{ fontSize: 16, marginTop: 28 }}>
-        Storybook gates G–Q
+      <h2 id="architecture" style={{ fontSize: 16, marginTop: 28 }}>
+        Architecture
       </h2>
-      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 14 }}>
-        Acceptance mockups G–Q are all <strong>5/5</strong> after round 3 polish (C52–C62): KPI
-        tiles, freshness chips, SLO/plan references, and vertical callouts. Run{" "}
-        <code>pnpm storybook</code> locally or browse the live templates.
-      </p>
-      <p style={{ color: "#475569", maxWidth: 640, lineHeight: 1.6, fontSize: 13 }}>
-        <Link to="/verticals#storybook-round3">Vertical gallery release notes</Link>
-        {" · "}
-        <code>pnpm test:e2e:share-import</code>
+      <p style={{ ...docBodyStyle(), fontSize: 13 }}>
+        <Link to="/packages">All packages</Link> ·{" "}
+        <Link to="/spec">Spec layer</Link> ·{" "}
+        <Link to="/plugins">Community plugins</Link> ·{" "}
+        <a
+          href="https://github.com/Axidify/Dashboarder/tree/main/docs/charts"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Product RFCs (Dashboarder)
+        </a>
       </p>
     </div>
   );

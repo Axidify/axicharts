@@ -4,13 +4,21 @@ import { docColors, docRadii, docShadow } from "../styles/docTokens";
 
 const topLinks = [
   { to: "/", label: "Home" },
-  { to: "/start", label: "Getting started" },
+  { to: "/start", label: "Start here" },
+  { to: "/guides/choosing-your-path", label: "Choosing your path" },
+  { to: "/guides/imports", label: "Import cheat sheet" },
+  { to: "/benchmarks", label: "Benchmarks" },
+  { to: "/guides/agent-cartesian", label: "Agent cartesian" },
+  { to: "/guides/troubleshooting", label: "Troubleshooting" },
   { to: "/compare", label: "vs Recharts" },
   { to: "/shadcn", label: "shadcn gallery" },
+  { to: "/spec/blocks", label: "Blocks Playground" },
+] as const;
+
+const advancedLinks = [
   { to: "/templates/community", label: "Community templates" },
   { to: "/verticals", label: "Verticals" },
   { to: "/spec", label: "Spec layer" },
-  { to: "/spec/blocks", label: "Blocks Playground" },
 ] as const;
 
 const runtimeLinks = [
@@ -117,6 +125,23 @@ export function DocLayout(): ReactElement {
         >
           {topLinks.map((link) => (
             <NavItem key={link.to} to={link.to} label={link.label} end={link.to === "/"} />
+          ))}
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: "#94a3b8",
+              marginTop: 16,
+              marginBottom: 6,
+              paddingLeft: 10,
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+            }}
+          >
+            Advanced
+          </div>
+          {advancedLinks.map((link) => (
+            <NavItem key={link.to} to={link.to} label={link.label} />
           ))}
           <div
             style={{

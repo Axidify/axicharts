@@ -17,6 +17,23 @@ pnpm bench:all          # node + competitive browser
 
 Methodology: Dashboarder [PERFORMANCE.md](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/PERFORMANCE.md).
 
+**Docs:** [axidify.github.io/axicharts/benchmarks](https://axidify.github.io/axicharts/benchmarks) — category subpath table + line-only recipe.
+
+## Category entry subpaths (gzip, `pnpm size`)
+
+Measured entry-shim gzip — peers (`uplot`, `echarts`) excluded. CI: `.size-limit.json`.
+
+| Subpath | Entry gzip | Peers | Charts |
+|---------|------------|-------|--------|
+| `@axicharts/charts/quick` | 669 B | uplot | QuickLineChart |
+| `@axicharts/charts/cartesian` | 1.26 KB | uplot | Line, area, bar, combo, scatter |
+| `@axicharts/charts/distribution` | 743 B | echarts | Pie, funnel, boxplot, … |
+| `@axicharts/charts/financial` | 593 B | echarts | Waterfall, candlestick |
+| `@axicharts/charts/matrix` | 780 B | echarts | Heatmap, radar, treemap, … |
+| `@axicharts/charts (root)` | 2.03 KB | echarts + uplot | Full barrel — discouraged |
+
+Line-only dashboard: `pnpm add @axicharts/charts @axicharts/charts-theme uplot` — no `echarts`.
+
 ## Bundle size (gzip)
 
 | Package | Size | Budget | Pass |

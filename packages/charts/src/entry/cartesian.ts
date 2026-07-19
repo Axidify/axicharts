@@ -33,6 +33,14 @@ export {
   useChartInteraction,
 } from "../interaction/ChartInteractionContext";
 export {
+  buildChartPointerEvent,
+  normalizeChartCategories,
+  type ChartCategoryInput,
+  type ChartPointerEvent,
+  type ChartSeriesInput,
+} from "../interaction/chartPointerEvent";
+export { CategoryClickOverlay } from "../interaction/CategoryClickOverlay";
+export {
   ChartSyncGroup,
   useChartSync,
   useOptionalChartSync,

@@ -45,12 +45,19 @@ import {
   useCartesianAnimate,
   useLiveCrossfade,
 } from "../motion";
+import { CategoryClickOverlay } from "../interaction/CategoryClickOverlay";
+import {
+  normalizeChartCategories,
+  type ChartCategoryInput,
+  type ChartPointerEvent,
+  type ChartSeriesInput,
+} from "../interaction/chartPointerEvent";
 
 const LINE_SERIES_KINDS = ["line", "area"] as const;
 
 export type LineChartProps = {
-  categories?: string[];
-  series?: PlotSeries[];
+  categories?: ChartCategoryInput[];
+  series?: ChartSeriesInput[];
   data?: Record<string, unknown>[];
   children?: ReactNode;
   fill?: boolean;
@@ -70,6 +77,9 @@ export type LineChartProps = {
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
   animate?: ChartAnimate;
   liveAnimate?: LiveAnimate;
+  selectedCategoryIndex?: number;
+  onCategoryClick?: (event: ChartPointerEvent) => void;
+  onSeriesClick?: (event: ChartPointerEvent) => void;
 };
 
 type LinePlotProps = {
@@ -96,6 +106,11 @@ type LinePlotProps = {
   engine: "canvas" | "svg";
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
   seriesEnterDelayMs?: (seriesIndex: number) => number;
+  categoryMeta?: unknown[];
+  selectedCategoryIndex?: number;
+  onCategoryClick?: (event: ChartPointerEvent) => void;
+  onSeriesClick?: (event: ChartPointerEvent) => void;
+  dualAxisResolved?: boolean;
 };
 
 function LinePlot({
@@ -122,6 +137,11 @@ function LinePlot({
   engine,
   onMarkerDragEnd,
   seriesEnterDelayMs,
+  categoryMeta = [],
+  selectedCategoryIndex,
+  onCategoryClick,
+  onSeriesClick,
+  dualAxisResolved = false,
 }: LinePlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
@@ -199,6 +219,19 @@ function LinePlot({
         dualAxis={overlayDualAxis}
         onDragEnd={onMarkerDragEnd}
       />
+      <CategoryClickOverlay
+        width={Math.floor(size.width)}
+        height={plotHeight}
+        categories={categories}
+        categoryMeta={categoryMeta}
+        series={series}
+        compact={compact}
+        dualAxis={dualAxisResolved}
+        showLegend={showLegend}
+        selectedCategoryIndex={selectedCategoryIndex}
+        onCategoryClick={onCategoryClick}
+        onSeriesClick={onSeriesClick}
+      />
       {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
         <UPlotRangeOverview
           width={Math.floor(size.width)}
@@ -235,6 +268,9 @@ export function LineChart({
   onMarkerDragEnd,
   animate,
   liveAnimate: liveAnimateProp,
+  selectedCategoryIndex,
+  onCategoryClick,
+  onSeriesClick,
 }: LineChartProps): ReactElement | null {
   const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate } =
     useChartLayout();
@@ -249,9 +285,13 @@ export function LineChart({
     brush,
     brushEnd,
   });
+  const normalizedCategories = useMemo(
+    () => normalizeChartCategories(categoriesProp),
+    [categoriesProp],
+  );
   const { categories, series: resolvedSeries, valueSuffix, curve } = useResolvedCartesianProps(
     {
-      categories: categoriesProp,
+      categories: normalizedCategories.labels,
       series: seriesProp,
       data,
       children,
@@ -312,6 +352,7 @@ export function LineChart({
     showAxes ?? (theme.axis.show && !compact);
   const plotCategories = prepared.categories;
   const plotSeries = prepared.series;
+  const dualAxisResolved = stacked ? false : shouldUseDualAxis(series, dualAxis);
 
   return (
     <CartesianChartA11yRoot
@@ -360,6 +401,11 @@ export function LineChart({
             engine={engine}
             onMarkerDragEnd={onMarkerDragEnd}
             seriesEnterDelayMs={motion.seriesEnterDelayMs}
+            categoryMeta={normalizedCategories.meta}
+            selectedCategoryIndex={selectedCategoryIndex}
+            onCategoryClick={onCategoryClick}
+            onSeriesClick={onSeriesClick}
+            dualAxisResolved={dualAxisResolved}
           />
         }
       />

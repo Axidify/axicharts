@@ -4,40 +4,28 @@
 [![CI](https://github.com/Axidify/axicharts/actions/workflows/ci.yml/badge.svg)](https://github.com/Axidify/axicharts/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-**Free, open-source chart platform for React dashboards** — layout DX, live performance, and vertical breadth (finance, trading, resources, SaaS, ops) on one MIT-licensed stack.
+**MIT React charts for dashboards** — composable JSX, optional JSON spec, canvas when panels go live.
 
-**Direction (2026):** **Cartesian building blocks for AI agents** — one `type: "cartesian"` spec with composable `marks[]` (`bar`, `line`, `area`, `rule`, `band`), validated before render, compiling to the same React path humans edit via `ejectPanel`. Chart types (`LineChart`, `ComboChart`, …) become presets over the same blocks. See [packages/charts-spec/CARTESIAN.md](./packages/charts-spec/CARTESIAN.md) and planning [RFC-002](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/rfcs/RFC-002-cartesian-building-blocks.md).
-
-Line/bar/area via uPlot; pie, candlestick, waterfall, and heatmap via ECharts; industrial SVG primitives; `ChartContainer` that sizes correctly in flex/grid layouts.
-
-- **GitHub:** https://github.com/Axidify/axicharts
 - **npm:** [@axicharts/charts](https://www.npmjs.com/package/@axicharts/charts) · [@axicharts/charts-theme](https://www.npmjs.com/package/@axicharts/charts-theme)
+- **Docs:** https://axidify.github.io/axicharts/
 - **Storybook:** `pnpm storybook` → http://localhost:6006
-- **Docs:** `pnpm docs` → http://localhost:3001 ([GitHub Pages](https://axidify.github.io/axicharts/))
-- **Compare vs Recharts:** [live demo](https://axidify.github.io/axicharts/compare) · [benchmarks](benchmarks/BENCHMARKS.md)
-- **shadcn registry:** [install guide](https://axidify.github.io/axicharts/shadcn/registry) · [catalog](https://axidify.github.io/axicharts/registry/registry.json)
-- **Dashboarder:** `pnpm dashboarder` → http://localhost:3000
-- **License:** MIT
+- **Issues:** https://github.com/Axidify/axicharts/issues
 
-## Install
+---
 
-**Batteries included (recommended):**
+## Start here
 
-```bash
-pnpm add @axicharts/charts-full echarts uplot
-```
+**Goal:** one themed line chart in a React app — smallest install, no spec layer.
 
-**Modular (smallest bundle):**
+### 1. Install (line-only)
 
 ```bash
-pnpm add @axicharts/charts @axicharts/charts-theme echarts uplot
+pnpm add @axicharts/charts @axicharts/charts-theme uplot
 ```
 
-Peer dependencies: `react`, `react-dom`, `uplot`, `echarts`.
+Peers: `react`, `react-dom`, `uplot`. **No `echarts` required** for line/bar/area — see [import guide](https://axidify.github.io/axicharts/guides/imports).
 
-## Quick start
-
-### Simplest chart
+### 2. Render
 
 ```tsx
 import { QuickLineChart } from "@axicharts/charts/quick";
@@ -53,11 +41,61 @@ export function LatencySparkline() {
 }
 ```
 
-`QuickLineChart` wraps `ChartContainer` + `LineChart` with `cleanTheme`, `mode="static"`, and `width="100%"`. Optional props: `labels`, `title`, `height`, `theme`, `mode`.
+`QuickLineChart` wraps `ChartContainer` + `LineChart` with `cleanTheme` and sensible defaults.
 
-### Agent-safe cartesian spec (C136+)
+### 3. Theme
 
-Compose charts on the fly with a closed `marks[]` catalog — one tool surface for planners and MCP agents:
+```tsx
+import { cleanTheme, createTheme } from "@axicharts/charts-theme";
+
+const brandTheme = createTheme(cleanTheme, {
+  name: "acme",
+  bar: { radius: 8 },
+});
+```
+
+Copy `tokens.css` from `@axicharts/charts-theme` for shadcn `--chart-*` alignment.
+
+### 4. Layout + grow
+
+`ChartContainer` needs an explicit height (or `minHeight`) in flex/grid layouts:
+
+```tsx
+import { ChartContainer, LineChart } from "@axicharts/charts/cartesian";
+import { cleanTheme } from "@axicharts/charts-theme";
+
+<ChartContainer theme={cleanTheme} minHeight={280}>
+  <LineChart
+    categories={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+    series={[{ name: "p95", data: [42, 38, 55, 49, 62, 58, 71] }]}
+    fill
+  />
+</ChartContainer>
+```
+
+**Scaffold:** `npx @axicharts/charts create-dashboard my-app --category cartesian`
+
+**Choosing your path:** [docs /guides/choosing-your-path](https://axidify.github.io/axicharts/guides/choosing-your-path)
+
+---
+
+## Advanced
+
+Use these when you outgrow hand-built JSX — agents, codegen, or portable dashboard JSON.
+
+### Agent-safe cartesian spec
+
+One `type: "cartesian"` panel with composable `marks[]`, validated **before** render:
+
+```ts
+import { Chart, validateCartesianSpec, normalizeToCartesian } from "@axicharts/charts-spec";
+
+const panel = normalizeToCartesian(rawPanel);
+const check = validateCartesianSpec(panel, { rows: data });
+if (!check.ok) throw check.errors; // UNKNOWN_FIELD + suggestions
+
+<Chart panel={panel} data={data} />
+```
 
 ```json
 {
@@ -71,118 +109,49 @@ Compose charts on the fly with a closed `marks[]` catalog — one tool surface f
 }
 ```
 
-```ts
-import { Chart, validateCartesianSpec, normalizeToCartesian } from "@axicharts/charts-spec";
+- Full guide: [packages/charts-spec/CARTESIAN.md](./packages/charts-spec/CARTESIAN.md)
+- Playground: [docs /spec/blocks](https://axidify.github.io/axicharts/spec/blocks)
+- Eject to JSX: `npx @axicharts/charts-spec eject panel.json`
+- Agent tutorial: [docs /guides/agent-cartesian](https://axidify.github.io/axicharts/guides/agent-cartesian)
 
-const panel = normalizeToCartesian(rawPanel);
-const check = validateCartesianSpec(panel, { rows: data });
-if (!check.ok) throw check.errors; // field suggestions for agent retry
+### Migrating from Recharts / shadcn Charts
 
-<Chart panel={panel} data={data} />
-```
+Secondary path — not the default front door:
 
-Invalid specs fail **before** render (`UNKNOWN_FIELD`, `MISSING_DATA_MARK`, …). Legacy `line` / `combo` / `blocks` normalize to `cartesian`. Full guide: [packages/charts-spec/CARTESIAN.md](./packages/charts-spec/CARTESIAN.md).
+- Gallery: [docs /shadcn](https://axidify.github.io/axicharts/shadcn)
+- Registry: [docs /shadcn/registry](https://axidify.github.io/axicharts/shadcn/registry)
+- `chartConfig`, `<Cell fill />`, spec `encoding.color` parity
 
-### Full control
+### Live ops dashboards
 
-```tsx
-import { ChartContainer, LineChart } from "@axicharts/charts";
-import { cleanTheme } from "@axicharts/charts-theme";
+`mode="live"` + `liveTheme` for 5–10 Hz panels. Brush sync across charts: Storybook **Charts/BrushSync**. Compare: [docs /compare](https://axidify.github.io/axicharts/compare).
 
-export function LatencyPanel() {
-  return (
-    <ChartContainer theme={cleanTheme} height={200}>
-      <LineChart
-        categories={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
-        series={[{ name: "p95", data: [42, 38, 55, 49, 62, 58, 71] }]}
-        fill
-      />
-    </ChartContainer>
-  );
-}
-```
+---
 
-## Scaffold a dashboard
+## Architecture
 
-One command from npm (no clone required):
+Full platform stack — optional until you need embed, planner, or breadth chart types.
 
-```bash
-npx @axicharts/charts create-dashboard my-dashboard
-cd my-dashboard
-pnpm install
-pnpm dev
-```
+| Package | Role |
+|---------|------|
+| `@axicharts/charts` | React API — import **subpaths** (`/cartesian`, `/quick`, …) not root when possible |
+| `@axicharts/charts-theme` | `cleanTheme`, `liveTheme`, `industrialTheme`, `tokens.css` |
+| `@axicharts/charts-spec` | Templates, `validateCartesianSpec`, eject CLI |
+| `@axicharts/charts-runtime` | Embed SDK, adapters, mosaic layout |
+| `@axicharts/charts-planner` | Server planner — intent → panels (optional) |
+| `@axicharts/charts-full` | Meta-package — everything + spec + runtime |
 
-Pick a taxonomy category (`cartesian`, `distribution`, `financial`, `matrix`, `industrial`, `kpi`) or the full platform stack:
+**Import cheat sheet:** [docs /guides/imports](https://axidify.github.io/axicharts/guides/imports) · **Bundle sizes:** [docs /benchmarks](https://axidify.github.io/axicharts/benchmarks) · **Troubleshooting:** [docs /guides/troubleshooting](https://axidify.github.io/axicharts/guides/troubleshooting)
+
+**Batteries-included install** (pie, candlestick, heatmap, spec, runtime):
 
 ```bash
-npx @axicharts/charts create-dashboard ops-board --category distribution
-npx @axicharts/charts create-dashboard my-app --preset full
+pnpm add @axicharts/charts-full echarts uplot
 ```
 
-From the axicharts repo:
+Product RFCs and roadmap: [Dashboarder docs](https://github.com/Axidify/Dashboarder/tree/main/docs/charts)
 
-```bash
-pnpm create:dashboard my-dashboard
-cd my-dashboard
-pnpm install
-pnpm dev
-```
-
-### Category installs
-
-Tree-shaken category subpaths — install only the chart families you need:
-
-| Subpath | Charts | Peer deps |
-|---------|--------|-----------|
-| `@axicharts/charts/cartesian` | Line, area, bar, combo, scatter | `uplot` |
-| `@axicharts/charts/distribution` | Pie, funnel, boxplot, histogram | `echarts` |
-| `@axicharts/charts/financial` | Waterfall, candlestick | `echarts` |
-| `@axicharts/charts/matrix` | Heatmap, radar, treemap, … | `echarts` |
-| `@axicharts/charts/industrial` | Gauge, digital, status lamp | — |
-| `@axicharts/charts/kpi` | Stat + presentation motion | — |
-| `@axicharts/charts/quick` | `QuickLineChart` hello-world | `uplot` |
-| `@axicharts/charts/full` | Full barrel (same as root `.`) | 4 KB shim |
-| `@axicharts/charts-full` | Meta-package — charts + spec + runtime + theme | 3 KB shim |
-
-Per-chart subpaths: `@axicharts/charts/line`, `/bar`, `/area`, `/pie`, `/candlestick`, `/waterfall`, `/heatmap`.
-
-## Migrating from Recharts / shadcn Charts
-
-- **Same admin patterns** — `chartConfig` labels/colors, per-category `<Cell fill />`, area/line segmentation via `encoding.color`
-- **Spec + eject** — panel JSON compiles to React; `ejectPanel` preserves Cell fills for hand-editing
-- **Live when you need it** — uPlot canvas path for 5–10 Hz dashboards ([compare demo](https://axidify.github.io/axicharts/compare))
-
-Gallery: [docs `/shadcn`](https://axidify.github.io/axicharts/shadcn) · [shadcn registry install](https://axidify.github.io/axicharts/shadcn/registry) · [community templates](https://axidify.github.io/axicharts/templates/community) · Storybook **Charts/ShadcnParity** · Examples in `packages/charts-spec/examples/`
-
-```bash
-# shadcn custom registry (bar/line/donut/area/stacked-bar + chartConfig lib)
-npx shadcn@latest add https://axidify.github.io/axicharts/registry/chart-axi-bar.json
-```
-
-Registry CI: `pnpm test:registry` (validates source + dry-runs `shadcn add`).
-
-Visual regression: `pnpm test:visual` (static Storybook + Playwright snapshots; `UPDATE_SNAPSHOTS=1 pnpm test:visual` to refresh baselines).
-
-Chart catalog: Storybook **Charts/Catalog → AllTypes**.
-
-## Packages
-
-| Package | Description |
-|---------|-------------|
-| `@axicharts/charts-full` | **Recommended** — meta-package: full charts + spec + runtime + theme |
-| `@axicharts/charts` | React API — all chart types, primitives, registry, formatters |
-| `@axicharts/charts-theme` | `cleanTheme`, `liveTheme`, `industrialTheme`, CSS tokens |
-| `@axicharts/charts-canvas` | uPlot — line, bar, area (live path) |
-| `@axicharts/charts-echarts` | ECharts — pie, candlestick, waterfall, heatmap |
-| `@axicharts/charts-core` | Layout math + `formatTick` / `registerTickFormat` |
-| `@axicharts/charts-spec` | Vertical templates, rules planner, eject CLI, **cartesian `marks[]` + validation** |
-| `@axicharts/charts-planner` | Server planner — intent → panels; **migrating to `cartesian` emits** (C139) |
-| `@axicharts/charts-runtime` | Data adapters, embed SDK, spec portability |
-| `@axicharts/charts-tank` | Community plugin — tank level chart (`registerChartType`) |
-| `@axicharts/charts-geo` | Community plugin — regional cartogram map (`registerChartType`) |
-| `@axicharts/charts-andon` | Community plugin — production andon board (`registerChartType`) |
-| `@axicharts/charts-sankey` | Community plugin — Sankey flow diagram (`registerChartType`, ECharts) |
+---
 
 ## Develop
 
@@ -190,34 +159,15 @@ Chart catalog: Storybook **Charts/Catalog → AllTypes**.
 pnpm install
 pnpm build
 pnpm test
-pnpm --filter @axicharts/charts-spec test compositionSimulation  # RFC-002 cartesian gate
-pnpm ci          # full local mirror when GitHub Actions minutes are limited
-pnpm test:perf   # uPlot update gates (500 / 5k / 10k + 6-panel)
-pnpm bench       # collect published numbers → benchmarks/BENCHMARKS.md
-pnpm bench:browser  # Chromium competitive vs Recharts/ECharts
-pnpm size        # bundle gzip budgets
-pnpm test:registry  # shadcn registry validate + add dry-run E2E
 pnpm storybook
-pnpm docs
+pnpm docs        # → http://localhost:3001
+pnpm size        # bundle gzip budgets
 ```
-
-## Storybook gates
-
-**Round 2 (universal + ops):** G, H, I, J, K, L + Industrial Primitives — baseline **4/5**  
-**Round 3 (all verticals):** **G–Q all 5/5** — KPI tiles, callouts, SLO/plan references (`C52–C62`)  
-**Round 4 (presentation):** **E · Presentation 5/5** — hero KPI, deck callout, bold charts (`C65`)
-
-**Granular styling (C68–C73):** Bar/Line/Area `<Cell fill />` + spec `encoding.color` — same renderer path for JSX and AI. Examples: `packages/charts-spec/examples/` · Storybook **ShadcnParity** / **RechartsCompare**.
-
-Gates: G · SaaS clean · H · Rich ops · I · Detailed bars · J · Dual series · K · KPI + chart · L · Grid cells · M · Finance · N · Trading · O · Resources · P · Plugins wall · Q · Program dashboard · **E · Presentation**
 
 ## Community
 
-- [Contributing](./CONTRIBUTING.md)
-- [Code of conduct](./CODE_OF_CONDUCT.md)
-- [Changelog](./CHANGELOG.md)
-- [GitHub releases](https://github.com/Axidify/axicharts/releases)
-- Product RFCs and governance: [Dashboarder docs](https://github.com/Axidify/Dashboarder/tree/main/docs)
+- [Contributing](./CONTRIBUTING.md) · [Code of conduct](./CODE_OF_CONDUCT.md) · [Changelog](./CHANGELOG.md)
+- Adoption track: [Axidify/axicharts#3](https://github.com/Axidify/axicharts/issues/3)
 
 ## License
 

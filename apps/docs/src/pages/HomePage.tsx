@@ -2,26 +2,6 @@ import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { docBodyStyle, docCardStyle, docColors, docRadii } from "../styles/docTokens";
 
-const layers = [
-  {
-    title: "Layer 1",
-    package: "@axicharts/charts",
-    description: "Composable React charts — line, bar, area, pie, candlestick, and more.",
-  },
-  {
-    title: "Layer 2",
-    package: "@axicharts/charts-spec",
-    description: "Templates, planner, and spec-driven dashboards.",
-    href: "/spec",
-  },
-  {
-    title: "Runtime",
-    package: "@axicharts/charts-runtime",
-    description: "Live data adapters, embed SDK, validation, and import gallery.",
-    href: "/runtime",
-  },
-] as const;
-
 export function HomePage(): ReactElement {
   return (
     <div>
@@ -34,12 +14,11 @@ export function HomePage(): ReactElement {
         }}
       >
         <h1 style={{ marginTop: 0, fontSize: 34, letterSpacing: "-0.03em", lineHeight: 1.15 }}>
-          The React chart platform for dashboards
+          React charts for dashboards
         </h1>
-        <p style={{ ...docBodyStyle(), fontSize: 16, marginBottom: 0 }}>
-          AxiCharts ships line, bar, area, pie, candlestick, waterfall, and heatmap charts with
-          industrial primitives, live themes, spec-driven templates, community plugins, and a
-          portable runtime embed SDK.
+        <p style={{ ...docBodyStyle(), fontSize: 16, marginBottom: 0, maxWidth: 560 }}>
+          Composable JSX, optional JSON spec, canvas when panels go live. Start with{" "}
+          <code>QuickLineChart</code> — add cartesian spec when agents need it.
         </p>
         <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
           <Link
@@ -54,10 +33,10 @@ export function HomePage(): ReactElement {
               fontWeight: 500,
             }}
           >
-            Get started
+            Start here
           </Link>
           <Link
-            to="/verticals"
+            to="/guides/choosing-your-path"
             style={{
               padding: "10px 16px",
               borderRadius: docRadii.md,
@@ -69,10 +48,10 @@ export function HomePage(): ReactElement {
               background: docColors.surface,
             }}
           >
-            Browse verticals
+            Choosing your path
           </Link>
           <Link
-            to="/compare"
+            to="/guides/imports"
             style={{
               padding: "10px 16px",
               borderRadius: docRadii.md,
@@ -84,66 +63,51 @@ export function HomePage(): ReactElement {
               background: docColors.surface,
             }}
           >
-            Live vs Recharts
-          </Link>
-          <Link
-            to="/shadcn"
-            style={{
-              padding: "10px 16px",
-              borderRadius: docRadii.md,
-              border: `1px solid ${docColors.border}`,
-              color: docColors.text,
-              textDecoration: "none",
-              fontSize: 14,
-              fontWeight: 500,
-              background: docColors.surface,
-            }}
-          >
-            shadcn gallery
-          </Link>
-          <Link
-            to="/verticals#storybook-round3"
-            style={{
-              padding: "10px 16px",
-              borderRadius: docRadii.md,
-              color: docColors.accent,
-              textDecoration: "none",
-              fontSize: 14,
-              fontWeight: 500,
-            }}
-          >
-            Storybook gates G–Q →
+            Import cheat sheet
           </Link>
         </div>
       </div>
 
-      <section>
-        <h2 style={{ fontSize: 18, marginTop: 0 }}>Stack layers</h2>
-        <div style={{ display: "grid", gap: 12 }}>
-          {layers.map((layer) => (
-            <div
-              key={layer.package}
-              style={{
-                ...docCardStyle(),
-                padding: "14px 16px",
-                boxShadow: "none",
-              }}
-            >
-              <div style={{ fontSize: 13, fontWeight: 600, color: docColors.text }}>
-                {layer.title} — <code>{layer.package}</code>
-              </div>
-              <p style={{ margin: "6px 0 0", fontSize: 13, color: docColors.muted, lineHeight: 1.5 }}>
-                {layer.description}
-                {"href" in layer && layer.href ? (
-                  <>
-                    {" "}
-                    <Link to={layer.href}>Learn more</Link>
-                  </>
-                ) : null}
-              </p>
-            </div>
-          ))}
-        </div>
+      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
+        {[
+          {
+            title: "Start here",
+            body: "QuickLineChart → theme → ChartContainer. uPlot only — no ECharts.",
+            to: "/start",
+          },
+          {
+            title: "Advanced",
+            body: "Cartesian marks[], validateCartesianSpec, eject to JSX.",
+            to: "/spec/blocks",
+          },
+          {
+            title: "shadcn / Recharts",
+            body: "Migration gallery and registry — secondary path.",
+            to: "/shadcn",
+          },
+          {
+            title: "Live ops",
+            body: "5–10 Hz compare wall vs Recharts and ECharts.",
+            to: "/compare",
+          },
+        ].map((card) => (
+          <Link
+            key={card.to}
+            to={card.to}
+            style={{
+              ...docCardStyle(),
+              padding: "16px 18px",
+              boxShadow: "none",
+              textDecoration: "none",
+              color: "inherit",
+            }}
+          >
+            <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 6 }}>{card.title}</div>
+            <p style={{ margin: 0, fontSize: 13, color: docColors.muted, lineHeight: 1.5 }}>
+              {card.body}
+            </p>
+          </Link>
+        ))}
       </section>
     </div>
   );
