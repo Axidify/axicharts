@@ -1,5 +1,5 @@
 import { createElement, type ReactElement } from "react";
-import { Dashboard, compileTemplate } from "@axicharts/charts-spec";
+import { Chart, Dashboard, compileTemplate } from "@axicharts/charts-spec";
 import {
   compileFinancePnlDeckSlide,
   compileLineOverviewDeckSlide,
@@ -52,6 +52,25 @@ export function buildDeckSlideContent(
       mode,
       data: cellData,
     });
+  }
+
+  if (spec.layout === "panels") {
+    const block =
+      spec.panels.charts.find(
+        (item, index) => (item.questionId ?? `chart-${index}`) === slide.id,
+      ) ?? spec.panels.charts[0];
+    if (!block) {
+      return createElement("div", null, "No tabular charts");
+    }
+    return createElement(
+      "div",
+      { className: "axicharts-deck-slide-full", style: { width: "100%", maxWidth: 900 } },
+      createElement(Chart, {
+        panel: block.panel,
+        data: { rows: block.rows },
+        height: 360,
+      }),
+    );
   }
 
   const dashboard = spec.dashboard;

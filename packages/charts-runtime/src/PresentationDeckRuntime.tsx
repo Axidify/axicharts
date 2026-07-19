@@ -41,7 +41,11 @@ export function PresentationDeckRuntime({
 
   const deckTitle =
     title ??
-    (spec.layout === "mosaic" ? spec.wall.title : spec.dashboard.title) ??
+    (spec.layout === "mosaic"
+      ? spec.wall.title
+      : spec.layout === "panels"
+        ? spec.panels.title
+        : spec.dashboard.title) ??
     "Presentation deck";
 
   return (
