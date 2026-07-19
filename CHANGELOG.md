@@ -10,7 +10,11 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ### Added
 
-- (nothing yet)
+- JSON Schema export: `cartesian-panel.schema.json` (marks `oneOf` per type) and `data-profile.schema.json` via `pnpm export:schemas`
+
+### Fixed
+
+- Dashboarder app TypeScript errors (`typecheck` clean)
 
 ## [0.3.52] - 2026-07-19
 
