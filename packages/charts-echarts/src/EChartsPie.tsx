@@ -10,8 +10,7 @@ import { gridOptions, hiddenTooltip, seriesPalette } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { resolvePieSliceColor } from "./pieSliceColor";
-import { pieGapOptions } from "./pieGapOptions";
-import { pieOuterRadius } from "./pieLayout";
+import { pieGapOptions, pieOuterRadius } from "./pieLayout";
 import type { PieSlice } from "./types";
 
 export type EChartsPieProps = {
