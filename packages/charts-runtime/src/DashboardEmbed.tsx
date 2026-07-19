@@ -1,8 +1,9 @@
 "use client";
 
-import type { ReactElement } from "react";
+import { useMemo, type ReactElement } from "react";
 import { Dashboard } from "@axicharts/charts-spec";
 import { aggregateSnapshots, mergeDashboardData } from "./aggregateSnapshots";
+import { dataSourceSpecKey } from "./dataSourceSpecKey";
 import { readAlarms } from "./readAlarms";
 import { RuntimeShell } from "./RuntimeShell";
 import { isLiveDataSource } from "./isLiveDataSource";
@@ -31,12 +32,15 @@ export function DashboardEmbed({
   adapterFixtureHref,
 }: DashboardEmbedProps): ReactElement {
   const multiSources = dashboard.dataSources;
+  const staticDataKey = dashboard.data ? dataSourceSpecKey({ type: "static", data: dashboard.data }) : "";
+  const singleSource = useMemo(() => {
+    if (dashboard.dataSource) return dashboard.dataSource;
+    if (dashboard.data && !multiSources?.length) {
+      return { type: "static" as const, data: dashboard.data };
+    }
+    return undefined;
+  }, [dashboard.dataSource, multiSources, staticDataKey]);
   const snapshots = useDataSources(multiSources);
-  const singleSource =
-    dashboard.dataSource ??
-    (dashboard.data && !multiSources?.length
-      ? { type: "static" as const, data: dashboard.data }
-      : undefined);
   const singleSnapshot = useDataSource(multiSources?.length ? undefined : singleSource);
   const snapshot = multiSources?.length
     ? aggregateSnapshots(snapshots, dashboard.dataSourceId)

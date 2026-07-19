@@ -39,9 +39,10 @@ export function CsvDashboardGuidePage(): ReactElement {
           <li>You are fine with cartesian line/bar panels (planner rules)</li>
         </ul>
         <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b" }}>
-          Prefer <Link to="/runtime">RuntimeDashboard</Link> only for live ops walls with adapters.
-          For CSV dashboards, per-panel <code>Chart</code> is the stable default (see{" "}
-          <Link to="/guides/troubleshooting">troubleshooting</Link>).
+          Prefer <Link to="/runtime">RuntimeDashboard</Link> for live ops walls with adapters.
+          Static <code>dashboard.data</code> embeds are stable (v0.4.6+). For CSV uploads, per-panel{" "}
+          <code>Chart</code> is still the lighter default (see{" "}
+          <Link to="/guides/csv-dashboard">CSV guide</Link>).
         </p>
       </div>
 
@@ -121,8 +122,9 @@ pnpm csv-dashboard   # http://localhost:3002`}
         </li>
         <li>OHLC / candlestick column groups from trading CSVs — needs richer profiling</li>
         <li>
-          <code>RuntimeDashboard</code> stability with static CSV + React 19 — use per-panel{" "}
-          <code>Chart</code> until fixed
+          <code>RuntimeDashboard</code> with static <code>dashboard.data</code> — stable since v0.4.6
+          (spec key dedupes inline static sources). For CSV uploads, per-panel <code>Chart</code> remains
+          the lighter default.
         </li>
       </ul>
 

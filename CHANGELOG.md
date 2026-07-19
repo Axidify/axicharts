@@ -8,6 +8,12 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
+## [0.4.6] - 2026-07-19
+
+### Fixed
+
+- **C147e** — `DashboardEmbed` / `useDataSource` stable with static `dashboard.data` (no reconnect loop on inline spec objects); `dataSourceSpecKey` for serializable adapter identity
+
 ## [0.4.5] - 2026-07-19
 
 ### Added

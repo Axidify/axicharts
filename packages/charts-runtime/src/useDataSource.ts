@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { connectSource } from "./connectSource";
+import { dataSourceSpecKey } from "./dataSourceSpecKey";
 import type { DataSourceSnapshot, DataSourceSpec } from "./types";
 import { EMPTY_SNAPSHOT } from "./aggregateSnapshots";
 
@@ -15,15 +16,19 @@ function initialSnapshot(spec: DataSourceSpec | undefined): DataSourceSnapshot {
 }
 
 export function useDataSource(spec: DataSourceSpec | undefined): DataSourceSnapshot {
+  const specRef = useRef(spec);
+  specRef.current = spec;
+  const specKey = dataSourceSpecKey(spec);
   const [snapshot, setSnapshot] = useState<DataSourceSnapshot>(() => initialSnapshot(spec));
 
   useEffect(() => {
-    if (!spec) {
+    const current = specRef.current;
+    if (!current) {
       setSnapshot(EMPTY_SNAPSHOT);
       return;
     }
-    return connectSource(spec, setSnapshot);
-  }, [spec]);
+    return connectSource(current, setSnapshot);
+  }, [specKey]);
 
   return snapshot;
 }
