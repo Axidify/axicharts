@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-spec",
-  "version": "0.4.15",
+  "version": "0.4.16",
   "description": "Layer 2 panel spec compiler and vertical templates for AxiCharts.",
   "license": "MIT",
   "repository": {

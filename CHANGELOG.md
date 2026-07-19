@@ -10,6 +10,28 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.16] - 2026-07-19
+
+### Added
+
+- **C167** — Panels spec persists `decisions` and round-trips through workspace JSON validation
+
+### Changed
+
+- **charts-spec** — Agent integration tests use `planDashboardFromRows` (removed app-local `agentPlan*` imports)
+
+### Fixed
+
+- **charts-spec** — `tsconfig.json` `noEmit: true` — fixes IDE TS5055 when `dist/` exists alongside `src/`
+
+### Axiboard app (monorepo, not npm)
+
+- **C167** — `TabularUploadView` replaces R&D flow; orchestrator-only (no `/api/rnd`)
+- **C167** — `DecisionLog` on upload + saved dashboard; legacy `src/rnd/*` removed
+- **C167** — Workspace is the only tabular persistence layer
+
+See [RELEASE-v0.4.16.md](./RELEASE-v0.4.16.md).
+
 ## [0.4.15] - 2026-07-19
 
 ### Added
