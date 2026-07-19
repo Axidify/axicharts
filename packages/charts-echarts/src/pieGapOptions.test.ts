@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { presentationTheme, liveTheme } from "@axicharts/charts-theme";
-import { pieGapOptions } from "./pieGapOptions";
-import { pieOuterRadius } from "./pieLayout";
+import { pieGapOptions, pieOuterRadius } from "./pieLayout";
 
 describe("pieLayout", () => {
   it("keeps full pies full and only donuts when innerRadius is set", () => {
