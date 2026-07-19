@@ -8,6 +8,7 @@
     "storybook": "pnpm --filter @axicharts/storybook dev",
     "dashboarder": "pnpm --filter @axicharts/dashboarder dev",
     "planner": "pnpm --filter @axicharts/charts-planner exec charts-planner serve",
+    "mcp": "pnpm --filter @axicharts/charts-mcp exec charts-mcp",
     "docs": "pnpm --filter @axicharts/docs dev",
     "lint": "turbo run lint",
     "test": "turbo run test",
