@@ -24,7 +24,12 @@ export const brandTheme = createTheme(cleanTheme, {
   bar: { radius: 8 },
 });`;
 
-const GROW_CODE = `import { ChartContainer, LineChart } from "@axicharts/charts/cartesian";
+const GROW_CODE = `import {
+  ChartContainer,
+  LineChart,
+  type ChartCategoryInput,
+  type ChartPointerEvent,
+} from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
 
 export function LatencyPanel() {
@@ -34,6 +39,44 @@ export function LatencyPanel() {
         categories={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
         series={[{ name: "p95", data: [42, 38, 55, 49, 62, 58, 71] }]}
         fill
+      />
+    </ChartContainer>
+  );
+}`;
+
+const FILTER_CODE = `import { useState } from "react";
+import {
+  ChartContainer,
+  LineChart,
+  type ChartCategoryInput,
+  type ChartPointerEvent,
+} from "@axicharts/charts";
+import { cleanTheme } from "@axicharts/charts-theme";
+
+type WeekMeta = { date: string };
+
+const DAYS: ChartCategoryInput<WeekMeta>[] = [
+  { label: "Mon", meta: { date: "2026-07-13" } },
+  { label: "Tue", meta: { date: "2026-07-14" } },
+  // …
+];
+
+export function WeekFilterChart() {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const onCategoryClick = (e: ChartPointerEvent<WeekMeta>) => {
+    setActiveIndex(e.categoryIndex);
+    // e.meta?.date — typed, no cast
+  };
+
+  return (
+    <ChartContainer theme={cleanTheme} minHeight={280}>
+      <LineChart
+        categories={DAYS}
+        series={[{ name: "Throughput", data: [12, 8, 15, 10, 14] }]}
+        fill
+        selectedCategoryIndex={activeIndex ?? undefined}
+        onCategoryClick={onCategoryClick}
       />
     </ChartContainer>
   );
@@ -110,6 +153,13 @@ export function StartPage(): ReactElement {
         </ChartContainer>
       </div>
       <pre style={{ ...codeBlock("#f1f5f9", "#0f172a"), marginTop: 12 }}>{GROW_CODE}</pre>
+
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>5. Chart as filter</h2>
+      <p style={{ ...docBodyStyle(), fontSize: 13 }}>
+        Category clicks replace a separate chip row. Zeros still emit — skip drilldowns in your
+        handler when <code>value === 0</code> or the week is flat (app policy).
+      </p>
+      <pre style={{ ...codeBlock("#f1f5f9", "#0f172a") }}>{FILTER_CODE}</pre>
 
       <p style={{ ...docBodyStyle(), marginTop: 20, fontSize: 13 }}>
         Scaffold:{" "}

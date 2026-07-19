@@ -47,4 +47,17 @@ describe("buildChartPointerEvent", () => {
     expect(event.value).toBe(0);
     expect(event.seriesName).toBe("A");
   });
+
+  it("preserves typed category meta", () => {
+    type WeekMeta = { date: string };
+    const event = buildChartPointerEvent<WeekMeta>({
+      categoryIndex: 0,
+      labels: ["Mon"],
+      categoryMeta: [{ date: "2026-07-13" }],
+      series: [{ name: "A", data: [1] }],
+      seriesIndex: null,
+      nativeEvent: { type: "click" } as PointerEvent,
+    });
+    expect(event.meta?.date).toBe("2026-07-13");
+  });
 });

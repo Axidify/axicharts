@@ -1,29 +1,29 @@
 import type { PlotSeries } from "@axicharts/charts-canvas";
 
-export type ChartCategoryInput =
+export type ChartCategoryInput<TMeta = unknown> =
   | string
   | {
       label: string;
-      meta?: unknown;
+      meta?: TMeta;
     };
 
-export type ChartSeriesInput = PlotSeries & {
-  meta?: unknown;
+export type ChartSeriesInput<TSeriesMeta = unknown> = PlotSeries & {
+  meta?: TSeriesMeta;
 };
 
-export type NormalizedChartCategories = {
+export type NormalizedChartCategories<TMeta = unknown> = {
   labels: string[];
-  meta: unknown[];
+  meta: (TMeta | undefined)[];
 };
 
-export function normalizeChartCategories(
-  categories: ChartCategoryInput[] | undefined,
-): NormalizedChartCategories {
+export function normalizeChartCategories<TMeta = unknown>(
+  categories: ChartCategoryInput<TMeta>[] | undefined,
+): NormalizedChartCategories<TMeta> {
   if (!categories?.length) {
     return { labels: [], meta: [] };
   }
   const labels: string[] = [];
-  const meta: unknown[] = [];
+  const meta: (TMeta | undefined)[] = [];
   for (const item of categories) {
     if (typeof item === "string") {
       labels.push(item);
@@ -36,7 +36,7 @@ export function normalizeChartCategories(
   return { labels, meta };
 }
 
-export type ChartPointerEvent = {
+export type ChartPointerEvent<TMeta = unknown> = {
   /** Category label as passed in `categories` */
   category: string;
   /** Index into categories / series data — primary key for filters */
@@ -47,11 +47,11 @@ export type ChartPointerEvent = {
   /** Value at category when series is resolved */
   value: number | null;
   /** Category meta, or merged `{ ...categoryMeta, ...seriesMeta }` when series hit */
-  meta?: unknown;
+  meta?: TMeta;
   nativeEvent: globalThis.Event;
 };
 
-export function buildChartPointerEvent({
+export function buildChartPointerEvent<TMeta = unknown>({
   categoryIndex,
   labels,
   categoryMeta,
@@ -61,11 +61,11 @@ export function buildChartPointerEvent({
 }: {
   categoryIndex: number;
   labels: string[];
-  categoryMeta: unknown[];
+  categoryMeta: (TMeta | undefined)[];
   series: ChartSeriesInput[];
   seriesIndex: number | null;
   nativeEvent: globalThis.Event;
-}): ChartPointerEvent {
+}): ChartPointerEvent<TMeta> {
   const category = labels[categoryIndex] ?? "";
   const baseMeta = categoryMeta[categoryIndex];
   if (seriesIndex == null) {
@@ -84,7 +84,7 @@ export function buildChartPointerEvent({
   const seriesMeta = hit?.meta;
   const meta =
     baseMeta !== undefined || seriesMeta !== undefined
-      ? { ...(baseMeta as object), ...(seriesMeta as object) }
+      ? ({ ...(baseMeta as object), ...(seriesMeta as object) } as TMeta)
       : undefined;
   return {
     category,

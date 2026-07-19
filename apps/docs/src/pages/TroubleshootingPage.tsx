@@ -98,6 +98,17 @@ const LatencyPanel = dynamic(
         </p>
       </section>
 
+      <section style={{ ...docCardStyle(), padding: 20, marginBottom: 16, boxShadow: "none" }}>
+        <h2 style={{ margin: "0 0 10px", fontSize: 16 }}>Zero / flat weeks and click policy</h2>
+        <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
+          Charts always emit category clicks (including <code>value === 0</code> and all-zero weeks).
+          A flat-zero caption hints when every series is zero. Whether to open a drilldown or no-op
+          is <strong>app policy</strong> — check <code>value</code> and <code>meta</code> in{" "}
+          <code>onCategoryClick</code>; optionally use <code>cursor: default</code> on no-op bands in
+          your own chrome.
+        </p>
+      </section>
+
       <section style={{ ...docCardStyle(), padding: 20, boxShadow: "none" }}>
         <h2 style={{ margin: "0 0 10px", fontSize: 16 }}>Experimental imports</h2>
         <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.6 }}>

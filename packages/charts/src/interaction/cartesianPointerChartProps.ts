@@ -4,19 +4,20 @@ import {
   type ChartCategoryInput,
   type ChartPointerEvent,
   type ChartSeriesInput,
+  type NormalizedChartCategories,
 } from "./chartPointerEvent";
 
-export type CartesianPointerChartProps = {
-  categories?: ChartCategoryInput[];
+export type CartesianPointerChartProps<TMeta = unknown> = {
+  categories?: ChartCategoryInput<TMeta>[];
   series?: ChartSeriesInput[];
   selectedCategoryIndex?: number;
-  onCategoryClick?: (event: ChartPointerEvent) => void;
-  onSeriesClick?: (event: ChartPointerEvent) => void;
+  onCategoryClick?: (event: ChartPointerEvent<TMeta>) => void;
+  onSeriesClick?: (event: ChartPointerEvent<TMeta>) => void;
 };
 
-export function useCartesianCategoryMeta(
-  categoriesProp: ChartCategoryInput[] | undefined,
-): ReturnType<typeof normalizeChartCategories> {
+export function useCartesianCategoryMeta<TMeta = unknown>(
+  categoriesProp: ChartCategoryInput<TMeta>[] | undefined,
+): NormalizedChartCategories<TMeta> {
   return useMemo(() => normalizeChartCategories(categoriesProp), [categoriesProp]);
 }
 

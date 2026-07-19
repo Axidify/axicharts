@@ -1,9 +1,11 @@
 import { useState, type ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { ChartContainer, LineChart } from "@axicharts/charts";
+import { ChartContainer, LineChart, type ChartCategoryInput } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
 
-const DAYS = [
+type DayMeta = { date: string };
+
+const DAYS: ChartCategoryInput<DayMeta>[] = [
   { label: "Mon", meta: { date: "2026-07-13" } },
   { label: "Tue", meta: { date: "2026-07-14" } },
   { label: "Wed", meta: { date: "2026-07-15" } },
@@ -74,8 +76,7 @@ function PortfolioFilterDemo(): ReactElement {
       >
         {selected ? (
           <>
-            Filter active: <strong>{selected.label}</strong> (
-            {(selected.meta as { date: string }).date})
+            Filter active: <strong>{selected.label}</strong> ({selected.meta?.date})
           </>
         ) : (
           <span style={{ color: "#94a3b8" }}>No day selected — click a category on the chart</span>

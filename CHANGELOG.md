@@ -8,6 +8,13 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-07-19
+
+### Added
+
+- Generic `ChartPointerEvent<TMeta>` and `ChartCategoryInput<TMeta>` for typed category `meta` (no cast in handlers)
+- Start here docs: chart-as-filter snippet with typed imports; troubleshooting note on zero/flat-week click policy (app-owned)
+
 ## [0.4.1] - 2026-07-19
 
 ### Fixed

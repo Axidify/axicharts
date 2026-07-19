@@ -53,7 +53,7 @@ import type { ChartPointerEvent, ChartSeriesInput } from "../interaction/chartPo
 
 const BAR_SERIES_KINDS = ["bar"] as const;
 
-export type BarChartProps = CartesianPointerChartProps & {
+export type BarChartProps<TMeta = unknown> = CartesianPointerChartProps<TMeta> & {
   series?: ChartSeriesInput[];
   data?: Record<string, unknown>[];
   children?: ReactNode;

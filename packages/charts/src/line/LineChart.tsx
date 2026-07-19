@@ -56,7 +56,7 @@ import type { ChartPointerEvent, ChartSeriesInput } from "../interaction/chartPo
 
 const LINE_SERIES_KINDS = ["line", "area"] as const;
 
-export type LineChartProps = CartesianPointerChartProps & {
+export type LineChartProps<TMeta = unknown> = CartesianPointerChartProps<TMeta> & {
   series?: ChartSeriesInput[];
   data?: Record<string, unknown>[];
   children?: ReactNode;
@@ -77,9 +77,6 @@ export type LineChartProps = CartesianPointerChartProps & {
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
   animate?: ChartAnimate;
   liveAnimate?: LiveAnimate;
-  selectedCategoryIndex?: number;
-  onCategoryClick?: (event: ChartPointerEvent) => void;
-  onSeriesClick?: (event: ChartPointerEvent) => void;
 };
 
 type LinePlotProps = {
