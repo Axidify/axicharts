@@ -39,13 +39,9 @@ Branch: `feat/rfc-002-c136-cartesian`
 
 ## Publish
 
-```bash
-cd axicharts
-pnpm install
-pnpm build
-pnpm test
-# Create GitHub release → triggers .github/workflows/publish.yml
-```
+**Status:** Published to npm on 2026-07-19 ([workflow run 29671049265](https://github.com/Axidify/axicharts/actions/runs/29671049265), branch `feat/rfc-002-c136-cartesian` @ `1817fee`).
+
+Note: GitHub release tag `v0.3.52` still points at `b8e3f46`; npm packages ship the post-fix commit via `workflow_dispatch`.
 
 ## Remaining for v0.4.0
 
