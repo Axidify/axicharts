@@ -4,7 +4,7 @@ import type { OrchestratorChatResult } from "../types";
 
 export const PERSISTENCE_VERSION = 1 as const;
 
-export type RndSlug = "ledger" | "sales" | "attendance";
+export type RndSlug = "tabular" | "ledger" | "sales" | "attendance";
 
 export type RndSession = {
   csv: string;

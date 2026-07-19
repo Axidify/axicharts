@@ -87,3 +87,17 @@ describe("C156 planning — persona + question catalogs", () => {
     expect(ranked.ranked.some((r) => r.question.id === "ledger.chart.payment_method")).toBe(true);
   });
 });
+
+describe("C164 planDashboardFromRows — domain decision log", () => {
+  it("records classifyTabularDomain in decisions with confidence", async () => {
+    const { planDashboardFromRows } = await import("./planDashboardFromRows");
+    const rows = parseTabular(LEDGER_TEXT);
+    const plan = planDashboardFromRows(rows);
+    expect(plan).not.toBeNull();
+
+    const domainDecision = plan!.decisions.find((entry) => entry.api === "classifyTabularDomain");
+    expect(domainDecision).toBeDefined();
+    expect(domainDecision!.notes).toMatch(/vertical ledger/);
+    expect(domainDecision!.notes).toMatch(/confidence \d+%/);
+  });
+});

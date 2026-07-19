@@ -37,6 +37,7 @@ export function runTabularPlan(
     dataProfile: plan.dataProfile,
     persona: plan.persona,
     vertical: plan.vertical,
+    domain: plan.domain,
     summary: {
       kpiCount: plan.kpis.length,
       chartCount: plan.charts.length,

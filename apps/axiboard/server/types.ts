@@ -5,6 +5,7 @@ import type {
   PanelSpec,
   Persona,
 } from "@axicharts/charts-spec";
+import type { DomainSemantics } from "@axicharts/charts-spec/planning";
 
 export type AgentDecision = {
   step: string;
@@ -31,6 +32,7 @@ export type OrchestratorPlanResult = {
   dataProfile: DataProfile;
   persona: Persona;
   vertical: string;
+  domain: DomainSemantics;
   summary: {
     kpiCount: number;
     chartCount: number;

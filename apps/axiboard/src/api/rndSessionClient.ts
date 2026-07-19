@@ -1,7 +1,7 @@
 import type { Persona } from "@axicharts/charts-spec";
 import type { OrchestratorChatResult } from "../../server/types";
 
-export type RndSlug = "ledger" | "sales" | "attendance";
+export type RndSlug = "tabular" | "ledger" | "sales" | "attendance";
 
 export type RndSessionPayload = {
   csv: string;

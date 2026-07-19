@@ -244,6 +244,14 @@ export function planDashboardFromRows(
   });
 
   const domain = classifyTabularDomain({ fieldProfiles });
+  pushDecision(decisions, {
+    step: "Domain",
+    api: "classifyTabularDomain",
+    status: domain.needsReview ? "needs_review" : "ok",
+    notes: domain.needsReview
+      ? `vertical ${domain.vertical} · confidence ${Math.round(domain.confidence * 100)}% · signals: ${domain.signals.slice(0, 4).join(", ") || "weak match"}`
+      : `vertical ${domain.vertical} · confidence ${Math.round(domain.confidence * 100)}%`,
+  });
   const enrichment = options.enrichment ?? enrichTabular(rows, domain);
 
   if (!enrichment) {

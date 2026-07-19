@@ -37,9 +37,7 @@ import {
   fetchWorkspaceStore,
   saveWorkspaceStoreToServer,
 } from "./api/workspaceClient";
-import { AttendanceRndView } from "./rnd/AttendanceRndView";
-import { LedgerRndView } from "./rnd/LedgerRndView";
-import { SalesRndView } from "./rnd/SalesRndView";
+import { TabularRndView } from "./rnd/TabularRndView";
 import {
   buildRuntimeSpec,
   defaultSeedSpec,
@@ -138,7 +136,7 @@ export function App(): ReactElement {
   const [importJson, setImportJson] = useState("");
   const [importFilename, setImportFilename] = useState<string | undefined>();
   const [importPresetId, setImportPresetId] = useState<string | undefined>();
-  const [rndView, setRndView] = useState<"ledger" | "attendance" | "sales" | null>(null);
+  const [tabularRndOpen, setTabularRndOpen] = useState(false);
   const [appliedPlan, setAppliedPlan] = useState<DashboardPlan | null>(null);
 
   useEffect(() => {
@@ -382,7 +380,7 @@ export function App(): ReactElement {
   const activeWorkspace = store.workspaces.find((item) => item.id === store.activeWorkspaceId);
   const canDeleteDashboard = (activeWorkspace?.dashboards.length ?? 0) > 1;
   const showPlannerPanels =
-    !rndView &&
+    !tabularRndOpen &&
     feed === "static" &&
     layout === "embed" &&
     (appliedPlan?.panels.length ?? 0) > 0;
@@ -515,14 +513,8 @@ export function App(): ReactElement {
               </select>
             </label>
           )}
-          <button type="button" onClick={() => setRndView("ledger")} style={buttonStyle}>
-            R&D Ledger
-          </button>
-          <button type="button" onClick={() => setRndView("attendance")} style={buttonStyle}>
-            R&D Attendance
-          </button>
-          <button type="button" onClick={() => setRndView("sales")} style={buttonStyle}>
-            R&D Sales
+          <button type="button" onClick={() => setTabularRndOpen(true)} style={buttonStyle}>
+            Upload CSV
           </button>
           <button type="button" onClick={() => setPlannerOpen(true)} style={buttonStyle}>
             Plan
@@ -576,13 +568,9 @@ export function App(): ReactElement {
           onShareWorkspace={handleShareWorkspace}
           onDeleteDashboard={handleDeleteDashboard}
         />
-        <main style={{ flex: 1, padding: 24, maxWidth: rndView ? 1200 : presentation ? 1100 : 900 }}>
-          {rndView === "ledger" ? (
-            <LedgerRndView onExit={() => setRndView(null)} />
-          ) : rndView === "attendance" ? (
-            <AttendanceRndView onExit={() => setRndView(null)} />
-          ) : rndView === "sales" ? (
-            <SalesRndView onExit={() => setRndView(null)} />
+        <main style={{ flex: 1, padding: 24, maxWidth: tabularRndOpen ? 1200 : presentation ? 1100 : 900 }}>
+          {tabularRndOpen ? (
+            <TabularRndView onExit={() => setTabularRndOpen(false)} />
           ) : showPlannerPanels && appliedPlan ? (
             <PlannerPanelsWorkspace plan={appliedPlan} />
           ) : (

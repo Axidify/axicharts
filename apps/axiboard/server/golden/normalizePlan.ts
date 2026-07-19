@@ -82,7 +82,7 @@ export function snapshotFromOrchestrator(result: OrchestratorPlanResult): Golden
   return snapshotFromBlocks({
     vertical: result.vertical,
     persona: result.persona,
-    domainVertical: result.vertical,
+    domainVertical: result.domain.vertical,
     dashboardIntent: result.dashboardIntent,
     summary: result.summary,
     kpis: result.kpis,

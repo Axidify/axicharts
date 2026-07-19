@@ -3,7 +3,7 @@ import type { WorkspaceStore } from "@axicharts/charts-runtime/workspace";
 import type { AxiboardPersistence, RndSession, RndSlug } from "./types";
 import { PERSISTENCE_VERSION } from "./types";
 
-const RND_SLUGS = new Set<RndSlug>(["ledger", "sales", "attendance"]);
+const RND_SLUGS = new Set<RndSlug>(["tabular", "ledger", "sales", "attendance"]);
 
 export function isRndSlug(value: string): value is RndSlug {
   return RND_SLUGS.has(value as RndSlug);
