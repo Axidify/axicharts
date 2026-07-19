@@ -11,6 +11,7 @@ import {
   ChartNavigator,
   CHART_NAVIGATOR_HEIGHT,
   ComboChart,
+  CartesianChart,
   Gauge,
   HeatmapChart,
   HistogramChart,
@@ -57,6 +58,15 @@ import { resolveTheme } from "./themes";
 import { fillsFromColorField } from "./colorEncoding";
 import { sizesFromSizeField } from "./sizeEncoding";
 import { comboSeriesFromEncoding } from "./comboEncoding";
+import {
+  blockMarksToChartProps,
+  marksCurve,
+} from "./blockMarks";
+import { normalizeToCartesian } from "./normalizeToCartesian";
+import {
+  CartesianSpecValidationError,
+  validateCartesianSpec,
+} from "./cartesianValidation";
 import {
   chartPropsWithoutChromeMeta,
   readPanelChrome,
@@ -119,6 +129,9 @@ export type CompileOptions = {
   height?: number;
   width?: number | string;
   tagTones?: Record<string, SeriesTone>;
+  /** Validate cartesian/blocks panels before compile (default true). */
+  validateCartesian?: boolean;
+  dataProfile?: import("./types").DataProfile;
 };
 
 function seriesFromEncoding(
@@ -357,6 +370,73 @@ export function compilePanel(
       });
 
       return wrap(createElement(ComboChart, chartProps));
+    }
+
+    case "cartesian":
+    case "blocks": {
+      if (resolved.type === "blocks" && process.env.NODE_ENV !== "production") {
+        console.warn(
+          '[axicharts] Panel type "blocks" is deprecated; use type "cartesian"',
+        );
+      }
+
+      const cartesian = normalizeToCartesian(resolved);
+      const shouldValidate = options.validateCartesian !== false;
+      if (shouldValidate) {
+        const validation = validateCartesianSpec(cartesian, {
+          rows,
+          dataProfile: options.dataProfile,
+        });
+        if (!validation.ok) {
+          throw new CartesianSpecValidationError(validation.errors);
+        }
+        for (const warning of validation.warnings) {
+          if (process.env.NODE_ENV !== "production") {
+            console.warn(`[axicharts] ${warning.code}: ${warning.message}`);
+          }
+        }
+      }
+
+      const categories = cartesian.encoding?.x
+        ? (pluckField(rows, cartesian.encoding.x) as string[])
+        : (props.categories as string[] | undefined) ?? [];
+      const marks = cartesian.marks ?? [];
+      const fromMarks = blockMarksToChartProps(rows, marks);
+      const panelLiveAnimate = readPanelLiveAnimate(cartesian);
+      const curve =
+        marksCurve(marks) ?? readPanelStyle(cartesian.props)?.line?.curve;
+
+      const chartProps = panelChartProps(cartesian, {
+        ...props,
+        categories,
+        series: applyTagTonesToSeries(fromMarks.series, tagTones) as ComboSeries[],
+        fill: cartesian.fill ?? fromMarks.fill,
+        valueSuffix: cartesian.valueSuffix,
+        ...(fromMarks.showValues || cartesian.showValues
+          ? { showValues: true }
+          : {}),
+        ...(fromMarks.stacked || cartesian.stacked ? { stacked: true } : {}),
+        ...(fromMarks.dualAxis != null
+          ? { dualAxis: fromMarks.dualAxis }
+          : props.dualAxis != null
+            ? { dualAxis: props.dualAxis as boolean }
+            : {}),
+        referenceLines: [
+          ...fromMarks.referenceLines,
+          ...((props.referenceLines as typeof fromMarks.referenceLines | undefined) ??
+            []),
+        ],
+        thresholdBands: [
+          ...fromMarks.thresholdBands,
+          ...((props.thresholdBands as typeof fromMarks.thresholdBands | undefined) ??
+            []),
+        ],
+        ...(curve ? { curve } : {}),
+        animate: readPanelAnimation(cartesian),
+        ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
+      });
+
+      return wrap(createElement(CartesianChart, chartProps));
     }
 
     case "scatter": {

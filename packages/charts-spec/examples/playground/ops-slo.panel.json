@@ -1,0 +1,35 @@
+{
+  "specVersion": 1,
+  "type": "cartesian",
+  "title": "API p95 latency",
+  "theme": "live",
+  "mode": "interactive",
+  "height": 240,
+  "encoding": {
+    "x": {
+      "field": "hour",
+      "label": "Hour"
+    }
+  },
+  "marks": [
+    {
+      "type": "line",
+      "field": "latency_ms",
+      "label": "p95",
+      "tone": "info"
+    },
+    {
+      "type": "rule",
+      "value": 200,
+      "label": "SLO",
+      "tone": "critical"
+    },
+    {
+      "type": "band",
+      "min": 0,
+      "max": 150,
+      "label": "Healthy",
+      "tone": "success"
+    }
+  ]
+}

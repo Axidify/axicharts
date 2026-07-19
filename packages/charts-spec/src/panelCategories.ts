@@ -11,6 +11,8 @@ export const PANEL_TYPE_CATEGORY: Record<string, PanelCategory> = {
   line: "cartesian",
   area: "cartesian",
   bar: "cartesian",
+  blocks: "cartesian",
+  cartesian: "cartesian",
   combo: "cartesian",
   scatter: "cartesian",
   navigator: "cartesian",

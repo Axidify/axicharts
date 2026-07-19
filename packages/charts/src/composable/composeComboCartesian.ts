@@ -1,0 +1,133 @@
+import { Children, isValidElement, type ReactNode } from "react";
+import type { ComboSeries } from "@axicharts/charts-canvas";
+import { resolveSeriesColor } from "@axicharts/charts-canvas";
+import type { ChartConfig } from "../container/ChartLayoutContext";
+import type { ComposableMarkKind } from "./marks";
+import { readMarkKind } from "./readMarkKind";
+import {
+  readCartesianCells,
+  resolveCellColor,
+  type CartesianCellStyle,
+} from "./readCartesianCells";
+import type { BarRenderFn, PathRenderFn } from "./customMarks";
+import type { ComposedCartesian } from "./composeCartesian";
+
+export type ComposedComboCartesian = ComposedCartesian & {
+  series: ComboSeries[];
+};
+
+type MarkCellBinding = {
+  dataKey: string;
+  markKind: "bar" | "line" | "area";
+  cells: Map<string, CartesianCellStyle>;
+};
+
+const COMBO_MARK_KINDS: ComposableMarkKind[] = ["bar", "line", "area"];
+
+/**
+ * Compose Recharts-style cartesian children into combo series (bar + line + area).
+ */
+export function composeComboCartesianMarks(
+  children: ReactNode,
+  data: Record<string, unknown>[],
+  config: ChartConfig | undefined,
+): ComposedComboCartesian {
+  let xKey = "date";
+  let valueSuffix: string | undefined;
+  let curve: ComposedCartesian["curve"];
+  const series: ComboSeries[] = [];
+  const cellBindings: MarkCellBinding[] = [];
+
+  Children.forEach(children, (child) => {
+    if (!isValidElement(child)) return;
+
+    const kind = readMarkKind(child.type);
+    if (!kind) return;
+
+    const props = child.props as Record<string, unknown>;
+
+    switch (kind) {
+      case "xAxis":
+        xKey = String(props.dataKey ?? props.field ?? xKey);
+        break;
+      case "yAxis": {
+        const tickFormat = props.tickFormat ?? props.format;
+        if (typeof tickFormat === "string") {
+          const Y_AXIS_SUFFIX: Partial<Record<string, string>> = {
+            currency: " USD",
+            percent: "%",
+            bps: " bps",
+          };
+          valueSuffix = Y_AXIS_SUFFIX[tickFormat];
+        }
+        break;
+      }
+      case "line":
+      case "area":
+      case "bar": {
+        if (!COMBO_MARK_KINDS.includes(kind)) break;
+        const dataKey = String(props.dataKey ?? props.field);
+        const markType = props.type;
+        if (kind === "line" || kind === "area") {
+          if (markType === "linear" || markType === "monotone") {
+            curve = markType;
+          }
+        }
+        cellBindings.push({
+          dataKey,
+          markKind: kind,
+          cells: readCartesianCells(child),
+        });
+        series.push({
+          key: dataKey,
+          name: String(props.name ?? props.label ?? dataKey),
+          data: data.map((row) => Number(row[dataKey])),
+          kind: kind === "bar" ? "bar" : "line",
+          tone: props.tone as ComboSeries["tone"],
+          ...(kind === "area" ? { fill: true } : {}),
+          ...(kind !== "bar" && (markType === "linear" || markType === "monotone")
+            ? { curve: markType }
+            : {}),
+          ...(kind === "bar" && typeof props.renderBar === "function"
+            ? { renderBar: props.renderBar as BarRenderFn }
+            : {}),
+          ...((kind === "line" || kind === "area") &&
+          typeof props.renderPath === "function"
+            ? { renderPath: props.renderPath as PathRenderFn }
+            : {}),
+        });
+        break;
+      }
+      default:
+        break;
+    }
+  });
+
+  const categories = data.map((row) => String(row[xKey] ?? ""));
+
+  const withCellStyles = series.map((item, index) => {
+    const binding = cellBindings.find((entry) => entry.dataKey === item.key);
+    if (!binding || binding.cells.size === 0) return item;
+
+    const baseColor = item.color ?? resolveSeriesColor(item.tone, index);
+    const fills = categories.map((category) => {
+      const style = binding.cells.get(category);
+      return style ? (resolveCellColor(style) ?? baseColor) : baseColor;
+    });
+    const rawSizes = categories.map(
+      (category) => binding.cells.get(category)?.size,
+    );
+    const hasSizes = rawSizes.some((value) => value != null);
+    const defaultSize = binding.markKind === "bar" ? 1 : 4;
+
+    return {
+      ...item,
+      fills,
+      ...(hasSizes
+        ? { sizes: rawSizes.map((value) => value ?? defaultSize) }
+        : {}),
+    };
+  });
+
+  return { categories, series: withCellStyles, valueSuffix, curve };
+}

@@ -10,6 +10,7 @@ import { RuntimeDeepLinkPage } from "./pages/RuntimeDeepLinkPage";
 import { RuntimeImportPage } from "./pages/RuntimeImportPage";
 import { RuntimeSchemaPage } from "./pages/RuntimeSchemaPage";
 import { SpecPage } from "./pages/SpecPage";
+import { BlocksPlaygroundPage } from "./pages/BlocksPlaygroundPage";
 import { StartPage } from "./pages/StartPage";
 import { VerticalsPage } from "./pages/VerticalsPage";
 import { ComparePage } from "./pages/ComparePage";
@@ -30,6 +31,7 @@ export function App(): ReactElement {
           <Route path="shadcn/registry" element={<ShadcnRegistryPage />} />
           <Route path="templates/community" element={<CommunityTemplatesPage />} />
           <Route path="spec" element={<SpecPage />} />
+          <Route path="spec/blocks" element={<BlocksPlaygroundPage />} />
           <Route path="runtime" element={<RuntimePage />} />
           <Route path="runtime/adapters" element={<RuntimeAdaptersPage />} />
           <Route path="runtime/schema" element={<RuntimeSchemaPage />} />

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "axicharts-cartesian": {
+      "command": "npx",
+      "args": ["-y", "@axicharts/charts-mcp"],
+      "env": {}
+    }
+  }
+}

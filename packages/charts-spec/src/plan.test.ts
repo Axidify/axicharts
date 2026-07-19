@@ -9,10 +9,17 @@ describe("plan", () => {
       tags: { vertical: "ops", refresh: "live" },
     });
 
-    expect(panel.type).toBe("line");
+    expect(panel.type).toBe("cartesian");
     expect(panel.mode).toBe("live");
     expect(panel.theme).toBe("live");
     expect(panel.valueSuffix).toBe(" ms");
+    expect(panel.marks).toEqual(
+      expect.arrayContaining([
+        { type: "line", field: "p95_latency", label: "p95_latency" },
+        { type: "band", min: 0, max: 500, label: "SLO band", tone: "warning" },
+        { type: "rule", value: 500, label: "SLO limit", tone: "critical" },
+      ]),
+    );
   });
 
   it("maps ohlc metrics to candlestick", () => {
@@ -87,7 +94,8 @@ describe("plan", () => {
     });
 
     expect(panels).toHaveLength(2);
-    expect(panels[0]?.type).toBe("line");
+    expect(panels[0]?.type).toBe("cartesian");
+    expect(panels[0]?.marks?.[0]?.type).toBe("line");
   });
 
   it("infers encoding.color from profile fields for throughput metrics", () => {
@@ -98,7 +106,7 @@ describe("plan", () => {
       },
     );
 
-    expect(panel.type).toBe("line");
+    expect(panel.type).toBe("cartesian");
     expect(panel.encoding?.color).toEqual({
       field: "aboveTarget",
       type: "semantic",
@@ -125,7 +133,7 @@ describe("plan", () => {
       },
     );
 
-    expect(panel.type).toBe("bar");
+    expect(panel.type).toBe("cartesian");
     expect(panel.encoding?.size).toEqual({
       field: "weight",
       type: "quantitative",
@@ -138,8 +146,8 @@ describe("plan", () => {
       { intent: "Linear latency trend by hour" },
     );
 
-    expect(panel.type).toBe("line");
-    expect(panel.props?.style).toEqual({ line: { curve: "linear" } });
+    expect(panel.type).toBe("cartesian");
+    expect(panel.marks?.[0]).toMatchObject({ type: "line", curve: "linear" });
   });
 
   it("infers encoding.size and line curve across profile planning", () => {
@@ -152,6 +160,6 @@ describe("plan", () => {
     );
 
     expect(panels[0]?.encoding?.size?.field).toBe("volume");
-    expect(panels[0]?.props?.style).toEqual({ line: { curve: "monotone" } });
+    expect(panels[0]?.marks?.[0]).toMatchObject({ type: "line", curve: "monotone" });
   });
 });

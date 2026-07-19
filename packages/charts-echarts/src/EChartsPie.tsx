@@ -3,10 +3,15 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import { resolveChartChrome } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
-import { gridOptions, hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
+import { echartsColor } from "./echartsColor";
+import { gridOptions, hiddenTooltip, seriesPalette } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
+import { resolvePieSliceColor } from "./pieSliceColor";
+import { pieGapOptions } from "./pieGapOptions";
+import { pieOuterRadius } from "./pieLayout";
 import type { PieSlice } from "./types";
 
 export type EChartsPieProps = {
@@ -35,16 +40,17 @@ export function EChartsPie({
   onItemHover,
 }: EChartsPieProps): ReactElement {
   const total = slices.reduce((sum, slice) => sum + slice.value, 0);
-
+  const presentation = animate || theme.name === "presentation";
+  const chrome = resolveChartChrome(theme);
+  const labelColor = echartsColor(chrome.axis);
   const palette = seriesPalette(theme);
+  const gap = pieGapOptions(innerRadius);
+
   const data = slices.map((slice, index) => ({
     name: slice.name,
     value: slice.value,
     itemStyle: {
-      color:
-        slice.color ??
-        toneColor(slice.tone, theme) ??
-        palette[index % palette.length],
+      color: resolvePieSliceColor(slice, index, palette, theme),
     },
   }));
 
@@ -55,15 +61,52 @@ export function EChartsPie({
       series: [
         {
           type: "pie",
-          radius: innerRadius > 0 ? [`${innerRadius}%`, "70%"] : "70%",
+          radius: pieOuterRadius(theme, innerRadius),
           center: ["50%", "50%"],
+          padAngle: gap.padAngle,
+          avoidLabelOverlap: true,
+          minShowLabelAngle: 8,
           data,
+          itemStyle: gap.itemStyle,
+          emphasis: {
+            scale: !presentation,
+            scaleSize: 6,
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: "rgba(15, 23, 42, 0.12)",
+            },
+          },
           label: {
             show: showLabels,
-            formatter: "{b}: {d}%",
-            fontSize: 11,
+            formatter: "{name|{b}}\n{pct|{d}%}",
+            rich: {
+              name: {
+                color: labelColor,
+                fontSize: presentation ? 12 : 11,
+                fontWeight: presentation ? 600 : 500,
+                lineHeight: presentation ? 18 : 16,
+              },
+              pct: {
+                color: labelColor,
+                fontSize: presentation ? 11 : 10,
+                fontWeight: 600,
+                lineHeight: presentation ? 16 : 14,
+                opacity: 0.88,
+              },
+            },
           },
-          labelLine: { show: showLabels },
+          labelLine: {
+            show: showLabels,
+            length: presentation ? 14 : 12,
+            length2: presentation ? 12 : 10,
+            smooth: 0.25,
+            lineStyle: {
+              color: labelColor,
+              width: 1,
+              opacity: 0.55,
+            },
+          },
         },
       ],
     },

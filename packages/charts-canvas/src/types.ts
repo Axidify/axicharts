@@ -30,6 +30,10 @@ export type ComboSeriesKind = "line" | "bar";
 
 export type ComboSeries = PlotSeries & {
   kind: ComboSeriesKind;
+  /** Per-series area fill (overrides chart-level `fill` for this series). */
+  fill?: boolean;
+  /** Per-series line curve (overrides chart-level `curve` for this series). */
+  curve?: LineCurve;
 };
 
 export type ReferenceLine = {
@@ -117,6 +121,7 @@ export type UPlotComboProps = {
   showValues?: boolean;
   valueSuffix?: string;
   dualAxis?: DualAxisMode;
+  stacked?: boolean;
   referenceLines?: ReferenceLine[];
   thresholdBands?: ThresholdBand[];
   annotations?: ChartAnnotation[];

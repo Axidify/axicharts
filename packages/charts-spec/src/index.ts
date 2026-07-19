@@ -11,6 +11,10 @@ export type {
   FieldType,
   MetricKind,
   MetricProfile,
+  ChartBlockBandMark,
+  ChartBlockMarkSpec,
+  ChartBlockRuleMark,
+  ChartBlockSeriesMark,
   PanelChartType,
   PanelSpec,
   PanelStyleSpec,
@@ -21,6 +25,48 @@ export type {
   ThemeName,
 } from "./types";
 
+export { blockMarksToChartProps, type BlockMarksChartProps } from "./blockMarks";
+export {
+  normalizeBlockMark,
+  normalizeMarksArray,
+  isDataMark,
+  isOverlayMark,
+} from "./cartesianMarks";
+export {
+  validateCartesianSpec,
+  assertValidCartesianSpec,
+  detectPreNormalizeWarnings,
+  CartesianSpecValidationError,
+  type CartesianValidationError,
+  type CartesianValidationIssue,
+  type ValidateCartesianOptions,
+} from "./cartesianValidation";
+export { normalizeToCartesian, normalizeRawCartesianPanel, type NormalizedCartesianSpec } from "./normalizeToCartesian";
+export { suggestField, levenshtein } from "./fieldSuggest";
+export {
+  BlocksPlayground,
+  BLOCKS_PLAYGROUND_PRESETS,
+  evaluatePlaygroundSpec,
+  formatPlaygroundEject,
+  parsePlaygroundData,
+  findPlaygroundPreset,
+  presetSpecJson,
+  type BlocksPlaygroundProps,
+  type BlocksPlaygroundPreset,
+  type PlaygroundEvaluation,
+} from "./blocksPlayground";
+export {
+  createCartesianPanel,
+  reviseCartesianPanel,
+  listCartesianMarks,
+  CARTESIAN_MARK_CATALOG,
+  type CreateCartesianPanelInput,
+  type CreateCartesianPanelResult,
+  type ReviseCartesianPanelInput,
+  type ReviseCartesianPanelResult,
+  type PlannerReviewReason,
+  type CartesianMarkCatalogEntry,
+} from "./createCartesianPanel";
 export { compilePanel, type CompileOptions } from "./compilePanel";
 export {
   compileDashboard,
@@ -38,7 +84,7 @@ export {
 } from "./templates";
 export { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 export { Chart, Dashboard, type ChartProps, type DashboardProps } from "./Chart";
-export { ejectPanel } from "./eject";
+export { ejectPanel, type EjectOptions } from "./eject";
 export {
   planPanelFromMetric,
   planPanelsFromProfile,

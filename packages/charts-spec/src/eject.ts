@@ -7,6 +7,11 @@ import {
   ejectCartesianImports,
 } from "./ejectCartesian";
 import { ejectComboBody } from "./ejectCombo";
+import {
+  ejectBlocksComposableBody,
+  ejectBlocksImperativeBody,
+  ejectBlocksImports,
+} from "./ejectBlocks";
 import { chartPropsWithoutChromeMeta, readPanelChrome } from "./panelChrome";
 import { chartPropsWithoutChartConfig, readPanelChartConfig } from "./panelChartConfig";
 import { chartPropsWithoutStyle, readPanelStyle } from "./panelStyle";
@@ -14,6 +19,7 @@ import { chartPropsWithoutAnimation, readPanelAnimation } from "./panelAnimation
 import { chartPropsWithoutLiveAnimate } from "./panelLiveAnimate";
 import { mapDrillEjectProps } from "./mapEncoding";
 import { ejectGraphicsProp } from "./panelGraphics";
+import { normalizeToCartesian } from "./normalizeToCartesian";
 import {
   SIZE_SCALE_HELPER,
   sizeFieldMinMaxBlock,
@@ -55,7 +61,9 @@ function resolveChartName(spec: PanelSpec): string {
 
   return spec.type === "combo"
     ? "ComboChart"
-    : spec.type === "pie"
+    : spec.type === "blocks" || spec.type === "cartesian"
+      ? "CartesianChart"
+      : spec.type === "pie"
       ? "PieChart"
       : spec.type === "donut"
         ? "PieChart"
@@ -118,7 +126,20 @@ function resolveChartName(spec: PanelSpec): string {
                                   : "Gauge";
 }
 
-export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
+export type EjectOptions = {
+  /** `composable` (default for cartesian/blocks) emits `<CartesianChart>` + blocks; `imperative` emits `ComboChart series`. */
+  style?: "composable" | "imperative";
+};
+
+export function ejectPanel(
+  spec: PanelSpec,
+  dataVar = "data",
+  options: EjectOptions = {},
+): string {
+  const ejectStyle = options.style ?? "composable";
+  if (spec.type === "cartesian" || spec.type === "blocks") {
+    spec = normalizeToCartesian(spec);
+  }
   const theme = spec.theme ?? "clean";
   const panelStyle = readPanelStyle(spec.props);
   const chrome = readPanelChrome(spec.props);
@@ -134,7 +155,11 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     : `${theme}Theme`;
   const mode = spec.mode ? `\n  mode="${spec.mode}"` : "";
   const height = spec.height ?? 240;
-  const chartName = resolveChartName(spec);
+  const chartName =
+    (spec.type === "cartesian" || spec.type === "blocks") &&
+    ejectStyle === "imperative"
+      ? "ComboChart"
+      : resolveChartName(spec);
   const chromeAttrs = [
     chrome.legendVariant ? `\n  legendVariant="${chrome.legendVariant}"` : "",
     chrome.tooltipVariant ? `\n  tooltipVariant="${chrome.tooltipVariant}"` : "",
@@ -485,6 +510,11 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     }))}`;
   } else if (spec.type === "combo") {
     chartBody = ejectComboBody(spec, dataVar);
+  } else if (spec.type === "cartesian" || spec.type === "blocks") {
+    chartBody =
+      ejectStyle === "imperative"
+        ? ejectBlocksImperativeBody(spec, dataVar)
+        : ejectBlocksComposableBody(spec, dataVar);
   } else if (spec.type === "sankey") {
     chartBody = `nodes={${dataVar}.nodes ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).nodes ?? [])}}
     links={${dataVar}.links ?? ${JSON.stringify(chartPropsFromPanel(spec.props ?? {}).links ?? [])}}`;
@@ -541,7 +571,9 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     spec.type !== "line" &&
     spec.type !== "area" &&
     spec.type !== "bar" &&
-    spec.type !== "combo"
+    spec.type !== "combo" &&
+    spec.type !== "blocks" &&
+    spec.type !== "cartesian"
   ) {
     chartBody += `\n    ${graphicsEject}`;
   }
@@ -549,6 +581,8 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
   const chartProps = chartPropsFromPanel(spec.props ?? {});
   const extraProps =
   spec.type !== "combo" &&
+  spec.type !== "blocks" &&
+  spec.type !== "cartesian" &&
     !cartesianUsesComposableMarks(spec) &&
     Object.keys(chartProps).length > 0
       ? `\n    ${serializeProps(chartProps, "    ")}`
@@ -557,6 +591,10 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
   const imports = new Set<string>(["ChartContainer"]);
   if (spec.type === "line" || spec.type === "area" || spec.type === "bar") {
     for (const item of ejectCartesianImports(spec)) {
+      imports.add(item);
+    }
+  } else if (spec.type === "cartesian" || spec.type === "blocks") {
+    for (const item of ejectBlocksImports(ejectStyle)) {
       imports.add(item);
     }
   } else if (
@@ -584,9 +622,13 @@ export function ejectPanel(spec: PanelSpec, dataVar = "data"): string {
     : "";
 
   const preambleBlock = preamble ? `${preamble}\n\n` : "";
+  const isComposableCartesian =
+    spec.type === "cartesian" || spec.type === "blocks"
+      ? ejectStyle === "composable"
+      : cartesianUsesComposableMarks(spec);
 
-  if (cartesianUsesComposableMarks(spec)) {
-    return `${preambleBlock}import { ${[...imports].join(", ")} } from "@axicharts/charts";
+  if (isComposableCartesian) {
+    return `${preambleBlock}import { ${[...imports].join(", ")} } from "@axicharts/charts/cartesian";
 import { ${themeImport} } from "@axicharts/charts-theme";
 ${chartsImport ? `${chartsImport}\n` : ""}
 <ChartContainer theme={${themeExpr}}${mode}${chromeAttrs} height={${height}} width="100%">

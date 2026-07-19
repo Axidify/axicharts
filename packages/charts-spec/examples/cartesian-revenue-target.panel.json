@@ -1,0 +1,17 @@
+{
+  "specVersion": 1,
+  "type": "cartesian",
+  "title": "Revenue vs target",
+  "theme": "studio",
+  "mode": "static",
+  "height": 260,
+  "encoding": {
+    "x": { "field": "week", "label": "Week" }
+  },
+  "marks": [
+    { "mark": "bar", "field": "revenue", "label": "Revenue", "tone": "default" },
+    { "mark": "line", "field": "target", "label": "Target", "tone": "info", "curve": "monotone" },
+    { "mark": "rule", "value": 50, "label": "Quota", "tone": "warning" },
+    { "mark": "band", "min": 44, "max": 52, "label": "Healthy band", "tone": "success" }
+  ]
+}

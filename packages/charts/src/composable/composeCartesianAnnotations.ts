@@ -15,7 +15,9 @@ export function composeCartesianAnnotations(
       kind !== "annotationLabel" &&
       kind !== "annotationBand" &&
       kind !== "annotationLine" &&
-      kind !== "annotationMarker"
+      kind !== "annotationMarker" &&
+      kind !== "rule" &&
+      kind !== "band"
     ) {
       return;
     }
@@ -42,6 +44,7 @@ export function composeCartesianAnnotations(
         });
         break;
       case "annotationBand":
+      case "band":
         annotations.push({
           type: "band",
           min: Number(props.min),
@@ -52,6 +55,7 @@ export function composeCartesianAnnotations(
         });
         break;
       case "annotationLine":
+      case "rule":
         annotations.push({
           type: "line",
           value: Number(props.value),

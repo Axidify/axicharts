@@ -41,15 +41,24 @@ function applyTradingPanelRules(panel: PanelSpec, ctx: VerticalPanelContext): Pa
   if (/rsi|macd|stochastic|momentum/.test(name) || /rsi|momentum|follower|oscillator/.test(intent)) {
     return {
       ...panel,
-      type: "line",
+      type: "cartesian",
       theme: "live",
       mode: "live",
-      fill: true,
+      encoding: {
+        x: panel.encoding?.x ?? { field: "time", type: "nominal" },
+      },
+      marks: [
+        {
+          type: "area",
+          field: ctx.metric.name,
+          label: ctx.metric.name,
+          tone: "warning",
+        },
+      ],
       props: {
         ...panel.props,
         syncId: "rsi",
         syncFollower: "ohlc",
-        tone: "warning",
       },
     };
   }
@@ -57,9 +66,13 @@ function applyTradingPanelRules(panel: PanelSpec, ctx: VerticalPanelContext): Pa
   if (/volume|vwap/.test(name)) {
     return {
       ...panel,
-      type: "bar",
+      type: "cartesian",
       theme: "live",
       mode: "live",
+      encoding: {
+        x: panel.encoding?.x ?? { field: "time", type: "nominal" },
+      },
+      marks: [{ type: "bar", field: ctx.metric.name, label: ctx.metric.name }],
       props: {
         ...panel.props,
         syncId: "volume",

@@ -46,6 +46,7 @@ export type ComboChartProps = {
   valueSuffix?: string;
   curve?: LineCurve;
   dualAxis?: DualAxisMode;
+  stacked?: boolean;
   referenceLines?: ReferenceLine[];
   thresholdBands?: ThresholdBand[];
   annotations?: ChartAnnotation[];
@@ -68,6 +69,7 @@ function ComboPlot({
   valueSuffix,
   curve,
   dualAxis,
+  stacked,
   referenceLines,
   thresholdBands,
   annotations,
@@ -105,6 +107,7 @@ function ComboPlot({
       showValues={showValues}
       valueSuffix={valueSuffix}
       dualAxis={dualAxis}
+      stacked={stacked}
       referenceLines={referenceLines}
       thresholdBands={thresholdBands}
       annotations={annotations}
@@ -143,6 +146,7 @@ function ComboPlot({
   );
 }
 
+/** @internal Legacy combo adapter — prefer `CartesianChart` + block marks. */
 export function ComboChart({
   categories,
   series: seriesProp,
@@ -152,6 +156,7 @@ export function ComboChart({
   valueSuffix,
   curve,
   dualAxis = "auto",
+  stacked = false,
   referenceLines,
   thresholdBands,
   annotations,
@@ -251,6 +256,7 @@ export function ComboChart({
             valueSuffix={valueSuffix}
             curve={curve}
             dualAxis={dualAxis}
+            stacked={stacked}
             referenceLines={annotationProps.referenceLines}
             thresholdBands={annotationProps.thresholdBands}
             annotations={annotationProps.annotations}

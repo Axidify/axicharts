@@ -60,17 +60,17 @@ function applyFinancePanelRules(panel: PanelSpec, ctx: VerticalPanelContext): Pa
 
     return {
       ...panel,
-      type: "combo",
+      type: "cartesian",
       theme: "clean",
       mode: "interactive",
       encoding: {
         x: { field: periodField, type: "nominal" },
-        y: [
-          { field: revenueField, type: "quantitative", kind: "bar", label: "Revenue" },
-          { field: marginField, type: "quantitative", kind: "line", label: "Margin" },
-        ],
       },
-      props: { dualAxis: "auto", showValues: true },
+      marks: [
+        { type: "bar", field: revenueField, label: "Revenue" },
+        { type: "line", field: marginField, label: "Margin", yAxisId: "right" },
+      ],
+      props: { showValues: true },
     };
   }
 

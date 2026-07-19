@@ -6,6 +6,8 @@
 
 **Free, open-source chart platform for React dashboards** — layout DX, live performance, and vertical breadth (finance, trading, resources, SaaS, ops) on one MIT-licensed stack.
 
+**Direction (2026):** **Cartesian building blocks for AI agents** — one `type: "cartesian"` spec with composable `marks[]` (`bar`, `line`, `area`, `rule`, `band`), validated before render, compiling to the same React path humans edit via `ejectPanel`. Chart types (`LineChart`, `ComboChart`, …) become presets over the same blocks. See [packages/charts-spec/CARTESIAN.md](./packages/charts-spec/CARTESIAN.md) and planning [RFC-002](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/rfcs/RFC-002-cartesian-building-blocks.md).
+
 Line/bar/area via uPlot; pie, candlestick, waterfall, and heatmap via ECharts; industrial SVG primitives; `ChartContainer` that sizes correctly in flex/grid layouts.
 
 - **GitHub:** https://github.com/Axidify/axicharts
@@ -52,6 +54,34 @@ export function LatencySparkline() {
 ```
 
 `QuickLineChart` wraps `ChartContainer` + `LineChart` with `cleanTheme`, `mode="static"`, and `width="100%"`. Optional props: `labels`, `title`, `height`, `theme`, `mode`.
+
+### Agent-safe cartesian spec (C136+)
+
+Compose charts on the fly with a closed `marks[]` catalog — one tool surface for planners and MCP agents:
+
+```json
+{
+  "type": "cartesian",
+  "encoding": { "x": { "field": "week" } },
+  "marks": [
+    { "mark": "bar", "field": "revenue", "label": "Revenue" },
+    { "mark": "line", "field": "target", "label": "Target" },
+    { "mark": "rule", "value": 50, "label": "Quota" }
+  ]
+}
+```
+
+```ts
+import { Chart, validateCartesianSpec, normalizeToCartesian } from "@axicharts/charts-spec";
+
+const panel = normalizeToCartesian(rawPanel);
+const check = validateCartesianSpec(panel, { rows: data });
+if (!check.ok) throw check.errors; // field suggestions for agent retry
+
+<Chart panel={panel} data={data} />
+```
+
+Invalid specs fail **before** render (`UNKNOWN_FIELD`, `MISSING_DATA_MARK`, …). Legacy `line` / `combo` / `blocks` normalize to `cartesian`. Full guide: [packages/charts-spec/CARTESIAN.md](./packages/charts-spec/CARTESIAN.md).
 
 ### Full control
 
@@ -146,8 +176,8 @@ Chart catalog: Storybook **Charts/Catalog → AllTypes**.
 | `@axicharts/charts-canvas` | uPlot — line, bar, area (live path) |
 | `@axicharts/charts-echarts` | ECharts — pie, candlestick, waterfall, heatmap |
 | `@axicharts/charts-core` | Layout math + `formatTick` / `registerTickFormat` |
-| `@axicharts/charts-spec` | Vertical templates, rules planner, eject CLI |
-| `@axicharts/charts-planner` | Phase 3 server planner — intent, LLM provider hooks, HTTP `/plan` |
+| `@axicharts/charts-spec` | Vertical templates, rules planner, eject CLI, **cartesian `marks[]` + validation** |
+| `@axicharts/charts-planner` | Server planner — intent → panels; **migrating to `cartesian` emits** (C139) |
 | `@axicharts/charts-runtime` | Data adapters, embed SDK, spec portability |
 | `@axicharts/charts-tank` | Community plugin — tank level chart (`registerChartType`) |
 | `@axicharts/charts-geo` | Community plugin — regional cartogram map (`registerChartType`) |
@@ -160,6 +190,8 @@ Chart catalog: Storybook **Charts/Catalog → AllTypes**.
 pnpm install
 pnpm build
 pnpm test
+pnpm --filter @axicharts/charts-spec test compositionSimulation  # RFC-002 cartesian gate
+pnpm ci          # full local mirror when GitHub Actions minutes are limited
 pnpm test:perf   # uPlot update gates (500 / 5k / 10k + 6-panel)
 pnpm bench       # collect published numbers → benchmarks/BENCHMARKS.md
 pnpm bench:browser  # Chromium competitive vs Recharts/ECharts

@@ -11,7 +11,7 @@ import { cleanTheme } from "@axicharts/charts-theme";
 import resourcesFixture from "../../../packages/charts-spec/examples/pictorial-bar-resources.panel.json";
 
 const STATIC_ITEMS: PictorialBarItem[] = [
-  { category: "CPU", value: 72, symbol: "roundRect", tone: "primary" },
+  { category: "CPU", value: 72, symbol: "roundRect", tone: "info" },
   { category: "Memory", value: 58, symbol: "rect" },
   { category: "Storage", value: 41, symbol: "triangle" },
   { category: "Network", value: 29, symbol: "diamond" },

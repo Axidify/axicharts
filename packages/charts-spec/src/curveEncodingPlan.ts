@@ -1,7 +1,7 @@
 import type { MetricProfile, PanelSpec } from "./types";
 
 function isLinePanelType(type: PanelSpec["type"]): boolean {
-  return type === "line" || type === "area";
+  return type === "line" || type === "area" || type === "cartesian";
 }
 
 export function intentWantsLinearCurve(intent?: string): boolean {

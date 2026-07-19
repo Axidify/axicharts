@@ -21,6 +21,7 @@ import { resolveSeriesColor } from "./seriesColor";
 import { lineSeriesPaths, resolveLineCurve } from "./linePaths";
 import { axisCategoryValues } from "./axisCategoryLabel";
 import { shouldUseDualAxis } from "./dualAxis";
+import { shouldStackSeries, STACK_GROUP } from "./stack";
 
 type BarLayout = {
   left: number;
@@ -54,6 +55,7 @@ export function buildComboOptions(
     showValues = false,
     valueSuffix = "",
     dualAxis = "auto",
+    stacked = false,
     referenceLines = [],
     thresholdBands = [],
     annotations = [],
@@ -84,14 +86,15 @@ export function buildComboOptions(
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme);
   const gapPx = Math.max(3, Math.round(theme.bar.gap * 28));
-  const curve = resolveLineCurve(theme.line.curve, curveOverride);
-  const smoothPaths = lineSeriesPaths(curve);
   const fillOpacity = theme.area.fillOpacity;
   const annotateY =
     thresholdBandsResolved.length > 0 ||
     referenceLinesResolved.length > 0 ||
     extraY.length > 0;
-  const useDualAxis = shouldUseDualAxis(series, dualAxis);
+  const barCount = series.filter((item) => item.kind === "bar").length;
+  const stackBars = shouldStackSeries(stacked, barCount);
+  const showBarValues = showValues && !stackBars;
+  const useDualAxis = stackBars ? false : shouldUseDualAxis(series, dualAxis);
 
   return {
     width,
@@ -200,6 +203,12 @@ export function buildComboOptions(
       ...series.map((item, index) => {
         const color = item.color ?? resolveSeriesColor(item.tone, index, theme);
         const scale = useDualAxis && index > 0 ? "y2" : "y";
+        const seriesCurve = resolveLineCurve(
+          theme.line.curve,
+          item.curve ?? curveOverride,
+        );
+        const seriesPaths = lineSeriesPaths(seriesCurve);
+        const seriesFill = item.fill ?? fill;
         if (item.kind === "bar") {
           return {
             label: item.name,
@@ -207,6 +216,7 @@ export function buildComboOptions(
             stroke: color,
             fill: color,
             width: 0,
+            stack: stackBars ? STACK_GROUP : undefined,
             paths: uPlot.paths.bars!({
               gap: gapPx,
               size: [0.45, 100],
@@ -216,7 +226,7 @@ export function buildComboOptions(
                 if (seriesIdx === 1 && idx === 0) {
                   barLayoutsRef.current = [];
                 }
-                if (showValues) {
+                if (showBarValues) {
                   barLayoutsRef.current.push({
                     left,
                     top,
@@ -237,9 +247,9 @@ export function buildComboOptions(
           scale,
           stroke: color,
           width: theme.line.strokeWidth,
-          paths: smoothPaths,
+          paths: seriesPaths,
           fill:
-            fill && theme.area.show
+            seriesFill && theme.area.show
               ? (u: uPlot) => {
                   const top = u.bbox.top;
                   const bottom = u.bbox.top + u.bbox.height;
@@ -265,7 +275,7 @@ export function buildComboOptions(
           labels: plotLabels,
           markers: plotMarkers,
           categories,
-          onDraw: showValues
+          onDraw: showBarValues
             ? (u) => {
                 const ctx = u.ctx;
                 ctx.save();
@@ -369,6 +379,7 @@ export function UPlotCombo(props: UPlotComboProps): ReactElement {
     props.plotLabels,
     props.plotMarkers,
     props.dualAxis,
+    props.stacked,
     showAxes,
     showCursor,
     useNativeLegend,

@@ -16,7 +16,8 @@ export function toneColor(
   tone: SeriesTone = "default",
   theme?: Pick<ChartTheme, "tokens">,
 ): string {
-  return echartsColor(resolveToneColors(theme)[tone]);
+  const colors = resolveToneColors(theme);
+  return echartsColor(colors[tone] ?? colors.default);
 }
 
 export { SERIES_PALETTE, SERIES_COLORS } from "./types";

@@ -1,0 +1,25 @@
+{
+  "specVersion": 1,
+  "type": "cartesian",
+  "theme": "clean",
+  "mode": "static",
+  "height": 260,
+  "encoding": {
+    "x": {
+      "field": "month"
+    }
+  },
+  "marks": [
+    {
+      "type": "bar",
+      "field": "revenue",
+      "label": "Revenue ($k)"
+    },
+    {
+      "type": "line",
+      "field": "margin_pct",
+      "label": "Margin %",
+      "curve": "linear"
+    }
+  ]
+}

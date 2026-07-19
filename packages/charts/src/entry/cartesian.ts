@@ -1,7 +1,9 @@
 export * from "./_container";
+export { CartesianChart, type CartesianChartProps } from "../cartesian/CartesianChart";
 export { LineChart, type LineChartProps } from "../line/LineChart";
 export { AreaChart, type AreaChartProps } from "../area/AreaChart";
 export { BarChart, type BarChartProps } from "../bar/BarChart";
+/** @internal Legacy combo adapter — prefer `CartesianChart` + block marks. */
 export { ComboChart, type ComboChartProps } from "../combo/ComboChart";
 export {
   ScatterChart,
@@ -105,12 +107,16 @@ export {
 export {
   Area,
   Bar,
+  Band,
   Cell,
   Grid,
   Legend,
   Line,
+  Rule,
   Tooltip,
+  X,
   XAxis,
+  Y,
   YAxis,
   AnnotationBand,
   AnnotationLabel,
@@ -118,11 +124,15 @@ export {
   AnnotationMarker,
   composeCartesianAnnotations,
   composeCartesianMarks,
+  composeComboCartesianMarks,
   type AreaMarkProps,
+  type BandMarkProps,
   type BarMarkProps,
   type CellMarkProps,
   type ComposedCartesian,
+  type ComposedComboCartesian,
   type LineMarkProps,
+  type RuleMarkProps,
   type XAxisMarkProps,
   type YAxisMarkProps,
   type BarRenderContext,
