@@ -225,7 +225,7 @@ export {
   type TabularPlanBlock,
   type TabularPlanDecision,
   type TabularEnrichment,
-} from "./planning";
+} from "./tabularPlanning";
 export {
   inferFieldRoles,
   fieldProfilesToDataProfile,

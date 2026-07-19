@@ -5,7 +5,7 @@ import {
   inferPersonaFromIntent,
   rankQuestions,
   resolvePersona,
-} from "../planning";
+} from "../tabularPlanning";
 
 const PIPELINE_TEXT = `| Opportunity ID | Customer | Salesperson | Stage | Value (RM) | Probability | Expected Close | Source |
 | OPP-001 | ABC | Amir | Proposal | 85,000 | 70% | 2026-08-15 | Referral |`;

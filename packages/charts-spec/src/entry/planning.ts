@@ -22,4 +22,4 @@ export {
   inferGrain,
   inferTimeSpan,
 } from "../profileTabular";
-export * from "../planning";
+export * from "../tabularPlanning";
