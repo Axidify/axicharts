@@ -22,6 +22,7 @@ import { ThemePlaygroundPage } from "./pages/ThemePlaygroundPage";
 import { BenchmarksPage } from "./pages/BenchmarksPage";
 import { TroubleshootingPage } from "./pages/TroubleshootingPage";
 import { ChoosingPathPage } from "./pages/ChoosingPathPage";
+import { CsvDashboardGuidePage } from "./pages/CsvDashboardGuidePage";
 import { ImportsGuidePage } from "./pages/ImportsGuidePage";
 import { CommunityTemplatesPage } from "./pages/CommunityTemplatesPage";
 
@@ -38,6 +39,7 @@ export function App(): ReactElement {
           <Route path="guides/theme" element={<ThemePlaygroundPage />} />
           <Route path="guides/branding" element={<BrandingPage />} />
           <Route path="guides/agent-cartesian" element={<AgentCartesianGuidePage />} />
+          <Route path="guides/csv-dashboard" element={<CsvDashboardGuidePage />} />
           <Route path="guides/troubleshooting" element={<TroubleshootingPage />} />
           <Route path="verticals" element={<VerticalsPage />} />
           <Route path="compare" element={<ComparePage />} />

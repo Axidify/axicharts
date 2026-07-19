@@ -176,6 +176,10 @@ export function StartPage(): ReactElement {
       </p>
       <ul style={{ fontSize: 14, lineHeight: 1.8, color: "#475569" }}>
         <li>
+          <Link to="/guides/csv-dashboard">CSV → dashboard</Link> — upload → planner → per-panel{" "}
+          <code>Chart</code> (Path 2)
+        </li>
+        <li>
           <Link to="/spec/blocks">Cartesian spec + validation</Link> — <code>marks[]</code>,{" "}
           <code>validateCartesianSpec</code>, <code>ejectPanel</code>
         </li>

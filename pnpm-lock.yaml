@@ -70,6 +70,46 @@ importers:
         specifier: ^6.2.2
         version: 6.4.3(@types/node@22.20.1)(jiti@2.7.0)
 
+  apps/csv-dashboard:
+    dependencies:
+      '@axicharts/charts':
+        specifier: workspace:*
+        version: link:../../packages/charts
+      '@axicharts/charts-planner':
+        specifier: workspace:*
+        version: link:../../packages/charts-planner
+      '@axicharts/charts-spec':
+        specifier: workspace:*
+        version: link:../../packages/charts-spec
+      '@axicharts/charts-theme':
+        specifier: workspace:*
+        version: link:../../packages/charts-theme
+      react:
+        specifier: ^19.0.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.7(react@19.2.7)
+      uplot:
+        specifier: ^1.6.31
+        version: 1.6.32
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.2.3(@types/react@19.2.17)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.4
+        version: 4.7.0(vite@6.4.3(@types/node@22.20.1)(jiti@2.7.0))
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vite:
+        specifier: ^6.2.2
+        version: 6.4.3(@types/node@22.20.1)(jiti@2.7.0)
+
   apps/dashboarder:
     dependencies:
       '@axicharts/charts':

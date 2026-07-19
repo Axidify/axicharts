@@ -8,6 +8,10 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
+### Added
+
+- **C147c** — [CSV → dashboard guide](https://axidify.github.io/axicharts/guides/csv-dashboard) (Path 2): parse → profile → `planFromIntent` → `Chart` panels; `apps/csv-dashboard` Vite example; linked from Choosing your path
+
 ## [0.4.4] - 2026-07-19
 
 ### Fixed

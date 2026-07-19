@@ -15,6 +15,17 @@ const paths = [
     cta: "Getting started",
   },
   {
+    title: "CSV → dynamic dashboard",
+    who: "Spreadsheet upload, batch snapshot, auto panel grid",
+    steps: [
+      "Parse CSV → rows in your app",
+      "profile.fields + planFromIntent (static feed)",
+      "Chart per panel — not RuntimeDashboard for CSV",
+    ],
+    start: "/guides/csv-dashboard",
+    cta: "CSV dashboard guide",
+  },
+  {
     title: "Agent / JSON cartesian spec",
     who: "LLM, MCP, or codegen emits panel JSON",
     steps: [

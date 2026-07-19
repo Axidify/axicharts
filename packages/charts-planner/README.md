@@ -44,6 +44,8 @@ charts-planner plan examples/trading.profile.json --intent "Trading blotter cand
 
 Profile examples: `examples/finance.profile.json`, `examples/trading.profile.json`, `examples/ops.profile.json`.
 
+CSV sample for Path 2: `examples/sample-weekly.csv` — see [CSV dashboard guide](https://axidify.github.io/axicharts/guides/csv-dashboard).
+
 ## Planner feeds
 
 `inferFeed()` maps intent keywords to `DashboardPlan.feed`. Each feed binds to a shipped import
