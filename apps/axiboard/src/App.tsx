@@ -11,6 +11,7 @@ import {
   importSharedWorkspace,
   loadWorkspaceStore,
   parseDashboardSpec,
+  tryParseDashboardSpec,
   persistWorkspaceStore,
   renameDashboard,
   renameWorkspace,
@@ -197,8 +198,8 @@ export function App(): ReactElement {
 
   const builtSpec = useMemo(() => {
     if (store && layout === "panels") {
-      const saved = parseDashboardSpec(getActiveDashboard(store));
-      if (saved.layout === "panels") return saved;
+      const saved = tryParseDashboardSpec(getActiveDashboard(store));
+      if (saved?.layout === "panels") return saved;
     }
 
     const next = buildRuntimeSpec({ template, layout, feed, presentation, mosaicPreset });
@@ -221,9 +222,10 @@ export function App(): ReactElement {
   const activeSpec = useMemo((): RuntimeDashboardSpec | null => {
     if (!store) return null;
     const dashboard = getActiveDashboard(store);
-    const saved = parseDashboardSpec(dashboard);
+    const saved = tryParseDashboardSpec(getActiveDashboard(store));
+    if (!saved) return builtSpec;
 
-    if (saved.layout === "panels") {
+    if (saved.layout === "panels" || saved.layout === "hybrid") {
       return saved;
     }
 

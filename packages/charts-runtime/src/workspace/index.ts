@@ -8,6 +8,7 @@ export {
   getActiveWorkspace,
   loadWorkspaceStore,
   parseDashboardSpec,
+  tryParseDashboardSpec,
   persistWorkspaceStore,
   renameDashboard,
   renameWorkspace,

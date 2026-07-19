@@ -1,4 +1,4 @@
-import { parseRuntimeSpec, serializeRuntimeSpec } from "../runtimeSpec";
+import { parseRuntimeSpec, serializeRuntimeSpec, validateRuntimeSpecJson } from "../runtimeSpec";
 import type { RuntimeDashboardSpec } from "../types";
 import {
   DEFAULT_WORKSPACE_STORE_KEY,
@@ -70,6 +70,12 @@ export function getActiveDashboard(store: WorkspaceStore): SavedDashboard {
 
 export function parseDashboardSpec(dashboard: SavedDashboard): RuntimeDashboardSpec {
   return parseRuntimeSpec(dashboard.specJson);
+}
+
+/** Returns null when specJson is missing or fails runtime validation. */
+export function tryParseDashboardSpec(dashboard: SavedDashboard): RuntimeDashboardSpec | null {
+  const result = validateRuntimeSpecJson(dashboard.specJson);
+  return result.ok ? result.spec : null;
 }
 
 export function selectWorkspace(store: WorkspaceStore, workspaceId: string): WorkspaceStore {
