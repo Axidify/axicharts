@@ -4,6 +4,7 @@ import type { AgentChartBlock, OrchestratorPlanResult } from "../types";
 
 function mapBlock(block: PlannerDashboardPlan["kpis"][number]): AgentChartBlock {
   return {
+    questionId: block.questionId,
     panel: block.panel,
     rows: block.rows,
     decision: block.decision,

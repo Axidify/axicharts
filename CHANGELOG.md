@@ -8,7 +8,11 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
-_Nothing yet._
+### Added
+
+- **C161** — Golden contract tests: MCP `plan_dashboard` ≡ orchestrator `runTabularPlan` on ledger, sales, attendance fixtures (`apps/axiboard/server/golden/`)
+
+_Nothing else yet._
 
 ## Axiboard app (monorepo, not npm) — 2026-07-19
 

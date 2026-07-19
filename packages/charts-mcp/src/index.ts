@@ -19,4 +19,9 @@ export {
   type ToolTextResult,
 } from "./tools";
 export { describeDataProfile, type DescribeDataProfileResult, type DescribedField } from "./describeDataProfile";
+export {
+  planDashboardForMcp,
+  type McpDashboardBlock,
+  type McpPlanDashboardResult,
+} from "./planDashboardMcp";
 export { OPENAPI_TOOL_BUNDLE, type OpenApiToolDefinition } from "./openapi";

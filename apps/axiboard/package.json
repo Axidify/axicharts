@@ -26,6 +26,7 @@
     "uplot": "^1.6.31"
   },
   "devDependencies": {
+    "@axicharts/charts-mcp": "workspace:*",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",

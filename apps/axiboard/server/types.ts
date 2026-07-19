@@ -15,6 +15,7 @@ export type AgentDecision = {
 };
 
 export type AgentChartBlock = {
+  questionId: string;
   panel: PanelSpec;
   rows: Array<Record<string, string | number | boolean>>;
   decision: AgentDecision;
