@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import {
   compileTemplate,
+  isRegisteredTemplate,
   listTemplateMeta,
   registerDashboardTemplate,
 } from "@axicharts/charts-spec";
@@ -165,25 +166,27 @@ export const AllTemplates: Story = {
 
 export const CommunitySlot: Story = {
   render: () => {
-    registerDashboardTemplate({
-      id: "gallery-demo",
-      label: "Gallery demo (community)",
-      vertical: "custom",
-      render: () => (
-        <div
-          style={{
-            padding: 16,
-            borderRadius: 8,
-            border: "1px dashed #7c3aed",
-            background: "#faf5ff",
-            color: "#5b21b6",
-            maxWidth: 420,
-          }}
-        >
-          Community template registered at runtime — no charts-spec fork required.
-        </div>
-      ),
-    });
+    if (!isRegisteredTemplate("gallery-demo")) {
+      registerDashboardTemplate({
+        id: "gallery-demo",
+        label: "Gallery demo (community)",
+        vertical: "custom",
+        render: () => (
+          <div
+            style={{
+              padding: 16,
+              borderRadius: 8,
+              border: "1px dashed #7c3aed",
+              background: "#faf5ff",
+              color: "#5b21b6",
+              maxWidth: 420,
+            }}
+          >
+            Community template registered at runtime — no charts-spec fork required.
+          </div>
+        ),
+      });
+    }
 
     return <TemplateGallery />;
   },

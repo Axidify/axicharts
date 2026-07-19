@@ -15,6 +15,7 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 ### Fixed
 
 - Dashboarder app TypeScript errors (`typecheck` clean)
+- Storybook HMR: idempotent builtin dashboard template registration; guard community gallery demo re-register
 
 ## [0.3.52] - 2026-07-19
 

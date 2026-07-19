@@ -43,7 +43,7 @@ export function registerBuiltinDashboardTemplate(
 ): void {
   const id = assertId(registration.id);
   if (builtins.has(id)) {
-    throw new Error(`[AxiCharts] Builtin dashboard template "${id}" is already registered`);
+    return;
   }
   if (community.has(id)) {
     throw new Error(
