@@ -73,6 +73,22 @@ export function buildDeckSlideContent(
     );
   }
 
+  if (spec.layout === "hybrid") {
+    if (slide.id.startsWith("live-")) {
+      const cellId = slide.id.slice("live-".length);
+      return buildDeckSlideContent(
+        { layout: "mosaic", wall: spec.hybrid.wall },
+        { ...slide, id: cellId },
+        options,
+      );
+    }
+    return buildDeckSlideContent(
+      { layout: "panels", panels: spec.hybrid.panels },
+      slide,
+      options,
+    );
+  }
+
   const dashboard = spec.dashboard;
   const data = dashboard.data ?? {};
   const theme = presentationTheme(presentation, dashboard.theme);

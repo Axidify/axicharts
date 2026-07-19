@@ -19,12 +19,30 @@ All cartesian tools reference schema: `@axicharts/charts-spec/schema/cartesian-p
 
 ## Cursor / Claude Desktop
 
+**Published (npm):**
+
 ```json
 {
   "mcpServers": {
     "axicharts-cartesian": {
       "command": "npx",
       "args": ["-y", "@axicharts/charts-mcp"]
+    }
+  }
+}
+```
+
+**Local monorepo (recommended for axiboard dev)** — uses `~/.cursor/run-charts-mcp.sh`:
+
+```json
+{
+  "mcpServers": {
+    "axicharts-cartesian": {
+      "command": "bash",
+      "args": ["/Users/axidrain/.cursor/run-charts-mcp.sh"],
+      "env": {
+        "AXICHARTS_ROOT": "/Users/axidrain/Projects/axicharts"
+      }
     }
   }
 }

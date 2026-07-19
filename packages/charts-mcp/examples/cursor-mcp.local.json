@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "axicharts-cartesian": {
+      "command": "bash",
+      "args": ["/Users/axidrain/.cursor/run-charts-mcp.sh"],
+      "env": {
+        "AXICHARTS_ROOT": "/Users/axidrain/Projects/axicharts"
+      }
+    }
+  }
+}

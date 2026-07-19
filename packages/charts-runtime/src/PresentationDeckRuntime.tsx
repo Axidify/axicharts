@@ -45,7 +45,9 @@ export function PresentationDeckRuntime({
       ? spec.wall.title
       : spec.layout === "panels"
         ? spec.panels.title
-        : spec.dashboard.title) ??
+        : spec.layout === "hybrid"
+          ? (spec.hybrid.title ?? spec.hybrid.panels.title)
+          : spec.dashboard.title) ??
     "Presentation deck";
 
   return (
