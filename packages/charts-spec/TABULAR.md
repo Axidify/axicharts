@@ -9,10 +9,20 @@ Agent and planner APIs for **row-shaped business data** (CSV, API exports, ledge
 | API | Purpose |
 |-----|---------|
 | `inferFieldRoles(rows)` | time / dimension / measure / identifier |
+| `classifyTabularDomain(profile)` | data-driven vertical (sales, ledger, attendance, …) — C155 |
+| `enrichProfileWithDomain(profile)` | tag metrics with inferred vertical when confident |
+| `rankQuestions(...)` | persona-weighted question ranking (C156) |
+| `findQuestionsForIntent(intent, vertical)` | NL follow-up → catalog questions |
+| `questionToRecipe` / `compileRecipe` | question → geometry → PanelSpec (C158) |
 | `fieldProfilesToDataProfile(profiles)` | metrics + fields for planner |
 | `aggregateRows(rows, { groupBy, aggregates })` | chart-ready grouped rows |
-| `createCartesianPanel({ yField, xField, intent })` | explicit field binding |
+| `createCartesianPanel({ yField, yFields, xField, intent })` | explicit field binding + stacked bars |
+| `createTablePanel` | transaction / row preview table panel |
+| `parseTabular(text)` | CSV / pipe / TSV → rows |
+| `planFromCsv` (charts-planner) | text → `DashboardPlan` |
 | `ledgerRulePack` | vertical rules for journal / GL data |
+| `attendanceRulePack` | vertical rules for HR / timesheet data (C153) |
+| `salesRulePack` | vertical rules for CRM / pipeline data (C154) |
 | `PanelSpecGrid` | render `PanelSpec[]` + `{ rows }` |
 
 ## Example

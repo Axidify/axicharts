@@ -88,4 +88,52 @@ export const OPENAPI_TOOL_BUNDLE: OpenApiToolDefinition[] = [
       },
     },
   },
+  {
+    name: "create_table_panel",
+    description: "Create a table panel for transaction lists or row previews.",
+    schemaUrl: CARTESIAN_PANEL_SCHEMA_URL,
+    inputSchema: {
+      type: "object",
+      properties: {
+        intent: { type: "string" },
+        title: { type: "string" },
+        columns: {
+          type: "array",
+          items: {
+            type: "object",
+            required: ["key"],
+            properties: {
+              key: { type: "string" },
+              label: { type: "string" },
+              align: { enum: ["left", "right"] },
+            },
+          },
+        },
+        compact: { type: "boolean" },
+      },
+    },
+  },
+  {
+    name: "plan_dashboard",
+    description:
+      "Plan a tabular dashboard — C157 compiled KPIs/charts, decision log, persona, ranked questions, and dashboard shell (C159).",
+    schemaUrl: DATA_PROFILE_SCHEMA_URL,
+    inputSchema: {
+      type: "object",
+      properties: {
+        intent: { type: "string" },
+        csv: { type: "string" },
+        dataProfile: { type: "object" },
+        rows: { type: "array", items: { type: "object" } },
+        persona: {
+          type: "string",
+          enum: ["executive", "manager", "analyst", "operator"],
+        },
+        followUpIntents: {
+          type: "array",
+          items: { type: "string" },
+        },
+      },
+    },
+  },
 ];

@@ -33,6 +33,12 @@ export type LedgerEnrichment = {
   revenueByCategory: Record<string, string | number>[];
   spendByCostCenter: Record<string, string | number>[];
   volumeByPaymentMethod: Record<string, string | number>[];
+  waterfallByCategory: Array<{
+    name: string;
+    value: number;
+    isTotal?: boolean;
+    tone?: "success" | "warning" | "critical";
+  }>;
 };
 
 function findNamedField(fieldProfiles: FieldProfile[], pattern: RegExp): string {
@@ -115,6 +121,18 @@ export function enrichLedger(rows: TabularRow[]): LedgerEnrichment | null {
     },
   }).sort((a, b) => Number(b.volume) - Number(a.volume));
 
+  const waterfallByCategory = [
+    { name: "Credits", value: totalCredits, tone: "success" as const },
+    ...byCategory
+      .filter((row) => Number(row.debit) > 0)
+      .map((row) => ({
+        name: String(row[fieldMap.category]),
+        value: -Number(row.debit),
+        tone: "warning" as const,
+      })),
+    { name: "Net flow", value: totalCredits - totalDebits, isTotal: true },
+  ];
+
   return {
     rows,
     fieldProfiles,
@@ -131,6 +149,7 @@ export function enrichLedger(rows: TabularRow[]): LedgerEnrichment | null {
     revenueByCategory,
     spendByCostCenter,
     volumeByPaymentMethod,
+    waterfallByCategory,
   };
 }
 

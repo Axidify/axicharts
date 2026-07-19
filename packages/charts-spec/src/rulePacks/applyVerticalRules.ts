@@ -1,4 +1,4 @@
-import type { MetricProfile, PanelSpec } from "../types";
+import type { FieldProfile, MetricProfile, PanelSpec } from "../types";
 import { resolveVerticalId, rulePackForVertical } from "./index";
 import type { VerticalPanelContext } from "./types";
 
@@ -6,6 +6,7 @@ export type ApplyVerticalRulesContext = {
   metric: MetricProfile;
   intent?: string;
   profileFields?: string[];
+  fieldProfiles?: FieldProfile[];
   allMetrics?: MetricProfile[];
 };
 
@@ -17,6 +18,7 @@ export function applyVerticalRules(
     metric: ctx.metric,
     intent: ctx.intent,
     profileFields: ctx.profileFields,
+    fieldProfiles: ctx.fieldProfiles,
     allMetrics: ctx.allMetrics,
   };
 

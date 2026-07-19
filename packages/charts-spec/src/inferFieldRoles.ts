@@ -2,11 +2,22 @@ import type { FieldProfile, FieldRole } from "./types";
 import { TIME_FIELD_RE } from "./profileInference";
 
 const IDENTIFIER_FIELD_RE =
-  /^(id|uuid|key|transaction|invoice|bill|ref|reference|no|number|trx)/i;
+  /^(id|uuid|key|transaction|invoice|bill|ref|reference|no|number|trx|emp)/i;
+const EMPLOYEE_ID_FIELD_RE = /\bemployee\s*id\b|\bstaff\s*id\b|\bemp\s*id\b/i;
+const OPPORTUNITY_ID_FIELD_RE = /\b(opportunity|deal|lead)\s*id\b/i;
+const CLOSE_DATE_FIELD_RE = /\bexpected\s*close\b|\bclose\s*date\b/i;
 const MEASURE_FIELD_RE =
-  /^(debit|credit|balance|amount|total|sum|value|price|cost|revenue|qty|quantity|volume|spend)/i;
+  /^(debit|credit|balance|amount|total|sum|value|price|cost|revenue|qty|quantity|volume|spend|hours|headcount|count|probability)$/i;
 const DIMENSION_FIELD_RE =
-  /(category|account|cost\s*center|department|vendor|customer|payment\s*method|method|type|status|region)/i;
+  /(category|account|cost\s*center|department|vendor|customer|payment\s*method|method|type|status|region|name)/i;
+
+/** Measure columns whose names also match TIME_FIELD_RE (e.g. "Hours"). */
+const MEASURE_TIME_COLLISION_RE = /^hours$/i;
+
+function isTimeFieldName(field: string): boolean {
+  if (MEASURE_TIME_COLLISION_RE.test(field.trim())) return false;
+  return TIME_FIELD_RE.test(field);
+}
 
 function sampleValues(rows: Record<string, unknown>[], field: string, limit = 8): unknown[] {
   return rows.slice(0, limit).map((row) => row[field]);
@@ -19,9 +30,11 @@ function isNumericColumn(rows: Record<string, unknown>[], field: string): boolea
 }
 
 function inferRoleFromName(field: string): FieldRole | undefined {
-  if (TIME_FIELD_RE.test(field)) return "time";
+  if (EMPLOYEE_ID_FIELD_RE.test(field) || OPPORTUNITY_ID_FIELD_RE.test(field)) return "identifier";
   if (IDENTIFIER_FIELD_RE.test(field)) return "identifier";
-  if (MEASURE_FIELD_RE.test(field)) return "measure";
+  if (MEASURE_FIELD_RE.test(field.trim())) return "measure";
+  if (CLOSE_DATE_FIELD_RE.test(field)) return "time";
+  if (isTimeFieldName(field)) return "time";
   if (DIMENSION_FIELD_RE.test(field)) return "dimension";
   return undefined;
 }

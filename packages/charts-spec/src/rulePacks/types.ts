@@ -1,11 +1,12 @@
-import type { MetricProfile, PanelSpec } from "../types";
+import type { MetricProfile, PanelSpec, FieldProfile } from "../types";
 
-export type VerticalId = "finance" | "ledger" | "trading" | "ops";
+export type VerticalId = "finance" | "ledger" | "trading" | "ops" | "attendance" | "sales";
 
 export type VerticalPanelContext = {
   metric: MetricProfile;
   intent?: string;
   profileFields?: string[];
+  fieldProfiles?: FieldProfile[];
   allMetrics?: MetricProfile[];
 };
 

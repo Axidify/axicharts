@@ -112,6 +112,20 @@ describe("createCartesianPanel", () => {
     expect(matchedRules).toContain("explicit-bar");
     expect(panel.marks?.some((mark) => mark.type === "bar" && mark.field === "credit")).toBe(true);
   });
+
+  it("builds stacked debit and credit bars from intent", () => {
+    const { panel, needsReview, matchedRules } = createCartesianPanel({
+      intent: "stacked debit and credit bar chart by category",
+      fields: ["category", "debit", "credit"],
+      xField: "category",
+    });
+
+    expect(needsReview).toBe(false);
+    expect(matchedRules).toContain("explicit-stacked-bar");
+    const bars = panel.marks?.filter((mark) => mark.type === "bar") ?? [];
+    expect(bars).toHaveLength(2);
+    expect(bars.every((mark) => mark.stack === "default")).toBe(true);
+  });
 });
 
 describe("reviseCartesianPanel", () => {

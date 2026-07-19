@@ -84,7 +84,7 @@ describe("charts-mcp tools", () => {
     expect(byName.create_cartesian_panel?.schemaUrl).toBe(CARTESIAN_PANEL_SCHEMA_URL);
     expect(byName.describe_data_profile?.schemaUrl).toBe(DATA_PROFILE_SCHEMA_URL);
     for (const tool of OPENAPI_TOOL_BUNDLE) {
-      if (tool.name === "describe_data_profile") continue;
+      if (tool.name === "describe_data_profile" || tool.name === "plan_dashboard") continue;
       expect(tool.schemaUrl).toBe(CARTESIAN_PANEL_SCHEMA_URL);
     }
     expect(OPENAPI_TOOL_BUNDLE.map((tool) => tool.name)).toEqual([
@@ -94,6 +94,8 @@ describe("charts-mcp tools", () => {
       "list_cartesian_marks",
       "describe_data_profile",
       "compile_cartesian_panel",
+      "create_table_panel",
+      "plan_dashboard",
     ]);
   });
 

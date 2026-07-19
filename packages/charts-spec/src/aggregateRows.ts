@@ -9,7 +9,46 @@ export type AggregateSpec =
 export type AggregateRowsOptions = {
   groupBy: string;
   aggregates: Record<string, AggregateSpec>;
+  /** C152 — filter rows before grouping. */
+  where?: Array<{
+    field: string;
+    op: "eq" | "neq" | "gt" | "gte" | "lt" | "lte";
+    value: string | number;
+  }>;
 };
+
+function matchesWhere(
+  row: Record<string, unknown>,
+  clause: NonNullable<AggregateRowsOptions["where"]>[number],
+): boolean {
+  const raw = row[clause.field];
+  const left = typeof raw === "number" ? raw : String(raw ?? "");
+  const right = clause.value;
+  switch (clause.op) {
+    case "eq":
+      return left === right || String(left) === String(right);
+    case "neq":
+      return left !== right && String(left) !== String(right);
+    case "gt":
+      return Number(left) > Number(right);
+    case "gte":
+      return Number(left) >= Number(right);
+    case "lt":
+      return Number(left) < Number(right);
+    case "lte":
+      return Number(left) <= Number(right);
+    default:
+      return true;
+  }
+}
+
+function filterRows(
+  rows: Record<string, unknown>[],
+  where?: AggregateRowsOptions["where"],
+): Record<string, unknown>[] {
+  if (!where?.length) return rows;
+  return rows.filter((row) => where.every((clause) => matchesWhere(row, clause)));
+}
 
 function cellNumber(row: Record<string, unknown>, field: string): number {
   const value = row[field];
@@ -51,10 +90,11 @@ export function aggregateRows(
   rows: Record<string, unknown>[],
   options: AggregateRowsOptions,
 ): Record<string, string | number>[] {
-  const { groupBy, aggregates } = options;
+  const { groupBy, aggregates, where } = options;
+  const source = filterRows(rows, where);
   const groups = new Map<string, Record<string, unknown>[]>();
 
-  for (const row of rows) {
+  for (const row of source) {
     const key = String(row[groupBy] ?? "Unknown");
     const bucket = groups.get(key) ?? [];
     bucket.push(row);

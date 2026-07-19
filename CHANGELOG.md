@@ -8,6 +8,93 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
+_Nothing yet._
+
+## Axiboard app (monorepo, not npm) — 2026-07-19
+
+### Added
+
+- **C160** — `apps/axiboard/server` orchestrator (plan, chat, BYOK session)
+- **C160** — Vite dev API `/api/orchestrator/*`; R&D Ledger / Sales / Attendance use server chat
+- **C160** — `OrchestratorChat`, `ByokSettings`, `useOrchestratorPlan`
+
+## [0.1.1] - 2026-07-19
+
+### Added
+
+- **C159** — `plan_dashboard` uses `planDashboardFromRows` (C157) — compiled KPIs, charts, full decision log
+- **C159** — MCP `persona` + `followUpIntents` on `plan_dashboard` (server schema wired)
+- `planDashboardMcp` helper — structured MCP payload with `summary.needsReview`
+
+## [0.4.13] - 2026-07-19
+
+### Added
+
+- **C157** — `planDashboardFromRows(rows, options)` unified tabular planner (L2–L5 pipeline)
+- **C157** — `enrichTabular` / `enrichSales` / `enrichLedger` / `enrichAttendance` in charts-spec
+- **C157** — `applyRecipeData` binds enriched datasets to panel recipes per question id
+- **charts-planner** — `planDashboardFromRows` wrapper adds `planFromIntent` dashboard shell
+- R&D `agentPlan*` scripts thinned to wrappers over unified planner
+
+## [0.4.12] - 2026-07-19
+
+### Added
+
+- **C158** — `PanelRecipe`, `inferChartGeometry`, `questionToRecipe`, `compileRecipe`
+- Chart geometry: time → line, stage → funnel, nominal → bar, KPI → stat, audit → table
+- Sales R&D dashboard uses `compileRecipe` (pipeline by stage renders as funnel)
+
+## [0.4.11] - 2026-07-19
+
+### Added
+
+- **C156** — `Persona`, question catalogs (sales / ledger / attendance), `rankQuestions`, `findQuestionsForIntent`
+- **C156** — `inferPersonaFromIntent` / `resolvePersona`
+- R&D views — Audience (`Persona`) selector; agent decision log shows ranked questions
+- MCP `plan_dashboard` — optional `persona`; returns `domain` + `questions`
+
+## [0.4.10] - 2026-07-19
+
+### Added
+
+- **C155** — `classifyTabularDomain`, `enrichProfileWithDomain` — data-driven vertical from field names + roles
+- `resolveVerticalId` falls back to domain classifier when intent/tags absent
+- MCP `describe_data_profile` returns `domain` block
+- `profileFromCsv` returns domain semantics; `planFromCsv` auto-tags metrics
+
+## [0.4.9] - 2026-07-19
+
+### Added
+
+- **C154** — `salesRulePack` for CRM / pipeline dashboards
+- R&D sales pipeline spike in `apps/axiboard` (`SalesRndView`, enrich + interpreter + agent plan)
+
+### Fixed
+
+- **C154** — `inferFieldRoles` treats `Opportunity ID` as identifier, `Expected Close` as time, `Probability` as measure
+- **C154** — `parseTabular` coerces percent strings (`70%` → `70`)
+
+## [0.4.8] - 2026-07-19
+
+### Added
+
+- **C153** — `attendanceRulePack` for HR / timesheet dashboards
+- R&D attendance spike in `apps/axiboard` (`AttendanceRndView`, enrich + interpreter + agent plan)
+
+### Fixed
+
+- **C153** — `inferFieldRoles` treats `Hours` as measure (not time); `Employee ID` as identifier
+
+## [0.4.7] - 2026-07-19
+
+### Added
+
+- **C149** — stacked multi-series bars via `yFields` + debit/credit intent in `createCartesianPanel`
+- **C150** — `createTablePanel` for transaction / row-preview panels
+- **C152** — `parseTabular`, `aggregateRows.where`, `planFromCsv` (charts-planner)
+- **charts-mcp** — `create_table_panel`, `plan_dashboard`; `describe_data_profile` uses `inferFieldRoles`
+- **axiboard** — C151 `PlannerPanelsWorkspace` renders planner `plan.panels` on static feed
+
 ## [0.4.6] - 2026-07-19
 
 ### Fixed

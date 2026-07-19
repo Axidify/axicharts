@@ -1,6 +1,7 @@
 import { useMemo, useState, type ChangeEvent, type ReactElement } from "react";
 import { Chart, PanelSpecGrid } from "@axicharts/charts-spec";
-import { agentPlanLedgerDashboard } from "./agentPlan";
+import { OrchestratorChat } from "../chat/OrchestratorChat";
+import { useOrchestratorPlan } from "../hooks/useOrchestratorPlan";
 import { enrichLedger, formatRm } from "./ledgerEnrich";
 import { parseTabular } from "./parseTabular";
 import { SAMPLE_LEDGER_TEXT } from "./sampleLedger";
@@ -29,11 +30,7 @@ export type LedgerRndViewProps = {
 
 export function LedgerRndView({ onExit }: LedgerRndViewProps): ReactElement {
   const [rawText, setRawText] = useState(SAMPLE_LEDGER_TEXT);
-  const [error, setError] = useState<string | null>(null);
-  const [agentAsk, setAgentAsk] = useState("show payment method breakdown");
-  const [followUpIntents, setFollowUpIntents] = useState<string[]>([
-    "show payment method breakdown",
-  ]);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   const enrichment = useMemo(() => {
     const rows = parseTabular(rawText);
@@ -41,23 +38,33 @@ export function LedgerRndView({ onExit }: LedgerRndViewProps): ReactElement {
     return enrichLedger(rows);
   }, [rawText]);
 
-  const agentPlan = useMemo(() => {
-    if (!enrichment) return null;
-    return agentPlanLedgerDashboard(enrichment, { followUpIntents });
-  }, [enrichment, followUpIntents]);
+  const {
+    result: agentPlan,
+    loading,
+    error: orchestratorError,
+    persona,
+    setPersona,
+    sendMessage,
+  } = useOrchestratorPlan({
+    csv: rawText,
+    initialPersona: "manager",
+    initialFollowUpIntents: ["show payment method breakdown"],
+  });
 
   const onFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     try {
       setRawText(await file.text());
-      setError(null);
+      setFileError(null);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Failed to read file");
+      setFileError(cause instanceof Error ? cause.message : "Failed to read file");
     } finally {
       event.target.value = "";
     }
   };
+
+  const error = fileError ?? orchestratorError;
 
   return (
     <div>
@@ -73,9 +80,8 @@ export function LedgerRndView({ onExit }: LedgerRndViewProps): ReactElement {
         <div>
           <div style={{ fontSize: 16, fontWeight: 700 }}>R&D — Ledger → dashboard</div>
           <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4, maxWidth: 640 }}>
-            Agent spike (RFC-003 / C148): <code>inferFieldRoles</code>,{" "}
-            <code>aggregateRows</code>, <code>createCartesianPanel</code>,{" "}
-            <code>planPanelFromMetric</code>, <code>PanelSpecGrid</code>.
+            Server orchestrator (C160): <code>planDashboardFromRows</code> via{" "}
+            <code>/api/orchestrator/chat</code> — BYOK optional.
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -97,45 +103,25 @@ export function LedgerRndView({ onExit }: LedgerRndViewProps): ReactElement {
         </div>
       </div>
 
-      <form
-        style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}
-        onSubmit={(event) => {
-          event.preventDefault();
-          const trimmed = agentAsk.trim();
-          if (!trimmed) return;
-          setFollowUpIntents((current) =>
-            current.includes(trimmed) ? current : [...current, trimmed],
-          );
-        }}
-      >
-        <input
-          value={agentAsk}
-          onChange={(event) => setAgentAsk(event.target.value)}
-          placeholder="Ask agent… e.g. show payment method breakdown"
-          style={{
-            flex: "1 1 280px",
-            minWidth: 220,
-            padding: "8px 12px",
-            borderRadius: 8,
-            border: "1px solid #475569",
-            background: "#0f172a",
-            color: "#e2e8f0",
-            fontSize: 12,
-          }}
-        />
-        <button type="submit" style={buttonStyle}>
-          Ask agent
-        </button>
-      </form>
+      <OrchestratorChat
+        persona={persona}
+        onPersonaChange={setPersona}
+        onSend={sendMessage}
+        loading={loading}
+        assistantMessage={agentPlan?.assistantMessage}
+        llmUsed={agentPlan?.llm.used}
+        placeholder="Ask agent… e.g. show payment method breakdown"
+      />
 
       {error ? (
         <div style={{ marginBottom: 12, fontSize: 12, color: "#f87171" }}>{error}</div>
       ) : null}
 
-      {!enrichment || !agentPlan ? (
+      {!enrichment || !agentPlan || loading ? (
         <p style={{ fontSize: 13, color: "#94a3b8" }}>
-          Paste or upload a ledger table with Date, Debit, Credit, Balance, Category, and Cost
-          Center columns.
+          {loading
+            ? "Planning dashboard…"
+            : "Paste or upload a ledger table with Date, Debit, Credit, Balance, Category, and Cost Center columns."}
         </p>
       ) : (
         <>
@@ -162,8 +148,11 @@ export function LedgerRndView({ onExit }: LedgerRndViewProps): ReactElement {
               Agent decisions
             </div>
             <ol style={{ margin: 0, paddingLeft: 18 }}>
-              {agentPlan.decisions.map((decision) => (
-                <li key={`${decision.step}-${decision.api}`} style={{ marginBottom: 6 }}>
+              {agentPlan.decisions.map((decision, index) => (
+                <li
+                  key={`${decision.step}-${decision.api}-${decision.intent ?? index}-${index}`}
+                  style={{ marginBottom: 6 }}
+                >
                   <span style={{ color: "#e2e8f0" }}>{decision.step}</span>
                   {" · "}
                   <code>{decision.api}</code>

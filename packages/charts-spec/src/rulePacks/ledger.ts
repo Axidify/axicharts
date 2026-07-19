@@ -6,6 +6,20 @@ function applyLedgerPanelRules(panel: PanelSpec, ctx: VerticalPanelContext): Pan
   const intent = ctx.intent?.toLowerCase() ?? "";
   const fields = ctx.profileFields ?? [];
 
+  if (/kpi|stat|headline/.test(intent)) {
+    return {
+      ...panel,
+      type: "stat",
+      theme: "clean",
+      mode: "interactive",
+      encoding: { value: { field: ctx.metric.name, type: "quantitative" } },
+      props: {
+        label: ctx.metric.name,
+        monospace: true,
+      },
+    };
+  }
+
   if (/balance/.test(name) || /balance/.test(intent)) {
     const timeField =
       fields.find((f) => /date|time|period|week|month/i.test(f)) ?? "date";
@@ -42,7 +56,10 @@ function applyLedgerPanelRules(panel: PanelSpec, ctx: VerticalPanelContext): Pan
       title: panel.title ?? "Expenses breakdown",
       theme: "clean",
       mode: "interactive",
-      encoding: { x: { field: dimField, type: "nominal" } },
+      encoding: {
+        x: { field: dimField, type: "nominal" },
+        y: { field: "debit", type: "quantitative", format: "currency" },
+      },
       marks: [
         {
           type: "bar",
@@ -75,20 +92,6 @@ function applyLedgerPanelRules(panel: PanelSpec, ctx: VerticalPanelContext): Pan
           labels: true,
         },
       ],
-    };
-  }
-
-  if (/kpi|stat|headline/.test(intent)) {
-    return {
-      ...panel,
-      type: "stat",
-      theme: "clean",
-      mode: "interactive",
-      encoding: { value: { field: ctx.metric.name, type: "quantitative" } },
-      props: {
-        label: ctx.metric.name,
-        monospace: true,
-      },
     };
   }
 

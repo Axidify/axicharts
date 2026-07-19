@@ -106,7 +106,10 @@ export function PlannerPanel({
     setLoading(true);
     try {
       const next = await requestDashboardPlan({
-        profile: { metrics: [...DEFAULT_OPS_PROFILE.metrics] },
+        profile: {
+          fields: ["time", "cpu", "memory", "errors", "p95"],
+          metrics: [...DEFAULT_OPS_PROFILE.metrics],
+        },
         intent,
         serverUrl,
       });

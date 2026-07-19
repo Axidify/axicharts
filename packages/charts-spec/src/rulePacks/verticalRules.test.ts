@@ -143,6 +143,66 @@ describe("vertical rule packs (C90)", () => {
     expect(panel.mode).toBe("live");
   });
 
+  it("attendance: maps hours metric to department bar", () => {
+    const panel = planPanelFromMetric(
+      { name: "Hours", tags: { vertical: "attendance" } },
+      {
+        intent: "Attendance hours by department bar",
+        profileFields: ["Employee ID", "Department", "Date", "Hours", "Status"],
+      },
+    );
+
+    expect(panel.type).toBe("cartesian");
+    expect(panel.marks?.[0]).toMatchObject({ type: "bar", field: "Hours" });
+    expect(panel.encoding?.x?.field).toBe("Department");
+  });
+
+  it("attendance: maps KPI intent to stat panel", () => {
+    const panel = planPanelFromMetric(
+      { name: "presentCount", tags: { vertical: "attendance" } },
+      { intent: "kpi headline stat panel attendance" },
+    );
+
+    expect(panel.type).toBe("stat");
+  });
+
+  it("sales: maps pipeline value to stage bar chart", () => {
+    const panel = planPanelFromMetric(
+      { name: "Value (RM)", tags: { vertical: "sales" } },
+      {
+        intent: "pipeline value bar chart by stage with value labels",
+        profileFields: ["Stage", "Value (RM)", "Salesperson", "Probability"],
+      },
+    );
+
+    expect(panel.type).toBe("cartesian");
+    expect(panel.encoding?.x?.field).toBe("Stage");
+    expect(panel.marks?.[0]).toMatchObject({ type: "bar", field: "Value (RM)" });
+  });
+
+  it("sales: maps weighted forecast intent to salesperson bar", () => {
+    const panel = planPanelFromMetric(
+      { name: "weightedValue", tags: { vertical: "sales" } },
+      {
+        intent: "weighted forecast bar chart by salesperson",
+        profileFields: ["Salesperson", "weightedValue", "Stage"],
+      },
+    );
+
+    expect(panel.type).toBe("cartesian");
+    expect(panel.encoding?.y?.field).toBe("weightedValue");
+    expect(panel.encoding?.x?.field).toBe("Salesperson");
+  });
+
+  it("sales: maps KPI intent to stat panel", () => {
+    const panel = planPanelFromMetric(
+      { name: "totalPipeline", tags: { vertical: "sales" } },
+      { intent: "kpi headline stat panel sales pipeline" },
+    );
+
+    expect(panel.type).toBe("stat");
+  });
+
   it("plans finance/trading/ops panels across profile", () => {
     const panels = planPanelsFromProfile(
       {

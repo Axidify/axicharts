@@ -2,11 +2,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { axiboardOrchestratorPlugin } from "./server/vitePlugin";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), axiboardOrchestratorPlugin()],
   resolve: {
     alias: {
       "@axicharts/charts-runtime": path.resolve(root, "packages/charts-runtime/src"),

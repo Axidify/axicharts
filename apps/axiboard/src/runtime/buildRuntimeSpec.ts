@@ -342,6 +342,17 @@ function applyLiveFeedToMosaicWall(wall: MosaicWallSpec, feed: LiveFeedMode): Mo
   };
 }
 
+export function opsStaticRows(): Record<string, string | number>[] {
+  const [cpu, memory, errors, p95] = OPS_DATA.cells;
+  return CATEGORIES.map((time, index) => ({
+    time,
+    cpu: cpu.data[index] ?? 0,
+    memory: memory.data[index] ?? 0,
+    errors: errors.data[index] ?? 0,
+    p95: p95.data[index] ?? 0,
+  }));
+}
+
 export function buildRuntimeSpec(options: {
   template: TemplateId;
   layout: LayoutMode;

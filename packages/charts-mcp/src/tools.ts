@@ -1,8 +1,10 @@
 import {
   compilePanel,
   createCartesianPanel,
+  createTablePanel,
   listCartesianMarks,
   normalizeToCartesian,
+  parseTabular,
   reviseCartesianPanel,
   validateCartesianSpec,
   CARTESIAN_PANEL_SCHEMA_URL,
@@ -10,9 +12,11 @@ import {
   type ChartMode,
   type DataProfile,
   type PanelSpec,
+  type Persona,
   type SpecData,
   type ThemeName,
 } from "@axicharts/charts-spec";
+import { planDashboardForMcp } from "./planDashboardMcp";
 import { describeDataProfile } from "./describeDataProfile";
 
 function asRowArray(rows?: SpecData): Record<string, unknown>[] | undefined {
@@ -118,6 +122,60 @@ export function handleDescribeDataProfile(args: {
   });
 }
 
+export function handleCreateTablePanel(args: {
+  intent?: string;
+  title?: string;
+  columns?: Array<{ key: string; label?: string; align?: "left" | "right" }>;
+  compact?: boolean;
+}): ToolTextResult {
+  const panel = createTablePanel(args);
+  return jsonResult({
+    schema: CARTESIAN_PANEL_SCHEMA_URL,
+    panel,
+    needsReview: false,
+    matchedRules: ["table-default"],
+  });
+}
+
+export function handlePlanDashboard(args: {
+  intent?: string;
+  csv?: string;
+  dataProfile?: DataProfile;
+  rows?: SpecData;
+  persona?: Persona;
+  followUpIntents?: string[];
+}): ToolTextResult {
+  const rows = args.csv?.trim()
+    ? parseTabular(args.csv)
+    : (asRowArray(args.rows) ?? []);
+
+  if (rows.length === 0) {
+    return jsonResult(
+      {
+        ok: false,
+        error: "plan_dashboard requires csv text or a non-empty rows array",
+      },
+      true,
+    );
+  }
+
+  const result = planDashboardForMcp(
+    rows,
+    {
+      intent: args.intent,
+      persona: args.persona,
+      followUpIntents: args.followUpIntents,
+    },
+    DATA_PROFILE_SCHEMA_URL,
+  );
+
+  if (!result.ok) {
+    return jsonResult(result, true);
+  }
+
+  return jsonResult(result);
+}
+
 export function handleCompileCartesianPanel(args: {
   spec: PanelSpec;
   rows: SpecData;
@@ -152,6 +210,8 @@ export const TOOL_HANDLERS = {
   revise_cartesian_panel: handleReviseCartesianPanel,
   list_cartesian_marks: handleListCartesianMarks,
   describe_data_profile: handleDescribeDataProfile,
+  create_table_panel: handleCreateTablePanel,
+  plan_dashboard: handlePlanDashboard,
   compile_cartesian_panel: handleCompileCartesianPanel,
 } as const;
 

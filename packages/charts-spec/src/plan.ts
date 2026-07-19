@@ -1,4 +1,4 @@
-import type { ChartBlockMarkSpec, DataProfile, MetricProfile, PanelSpec } from "./types";
+import type { ChartBlockMarkSpec, DataProfile, FieldProfile, MetricProfile, PanelSpec } from "./types";
 import { applySpecCompilers } from "./specCompiler";
 import { inferColorEncodingForPanel } from "./colorEncodingPlan";
 import { inferLineCurveForPanel } from "./curveEncodingPlan";
@@ -10,6 +10,7 @@ import { inferCategoryFieldFromProfile } from "./profileInference";
 export type PlanPanelsOptions = {
   intent?: string;
   allMetrics?: MetricProfile[];
+  fieldProfiles?: FieldProfile[];
 };
 
 function inferChartType(metric: MetricProfile): PanelSpec["type"] {
@@ -193,6 +194,7 @@ export function planPanelFromMetric(
     metric,
     intent: options.intent,
     profileFields: options.profileFields,
+    fieldProfiles: options.fieldProfiles,
     allMetrics: options.allMetrics,
   });
 
@@ -218,6 +220,7 @@ export function planPanelsFromProfile(
       planPanelFromMetric(metric, {
         intent: options.intent,
         profileFields,
+        fieldProfiles: options.fieldProfiles ?? profile.fieldProfiles,
         allMetrics: profile.metrics,
       }),
       [],

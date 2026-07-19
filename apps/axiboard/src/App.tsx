@@ -28,11 +28,14 @@ import { ImportDialog } from "./ImportDialog";
 import { findImportPreset, adapterFixtureGalleryDeepLink, feedAdapterGalleryDeepLink, parseImportPresetQuery } from "@axicharts/charts-runtime/validation";
 import type { DataSourceAdapterType } from "@axicharts/charts-runtime";
 import { PlannerPanel } from "./PlannerPanel";
+import { PlannerPanelsWorkspace } from "./PlannerPanelsWorkspace";
 import { ShareDialog } from "./ShareDialog";
 import { PluginStrip } from "./PluginStrip";
 import { FeedIntentGlossary } from "./FeedIntentGlossary";
 import { WorkspaceSidebar } from "./WorkspaceSidebar";
 import { LedgerRndView } from "./rnd/LedgerRndView";
+import { AttendanceRndView } from "./rnd/AttendanceRndView";
+import { SalesRndView } from "./rnd/SalesRndView";
 import {
   buildRuntimeSpec,
   defaultSeedSpec,
@@ -131,7 +134,8 @@ export function App(): ReactElement {
   const [importJson, setImportJson] = useState("");
   const [importFilename, setImportFilename] = useState<string | undefined>();
   const [importPresetId, setImportPresetId] = useState<string | undefined>();
-  const [ledgerRndOpen, setLedgerRndOpen] = useState(false);
+  const [rndView, setRndView] = useState<"ledger" | "attendance" | "sales" | null>(null);
+  const [appliedPlan, setAppliedPlan] = useState<DashboardPlan | null>(null);
 
   useEffect(() => {
     const loaded = loadWorkspaceStore(localStorage, undefined, defaultSeedSpec());
@@ -154,6 +158,12 @@ export function App(): ReactElement {
     setImportOpen(true);
     window.history.replaceState({}, "", window.location.pathname);
   }, [store]);
+
+  useEffect(() => {
+    if (feed !== "static" || layout !== "embed") {
+      setAppliedPlan(null);
+    }
+  }, [feed, layout]);
 
   const builtSpec = useMemo(() => {
     const next = buildRuntimeSpec({ template, layout, feed, presentation, mosaicPreset });
@@ -281,6 +291,7 @@ export function App(): ReactElement {
 
   const handleApplyPlan = (plan: DashboardPlan): void => {
     applyPlan(plan, setTemplate, setLayout, setFeed, setPresentation, setMosaicPreset);
+    setAppliedPlan(plan.panels.length > 0 ? plan : null);
     setDirty(true);
   };
 
@@ -340,6 +351,11 @@ export function App(): ReactElement {
   const activeDashboard = getActiveDashboard(store);
   const activeWorkspace = store.workspaces.find((item) => item.id === store.activeWorkspaceId);
   const canDeleteDashboard = (activeWorkspace?.dashboards.length ?? 0) > 1;
+  const showPlannerPanels =
+    !rndView &&
+    feed === "static" &&
+    layout === "embed" &&
+    (appliedPlan?.panels.length ?? 0) > 0;
 
   if (presenting && activeSpec) {
     return (
@@ -469,8 +485,14 @@ export function App(): ReactElement {
               </select>
             </label>
           )}
-          <button type="button" onClick={() => setLedgerRndOpen(true)} style={buttonStyle}>
+          <button type="button" onClick={() => setRndView("ledger")} style={buttonStyle}>
             R&D Ledger
+          </button>
+          <button type="button" onClick={() => setRndView("attendance")} style={buttonStyle}>
+            R&D Attendance
+          </button>
+          <button type="button" onClick={() => setRndView("sales")} style={buttonStyle}>
+            R&D Sales
           </button>
           <button type="button" onClick={() => setPlannerOpen(true)} style={buttonStyle}>
             Plan
@@ -524,9 +546,15 @@ export function App(): ReactElement {
           onShareWorkspace={handleShareWorkspace}
           onDeleteDashboard={handleDeleteDashboard}
         />
-        <main style={{ flex: 1, padding: 24, maxWidth: ledgerRndOpen ? 1200 : presentation ? 1100 : 900 }}>
-          {ledgerRndOpen ? (
-            <LedgerRndView onExit={() => setLedgerRndOpen(false)} />
+        <main style={{ flex: 1, padding: 24, maxWidth: rndView ? 1200 : presentation ? 1100 : 900 }}>
+          {rndView === "ledger" ? (
+            <LedgerRndView onExit={() => setRndView(null)} />
+          ) : rndView === "attendance" ? (
+            <AttendanceRndView onExit={() => setRndView(null)} />
+          ) : rndView === "sales" ? (
+            <SalesRndView onExit={() => setRndView(null)} />
+          ) : showPlannerPanels && appliedPlan ? (
+            <PlannerPanelsWorkspace plan={appliedPlan} />
           ) : (
             <>
               <RuntimeDashboard

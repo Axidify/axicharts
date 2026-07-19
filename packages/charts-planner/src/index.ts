@@ -42,6 +42,8 @@ export {
   type PlannerHealth,
   type RequestDashboardPlanOptions,
 } from "./client";
+export { planFromCsv, profileFromCsv, type PlanFromCsvOptions } from "./planFromCsv";
+export { planDashboardFromRows, type PlannerDashboardPlan, type PlannerDashboardOptions } from "./planDashboardFromRows";
 
 export const DEFAULT_OPS_PROFILE = {
   metrics: [

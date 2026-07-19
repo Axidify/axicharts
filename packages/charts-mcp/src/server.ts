@@ -100,6 +100,46 @@ export function createCartesianMcpServer(
     async (args) => callTool("compile_cartesian_panel", args),
   );
 
+  server.tool(
+    "create_table_panel",
+    "Create a table panel for transaction lists or row previews (C150).",
+    {
+      intent: z.string().optional(),
+      title: z.string().optional(),
+      columns: z
+        .array(
+          z.object({
+            key: z.string(),
+            label: z.string().optional(),
+            align: z.enum(["left", "right"]).optional(),
+          }),
+        )
+        .optional(),
+      compact: z.boolean().optional(),
+    },
+    async (args) => callTool("create_table_panel", args),
+  );
+
+  server.tool(
+    "plan_dashboard",
+    "Plan a full tabular dashboard via C157 planner — compiled KPIs/charts, decision log, persona, and template shell (C159).",
+    {
+      intent: z.string().optional(),
+      csv: z.string().optional().describe("Pipe or comma-delimited table text"),
+      dataProfile: dataProfileSchema,
+      rows: rowsSchema.optional(),
+      persona: z
+        .enum(["executive", "manager", "analyst", "operator"])
+        .optional()
+        .describe("Audience persona for question ranking"),
+      followUpIntents: z
+        .array(z.string())
+        .optional()
+        .describe("NL follow-ups mapped to catalog questions (e.g. show payment method breakdown)"),
+    },
+    async (args) => callTool("plan_dashboard", args),
+  );
+
   return server;
 }
 
@@ -118,6 +158,8 @@ export function isToolName(value: string): value is ToolName {
     value === "revise_cartesian_panel" ||
     value === "list_cartesian_marks" ||
     value === "describe_data_profile" ||
+    value === "create_table_panel" ||
+    value === "plan_dashboard" ||
     value === "compile_cartesian_panel"
   );
 }

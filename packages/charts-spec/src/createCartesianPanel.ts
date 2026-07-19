@@ -124,7 +124,16 @@ export function createCartesianPanel(
     numericFields.find((field) => field !== revenueField);
 
   const explicitYFields =
-    input.yFields ?? (input.yField ? [input.yField] : undefined);
+    input.yFields ??
+    (input.yField ? [input.yField] : undefined) ??
+    (() => {
+      if (!/debit/i.test(intent) || !/credit/i.test(intent)) return undefined;
+      const debit = numericFields.find((f) => /debit/i.test(f));
+      const credit = numericFields.find((f) => /credit/i.test(f));
+      return debit && credit ? [debit, credit] : undefined;
+    })();
+
+  const stackBars = /stack/i.test(intent) || (/debit/i.test(intent) && /credit/i.test(intent));
 
   if (explicitYFields?.length) {
     const markType: "bar" | "line" | "area" = BAR_INTENT_RE.test(intent)
@@ -132,13 +141,14 @@ export function createCartesianPanel(
       : AREA_INTENT_RE.test(intent)
         ? "area"
         : "line";
-    matchedRules.push(`explicit-${markType}`);
+    matchedRules.push(stackBars && markType === "bar" ? "explicit-stacked-bar" : `explicit-${markType}`);
     for (const field of explicitYFields) {
       if (!numericFields.includes(field) && !fields.includes(field)) continue;
       marks.push({
         type: markType,
         field,
         label: field,
+        ...(markType === "bar" && stackBars ? { stack: "default" } : {}),
         ...(markType === "bar" && (intent.includes("label") || intent.includes("value"))
           ? { labels: true }
           : {}),
