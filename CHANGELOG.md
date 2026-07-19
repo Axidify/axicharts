@@ -10,6 +10,31 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.19] - 2026-07-19
+
+### Added
+
+- **C173–C175** — `suggestAnalyticsFromProfile` generic tabular compose path in `planDashboardFromRows`
+- **C176** — Agent compose dashboards: project tasks, support cases, device telemetry, incidents (`compose*Dashboard`)
+- **C177** — `composeLayout` — KPI strip + chart grid + table pinning for tabular plans
+- **C180** — `extractTabularFromMessage` — parse markdown tables from chat messages
+- **charts-runtime** — `KpiFlipCard` — flip KPI cards to show agent rationale
+- **render-sandbox** — `pnpm render-sandbox` visual harness for compact dashboard layouts (http://localhost:3010)
+
+### Fixed
+
+- **charts-canvas** — Categorical bar charts in compact tiles: padded ordinal x-scale, wider bars for few categories, label ellipsis instead of hard clip (`categoricalScale`, `axisCategoryLabel`, `UPlotBar`/`UPlotCombo`/`UPlotLine`)
+- **charts-spec** — `applyKpiToRecipe` only overwrites KPIs in `KPI_FIELD_MAP` (fixes generic `Rows` KPI showing 0)
+- **charts-spec** — `suggestAnalyticsFromProfile` skips ID dimensions where cardinality equals row count
+
+### Axiboard app (monorepo, not npm)
+
+- **C179** — Chat-first workspace shell (thread, paste, split pane, welcome samples)
+- **C181** — Orchestrator refinement intent fixes; golden tests for tabular compose paths
+- Sample starters: inventory, ledger, project tasks, support cases, IoT sensors
+
+See [RELEASE-v0.4.19.md](./RELEASE-v0.4.19.md).
+
 ## [0.4.18] - 2026-07-19
 
 ### Added

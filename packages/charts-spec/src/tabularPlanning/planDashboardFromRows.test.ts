@@ -19,6 +19,43 @@ const ATTENDANCE_TEXT = `| Employee ID | Name | Department | Date | Clock In | C
 | EMP002 | Sarah | HR | 2026-07-18 | 09:03 | 17:58 | 8.9 | Present |
 | EMP003 | Jason | Sales | 2026-07-18 | - | - | 0 | Leave |`;
 
+const INVENTORY_TEXT = `| SKU | Product | Stock | Reorder Level | Unit Cost | Unit Price |
+| WIDGET-01 | Steel Bolt M8 | 120 | 50 | 0.45 | 1.20 |
+| WIDGET-02 | Rubber Gasket | 18 | 40 | 2.10 | 5.50 |
+| WIDGET-03 | Copper Wire 2mm | 8 | 25 | 12.00 | 28.00 |
+| WIDGET-04 | Plastic Housing | 95 | 30 | 3.75 | 9.99 |`;
+
+describe("C173/C175 generic compose", () => {
+  it("plans inventory dashboard via L4b when vertical is generic", () => {
+    const rows = parseTabular(INVENTORY_TEXT);
+    const plan = planDashboardFromRows(rows);
+    expect(plan).not.toBeNull();
+    expect(plan!.planSource).toBe("l4b");
+    expect(plan!.kpis.length).toBeGreaterThan(0);
+    expect(plan!.charts.length).toBeGreaterThan(0);
+    expect(plan!.layout?.variant).toBeTruthy();
+    expect(plan!.decisions.some((decision) => decision.api === "suggestAnalyticsFromProfile")).toBe(true);
+    for (const block of [...plan!.kpis, ...plan!.charts]) {
+      expect(block.validationIssues, block.questionId).toEqual([]);
+    }
+  });
+
+  it("adds below-reorder table on follow-up intent", () => {
+    const rows = parseTabular(INVENTORY_TEXT);
+    const plan = planDashboardFromRows(rows, {
+      followUpIntents: ["Which items are below reorder level?"],
+    });
+    expect(plan).not.toBeNull();
+    expect(
+      plan!.charts.some(
+        (block) =>
+          block.questionId === "generic.table.below_reorder" ||
+          block.panel.title.toLowerCase().includes("reorder"),
+      ),
+    ).toBe(true);
+  });
+});
+
 describe("C157 planDashboardFromRows", () => {
   it("plans sales pipeline dashboard with funnel stage chart", () => {
     const rows = parseTabular(PIPELINE_TEXT);

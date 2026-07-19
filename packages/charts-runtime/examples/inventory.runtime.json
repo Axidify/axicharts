@@ -1,0 +1,189 @@
+{
+  "$schema": "https://axidify.github.io/axicharts/schema/runtime-spec.schema.json",
+  "layout": "panels",
+  "panels": {
+    "title": "Inventory overview",
+    "subtitle": "4 SKUs · agent-built from Cursor MCP",
+    "vertical": "inventory",
+    "columns": 2,
+    "gap": 16,
+    "theme": "clean",
+    "mode": "static",
+    "sourceCsv": "SKU,Product,Category,Supplier,Stock,Reorder Level,Unit Cost,Selling Price\nITM001,Logitech MX Master 4,Mouse,Ingram,35,10,320,499\nITM002,Dell 27\" Monitor,Display,Dell,12,5,780,1099\nITM003,Mechanical Keyboard,Keyboard,Razer,8,5,450,699\nITM004,USB-C Dock,Accessories,UGreen,42,15,180,299",
+    "decisions": [
+      {
+        "step": "Profile",
+        "api": "describe_data_profile",
+        "status": "ok",
+        "notes": "generic inventory domain — manual agent panels"
+      }
+    ],
+    "kpis": [
+      {
+        "questionId": "inventory.kpi.total_stock",
+        "panel": {
+          "type": "stat",
+          "title": "Total units",
+          "props": { "label": "Total units on hand", "value": "97", "tone": "info" }
+        },
+        "rows": []
+      },
+      {
+        "questionId": "inventory.kpi.cost_value",
+        "panel": {
+          "type": "stat",
+          "title": "Cost value",
+          "props": { "label": "Inventory at cost", "value": "RM 31,720", "tone": "neutral" }
+        },
+        "rows": []
+      },
+      {
+        "questionId": "inventory.kpi.retail_value",
+        "panel": {
+          "type": "stat",
+          "title": "Retail value",
+          "props": { "label": "Inventory at retail", "value": "RM 48,803", "tone": "success" }
+        },
+        "rows": []
+      },
+      {
+        "questionId": "inventory.kpi.low_stock",
+        "panel": {
+          "type": "stat",
+          "title": "Low stock",
+          "props": { "label": "SKUs near reorder", "value": "1", "tone": "warning" }
+        },
+        "rows": []
+      }
+    ],
+    "charts": [
+      {
+        "questionId": "inventory.chart.stock_by_product",
+        "panel": {
+          "type": "cartesian",
+          "title": "Stock on hand by product",
+          "specVersion": 1,
+          "encoding": { "x": { "field": "Product" } },
+          "marks": [{ "type": "bar", "field": "Stock", "label": "Stock" }],
+          "mode": "interactive",
+          "theme": "clean",
+          "height": 260
+        },
+        "rows": [
+          { "Product": "Logitech MX Master 4", "Stock": 35 },
+          { "Product": "Dell 27\" Monitor", "Stock": 12 },
+          { "Product": "Mechanical Keyboard", "Stock": 8 },
+          { "Product": "USB-C Dock", "Stock": 42 }
+        ]
+      },
+      {
+        "questionId": "inventory.chart.stock_vs_reorder",
+        "panel": {
+          "type": "cartesian",
+          "title": "Stock vs reorder level",
+          "specVersion": 1,
+          "encoding": { "x": { "field": "Product" } },
+          "marks": [
+            { "type": "bar", "field": "Stock", "label": "Stock" },
+            { "type": "line", "field": "Reorder Level", "label": "Reorder Level" }
+          ],
+          "mode": "interactive",
+          "theme": "clean",
+          "height": 260
+        },
+        "rows": [
+          { "Product": "Logitech MX Master 4", "Stock": 35, "Reorder Level": 10 },
+          { "Product": "Dell 27\" Monitor", "Stock": 12, "Reorder Level": 5 },
+          { "Product": "Mechanical Keyboard", "Stock": 8, "Reorder Level": 5 },
+          { "Product": "USB-C Dock", "Stock": 42, "Reorder Level": 15 }
+        ]
+      },
+      {
+        "questionId": "inventory.chart.cost_vs_price",
+        "panel": {
+          "type": "cartesian",
+          "title": "Unit cost vs selling price",
+          "specVersion": 1,
+          "encoding": { "x": { "field": "Product" } },
+          "marks": [
+            { "type": "bar", "field": "Unit Cost", "label": "Unit Cost" },
+            { "type": "bar", "field": "Selling Price", "label": "Selling Price" }
+          ],
+          "mode": "interactive",
+          "theme": "clean",
+          "height": 260
+        },
+        "rows": [
+          { "Product": "Logitech MX Master 4", "Unit Cost": 320, "Selling Price": 499 },
+          { "Product": "Dell 27\" Monitor", "Unit Cost": 780, "Selling Price": 1099 },
+          { "Product": "Mechanical Keyboard", "Unit Cost": 450, "Selling Price": 699 },
+          { "Product": "USB-C Dock", "Unit Cost": 180, "Selling Price": 299 }
+        ]
+      },
+      {
+        "questionId": "inventory.table.snapshot",
+        "panel": {
+          "type": "table",
+          "title": "Inventory snapshot",
+          "theme": "clean",
+          "mode": "interactive",
+          "props": {
+            "columns": [
+              { "key": "SKU", "label": "SKU" },
+              { "key": "Product", "label": "Product" },
+              { "key": "Category", "label": "Category" },
+              { "key": "Supplier", "label": "Supplier" },
+              { "key": "Stock", "label": "Stock", "align": "right" },
+              { "key": "Reorder Level", "label": "Reorder", "align": "right" },
+              { "key": "Unit Cost", "label": "Cost", "align": "right" },
+              { "key": "Selling Price", "label": "Price", "align": "right" }
+            ],
+            "compact": false
+          }
+        },
+        "rows": [
+          {
+            "SKU": "ITM001",
+            "Product": "Logitech MX Master 4",
+            "Category": "Mouse",
+            "Supplier": "Ingram",
+            "Stock": 35,
+            "Reorder Level": 10,
+            "Unit Cost": 320,
+            "Selling Price": 499
+          },
+          {
+            "SKU": "ITM002",
+            "Product": "Dell 27\" Monitor",
+            "Category": "Display",
+            "Supplier": "Dell",
+            "Stock": 12,
+            "Reorder Level": 5,
+            "Unit Cost": 780,
+            "Selling Price": 1099
+          },
+          {
+            "SKU": "ITM003",
+            "Product": "Mechanical Keyboard",
+            "Category": "Keyboard",
+            "Supplier": "Razer",
+            "Stock": 8,
+            "Reorder Level": 5,
+            "Unit Cost": 450,
+            "Selling Price": 699
+          },
+          {
+            "SKU": "ITM004",
+            "Product": "USB-C Dock",
+            "Category": "Accessories",
+            "Supplier": "UGreen",
+            "Stock": 42,
+            "Reorder Level": 15,
+            "Unit Cost": 180,
+            "Selling Price": 299
+          }
+        ]
+      }
+    ]
+  }
+}

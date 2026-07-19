@@ -22,15 +22,29 @@ export function useOrchestratorPlan({
 }: UseOrchestratorPlanOptions) {
   const [persona, setPersona] = useState<Persona>(initialPersona);
   const [followUpIntents, setFollowUpIntents] = useState<string[]>(initialFollowUpIntents);
+  const [sessionCsv, setSessionCsv] = useState(csv);
   const [result, setResult] = useState<OrchestratorChatResult | null>(initialResult);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const followUpRef = useRef(followUpIntents);
   followUpRef.current = followUpIntents;
+  const sessionCsvRef = useRef(sessionCsv);
+  sessionCsvRef.current = sessionCsv;
+
+  useEffect(() => {
+    setSessionCsv(csv);
+    sessionCsvRef.current = csv;
+  }, [csv]);
 
   const refresh = useCallback(
-    async (overrides?: { followUpIntents?: string[]; persona?: Persona; message?: string }) => {
-      if (!csv.trim()) {
+    async (overrides?: {
+      followUpIntents?: string[];
+      persona?: Persona;
+      message?: string;
+      csv?: string;
+    }) => {
+      const activeCsv = overrides?.csv ?? sessionCsvRef.current;
+      if (!activeCsv.trim()) {
         setResult(null);
         return;
       }
@@ -38,7 +52,7 @@ export function useOrchestratorPlan({
       setError(null);
       try {
         const response = await postOrchestratorChat({
-          csv,
+          csv: activeCsv,
           persona: overrides?.persona ?? persona,
           followUpIntents: overrides?.followUpIntents ?? followUpRef.current,
           intent,
@@ -54,12 +68,12 @@ export function useOrchestratorPlan({
         setLoading(false);
       }
     },
-    [csv, intent, persona],
+    [sessionCsv, intent, persona],
   );
 
   useEffect(() => {
     if (!autoPlan) return;
-    if (!csv.trim()) {
+    if (!sessionCsv.trim()) {
       setResult(null);
       return;
     }
@@ -67,15 +81,38 @@ export function useOrchestratorPlan({
       void refresh();
     }, 400);
     return () => window.clearTimeout(timer);
-  }, [autoPlan, csv, persona, refresh]);
+  }, [autoPlan, sessionCsv, persona, refresh]);
+
+  const resetSession = useCallback(() => {
+    setSessionCsv("");
+    sessionCsvRef.current = "";
+    setFollowUpIntents([]);
+    followUpRef.current = [];
+    setResult(null);
+    setError(null);
+    setLoading(false);
+  }, []);
 
   const sendMessage = useCallback(
-    async (message: string) => {
+    async (message: string, csvOverride?: string) => {
+      const newCsv = csvOverride?.trim();
+      const activeCsv = newCsv ? csvOverride! : sessionCsvRef.current;
+      const resetFollowUps = Boolean(newCsv);
+      if (newCsv) {
+        setSessionCsv(newCsv);
+        sessionCsvRef.current = newCsv;
+        setFollowUpIntents([]);
+        followUpRef.current = [];
+      }
       const trimmed = message.trim();
-      if (!trimmed) return;
-      await refresh({ message: trimmed });
+      if (!trimmed && !activeCsv.trim()) return;
+      await refresh({
+        message: trimmed || "Build a dashboard for this data",
+        csv: activeCsv,
+        followUpIntents: resetFollowUps ? [] : undefined,
+      });
     },
-    [refresh],
+    [refresh, sessionCsv],
   );
 
   return {
@@ -85,7 +122,10 @@ export function useOrchestratorPlan({
     persona,
     setPersona,
     followUpIntents,
+    sessionCsv,
+    setSessionCsv,
     sendMessage,
     refresh,
+    resetSession,
   };
 }

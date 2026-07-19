@@ -160,6 +160,9 @@ export type TabularPanelBlock = {
   questionId?: string;
   panel: PanelSpec;
   rows: Array<Record<string, string | number | boolean>>;
+  /** Agent / planner notes shown on KPI flip back */
+  rationale?: string;
+  intent?: string;
 };
 
 export type TabularPlanDecision = {
@@ -180,6 +183,7 @@ export type PanelsDashboardSpec = {
   /** Mosaic-style column count for chart grid (C171) */
   columns?: number;
   gap?: number;
+  layoutVariant?: string;
   /** Raw CSV for replan / follow-up chat */
   sourceCsv?: string;
   decisions?: TabularPlanDecision[];

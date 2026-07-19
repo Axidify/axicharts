@@ -68,4 +68,19 @@ describe("UPlotCombo", () => {
     expect(options.series?.[3]?.stack).toBeUndefined();
     expect(options.scales?.y2).toBeUndefined();
   });
+
+  it("uses padded ordinal x scale for categorical charts", () => {
+    const barLayoutsRef = { current: [] as never[] };
+    const options = buildComboOptions({
+      width: 320,
+      height: 200,
+      categories: ["Online", "Warning"],
+      series: [{ name: "count", kind: "bar", data: [3, 1] }],
+      theme: cleanTheme,
+      barLayoutsRef,
+    });
+
+    expect(options.scales?.x?.range?.(null as never, 0, 1)).toEqual([-0.5, 1.5]);
+    expect(options.padding?.[3]).toBeGreaterThanOrEqual(14);
+  });
 });

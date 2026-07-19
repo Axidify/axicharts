@@ -1,4 +1,4 @@
-import { parseTabular } from "@axicharts/charts-spec/planning";
+import { extractTabularFromMessage, parseTabular } from "@axicharts/charts-spec/planning";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { resolveAuthContext } from "../auth/context";
 import { runOrchestratorChat } from "../orchestrator/chat";
@@ -50,9 +50,18 @@ async function resolveByok(req: IncomingMessage): Promise<ByokConfig | undefined
   return undefined;
 }
 
-function rowsFromBody(body: { csv?: string; rows?: Array<Record<string, unknown>> }): Record<string, unknown>[] {
+function rowsFromBody(body: {
+  csv?: string;
+  rows?: Array<Record<string, unknown>>;
+  message?: string;
+}): Record<string, unknown>[] {
   if (body.csv?.trim()) return parseTabular(body.csv);
-  return body.rows ?? [];
+  if (body.rows?.length) return body.rows;
+  if (body.message?.trim()) {
+    const { tabular } = extractTabularFromMessage(body.message);
+    if (tabular?.trim()) return parseTabular(tabular);
+  }
+  return [];
 }
 
 export async function handleOrchestratorRequest(

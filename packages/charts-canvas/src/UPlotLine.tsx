@@ -29,6 +29,11 @@ import {
 } from "./segmentedLineDraw";
 import { lineSeriesPaths, resolveLineCurve } from "./linePaths";
 import { axisCategoryValues } from "./axisCategoryLabel";
+import {
+  categoryAxisSize,
+  categoryChartPadding,
+  categoryXScale,
+} from "./categoricalScale";
 
 function buildOptions({
   width,
@@ -128,7 +133,9 @@ function buildOptions({
     width,
     height,
     class: "axicharts-uplot",
-    padding: compact ? [4, 6, 4, 6] : [topPad, 14, 8, useDualAxis ? 48 : 14],
+    padding: compact
+      ? [4, 6, 4, 6]
+      : categoryChartPadding(width, categories.length, useDualAxis, topPad),
     cursor: {
       show: showCursor,
       x: true,
@@ -137,7 +144,7 @@ function buildOptions({
     },
     legend: { show: showLegend },
     scales: {
-      x: { time: false },
+      x: compact ? { time: false } : categoryXScale(categories.length),
       y: annotateY
         ? {
             range: (_u, min, max) =>
@@ -175,9 +182,9 @@ function buildOptions({
               ? { stroke: gridStroke, width: gridWidth }
               : { show: false },
             ticks: { show: false },
-            values: axisCategoryValues(categories),
+            values: axisCategoryValues(categories, compact ? undefined : width),
             gap: 8,
-            size: compact ? 0 : 18,
+            size: compact ? 0 : categoryAxisSize(),
             font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
           },
           {

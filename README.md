@@ -9,6 +9,7 @@
 - **npm:** [@axicharts/charts](https://www.npmjs.com/package/@axicharts/charts) · [@axicharts/charts-theme](https://www.npmjs.com/package/@axicharts/charts-theme)
 - **Docs:** https://axidify.github.io/axicharts/
 - **Storybook:** `pnpm storybook` → http://localhost:6006
+- **Render sandbox:** `pnpm render-sandbox` → http://localhost:3010
 - **Issues:** https://github.com/Axidify/axicharts/issues
 
 ---

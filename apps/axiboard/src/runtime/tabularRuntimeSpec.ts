@@ -5,6 +5,7 @@ export function buildTabularRuntimeSpec(
   plan: OrchestratorChatResult,
   sourceCsv: string,
 ): RuntimeDashboardSpec {
+  const layout = plan.layout;
   return {
     layout: "panels",
     panels: {
@@ -13,6 +14,9 @@ export function buildTabularRuntimeSpec(
       theme: plan.dashboardPlan.theme,
       mode: "static",
       vertical: plan.vertical,
+      columns: layout?.columns ?? 2,
+      gap: layout?.gap ?? 16,
+      layoutVariant: layout?.variant,
       sourceCsv,
       decisions: plan.decisions.map(({ step, api, intent, status, notes }) => ({
         step,
@@ -21,8 +25,20 @@ export function buildTabularRuntimeSpec(
         status,
         notes,
       })),
-      kpis: plan.kpis.map(({ questionId, panel, rows }) => ({ questionId, panel, rows })),
-      charts: plan.charts.map(({ questionId, panel, rows }) => ({ questionId, panel, rows })),
+      kpis: plan.kpis.map(({ questionId, panel, rows, decision }) => ({
+        questionId,
+        panel,
+        rows,
+        rationale: decision.notes,
+        intent: decision.intent,
+      })),
+      charts: plan.charts.map(({ questionId, panel, rows, decision }) => ({
+        questionId,
+        panel,
+        rows,
+        rationale: decision.notes,
+        intent: decision.intent,
+      })),
     },
   };
 }

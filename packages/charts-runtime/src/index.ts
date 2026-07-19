@@ -60,6 +60,7 @@ export { DashboardEmbed, type DashboardEmbedProps } from "./DashboardEmbed";
 export { MosaicWall, type MosaicWallProps } from "./MosaicWall";
 export { RuntimeDashboard, type RuntimeDashboardProps } from "./RuntimeDashboard";
 export { PanelsDashboard, type PanelsDashboardProps } from "./PanelsDashboard";
+export { KpiFlipCard, resolveKpiRationale, type KpiFlipCardProps } from "./KpiFlipCard";
 export { HybridDashboard, type HybridDashboardProps } from "./HybridDashboard";
 export { inferPresentationDeck, resolvePresentationDeck } from "./presentationDeck/infer";
 export type {

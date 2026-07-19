@@ -11,6 +11,22 @@ import { applyKpiToRecipe, applyRecipeData, formatKpiDisplay, kpiTone } from "./
 import { findQuestionsForIntent, rankQuestions } from "./rankQuestions";
 import { compileRecipe, questionToRecipe } from "./recipes";
 import type { AnalyticalQuestion, Persona, RankQuestionsResult } from "./types";
+import type { PanelRecipe } from "./recipes/types";
+import { composeLayout, type LayoutPlan } from "./composeLayout";
+import { suggestAnalyticsFromProfile } from "./suggestAnalyticsFromProfile";
+import { detectIncidentTable, suggestIncidentAnalytics } from "./composeIncidentDashboard";
+import {
+  detectProjectTaskTable,
+  suggestProjectTaskAnalytics,
+} from "./composeProjectTaskDashboard";
+import {
+  detectDeviceTelemetryTable,
+  suggestDeviceTelemetryAnalytics,
+} from "./composeDeviceTelemetryDashboard";
+import {
+  detectSupportCaseTable,
+  suggestSupportCaseAnalytics,
+} from "./composeSupportCaseDashboard";
 
 export type TabularPlanDecision = {
   step: string;
@@ -38,6 +54,8 @@ export type TabularDashboardPlan = {
   kpis: TabularPlanBlock[];
   charts: TabularPlanBlock[];
   decisions: TabularPlanDecision[];
+  layout?: LayoutPlan;
+  planSource?: "l4a" | "l4b";
 };
 
 export type PlanDashboardFromRowsOptions = {
@@ -145,6 +163,179 @@ function syntheticQuestion(questionId: string, vertical: VerticalId): Analytical
     };
   }
   return undefined;
+}
+
+function compileRecipeBlock(
+  recipe: PanelRecipe,
+  enrichment: TabularEnrichment,
+  dataProfile: DataProfile,
+  decisions: TabularPlanDecision[],
+  stepPrefix: string,
+): TabularPlanBlock | null {
+  let bound = applyRecipeData(recipe, enrichment);
+  bound = applyKpiToRecipe(bound, enrichment);
+
+  const compiled = compileRecipe(bound, enrichment.derivedRows, { dataProfile });
+  let panel = compiled.panel;
+
+  if (recipe.panelType === "stat") {
+    const display =
+      recipe.kpiValue != null
+        ? String(
+            Number.isInteger(recipe.kpiValue)
+              ? recipe.kpiValue
+              : recipe.kpiValue.toLocaleString("en-MY", { maximumFractionDigits: 1 }),
+          )
+        : formatKpiDisplay(recipe.questionId, recipe.kpiValue ?? 0);
+    panel = {
+      ...panel,
+      title: recipe.title,
+      props: {
+        ...panel.props,
+        label: recipe.kpiLabel ?? recipe.title,
+        value: display,
+        monospace: true,
+      },
+    };
+  }
+
+  const validationIssues: CartesianValidationIssue[] = [];
+  let status: TabularPlanDecision["status"] = "validated";
+  let notes = `panel: ${panel.type}`;
+
+  if (panel.type === "cartesian") {
+    const validation = validateCartesianSpec(panel, { dataProfile, rows: compiled.rows });
+    validationIssues.push(...(validation.ok ? validation.warnings : validation.errors));
+    if (!validation.ok) {
+      status = "needs_review";
+      notes += ` · errors: ${validation.errors.map((issue) => issue.code).join(", ")}`;
+    } else if (validation.warnings.length > 0) {
+      notes += ` · warnings: ${validation.warnings.length}`;
+    }
+  } else if (panel.type === "stat") {
+    status = "ok";
+    notes = `Stat KPI — ${recipe.title}`;
+  } else if (panel.type === "table") {
+    status = "ok";
+    notes = `${compiled.rows.length} rows`;
+  } else if (panel.type === "funnel") {
+    notes = "geometry: stage funnel";
+  }
+
+  pushDecision(decisions, {
+    step: `${stepPrefix} — ${recipe.title}`,
+    api: recipe.panelType === "stat" ? "compileRecipe + stat" : "compileRecipe",
+    intent: recipe.intent,
+    status,
+    notes,
+  });
+
+  return {
+    questionId: recipe.questionId,
+    panel,
+    rows: compiled.rows as Array<Record<string, string | number | boolean>>,
+    validationIssues,
+    decision: decisions[decisions.length - 1]!,
+  };
+}
+
+function compileGenericDashboard(
+  rows: Record<string, unknown>[],
+  options: PlanDashboardFromRowsOptions,
+  tabularProfile: DataProfile,
+  domain: DomainSemantics,
+  decisions: TabularPlanDecision[],
+): TabularDashboardPlan | null {
+  const fieldProfiles = tabularProfile.fieldProfiles ?? [];
+  const enrichment: TabularEnrichment = {
+    vertical: "ops",
+    rows,
+    derivedRows: rows,
+    fieldProfiles,
+    fieldMap: {},
+    kpis: { rowCount: rows.length },
+    datasets: {},
+  };
+
+  const projectTask = detectProjectTaskTable(fieldProfiles);
+  const supportCase = detectSupportCaseTable(fieldProfiles);
+  const deviceTelemetry = detectDeviceTelemetryTable(fieldProfiles);
+  const incident = detectIncidentTable(fieldProfiles);
+  const composeApi = projectTask
+    ? "composeProjectTaskDashboard"
+    : supportCase
+      ? "composeSupportCaseDashboard"
+      : deviceTelemetry
+        ? "composeDeviceTelemetryDashboard"
+        : incident
+          ? "composeIncidentDashboard"
+          : "suggestAnalyticsFromProfile";
+
+  pushDecision(decisions, {
+    step: "L4b Generic analytics",
+    api: composeApi,
+    status: "ok",
+    notes: projectTask
+      ? `agent project compose · ${rows.length} tasks`
+      : supportCase
+        ? `agent support compose · ${rows.length} cases`
+        : deviceTelemetry
+          ? `agent telemetry compose · ${rows.length} readings`
+          : incident
+            ? `agent incident compose · ${rows.length} tickets`
+            : `domain ${domain.vertical} · generic compose path`,
+  });
+
+  const recipes = projectTask
+    ? suggestProjectTaskAnalytics(rows, fieldProfiles)
+    : supportCase
+      ? suggestSupportCaseAnalytics(rows, fieldProfiles)
+      : deviceTelemetry
+        ? suggestDeviceTelemetryAnalytics(rows, fieldProfiles)
+        : incident
+          ? suggestIncidentAnalytics(rows, fieldProfiles)
+          : suggestAnalyticsFromProfile(rows, {
+              persona: options.persona,
+              followUpIntents: options.followUpIntents,
+              dataProfile: tabularProfile,
+            });
+
+  if (recipes.length === 0) return null;
+
+  const dataProfile = enrichProfileWithDomain(tabularProfile).profile;
+  const persona = options.persona ?? "manager";
+  const kpis: TabularPlanBlock[] = [];
+  const charts: TabularPlanBlock[] = [];
+
+  for (const recipe of recipes) {
+    const block = compileRecipeBlock(recipe, enrichment, dataProfile, decisions, recipe.panelType === "stat" ? "KPI" : "Chart");
+    if (!block) continue;
+    if (recipe.panelType === "stat") kpis.push(block);
+    else charts.push(block);
+  }
+
+  const layout = composeLayout({ kpis, charts }, { dataProfile });
+  pushDecision(decisions, {
+    step: "L6 Layout",
+    api: "composeLayout",
+    status: "ok",
+    notes: `variant ${layout.variant} · columns ${layout.columns}`,
+  });
+
+  return {
+    dashboardIntent:
+      options.intent ?? `Tabular dashboard — ${domain.vertical === "generic" ? "generic" : domain.vertical}`,
+    vertical: "ops",
+    persona,
+    domain,
+    dataProfile,
+    enrichment,
+    kpis,
+    charts,
+    decisions,
+    layout,
+    planSource: "l4b",
+  };
 }
 
 function compileQuestionBlock(
@@ -281,13 +472,7 @@ export function planDashboardFromRows(
   const enrichment = options.enrichment ?? enrichTabular(rows, domain);
 
   if (!enrichment) {
-    pushDecision(decisions, {
-      step: "Enrich",
-      api: "enrichTabular",
-      status: "needs_review",
-      notes: `No enrichment for vertical ${domain.vertical}`,
-    });
-    return null;
+    return compileGenericDashboard(rows, options, tabularProfile, domain, decisions);
   }
 
   const ranked = rankQuestions({
@@ -371,6 +556,14 @@ export function planDashboardFromRows(
     }
   }
 
+  const layout = composeLayout({ kpis, charts }, { dataProfile });
+  pushDecision(decisions, {
+    step: "L6 Layout",
+    api: "composeLayout",
+    status: "ok",
+    notes: `variant ${layout.variant} · columns ${layout.columns}`,
+  });
+
   return {
     dashboardIntent,
     vertical,
@@ -381,5 +574,7 @@ export function planDashboardFromRows(
     kpis,
     charts,
     decisions,
+    layout,
+    planSource: "l4a",
   };
 }

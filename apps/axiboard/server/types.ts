@@ -1,4 +1,5 @@
 import type { DashboardPlan } from "@axicharts/charts-planner";
+import type { LayoutPlan } from "@axicharts/charts-spec/planning";
 import type {
   CartesianValidationIssue,
   DataProfile,
@@ -33,6 +34,8 @@ export type OrchestratorPlanResult = {
   persona: Persona;
   vertical: string;
   domain: DomainSemantics;
+  layout?: LayoutPlan;
+  planSource?: "l4a" | "l4b";
   summary: {
     kpiCount: number;
     chartCount: number;

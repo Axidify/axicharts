@@ -19,6 +19,13 @@ import { resolveAnnotationPlotProps } from "./annotations";
 import { shouldStackSeries, STACK_GROUP } from "./stack";
 import { resolveSeriesColor } from "./seriesColor";
 import { axisCategoryValues } from "./axisCategoryLabel";
+import {
+  categoryAxisSize,
+  categoryChartPadding,
+  categoryXScale,
+  ordinalBarGapPx,
+  ordinalBarSize,
+} from "./categoricalScale";
 import type { PlotSeries } from "./types";
 
 type BarLayout = {
@@ -111,7 +118,7 @@ function buildOptions({
 
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme);
-  const gapPx = Math.max(3, Math.round(theme.bar.gap * 28));
+  const gapPx = ordinalBarGapPx(categories.length, theme.bar.gap);
   const stackSeries = shouldStackSeries(stacked, series.length);
   const showBarValues = showValues && !stackSeries;
   const customFills = hasCustomFills(series) && !stackSeries;
@@ -122,7 +129,7 @@ function buildOptions({
     width,
     height,
     class: "axicharts-uplot",
-    padding: [8, 14, 8, 14],
+    padding: categoryChartPadding(width, categories.length),
     cursor: {
       show: showCursor,
       x: true,
@@ -131,7 +138,7 @@ function buildOptions({
     },
     legend: { show: useNativeLegend && series.length > 1 },
     scales: {
-      x: { time: false },
+      x: categoryXScale(categories.length),
       y: {
         range: (_u, dataMin, dataMax) => {
           const [expandedMin, expandedMax] = expandYRange(
@@ -158,8 +165,8 @@ function buildOptions({
               ? { stroke: gridStroke, width: theme.grid.strokeWidth }
               : { show: false },
             ticks: { show: false },
-            values: axisCategoryValues(categories),
-            size: 18,
+            values: axisCategoryValues(categories, width),
+            size: categoryAxisSize(),
             font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
             gap: 8,
           },
@@ -192,7 +199,7 @@ function buildOptions({
           stack: stackSeries ? STACK_GROUP : undefined,
           paths: uPlot.paths.bars!({
             gap: gapPx,
-            size: [0.6, 100],
+            size: ordinalBarSize(categories.length, series.length),
             each: (u, seriesIdx, idx, left, top, barWidth, barHeight) => {
               const seriesIndex = seriesIdx - 1;
               const value =

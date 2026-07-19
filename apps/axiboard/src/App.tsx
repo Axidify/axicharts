@@ -38,6 +38,8 @@ import {
   fetchWorkspaceStore,
   saveWorkspaceStoreToServer,
 } from "./api/workspaceClient";
+import { ChatWorkspaceView } from "./chat/ChatWorkspaceView";
+import "./chat/chat-theme.css";
 import { TabularUploadView } from "./tabular/TabularUploadView";
 import { TabularDashboardView } from "./TabularDashboardView";
 import { AuthStatus } from "./AuthStatus";
@@ -142,8 +144,18 @@ export function App(): ReactElement {
   const [importFilename, setImportFilename] = useState<string | undefined>();
   const [importPresetId, setImportPresetId] = useState<string | undefined>();
   const [tabularUploadOpen, setTabularUploadOpen] = useState(false);
+  const [chatWorkspaceOpen, setChatWorkspaceOpen] = useState(true);
   const [tabularEditCsv, setTabularEditCsv] = useState<string | undefined>();
   const [appliedPlan, setAppliedPlan] = useState<DashboardPlan | null>(null);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("axi-chat-mode", chatWorkspaceOpen);
+    document.documentElement.classList.toggle("dark", chatWorkspaceOpen);
+    return () => {
+      document.documentElement.classList.remove("axi-chat-mode");
+      document.documentElement.classList.remove("dark");
+    };
+  }, [chatWorkspaceOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -483,193 +495,269 @@ export function App(): ReactElement {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0f172a", color: "#e2e8f0" }}>
+    <div
+      className={chatWorkspaceOpen ? "axi-app-chat" : undefined}
+      style={{
+        minHeight: "100dvh",
+        background: chatWorkspaceOpen ? "#171717" : "#0f172a",
+        color: "#e2e8f0",
+        display: chatWorkspaceOpen ? "flex" : undefined,
+        flexDirection: chatWorkspaceOpen ? "column" : undefined,
+      }}
+    >
       <header
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: "16px 24px",
-          borderBottom: "1px solid #334155",
+          padding: chatWorkspaceOpen ? "12px 20px" : "16px 24px",
+          borderBottom: chatWorkspaceOpen ? "none" : "1px solid #334155",
+          flexShrink: chatWorkspaceOpen ? 0 : undefined,
         }}
       >
         <div>
-          <div style={{ fontSize: 18, fontWeight: 700 }}>Axiboard</div>
-          <div style={{ fontSize: 12, color: "#94a3b8" }}>
-            Workspaces · saved dashboards · {dirty ? "unsaved changes" : activeDashboard.name}
+          <div className={chatWorkspaceOpen ? "axi-app-logo" : undefined} style={{ fontSize: 18, fontWeight: 700 }}>
+            Axiboard
           </div>
-        </div>
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <AuthStatus />
-          <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
-            Layout
-            <select
-              value={isTabularDashboard ? "panels" : layout}
-              onChange={(event) => {
-                const next = event.target.value as LayoutMode;
-                if (next === "panels") return;
-                setLayout(next);
-                setDirty(true);
-              }}
-              style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
-            >
-              <option value="embed">Single embed</option>
-              <option value="mosaic">Mosaic wall</option>
-              {isTabularDashboard ? <option value="panels">Tabular panels</option> : null}
-            </select>
-          </label>
-          {!isTabularDashboard ? (
-            <label
-              style={{
-                fontSize: 12,
-                display: "inline-flex",
-                gap: 8,
-                alignItems: "center",
-                position: "relative",
-              }}
-            >
-              Feed
-              <select
-                value={feed}
-                onChange={(event) => {
-                  setFeed(event.target.value as FeedMode);
-                  setDirty(true);
-                }}
-                style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
-              >
-                <option value="historian">Historian (mock)</option>
-                <option value="rest">REST (mock)</option>
-                <option value="mock-live">Mock-live (mock)</option>
-                <option value="websocket">WebSocket (mock)</option>
-                <option value="mqtt">MQTT (mock)</option>
-                <option value="static">Static</option>
-              </select>
-              <a
-                href={feedAdapterGalleryDeepLink(feed, layout)}
-                target="_blank"
-                rel="noreferrer"
-                style={{ color: "#93c5fd", textDecoration: "none" }}
-                title="Open adapter fixture in docs gallery"
-              >
-                Fixture
-              </a>
-              <FeedIntentGlossary
-                feed={feed}
-                layout={layout}
-                onSelectFeed={(next) => {
-                  setFeed(next);
-                  setDirty(true);
-                }}
-              />
-            </label>
+          {!chatWorkspaceOpen ? (
+            <div style={{ fontSize: 12, color: "#94a3b8" }}>
+              {`Workspaces · saved dashboards · ${dirty ? "unsaved changes" : activeDashboard.name}`}
+            </div>
           ) : null}
-          <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
-            <input
-              type="checkbox"
-              checked={presentation}
-              onChange={(event) => {
-                setPresentation(event.target.checked);
-                setDirty(true);
-              }}
-            />
-            Presentation
-          </label>
-          {layout === "embed" && !isTabularDashboard ? (
-            <TemplatePicker
-              value={template}
-              onChange={(value) => {
-                setTemplate(value);
-                setDirty(true);
-              }}
-              label="Template"
-            />
-          ) : layout === "mosaic" && !isTabularDashboard ? (
-            <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
-              Preset
-              <select
-                value={mosaicPreset}
-                onChange={(event) => {
-                  setMosaicPreset(event.target.value as MosaicPresetId);
-                  setDirty(true);
-                }}
-                style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
-              >
-                {listMosaicPresets().map((preset) => (
-                  <option key={preset.id} value={preset.id}>
-                    {preset.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+        </div>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          {!chatWorkspaceOpen ? <AuthStatus /> : null}
+          {!chatWorkspaceOpen ? (
+            <>
+              <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
+                Layout
+                <select
+                  value={isTabularDashboard ? "panels" : layout}
+                  onChange={(event) => {
+                    const next = event.target.value as LayoutMode;
+                    if (next === "panels") return;
+                    setLayout(next);
+                    setDirty(true);
+                  }}
+                  style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
+                >
+                  <option value="embed">Single embed</option>
+                  <option value="mosaic">Mosaic wall</option>
+                  {isTabularDashboard ? <option value="panels">Tabular panels</option> : null}
+                </select>
+              </label>
+              {!isTabularDashboard ? (
+                <label
+                  style={{
+                    fontSize: 12,
+                    display: "inline-flex",
+                    gap: 8,
+                    alignItems: "center",
+                    position: "relative",
+                  }}
+                >
+                  Feed
+                  <select
+                    value={feed}
+                    onChange={(event) => {
+                      setFeed(event.target.value as FeedMode);
+                      setDirty(true);
+                    }}
+                    style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
+                  >
+                    <option value="historian">Historian (mock)</option>
+                    <option value="rest">REST (mock)</option>
+                    <option value="mock-live">Mock-live (mock)</option>
+                    <option value="websocket">WebSocket (mock)</option>
+                    <option value="mqtt">MQTT (mock)</option>
+                    <option value="static">Static</option>
+                  </select>
+                  <a
+                    href={feedAdapterGalleryDeepLink(feed, layout)}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: "#93c5fd", textDecoration: "none" }}
+                    title="Open adapter fixture in docs gallery"
+                  >
+                    Fixture
+                  </a>
+                  <FeedIntentGlossary
+                    feed={feed}
+                    layout={layout}
+                    onSelectFeed={(next) => {
+                      setFeed(next);
+                      setDirty(true);
+                    }}
+                  />
+                </label>
+              ) : null}
+              <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
+                <input
+                  type="checkbox"
+                  checked={presentation}
+                  onChange={(event) => {
+                    setPresentation(event.target.checked);
+                    setDirty(true);
+                  }}
+                />
+                Presentation
+              </label>
+              {layout === "embed" && !isTabularDashboard ? (
+                <TemplatePicker
+                  value={template}
+                  onChange={(value) => {
+                    setTemplate(value);
+                    setDirty(true);
+                  }}
+                  label="Template"
+                />
+              ) : layout === "mosaic" && !isTabularDashboard ? (
+                <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
+                  Preset
+                  <select
+                    value={mosaicPreset}
+                    onChange={(event) => {
+                      setMosaicPreset(event.target.value as MosaicPresetId);
+                      setDirty(true);
+                    }}
+                    style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
+                  >
+                    {listMosaicPresets().map((preset) => (
+                      <option key={preset.id} value={preset.id}>
+                        {preset.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+            </>
           ) : null}
           <button
             type="button"
             onClick={() => {
-              setTabularEditCsv(undefined);
-              setTabularUploadOpen(true);
+              setChatWorkspaceOpen(true);
+              setTabularUploadOpen(false);
             }}
-            style={buttonStyle}
+            style={{
+              ...buttonStyle,
+              ...(chatWorkspaceOpen
+                ? { border: "none", color: "#ececec", background: "rgba(255,255,255,0.08)" }
+                : {}),
+            }}
           >
-            Upload CSV
+            Chat
           </button>
-          {!isTabularDashboard ? (
-            <button type="button" onClick={() => setPlannerOpen(true)} style={buttonStyle}>
-              Plan
+          {!chatWorkspaceOpen ? (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  setTabularEditCsv(undefined);
+                  setTabularUploadOpen(true);
+                  setChatWorkspaceOpen(false);
+                }}
+                style={buttonStyle}
+              >
+                Upload CSV
+              </button>
+              {!isTabularDashboard ? (
+                <button type="button" onClick={() => setPlannerOpen(true)} style={buttonStyle}>
+                  Plan
+                </button>
+              ) : null}
+              {!isTabularDashboard ? (
+                <button type="button" onClick={() => setPresenting(true)} style={buttonStyle}>
+                  Present
+                </button>
+              ) : null}
+              <button type="button" onClick={() => setEmbedOpen(true)} style={buttonStyle}>
+                Embed
+              </button>
+              <button type="button" onClick={handleSave} style={buttonStyle}>
+                Save
+              </button>
+              <button type="button" onClick={handleExport} style={buttonStyle}>
+                Export
+              </button>
+              <button type="button" onClick={openImportDialog} style={buttonStyle}>
+                Import
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setChatWorkspaceOpen(false)}
+              style={{
+                ...buttonStyle,
+                border: "none",
+                background: "transparent",
+                color: "#a1a1a1",
+              }}
+            >
+              Workspace
             </button>
-          ) : null}
-          {!isTabularDashboard ? (
-            <button type="button" onClick={() => setPresenting(true)} style={buttonStyle}>
-              Present
-            </button>
-          ) : null}
-          <button type="button" onClick={() => setEmbedOpen(true)} style={buttonStyle}>
-            Embed
-          </button>
-          <button type="button" onClick={handleSave} style={buttonStyle}>
-            Save
-          </button>
-          <button type="button" onClick={handleExport} style={buttonStyle}>
-            Export
-          </button>
-          <button type="button" onClick={openImportDialog} style={buttonStyle}>
-            Import
-          </button>
+          )}
         </div>
       </header>
 
-      <div style={{ display: "flex" }}>
-        <WorkspaceSidebar
-          store={store}
-          canDeleteDashboard={canDeleteDashboard}
-          onSelectWorkspace={(workspaceId) => {
-            const next = selectWorkspace(store, workspaceId);
-            persist(next);
-            applyDashboardMeta(
-              getActiveDashboard(next),
-              setLayout,
-              setFeed,
-              setTemplate,
-              setPresentation,
-              setMosaicPreset,
-            );
-            setDirty(false);
+      <div style={{ display: "flex", flex: chatWorkspaceOpen ? 1 : undefined, minHeight: chatWorkspaceOpen ? 0 : undefined }}>
+        {!chatWorkspaceOpen ? (
+          <WorkspaceSidebar
+            store={store}
+            canDeleteDashboard={canDeleteDashboard}
+            onSelectWorkspace={(workspaceId) => {
+              const next = selectWorkspace(store, workspaceId);
+              persist(next);
+              applyDashboardMeta(
+                getActiveDashboard(next),
+                setLayout,
+                setFeed,
+                setTemplate,
+                setPresentation,
+                setMosaicPreset,
+              );
+              setDirty(false);
+            }}
+            onSelectDashboard={handleSelectDashboard}
+            onNewWorkspace={handleNewWorkspace}
+            onNewDashboard={handleNewDashboard}
+            onRenameDashboard={(name) => {
+              persist(
+                renameDashboard(store, store.activeWorkspaceId, store.activeDashboardId, name),
+              );
+            }}
+            onRenameWorkspace={(name) => {
+              persist(renameWorkspace(store, store.activeWorkspaceId, name));
+            }}
+            onShareWorkspace={handleShareWorkspace}
+            onDeleteDashboard={handleDeleteDashboard}
+          />
+        ) : null}
+        <main
+          style={{
+            flex: 1,
+            padding: chatWorkspaceOpen ? 0 : 24,
+            minHeight: chatWorkspaceOpen ? 0 : undefined,
+            display: chatWorkspaceOpen ? "flex" : undefined,
+            flexDirection: chatWorkspaceOpen ? "column" : undefined,
+            maxWidth: chatWorkspaceOpen
+              ? undefined
+              : tabularUploadOpen || isTabularDashboard
+                ? 1400
+                : presentation
+                  ? 1100
+                  : 900,
           }}
-          onSelectDashboard={handleSelectDashboard}
-          onNewWorkspace={handleNewWorkspace}
-          onNewDashboard={handleNewDashboard}
-          onRenameDashboard={(name) => {
-            persist(
-              renameDashboard(store, store.activeWorkspaceId, store.activeDashboardId, name),
-            );
-          }}
-          onRenameWorkspace={(name) => {
-            persist(renameWorkspace(store, store.activeWorkspaceId, name));
-          }}
-          onShareWorkspace={handleShareWorkspace}
-          onDeleteDashboard={handleDeleteDashboard}
-        />
-        <main style={{ flex: 1, padding: 24, maxWidth: tabularUploadOpen || isTabularDashboard ? 1200 : presentation ? 1100 : 900 }}>
-          {tabularUploadOpen ? (
+        >
+          {chatWorkspaceOpen ? (
+            <ChatWorkspaceView
+              onSave={(plan, rawText, persona, followUpIntents) => {
+                handleApplyTabularPlan(plan, rawText, persona, followUpIntents);
+              }}
+              initialCsv={tabularEditCsv}
+              initialPersona={activeDashboard.meta?.persona}
+            />
+          ) : tabularUploadOpen ? (
             <TabularUploadView
               onCancel={() => {
                 setTabularUploadOpen(false);

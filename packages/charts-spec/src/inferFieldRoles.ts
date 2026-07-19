@@ -11,11 +11,16 @@ const MEASURE_FIELD_RE =
 const DIMENSION_FIELD_RE =
   /(category|account|cost\s*center|department|vendor|customer|payment\s*method|method|type|status|region|name)/i;
 
-/** Measure columns whose names also match TIME_FIELD_RE (e.g. "Hours"). */
-const MEASURE_TIME_COLLISION_RE = /^hours$/i;
+/** Duration-style measure columns that also match TIME_FIELD_RE (e.g. "Hours", "Resolution Time (hrs)"). */
+const DURATION_MEASURE_FIELD_RE = /\b(hrs?|hours?|duration|elapsed)\b|\(hrs?\)/i;
+
+function isDurationMeasureField(field: string): boolean {
+  if (/^hours$/i.test(field.trim())) return true;
+  return DURATION_MEASURE_FIELD_RE.test(field);
+}
 
 function isTimeFieldName(field: string): boolean {
-  if (MEASURE_TIME_COLLISION_RE.test(field.trim())) return false;
+  if (isDurationMeasureField(field)) return false;
   return TIME_FIELD_RE.test(field);
 }
 
@@ -33,6 +38,7 @@ function inferRoleFromName(field: string): FieldRole | undefined {
   if (EMPLOYEE_ID_FIELD_RE.test(field) || OPPORTUNITY_ID_FIELD_RE.test(field)) return "identifier";
   if (IDENTIFIER_FIELD_RE.test(field)) return "identifier";
   if (MEASURE_FIELD_RE.test(field.trim())) return "measure";
+  if (isDurationMeasureField(field)) return "measure";
   if (CLOSE_DATE_FIELD_RE.test(field)) return "time";
   if (isTimeFieldName(field)) return "time";
   if (DIMENSION_FIELD_RE.test(field)) return "dimension";

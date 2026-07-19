@@ -44,3 +44,10 @@ export {
   type TabularPlanBlock,
   type TabularPlanDecision,
 } from "./planDashboardFromRows";
+export { suggestAnalyticsFromProfile, type SuggestAnalyticsOptions } from "./suggestAnalyticsFromProfile";
+export { composeLayout, type ComposeLayoutInput, type ComposeLayoutOptions, type LayoutPlan, type LayoutVariant } from "./composeLayout";
+export { extractTabularFromMessage } from "./extractTabularFromMessage";
+export {
+  detectIncidentTable,
+  suggestIncidentAnalytics,
+} from "./composeIncidentDashboard";

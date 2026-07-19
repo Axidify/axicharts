@@ -9,6 +9,7 @@
     "axiboard": "pnpm --filter @axicharts/axiboard dev",
     "axiboard:start": "pnpm --filter @axicharts/axiboard start",
     "csv-dashboard": "pnpm --filter @axicharts/csv-dashboard dev",
+    "render-sandbox": "pnpm --filter @axicharts/render-sandbox dev",
     "planner": "pnpm --filter @axicharts/charts-planner exec charts-planner serve",
     "mcp": "pnpm --filter @axicharts/charts-mcp exec charts-mcp",
     "docs": "pnpm --filter @axicharts/docs dev",

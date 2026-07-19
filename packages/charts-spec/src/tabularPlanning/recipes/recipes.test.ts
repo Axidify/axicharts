@@ -108,6 +108,22 @@ describe("C158 panel recipes + chart geometry", () => {
     expect(validation.ok).toBe(true);
   });
 
+  it("compiles generic KPI stat without cartesian UNKNOWN_FIELD", () => {
+    const recipe = {
+      questionId: "generic.kpi.rows",
+      title: "Rows",
+      intent: "kpi headline stat panel",
+      panelType: "stat" as const,
+      vertical: "ops" as const,
+      kpiValue: 4,
+      kpiLabel: "Rows",
+    };
+
+    const compiled = compileRecipe(recipe, [{ SKU: "A" }]);
+    expect(compiled.panel.type).toBe("stat");
+    expect(compiled.panel.props?.value).toBe("4");
+  });
+
   it("compiles ledger balance trend as line chart", () => {
     const rows = parseTabular(LEDGER_TEXT);
     const fieldProfiles = inferFieldRoles(rows);

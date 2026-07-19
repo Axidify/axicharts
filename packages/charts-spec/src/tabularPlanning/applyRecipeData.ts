@@ -190,6 +190,7 @@ export function applyRecipeData(recipe: PanelRecipe, enrichment: TabularEnrichme
 
 export function applyKpiToRecipe(recipe: PanelRecipe, enrichment: TabularEnrichment): PanelRecipe {
   if (recipe.panelType !== "stat" || !recipe.questionId) return recipe;
+  if (!(recipe.questionId in KPI_FIELD_MAP)) return recipe;
   const value = resolveKpiValue(recipe.questionId, enrichment);
   return {
     ...recipe,

@@ -1,10 +1,12 @@
-import { StrictMode } from "react";
+import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "@axicharts/charts-andon/register";
 import "@axicharts/charts-geo/register";
 import "@axicharts/charts-sankey/register";
 import "@axicharts/charts-gantt/register";
 import "@axicharts/charts-tank/register";
+import "./styles/globals.css";
+import "./index.css";
 import { App } from "./App";
 import { AuthGate } from "./AuthGate";
 

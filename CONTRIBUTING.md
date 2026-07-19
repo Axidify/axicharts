@@ -27,6 +27,7 @@ Useful commands:
 | Command | Purpose |
 |---------|---------|
 | `pnpm storybook` | Component docs and visual review → http://localhost:6006 |
+| `pnpm render-sandbox` | Render regression harness (compact layouts) → http://localhost:3010 |
 | `pnpm axiboard` | Axiboard demo app → http://localhost:3000 |
 | `pnpm test` | Unit and integration tests across packages |
 | `pnpm typecheck` | TypeScript project references |

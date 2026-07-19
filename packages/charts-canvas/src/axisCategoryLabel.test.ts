@@ -11,4 +11,9 @@ describe("formatAxisCategoryLabel", () => {
     expect(formatAxisCategoryLabel("Mon")).toBe("Mon");
     expect(formatAxisCategoryLabel("09:30")).toBe("09:30");
   });
+
+  it("truncates long labels when slot width is tight", () => {
+    expect(formatAxisCategoryLabel("DEV004", 30)).toBe("DEV…");
+    expect(formatAxisCategoryLabel("Warning", 80)).toBe("Warning");
+  });
 });

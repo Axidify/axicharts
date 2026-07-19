@@ -4,6 +4,7 @@ import { planDashboardForMcp } from "@axicharts/charts-mcp";
 import { DATA_PROFILE_SCHEMA_URL } from "@axicharts/charts-mcp";
 import {
   ATTENDANCE_CSV,
+  INVENTORY_CSV,
   LEDGER_CSV,
   SALES_CSV,
 } from "../fixtures/tabularFixtures";
@@ -74,6 +75,25 @@ describe("C161 golden contract — MCP plan_dashboard ≡ orchestrator plan", ()
     });
     expect(
       orch!.charts.some((block) => block.questionId === "ledger.chart.payment_method"),
+    ).toBe(true);
+  });
+
+  it("inventory follow-up adds below-reorder table (C181)", () => {
+    const rows = parseTabular(INVENTORY_CSV);
+    assertMcpOrchestratorParity(rows, {
+      persona: "manager",
+      followUpIntents: ["Which items are below reorder level?"],
+    });
+    const orch = runTabularPlan(rows, {
+      persona: "manager",
+      followUpIntents: ["Which items are below reorder level?"],
+    });
+    expect(
+      orch!.charts.some(
+        (block) =>
+          block.questionId === "generic.table.below_reorder" ||
+          String(block.panel.title ?? "").toLowerCase().includes("reorder"),
+      ),
     ).toBe(true);
   });
 });

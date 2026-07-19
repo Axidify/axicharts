@@ -1,0 +1,27 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+html {
+  background: #0f172a;
+}
+
+body {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+html.axi-chat-mode,
+html.axi-chat-mode body {
+  background: #171717;
+}

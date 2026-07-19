@@ -20,6 +20,13 @@ import { resolveAnnotationPlotProps } from "./annotations";
 import { resolveSeriesColor } from "./seriesColor";
 import { lineSeriesPaths, resolveLineCurve } from "./linePaths";
 import { axisCategoryValues } from "./axisCategoryLabel";
+import {
+  categoryAxisSize,
+  categoryChartPadding,
+  categoryXScale,
+  ordinalBarGapPx,
+  ordinalBarSize,
+} from "./categoricalScale";
 import { shouldUseDualAxis } from "./dualAxis";
 import { shouldStackSeries, STACK_GROUP } from "./stack";
 
@@ -85,7 +92,7 @@ export function buildComboOptions(
 
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme);
-  const gapPx = Math.max(3, Math.round(theme.bar.gap * 28));
+  const gapPx = ordinalBarGapPx(categories.length, theme.bar.gap);
   const fillOpacity = theme.area.fillOpacity;
   const annotateY =
     thresholdBandsResolved.length > 0 ||
@@ -100,7 +107,7 @@ export function buildComboOptions(
     width,
     height,
     class: "axicharts-uplot",
-    padding: [8, 14, 8, useDualAxis ? 48 : 14],
+    padding: categoryChartPadding(width, categories.length, useDualAxis),
     cursor: {
       show: showCursor,
       x: true,
@@ -109,7 +116,7 @@ export function buildComboOptions(
     },
     legend: { show: useNativeLegend && series.length > 1 },
     scales: {
-      x: { time: false },
+      x: categoryXScale(categories.length),
       y: useDualAxis
         ? annotateY
           ? {
@@ -163,8 +170,8 @@ export function buildComboOptions(
               ? { stroke: gridStroke, width: theme.grid.strokeWidth }
               : { show: false },
             ticks: { show: false },
-            values: axisCategoryValues(categories),
-            size: 18,
+            values: axisCategoryValues(categories, width),
+            size: categoryAxisSize(),
             font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
             gap: 8,
           },
@@ -219,7 +226,7 @@ export function buildComboOptions(
             stack: stackBars ? STACK_GROUP : undefined,
             paths: uPlot.paths.bars!({
               gap: gapPx,
-              size: [0.45, 100],
+              size: ordinalBarSize(categories.length, barCount),
               each: (u, seriesIdx, idx, left, top, barWidth, barHeight) => {
                 const value =
                   (u.data[seriesIdx] as number[] | undefined)?.[idx] ?? 0;

@@ -1,7 +1,6 @@
 import { aggregateRows } from "../../aggregateRows";
 import { createCartesianPanel } from "../../createCartesianPanel";
 import { createTablePanel } from "../../createTablePanel";
-import { planPanelFromMetric } from "../../plan";
 import { validateCartesianSpec } from "../../cartesianValidation";
 import { inferChartGeometry } from "./inferGeometry";
 import type {
@@ -53,23 +52,22 @@ function compileStatPanel(
   recipe: PanelRecipe,
   options: CompileRecipeOptions,
 ): CompiledRecipeResult {
-  const panel = planPanelFromMetric(
-    { name: recipe.kpiLabel ?? recipe.title, tags: recipe.vertical ? { vertical: recipe.vertical } : undefined },
-    {
-      intent: recipe.intent,
-      profileFields: options.dataProfile?.fields,
-    },
-  );
-
   const value = recipe.kpiValue ?? 0;
+  const display =
+    typeof value === "number" && !Number.isInteger(value)
+      ? value.toLocaleString("en-MY", { maximumFractionDigits: 1 })
+      : String(value);
+
   return {
     panel: {
-      ...panel,
+      specVersion: 1,
+      type: "stat",
       title: recipe.title,
+      theme: options.theme ?? "clean",
+      mode: options.mode ?? "interactive",
       props: {
-        ...panel.props,
         label: recipe.kpiLabel ?? recipe.title,
-        value,
+        value: display,
         monospace: true,
       },
     },

@@ -2,24 +2,31 @@
 
 import type { ReactElement } from "react";
 import { Chart } from "@axicharts/charts-spec";
+import { KpiFlipCard } from "./KpiFlipCard";
 import type { PanelsDashboardSpec } from "./types";
-
-const kpiStyle = {
-  flex: "1 1 160px",
-  padding: "14px 16px",
-  borderRadius: 10,
-  border: "1px solid #334155",
-  background: "#111827",
-} as const;
 
 export type PanelsDashboardProps = {
   panels: PanelsDashboardSpec;
   className?: string;
+  /** Flip KPI cards to show agent rationale (default true). */
+  flipKpis?: boolean;
 };
 
-export function PanelsDashboard({ panels, className }: PanelsDashboardProps): ReactElement {
+export function PanelsDashboard({
+  panels,
+  className,
+  flipKpis = true,
+}: PanelsDashboardProps): ReactElement {
   const columns = panels.columns ?? 2;
   const gap = panels.gap ?? 16;
+  const pinTableBottom = panels.layoutVariant === "table-pinned-bottom";
+
+  const chartBlocks = pinTableBottom
+    ? panels.charts.filter((block) => block.panel.type !== "table")
+    : panels.charts;
+  const tableBlocks = pinTableBottom
+    ? panels.charts.filter((block) => block.panel.type === "table")
+    : [];
 
   return (
     <div className={className} style={{ width: "100%" }}>
@@ -42,26 +49,56 @@ export function PanelsDashboard({ panels, className }: PanelsDashboardProps): Re
 
       {panels.kpis.length > 0 ? (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
-          {panels.kpis.map((block) => (
-            <div key={block.panel.title} style={{ ...kpiStyle, minWidth: 140 }}>
+          {panels.kpis.map((block) => {
+            const chart = (
               <Chart panel={block.panel} data={{ rows: block.rows }} height={72} />
-            </div>
-          ))}
+            );
+            if (!flipKpis) {
+              return (
+                <div key={block.questionId ?? block.panel.title} style={{ flex: "1 1 160px", minWidth: 140 }}>
+                  {chart}
+                </div>
+              );
+            }
+            return (
+              <KpiFlipCard
+                key={block.questionId ?? block.panel.title}
+                title={block.panel.title}
+                questionId={block.questionId}
+                rationale={block.rationale}
+                intent={block.intent}
+                decisions={panels.decisions}
+              >
+                {chart}
+              </KpiFlipCard>
+            );
+          })}
         </div>
       ) : null}
 
-      {panels.charts.length > 0 ? (
+      {chartBlocks.length > 0 ? (
         <div
           style={{
             display: "grid",
             gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
             gap,
             width: "100%",
+            marginBottom: tableBlocks.length > 0 ? gap : 0,
           }}
         >
-          {panels.charts.map((block) => (
+          {chartBlocks.map((block) => (
             <div key={block.panel.title} style={{ minWidth: 0 }}>
               <Chart panel={block.panel} data={{ rows: block.rows }} height={280} />
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {tableBlocks.length > 0 ? (
+        <div style={{ display: "flex", flexDirection: "column", gap, width: "100%" }}>
+          {tableBlocks.map((block) => (
+            <div key={block.panel.title} style={{ minWidth: 0 }}>
+              <Chart panel={block.panel} data={{ rows: block.rows }} height={320} />
             </div>
           ))}
         </div>
