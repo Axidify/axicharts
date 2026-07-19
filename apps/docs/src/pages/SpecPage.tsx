@@ -190,7 +190,7 @@ validateCartesianSpec(panel, { rows }); // throws before render if invalid`}
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", maxWidth: 640, lineHeight: 1.6 }}>
           The profile planner above maps metrics to panels. Phase 3{" "}
           <code>@axicharts/charts-planner</code> adds natural-language intent for full dashboard
-          plans — template, layout, live <code>feed</code>, and presentation mode. Dashboarder share
+          plans — template, layout, live <code>feed</code>, and presentation mode. Axiboard share
           exports persist planner <code>meta</code> for import.
         </p>
         <table

@@ -1,6 +1,6 @@
 /** Storybook G–Q round 3 track (C50–C62) — vertical gallery + acceptance gates. */
 export const STORYBOOK_ROUND3_RELEASE_NOTES = [
-  { slice: "C50", summary: "Dashboarder docs hygiene — CHARTS/TAXONOMY/ROADMAP synced to v0.2.8" },
+  { slice: "C50", summary: "Axiboard docs hygiene — CHARTS/TAXONOMY/ROADMAP synced to v0.2.8" },
   { slice: "C51", summary: "Playwright E2E share/import meta restore via Storybook fixtures" },
   { slice: "C52", summary: "Gate G Clean Default → 5/5 — KPI sparklines, freshness chip" },
   { slice: "C53", summary: "Gate H Rich Ops → 5/5 — live deltas, warn chrome, SLO reference" },

@@ -142,7 +142,7 @@ pnpm bench:stability    # 60s soak @ 1/5 Hz + leak check
 pnpm bench:all          # node + competitive browser
 \`\`\`
 
-Methodology: Dashboarder [PERFORMANCE.md](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/PERFORMANCE.md).
+Methodology: axiboard [PERFORMANCE.md](https://github.com/Axidify/axiboard/blob/main/docs/charts/PERFORMANCE.md).
 
 ## Bundle size (gzip)
 

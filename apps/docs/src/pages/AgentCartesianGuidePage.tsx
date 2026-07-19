@@ -128,7 +128,7 @@ export function AgentCartesianGuidePage(): ReactElement {
         </a>
         {" · "}
         <a
-          href="https://github.com/Axidify/Dashboarder/blob/main/docs/charts/rfcs/RFC-002-cartesian-building-blocks.md"
+          href="https://github.com/Axidify/axiboard/blob/main/docs/charts/rfcs/RFC-002-cartesian-building-blocks.md"
           target="_blank"
           rel="noreferrer"
         >
@@ -139,7 +139,7 @@ export function AgentCartesianGuidePage(): ReactElement {
       <p style={{ ...docBodyStyle(), marginTop: 24, fontSize: 13 }}>
         Composition simulation: <strong>16 valid / 8 throw / 0 silent_bad</strong> — see{" "}
         <a
-          href="https://github.com/Axidify/Dashboarder/blob/main/docs/charts/rfcs/RFC-002-composition-simulation.md"
+          href="https://github.com/Axidify/axiboard/blob/main/docs/charts/rfcs/RFC-002-composition-simulation.md"
           target="_blank"
           rel="noreferrer"
         >

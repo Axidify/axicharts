@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import {
-  dashboarderImportDeepLink,
+  axiboardImportDeepLink,
   formatValidatePresetCommand,
   HOSTED_IMPORT_PRESETS,
   listImportDeepLinks,
@@ -38,7 +38,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
       <RuntimeHubNav page="/runtime/links" />
       <h1 style={{ marginTop: 0 }}>Deep link index</h1>
       <p style={{ color: "#475569", maxWidth: 720, lineHeight: 1.6 }}>
-        Canonical URLs for schemas, shipped import presets, docs gallery routes, and Dashboarder
+        Canonical URLs for schemas, shipped import presets, docs gallery routes, and Axiboard
         auto-import query params. Use these in README snippets, issue templates, and CI fixtures.
         Every preset CLI command is copyable — same shortcuts as{" "}
         <Link to="/runtime/schema">schema validation</Link> and{" "}
@@ -94,7 +94,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
             <tr>
               <th style={cellStyle}>Preset</th>
               <th style={cellStyle}>Gallery</th>
-              <th style={cellStyle}>Dashboarder</th>
+              <th style={cellStyle}>Axiboard</th>
               <th style={cellStyle}>CLI</th>
               <th style={cellStyle}>Fixture</th>
             </tr>
@@ -118,7 +118,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
                   <Link to={entry.galleryPath}>{entry.galleryPath}</Link>
                 </td>
                 <td style={cellStyle}>
-                  <a href={entry.dashboarderUrl}>{entry.dashboarderUrl}</a>
+                  <a href={entry.axiboardUrl}>{entry.axiboardUrl}</a>
                 </td>
                 <td style={cellStyle}>
                   <ValidateCommandCopy
@@ -143,7 +143,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
       <section style={{ marginTop: 28 }} id="share-import">
         <h2 style={{ fontSize: 16, marginBottom: 12 }}>Share ↔ import round-trip</h2>
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
-          Dashboarder <strong>Share</strong> exports portable JSON with planner <code>meta</code>;{" "}
+          Axiboard <strong>Share</strong> exports portable JSON with planner <code>meta</code>;{" "}
           <strong>Import</strong> validates and restores layout, feed, template, and mosaic preset.
           Embed SDK JSON omits <code>meta</code> — use share exports for builder round-trip. Full
           flow:{" "}
@@ -159,7 +159,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
               <th style={cellStyle}>Step</th>
               <th style={cellStyle}>Preset</th>
               <th style={cellStyle}>Gallery</th>
-              <th style={cellStyle}>Dashboarder</th>
+              <th style={cellStyle}>Axiboard</th>
             </tr>
           </thead>
           <tbody>
@@ -174,7 +174,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
                 </Link>
               </td>
               <td style={cellStyle}>
-                <a href={dashboarderImportDeepLink(SHARE_EXPORT_REFERENCE_PRESET.dashboard)}>
+                <a href={axiboardImportDeepLink(SHARE_EXPORT_REFERENCE_PRESET.dashboard)}>
                   auto-import
                 </a>
               </td>
@@ -190,7 +190,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
                 </Link>
               </td>
               <td style={cellStyle}>
-                <a href={dashboarderImportDeepLink(SHARE_EXPORT_REFERENCE_PRESET.workspace)}>
+                <a href={axiboardImportDeepLink(SHARE_EXPORT_REFERENCE_PRESET.workspace)}>
                   auto-import
                 </a>
               </td>
@@ -198,7 +198,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
           </tbody>
         </table>
         <p style={{ margin: "12px 0 0", fontSize: 12, color: "#64748b" }}>
-          Storybook: <code>Dashboarder/Share ↔ Import</code> — ShareDialog meta export and
+          Storybook: <code>Axiboard/Share ↔ Import</code> — ShareDialog meta export and
           ImportDialog restore previews.
           {" · "}
           <Link to="/runtime/schema#share-meta">schema § meta</Link>
@@ -221,7 +221,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
         <h2 style={{ fontSize: 16, margin: "0 0 8px" }}>Share/import track release notes (C44–C49)</h2>
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
           The C44–C46 hardening track closes the planner meta round-trip: Share exports{" "}
-          <code>meta</code>, Import restores it, schema documents fields, and Dashboarder dialogs
+          <code>meta</code>, Import restores it, schema documents fields, and Axiboard dialogs
           link to hosted docs. Started from C42 overview docs and C43 Storybook fixtures.
         </p>
         <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
@@ -244,7 +244,7 @@ export function RuntimeDeepLinkPage(): ReactElement {
       <section style={{ marginTop: 28 }}>
         <h2 style={{ fontSize: 16, marginBottom: 12 }}>Share export references</h2>
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
-          Dashboarder Share export maps each tab to a shipped preset for comparison and import
+          Axiboard Share export maps each tab to a shipped preset for comparison and import
           testing.
         </p>
         <ul style={{ margin: 0, paddingLeft: 18, color: "#475569", lineHeight: 1.8 }}>

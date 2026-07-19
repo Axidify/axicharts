@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
-  dashboarderImportDeepLink,
+  axiboardImportDeepLink,
   docsImportGalleryDeepLink,
   findImportPreset,
   filterImportPresets,
@@ -156,12 +156,12 @@ describe("hosted import presets", () => {
     );
   });
 
-  it("builds gallery and dashboarder deep links", () => {
+  it("builds gallery and axiboard deep links", () => {
     expect(importGalleryDeepLink("ops-embed")).toBe("/runtime/import?preset=ops-embed");
     expect(docsImportGalleryDeepLink("ops-workspace")).toBe(
       "https://axidify.github.io/axicharts/runtime/import?preset=ops-workspace",
     );
-    expect(dashboarderImportDeepLink("ops-workspace")).toBe(
+    expect(axiboardImportDeepLink("ops-workspace")).toBe(
       "http://localhost:3000/?import=ops-workspace",
     );
     expect(parseImportPresetQuery("?import=ops-mosaic")).toBe("ops-mosaic");

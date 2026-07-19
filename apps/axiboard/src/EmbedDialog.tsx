@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactElement } from "react";
 import { RUNTIME_SPEC_SCHEMA_URL, type RuntimeDashboardSpec } from "@axicharts/charts-runtime";
 import { buildDeckExportBundle } from "@axicharts/charts-runtime/presentation-deck";
 import {
-  dashboarderImportDeepLink,
+  axiboardImportDeepLink,
   docsImportGalleryDeepLink,
   formatValidatePresetCommand,
   PLANNER_FEED_ROWS,
@@ -286,7 +286,7 @@ export function EmbedDialog({
               Gallery
             </a>
             {" · "}
-            <a href={dashboarderImportDeepLink(referencePreset.id)} style={{ color: "#93c5fd" }}>
+            <a href={axiboardImportDeepLink(referencePreset.id)} style={{ color: "#93c5fd" }}>
               Import in app
             </a>
             <ValidateCommandCopy command={formatValidatePresetCommand(referencePreset.id)} />

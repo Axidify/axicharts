@@ -365,7 +365,7 @@ export function App(): ReactElement {
         }}
       >
         <div>
-          <div style={{ fontSize: 18, fontWeight: 700 }}>Dashboarder</div>
+          <div style={{ fontSize: 18, fontWeight: 700 }}>Axiboard</div>
           <div style={{ fontSize: 12, color: "#94a3b8" }}>
             Workspaces · saved dashboards · {dirty ? "unsaved changes" : activeDashboard.name}
           </div>

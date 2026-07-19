@@ -29,6 +29,6 @@ export type WorkspaceStore = {
 
 export const WORKSPACE_STORE_VERSION = 1 as const;
 
-export const DEFAULT_WORKSPACE_STORE_KEY = "dashboarder.workspaces.v1";
+export const DEFAULT_WORKSPACE_STORE_KEY = "axiboard.workspaces.v1";
 
-export const LEGACY_RUNTIME_SPEC_KEY = "dashboarder.runtime.spec";
+export const LEGACY_RUNTIME_SPEC_KEY = "axiboard.runtime.spec";

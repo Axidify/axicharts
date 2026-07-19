@@ -243,7 +243,7 @@ export type PlannerFeedRow = {
   presetId: string;
 };
 
-/** Shipped planner feed → adapter fixture index for docs and Dashboarder cross-links. */
+/** Shipped planner feed → adapter fixture index for docs and Axiboard cross-links. */
 export const PLANNER_FEED_ROWS: PlannerFeedRow[] = [
   {
     feed: "static",
@@ -291,7 +291,7 @@ export function plannerFeedGalleryIndexDeepLink(origin = DOCS_SITE_ORIGIN): stri
   return `${base}/runtime/import#planner-feeds`;
 }
 
-/** Docs runtime overview anchor for Dashboarder share → import meta round-trip. */
+/** Docs runtime overview anchor for Axiboard share → import meta round-trip. */
 export function runtimeShareImportDeepLink(origin = DOCS_SITE_ORIGIN): string {
   const base = origin.endsWith("/") ? origin.slice(0, -1) : origin;
   return `${base}/runtime#share-import`;
@@ -414,7 +414,7 @@ export function docsImportGalleryDeepLink(
   return `${base}/runtime/import?preset=${encodeURIComponent(presetId)}`;
 }
 
-export function dashboarderImportDeepLink(
+export function axiboardImportDeepLink(
   presetId: string,
   origin = "http://localhost:3000",
 ): string {
@@ -425,7 +425,7 @@ export function dashboarderImportDeepLink(
 export type ImportDeepLinkEntry = {
   preset: HostedImportPreset;
   galleryPath: string;
-  dashboarderUrl: string;
+  axiboardUrl: string;
   hostedUrl: string;
   localMirrorPath: string;
 };
@@ -435,7 +435,7 @@ export function listImportDeepLinks(docsBase = "/"): ImportDeepLinkEntry[] {
   return HOSTED_IMPORT_PRESETS.map((preset) => ({
     preset,
     galleryPath: importGalleryDeepLink(preset.id),
-    dashboarderUrl: dashboarderImportDeepLink(preset.id),
+    axiboardUrl: axiboardImportDeepLink(preset.id),
     hostedUrl: hostedImportPresetUrl(preset),
     localMirrorPath: localImportPresetUrl(preset, examplesBase),
   }));

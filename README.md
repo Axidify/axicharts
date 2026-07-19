@@ -149,7 +149,7 @@ Full platform stack — optional until you need embed, planner, or breadth chart
 pnpm add @axicharts/charts-full echarts uplot
 ```
 
-Product RFCs and roadmap: [Dashboarder docs](https://github.com/Axidify/Dashboarder/tree/main/docs/charts)
+Product RFCs and roadmap: [axiboard docs](https://github.com/Axidify/axiboard/tree/main/docs/charts)
 
 ---
 

@@ -397,7 +397,7 @@ export function buildRuntimeSpec(options: {
   return {
     layout: "embed",
     dashboard: {
-      title: "Dashboarder runtime",
+      title: "Axiboard runtime",
       subtitle: isLiveFeed(feed) ? feedSubtitle(feed) : "Static feed",
       theme,
       mode,

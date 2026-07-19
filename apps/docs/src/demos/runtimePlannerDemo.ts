@@ -45,16 +45,16 @@ export const PLANNER_PLAN_RESPONSE = `{
   "panels": [ ... ]
 }`;
 
-export const DASHBOARDER_PLANNER_ENV = `# apps/dashboarder/.env.local
+export const DASHBOARDER_PLANNER_ENV = `# apps/axiboard/.env.local
 VITE_PLANNER_URL=http://127.0.0.1:3921`;
 
 export const PLANNER_TRACK_RELEASE_NOTES = [
   { slice: "C33", summary: "PlannerPanel adapter preset hints, RuntimeHubNav across runtime pages" },
-  { slice: "C34", summary: "Planner WS/MQTT feed intents, Dashboarder feed gallery deep links" },
+  { slice: "C34", summary: "Planner WS/MQTT feed intents, Axiboard feed gallery deep links" },
   { slice: "C35", summary: "REST feed intent, builder AdapterHealthStrip fixture gallery links" },
   { slice: "C36", summary: "Mock-live feed intent, mosaic multi-adapter fixture hints" },
   { slice: "C37", summary: "PLANNER_FEED_ROWS index, import gallery planner cross-links" },
-  { slice: "C38", summary: "Runtime planner HTTP examples, Dashboarder FeedIntentGlossary" },
+  { slice: "C38", summary: "Runtime planner HTTP examples, Axiboard FeedIntentGlossary" },
   { slice: "C39", summary: "Planner CLI on Start page, EmbedDialog feed/intent gallery hints" },
   { slice: "C40", summary: "ShareDialog planner meta export, Spec page Phase 3 planner section" },
   { slice: "C41", summary: "ImportDialog planner meta restore hints, planner track release notes" },

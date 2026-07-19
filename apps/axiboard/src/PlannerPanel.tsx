@@ -7,7 +7,7 @@ import {
   type PlannerHealth,
 } from "@axicharts/charts-planner";
 import {
-  dashboarderImportDeepLink,
+  axiboardImportDeepLink,
   docsImportGalleryDeepLink,
   formatValidatePresetCommand,
   plannerAdapterFixtures,
@@ -286,7 +286,7 @@ export function PlannerPanel({
                         </a>
                         {" · "}
                         <a
-                          href={dashboarderImportDeepLink(preset.id)}
+                          href={axiboardImportDeepLink(preset.id)}
                           style={{ color: "#93c5fd" }}
                         >
                           Import

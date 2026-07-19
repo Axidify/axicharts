@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
-  dashboarderImportDeepLink,
+  axiboardImportDeepLink,
   fetchImportPreset,
   filterImportPresets,
   findImportPreset,
@@ -135,7 +135,7 @@ function PresetCard({
   const localUrl = localImportPresetUrl(preset, `${base}examples/`);
   const hostedUrl = hostedImportPresetUrl(preset);
   const galleryLink = presetGalleryPath(preset.id);
-  const dashboarderLink = dashboarderImportDeepLink(preset.id);
+  const axiboardLink = axiboardImportDeepLink(preset.id);
   const validateCommand = formatValidatePresetCommand(preset.id);
 
   const copy = async (): Promise<void> => {
@@ -226,8 +226,8 @@ function PresetCard({
               <Link to={galleryLink} style={{ color: "#2563eb", marginRight: 12 }}>
                 Gallery deep link
               </Link>
-              <a href={dashboarderLink} style={{ color: "#2563eb" }}>
-                Open in Dashboarder
+              <a href={axiboardLink} style={{ color: "#2563eb" }}>
+                Open in Axiboard
               </a>
             </div>
             <ValidateCommandCopy command={validateCommand} buttonLabel="Copy validate" />
@@ -292,7 +292,7 @@ export function RuntimeImportPage(): ReactElement {
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
           <code>@axicharts/charts-planner</code> maps natural-language intent to{" "}
           <code>DashboardPlan.feed</code> — each feed binds to a gallery fixture validated in CI.
-          Dashboarder <strong>Plan</strong> surfaces the same presets with gallery and import links.
+          Axiboard <strong>Plan</strong> surfaces the same presets with gallery and import links.
         </p>
         <table
           style={{
@@ -359,8 +359,8 @@ export function RuntimeImportPage(): ReactElement {
           Planner track release notes (C33–C43)
         </div>
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
-          The planner ↔ gallery ↔ Dashboarder track ships share/import meta round-trip: exports
-          include <code>meta</code> and Dashboarder import restores layout, feed, template, and
+          The planner ↔ gallery ↔ Axiboard track ships share/import meta round-trip: exports
+          include <code>meta</code> and Axiboard import restores layout, feed, template, and
           mosaic preset. See <Link to="/spec#phase-3-planner">Spec Phase 3 planner</Link> and{" "}
           <Link to="/start#planner-cli">Start CLI</Link>.
         </p>
@@ -389,7 +389,7 @@ export function RuntimeImportPage(): ReactElement {
         </div>
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
           Hardening track for planner <code>meta</code> round-trip: deep-link preset table, schema{" "}
-          <code>dashboardMeta</code> fields, and Dashboarder Share/Import dialog docs links. See{" "}
+          <code>dashboardMeta</code> fields, and Axiboard Share/Import dialog docs links. See{" "}
           <Link to="/runtime#share-import">share ↔ import flow</Link>,{" "}
           <Link to="/runtime/schema#share-meta">schema § meta</Link>, and{" "}
           <Link to="/runtime/links#share-import-track">deep-link track notes</Link>.
@@ -407,7 +407,7 @@ export function RuntimeImportPage(): ReactElement {
           {" · "}
           <Link to="/runtime/import?preset=ops-workspace">ops-workspace</Link>
           {" · "}
-          Storybook <code>Dashboarder/Share ↔ Import</code>
+          Storybook <code>Axiboard/Share ↔ Import</code>
         </p>
       </section>
 

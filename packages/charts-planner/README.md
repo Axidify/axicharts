@@ -51,7 +51,7 @@ CSV sample for Path 2: `examples/sample-weekly.csv` — see [CSV dashboard guide
 ## Planner feeds
 
 `inferFeed()` maps intent keywords to `DashboardPlan.feed`. Each feed binds to a shipped import
-gallery fixture — same presets surfaced in Dashboarder **Plan** and the
+gallery fixture — same presets surfaced in Axiboard **Plan** and the
 [runtime import gallery](https://axidify.github.io/axicharts/runtime/import#planner-feeds).
 
 | Feed | Sample intent | Gallery preset |
@@ -125,7 +125,7 @@ charts-planner serve --port 3921
 
 ## Planner track (C33–C43)
 
-Dashboarder share exports include planner `meta` (layout, feed, template, mosaic preset,
+Axiboard share exports include planner `meta` (layout, feed, template, mosaic preset,
 presentation). Import restores the same fields — see the
 [import gallery planner track notes](https://axidify.github.io/axicharts/runtime/import#planner-track).
 

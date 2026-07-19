@@ -45,13 +45,13 @@ describe("composition simulation (RFC-002 feasibility)", () => {
     }
   });
 
-  const dashboarderRepo = resolve(import.meta.dirname, "../../../../Dashboarder");
+  const axiboardRepo = resolve(import.meta.dirname, "../../../../axiboard");
 
-  it.skipIf(!existsSync(dashboarderRepo))(
-    "writes simulation report for Dashboarder RFC-002",
+  it.skipIf(!existsSync(axiboardRepo))(
+    "writes simulation report for Axiboard RFC-002",
     () => {
-    const dashboarderPath = resolve(
-      dashboarderRepo,
+    const reportPath = resolve(
+      axiboardRepo,
       "docs/charts/rfcs/RFC-002-composition-simulation.md",
     );
     const body = `# RFC-002 composition simulation results
@@ -80,8 +80,8 @@ ${summary.gaps
   .map((r) => `- **${r.id}** (${r.description}): today \`${r.outcome}\` → RFC \`${r.rfcRecommendation}\``)
   .join("\n")}
 `;
-    mkdirSync(resolve(dashboarderPath, ".."), { recursive: true });
-    writeFileSync(dashboarderPath, body, "utf8");
+    mkdirSync(resolve(reportPath, ".."), { recursive: true });
+    writeFileSync(reportPath, body, "utf8");
     expect(summary.gaps.length).toBeGreaterThan(0);
   },
   );

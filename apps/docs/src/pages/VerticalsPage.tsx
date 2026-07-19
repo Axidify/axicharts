@@ -40,7 +40,7 @@ export function VerticalsPage(): ReactElement {
           Post–v0.2.8 track: share/import E2E, then gates G–Q elevated to 5/5 with KPI tiles,
           callouts, and SLO/plan references. See{" "}
           <Link to="/start#storybook-round3">getting started § Storybook</Link> and run{" "}
-          <code>pnpm test:e2e:share-import</code> for Dashboarder dialog coverage.
+          <code>pnpm test:e2e:share-import</code> for Axiboard dialog coverage.
         </p>
         <ul style={{ margin: 0, paddingLeft: 20, fontSize: 13, color: "#475569", lineHeight: 1.7 }}>
           {STORYBOOK_ROUND3_RELEASE_NOTES.map((item) => (

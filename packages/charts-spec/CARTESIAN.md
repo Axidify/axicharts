@@ -1,7 +1,7 @@
 # Cartesian building blocks (`@axicharts/charts-spec`)
 
 > **Wedge:** AI agents compose custom charts on the fly — humans edit the same blocks via `ejectPanel`.  
-> **Planning:** [RFC-002](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/rfcs/RFC-002-cartesian-building-blocks.md) (Dashboarder repo)
+> **Planning:** [RFC-002](https://github.com/Axidify/axiboard/blob/main/docs/charts/rfcs/RFC-002-cartesian-building-blocks.md) (axiboard repo)
 
 ## Mental model
 

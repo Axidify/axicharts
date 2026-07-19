@@ -1,14 +1,14 @@
 # Contributing to AxiCharts
 
-Thank you for helping improve `@axicharts/*`, the Dashboarder app, and related packages.
+Thank you for helping improve `@axicharts/*`, the Axiboard app, and related packages.
 
 **Code and packages:** this repository ([axicharts](https://github.com/Axidify/axicharts))  
-**Product design, RFCs, and roadmap docs:** [Dashboarder](https://github.com/Axidify/Dashboarder)
+**Product design, RFCs, and roadmap docs:** [axiboard](https://github.com/Axidify/axiboard)
 
 ## Before you start
 
 - Read [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
-- For non-trivial API or architecture changes, skim [GOVERNANCE](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/GOVERNANCE.md) and open or reference an RFC in Dashboarder when required.
+- For non-trivial API or architecture changes, skim [GOVERNANCE](https://github.com/Axidify/axiboard/blob/main/docs/charts/GOVERNANCE.md) and open or reference an RFC in axiboard when required.
 - Search [existing issues](https://github.com/Axidify/axicharts/issues) before opening a duplicate.
 
 ## Development setup
@@ -27,7 +27,7 @@ Useful commands:
 | Command | Purpose |
 |---------|---------|
 | `pnpm storybook` | Component docs and visual review → http://localhost:6006 |
-| `pnpm dashboarder` | Dashboarder demo app → http://localhost:3000 |
+| `pnpm axiboard` | Axiboard demo app → http://localhost:3000 |
 | `pnpm test` | Unit and integration tests across packages |
 | `pnpm typecheck` | TypeScript project references |
 | `pnpm size` | Bundle size budgets (`size-limit`) |
@@ -44,18 +44,18 @@ Useful commands:
 
 ### Layer boundaries
 
-- **Layer 1 (`@axicharts/charts`)** PRs must not import Dashboarder or AI planner code.
+- **Layer 1 (`@axicharts/charts`)** PRs must not import Axiboard or AI planner code.
 - Prefer new chart types via `registerChartType` in a plugin package over growing core.
 - Spec compiler changes (`charts-spec`) should keep parity with validation, compile, and eject paths.
 
 ### RFCs and stable API
 
-See [GOVERNANCE → RFC process](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/GOVERNANCE.md#rfc-process). Breaking stable APIs need an RFC, deprecation window, and migration notes.
+See [GOVERNANCE → RFC process](https://github.com/Axidify/axiboard/blob/main/docs/charts/GOVERNANCE.md#rfc-process). Breaking stable APIs need an RFC, deprecation window, and migration notes.
 
 ### Documentation
 
 - API and usage: Storybook stories and package READMEs in this repo.
-- Product direction and RFCs: [Dashboarder `docs/`](https://github.com/Axidify/Dashboarder/tree/main/docs).
+- Product direction and RFCs: [axiboard `docs/`](https://github.com/Axidify/axiboard/tree/main/docs).
 
 ## Reporting bugs
 

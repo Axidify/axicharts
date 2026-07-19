@@ -19,7 +19,7 @@ npx @axicharts/charts-spec eject examples/cartesian-revenue-target.panel.json
 pnpm --filter @axicharts/charts-spec test compositionSimulation
 ```
 
-Guide: [../CARTESIAN.md](../CARTESIAN.md) · Planning: [RFC-002](https://github.com/Axidify/Dashboarder/blob/main/docs/charts/rfcs/RFC-002-cartesian-building-blocks.md)
+Guide: [../CARTESIAN.md](../CARTESIAN.md) · Planning: [RFC-002](https://github.com/Axidify/axiboard/blob/main/docs/charts/rfcs/RFC-002-cartesian-building-blocks.md)
 
 ## Blocks Playground presets (C138)
 

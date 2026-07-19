@@ -9,7 +9,7 @@ import {
   type WorkspaceStore,
 } from "@axicharts/charts-runtime";
 import {
-  dashboarderImportDeepLink,
+  axiboardImportDeepLink,
   docsImportGalleryDeepLink,
   feedAdapterGalleryDeepLink,
   formatValidatePresetCommand,
@@ -266,7 +266,7 @@ export function ShareDialog({
               Gallery
             </a>
             {" · "}
-            <a href={dashboarderImportDeepLink(referencePreset.id)} style={{ color: "#93c5fd" }}>
+            <a href={axiboardImportDeepLink(referencePreset.id)} style={{ color: "#93c5fd" }}>
               Import in app
             </a>
             <ValidateCommandCopy command={formatValidatePresetCommand(referencePreset.id)} />
@@ -379,7 +379,7 @@ export function ShareDialog({
           >
             Workspace bundle includes planner <code>meta</code> per dashboard (
             {workspaceMetaCount}/{workspace.dashboards.length} with feed). Import restores layout,
-            feed, template, mosaic preset, and chartConfig labels in Dashboarder.
+            feed, template, mosaic preset, and chartConfig labels in Axiboard.
             {" · "}
             <a
               href={plannerFeedGalleryIndexDeepLink()}

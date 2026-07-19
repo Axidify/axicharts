@@ -8,8 +8,8 @@ const STORYBOOK_PORT = Number(process.env.E2E_STORYBOOK_PORT ?? 6017);
 const STORYBOOK_BASE_URL = `http://127.0.0.1:${STORYBOOK_PORT}`;
 
 const SHARE_IMPORT_STORIES = {
-  importDashboard: "dashboarder-share-↔-import--import-dashboard-meta-restore",
-  shareDashboard: "dashboarder-share-↔-import--share-dashboard-with-meta",
+  importDashboard: "axiboard-share-↔-import--import-dashboard-meta-restore",
+  shareDashboard: "axiboard-share-↔-import--share-dashboard-with-meta",
 };
 
 function run(command, options = {}) {

@@ -9,8 +9,8 @@ import {
 } from "@axicharts/charts-runtime";
 import opsDashboardShare from "../../../packages/charts-runtime/examples/ops-dashboard.share.json?raw";
 import opsWorkspaceBundle from "../../../packages/charts-runtime/examples/ops-workspace.workspace.json?raw";
-import { ImportDialog } from "../../dashboarder/src/ImportDialog";
-import { ShareDialog } from "../../dashboarder/src/ShareDialog";
+import { ImportDialog } from "../../axiboard/src/ImportDialog";
+import { ShareDialog } from "../../axiboard/src/ShareDialog";
 
 const SEED_SPEC: RuntimeDashboardSpec = {
   layout: "embed",
@@ -88,14 +88,14 @@ function ImportDialogFixture({
 }
 
 const meta = {
-  title: "Dashboarder/Share ↔ Import",
+  title: "Axiboard/Share ↔ Import",
   tags: ["!dev", "!test"],
   parameters: {
     layout: "fullscreen",
     docs: {
       description: {
         component:
-          "C43/C76 Dashboarder share export and import dialogs — planner meta and chartConfig preview on export and restore hints on import.",
+          "C43/C76 Axiboard share export and import dialogs — planner meta and chartConfig preview on export and restore hints on import.",
       },
     },
   },

@@ -99,7 +99,7 @@ export const SHARE_META_FIELD_ROWS = [
   { field: "presentation", type: "boolean", description: "Presentation mode flag for embed chrome" },
 ] as const;
 
-/** Share/import hardening track (C44–C46) — docs + Dashboarder cross-links. */
+/** Share/import hardening track (C44–C46) — docs + Axiboard cross-links. */
 export const SHARE_IMPORT_TRACK_RELEASE_NOTES = [
   {
     slice: "C44",

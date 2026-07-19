@@ -202,11 +202,11 @@ export function StartPage(): ReactElement {
         <Link to="/spec">Spec layer</Link> ·{" "}
         <Link to="/plugins">Community plugins</Link> ·{" "}
         <a
-          href="https://github.com/Axidify/Dashboarder/tree/main/docs/charts"
+          href="https://github.com/Axidify/axiboard/tree/main/docs/charts"
           target="_blank"
           rel="noreferrer"
         >
-          Product RFCs (Dashboarder)
+          Product RFCs (axiboard)
         </a>
       </p>
     </div>

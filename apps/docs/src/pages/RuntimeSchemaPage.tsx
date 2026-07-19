@@ -87,16 +87,16 @@ export function RuntimeSchemaPage(): ReactElement {
       <p style={{ color: "#475569", maxWidth: 720, lineHeight: 1.6 }}>
         Portable runtime JSON is validated in two layers: draft-07 JSON Schema for shape and
         enums, plus semantic checks for template IDs, adapter fields, and mosaic{" "}
-        <code>dataSourceId</code> references. Shipped examples and Dashboarder exports include
+        <code>dataSourceId</code> references. Shipped examples and Axiboard exports include
         top-level <code>$schema</code> hints. CI runs <code>pnpm validate:runtime</code> with the
         dual <code>--all</code> gate on every build.
       </p>
 
-      <Section title="Validation stack" subtitle="schema · CLI · presets · Dashboarder">
+      <Section title="Validation stack" subtitle="schema · CLI · presets · Axiboard">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
           Runtime portability ships with a complete validation path from editor hints through CI.
           Every shipped import preset has a matching <code>--preset</code> shortcut, live preview in
-          Dashboarder, and copyable commands across docs.
+          Axiboard, and copyable commands across docs.
         </p>
         <ul style={{ margin: 0, paddingLeft: 18, color: "#475569", lineHeight: 1.8, fontSize: 13 }}>
           <li>
@@ -111,7 +111,7 @@ export function RuntimeSchemaPage(): ReactElement {
             <strong>CI</strong> — <code>pnpm validate:runtime</code> loops all gallery presets
           </li>
           <li>
-            <strong>Dashboarder</strong> — Import, Share, and Embed dialogs run live validation with
+            <strong>Axiboard</strong> — Import, Share, and Embed dialogs run live validation with
             copyable CLI hints
           </li>
         </ul>
@@ -204,7 +204,7 @@ export function RuntimeSchemaPage(): ReactElement {
       <Section title="Editor integration" subtitle="VS Code · $schema headers">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
           Map <code>*.runtime.json</code> and share exports to hosted schemas in workspace settings,
-          or add a top-level <code>$schema</code> URL for per-file completion. Dashboarder exports
+          or add a top-level <code>$schema</code> URL for per-file completion. Axiboard exports
           include the hint automatically.
         </p>
         <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
@@ -227,11 +227,11 @@ export function RuntimeSchemaPage(): ReactElement {
 
       <Section
         title="Share export planner meta"
-        subtitle="dashboardMeta · Dashboarder round-trip"
+        subtitle="dashboardMeta · Axiboard round-trip"
         id="share-meta"
       >
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
-          Optional <code>meta</code> on dashboard and workspace share exports preserves Dashboarder
+          Optional <code>meta</code> on dashboard and workspace share exports preserves Axiboard
           builder state — layout, feed, template, mosaic preset, and presentation. Portable runtime
           JSON omits <code>meta</code>; use share envelopes for planner round-trip. Import restores
           fields via <code>applyDashboardMeta</code> — see{" "}

@@ -158,11 +158,11 @@ export function RuntimePage(): ReactElement {
 
       <Section
         title="Share → import round-trip"
-        subtitle="planner meta · Dashboarder"
+        subtitle="planner meta · Axiboard"
         id="share-import"
       >
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
-          Dashboarder <strong>Share</strong> serializes portable JSON with optional planner{" "}
+          Axiboard <strong>Share</strong> serializes portable JSON with optional planner{" "}
           <code>meta</code> (layout, feed, template, mosaic preset, presentation).{" "}
           <strong>Import</strong> validates the envelope, previews meta restore, and calls{" "}
           <code>applyDashboardMeta</code> on apply — same fields the builder uses after{" "}
@@ -178,7 +178,7 @@ export function RuntimePage(): ReactElement {
           }}
         >
           <li>
-            Plan or tune layout/feed in Dashboarder — builder state lives in{" "}
+            Plan or tune layout/feed in Axiboard — builder state lives in{" "}
             <code>dashboard.meta</code>.
           </li>
           <li>
@@ -228,7 +228,7 @@ export function RuntimePage(): ReactElement {
       <Section title="Planner feeds" subtitle="intent → feed → gallery fixture">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
           Phase 3 <code>@axicharts/charts-planner</code> infers a live feed from intent and applies it
-          in Dashboarder via <strong>Plan</strong>. Each feed maps to a shipped import preset — see
+          in Axiboard via <strong>Plan</strong>. Each feed maps to a shipped import preset — see
           the full index on the{" "}
           <Link to="/runtime/import#planner-feeds">import gallery planner feed table</Link>
           {" · "}
@@ -262,7 +262,7 @@ export function RuntimePage(): ReactElement {
 
       <Section title="Planner HTTP API" subtitle="serve · health · plan" id="planner-http">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
-          Run the Phase 3 planner locally and point Dashboarder at it with{" "}
+          Run the Phase 3 planner locally and point Axiboard at it with{" "}
           <code>VITE_PLANNER_URL</code>. Invalid LLM JSON falls back to rules with a warning on the
           plan — same behavior as the in-app <strong>Plan</strong> dialog.
         </p>
@@ -342,7 +342,7 @@ export function RuntimePage(): ReactElement {
           {PLANNER_PLAN_RESPONSE}
         </pre>
         <p style={{ margin: "0 0 8px", fontSize: 12, color: "#64748b" }}>
-          <strong>Dashboarder env</strong>
+          <strong>Axiboard env</strong>
         </p>
         <pre
           style={{
@@ -418,7 +418,7 @@ export function RuntimePage(): ReactElement {
 
       <Section title="Mosaic presets" subtitle="buildMosaicPreset · listMosaicPresets">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
-          Named multi-cell walls for Dashboarder and agent planners — ops+finance, trading+program,
+          Named multi-cell walls for Axiboard and agent planners — ops+finance, trading+program,
           and more.
         </p>
         <pre
@@ -437,7 +437,7 @@ export function RuntimePage(): ReactElement {
 
       <Section title="Embed SDK snippets" subtitle="buildEmbedBundle">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
-          Dashboarder exports React file-import, inline-spec, and portable JSON variants from{" "}
+          Axiboard exports React file-import, inline-spec, and portable JSON variants from{" "}
           <code>buildEmbedBundle</code>.
         </p>
         <pre
@@ -456,7 +456,7 @@ export function RuntimePage(): ReactElement {
 
       <Section title="Portable spec" subtitle="serializeRuntimeSpec / parseRuntimeSpec">
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
-          Export runtime JSON for Dashboarder, GitOps, or agent planners — see the{" "}
+          Export runtime JSON for Axiboard, GitOps, or agent planners — see the{" "}
           <Link to="/runtime/schema">schema page</Link> for validation and hosted URLs. Example
           fixture: <code>packages/charts-runtime/examples/ops-mosaic.runtime.json</code>.
         </p>
