@@ -33,8 +33,12 @@ import { ShareDialog } from "./ShareDialog";
 import { PluginStrip } from "./PluginStrip";
 import { FeedIntentGlossary } from "./FeedIntentGlossary";
 import { WorkspaceSidebar } from "./WorkspaceSidebar";
-import { LedgerRndView } from "./rnd/LedgerRndView";
+import {
+  fetchWorkspaceStore,
+  saveWorkspaceStoreToServer,
+} from "./api/workspaceClient";
 import { AttendanceRndView } from "./rnd/AttendanceRndView";
+import { LedgerRndView } from "./rnd/LedgerRndView";
 import { SalesRndView } from "./rnd/SalesRndView";
 import {
   buildRuntimeSpec,
@@ -138,16 +142,39 @@ export function App(): ReactElement {
   const [appliedPlan, setAppliedPlan] = useState<DashboardPlan | null>(null);
 
   useEffect(() => {
-    const loaded = loadWorkspaceStore(localStorage, undefined, defaultSeedSpec());
-    setStore(loaded);
-    applyDashboardMeta(
-      getActiveDashboard(loaded),
-      setLayout,
-      setFeed,
-      setTemplate,
-      setPresentation,
-      setMosaicPreset,
-    );
+    let cancelled = false;
+
+    void (async () => {
+      let loaded: WorkspaceStore | null = null;
+      try {
+        loaded = await fetchWorkspaceStore();
+      } catch {
+        loaded = null;
+      }
+
+      if (cancelled) return;
+
+      if (!loaded) {
+        loaded = loadWorkspaceStore(localStorage, undefined, defaultSeedSpec());
+        void saveWorkspaceStoreToServer(loaded).catch(() => {
+          // Server persistence is best-effort; localStorage remains fallback.
+        });
+      }
+
+      setStore(loaded);
+      applyDashboardMeta(
+        getActiveDashboard(loaded),
+        setLayout,
+        setFeed,
+        setTemplate,
+        setPresentation,
+        setMosaicPreset,
+      );
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -193,6 +220,9 @@ export function App(): ReactElement {
   const persist = (next: WorkspaceStore): void => {
     setStore(next);
     persistWorkspaceStore(localStorage, next);
+    void saveWorkspaceStoreToServer(next).catch(() => {
+      // Server persistence is best-effort; localStorage remains fallback.
+    });
   };
 
   const builderMeta = useMemo(() => {

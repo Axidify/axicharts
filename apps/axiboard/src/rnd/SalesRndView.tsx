@@ -1,7 +1,7 @@
 import { useMemo, useState, type ChangeEvent, type ReactElement } from "react";
 import { Chart, PanelSpecGrid } from "@axicharts/charts-spec";
 import { OrchestratorChat } from "../chat/OrchestratorChat";
-import { useOrchestratorPlan } from "../hooks/useOrchestratorPlan";
+import { useRndSession } from "../hooks/useOrchestratorPlan";
 import { enrichPipeline, formatRm } from "./pipelineEnrich";
 import { parseTabular } from "./parseTabular";
 import { SAMPLE_PIPELINE_TEXT } from "./samplePipeline";
@@ -29,28 +29,30 @@ export type SalesRndViewProps = {
 };
 
 export function SalesRndView({ onExit }: SalesRndViewProps): ReactElement {
-  const [rawText, setRawText] = useState(SAMPLE_PIPELINE_TEXT);
   const [fileError, setFileError] = useState<string | null>(null);
 
-  const enrichment = useMemo(() => {
-    const rows = parseTabular(rawText);
-    if (rows.length === 0) return null;
-    return enrichPipeline(rows);
-  }, [rawText]);
-
   const {
+    rawText,
+    setRawText,
+    hydrated,
     result: agentPlan,
     loading,
     error: orchestratorError,
     persona,
     setPersona,
     sendMessage,
-  } = useOrchestratorPlan({
-    csv: rawText,
-    initialPersona: "manager",
+  } = useRndSession({
+    slug: "sales",
+    sampleCsv: SAMPLE_PIPELINE_TEXT,
     initialFollowUpIntents: ["weighted forecast by salesperson"],
     intent: "Sales pipeline dashboard static CSV — value by stage, weighted forecast by salesperson",
   });
+
+  const enrichment = useMemo(() => {
+    const rows = parseTabular(rawText);
+    if (rows.length === 0) return null;
+    return enrichPipeline(rows);
+  }, [rawText]);
 
   const onFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -117,7 +119,7 @@ export function SalesRndView({ onExit }: SalesRndViewProps): ReactElement {
         <div style={{ marginBottom: 12, fontSize: 12, color: "#f87171" }}>{error}</div>
       ) : null}
 
-      {!enrichment || !agentPlan || loading ? (
+      {!enrichment || !agentPlan || loading || !hydrated ? (
         <p style={{ fontSize: 13, color: "#94a3b8" }}>
           {loading
             ? "Planning dashboard…"

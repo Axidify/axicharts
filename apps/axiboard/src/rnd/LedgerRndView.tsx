@@ -1,7 +1,7 @@
 import { useMemo, useState, type ChangeEvent, type ReactElement } from "react";
 import { Chart, PanelSpecGrid } from "@axicharts/charts-spec";
 import { OrchestratorChat } from "../chat/OrchestratorChat";
-import { useOrchestratorPlan } from "../hooks/useOrchestratorPlan";
+import { useRndSession } from "../hooks/useOrchestratorPlan";
 import { enrichLedger, formatRm } from "./ledgerEnrich";
 import { parseTabular } from "./parseTabular";
 import { SAMPLE_LEDGER_TEXT } from "./sampleLedger";
@@ -29,27 +29,29 @@ export type LedgerRndViewProps = {
 };
 
 export function LedgerRndView({ onExit }: LedgerRndViewProps): ReactElement {
-  const [rawText, setRawText] = useState(SAMPLE_LEDGER_TEXT);
   const [fileError, setFileError] = useState<string | null>(null);
 
-  const enrichment = useMemo(() => {
-    const rows = parseTabular(rawText);
-    if (rows.length === 0) return null;
-    return enrichLedger(rows);
-  }, [rawText]);
-
   const {
+    rawText,
+    setRawText,
+    hydrated,
     result: agentPlan,
     loading,
     error: orchestratorError,
     persona,
     setPersona,
     sendMessage,
-  } = useOrchestratorPlan({
-    csv: rawText,
-    initialPersona: "manager",
+  } = useRndSession({
+    slug: "ledger",
+    sampleCsv: SAMPLE_LEDGER_TEXT,
     initialFollowUpIntents: ["show payment method breakdown"],
   });
+
+  const enrichment = useMemo(() => {
+    const rows = parseTabular(rawText);
+    if (rows.length === 0) return null;
+    return enrichLedger(rows);
+  }, [rawText]);
 
   const onFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -117,7 +119,7 @@ export function LedgerRndView({ onExit }: LedgerRndViewProps): ReactElement {
         <div style={{ marginBottom: 12, fontSize: 12, color: "#f87171" }}>{error}</div>
       ) : null}
 
-      {!enrichment || !agentPlan || loading ? (
+      {!enrichment || !agentPlan || loading || !hydrated ? (
         <p style={{ fontSize: 13, color: "#94a3b8" }}>
           {loading
             ? "Planning dashboard…"

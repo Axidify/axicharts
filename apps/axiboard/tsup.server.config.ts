@@ -8,6 +8,7 @@ export default defineConfig({
   external: [
     "@axicharts/charts-spec/planning",
     "@axicharts/charts-planner/tabular",
+    "@axicharts/charts-runtime/workspace",
     "react",
     "react-dom",
     "echarts",

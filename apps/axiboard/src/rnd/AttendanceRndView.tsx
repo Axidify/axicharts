@@ -1,7 +1,7 @@
 import { useMemo, useState, type ChangeEvent, type ReactElement } from "react";
 import { Chart, PanelSpecGrid } from "@axicharts/charts-spec";
 import { OrchestratorChat } from "../chat/OrchestratorChat";
-import { useOrchestratorPlan } from "../hooks/useOrchestratorPlan";
+import { useRndSession } from "../hooks/useOrchestratorPlan";
 import { enrichAttendance, formatHours } from "./attendanceEnrich";
 import { parseTabular } from "./parseTabular";
 import { SAMPLE_ATTENDANCE_TEXT } from "./sampleAttendance";
@@ -29,27 +29,29 @@ export type AttendanceRndViewProps = {
 };
 
 export function AttendanceRndView({ onExit }: AttendanceRndViewProps): ReactElement {
-  const [rawText, setRawText] = useState(SAMPLE_ATTENDANCE_TEXT);
   const [fileError, setFileError] = useState<string | null>(null);
 
-  const enrichment = useMemo(() => {
-    const rows = parseTabular(rawText);
-    if (rows.length === 0) return null;
-    return enrichAttendance(rows);
-  }, [rawText]);
-
   const {
+    rawText,
+    setRawText,
+    hydrated,
     result: agentPlan,
     loading,
     error: orchestratorError,
     persona,
     setPersona,
     sendMessage,
-  } = useOrchestratorPlan({
-    csv: rawText,
-    initialPersona: "manager",
+  } = useRndSession({
+    slug: "attendance",
+    sampleCsv: SAMPLE_ATTENDANCE_TEXT,
     initialFollowUpIntents: ["show attendance table"],
   });
+
+  const enrichment = useMemo(() => {
+    const rows = parseTabular(rawText);
+    if (rows.length === 0) return null;
+    return enrichAttendance(rows);
+  }, [rawText]);
 
   const onFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -116,7 +118,7 @@ export function AttendanceRndView({ onExit }: AttendanceRndViewProps): ReactElem
         <div style={{ marginBottom: 12, fontSize: 12, color: "#f87171" }}>{error}</div>
       ) : null}
 
-      {!enrichment || !agentPlan || loading ? (
+      {!enrichment || !agentPlan || loading || !hydrated ? (
         <p style={{ fontSize: 13, color: "#94a3b8" }}>
           {loading
             ? "Planning dashboard…"

@@ -2,7 +2,8 @@ import { createReadStream, existsSync } from "node:fs";
 import { stat } from "node:fs/promises";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import path from "node:path";
-import { handleOrchestratorRequest } from "./http/handlers";
+import { handleApiRequest } from "./http/apiRouter";
+import { type AxiboardFileStore, getFileStore } from "./persistence/fileStore";
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -22,6 +23,9 @@ export type AxiboardServerOptions = {
   host?: string;
   /** Directory with Vite `dist/` output (index.html + assets). */
   staticDir: string;
+  /** Workspace + R&D persistence (defaults to AXIBOARD_DATA_DIR or ./data). */
+  dataDir?: string;
+  fileStore?: AxiboardFileStore;
 };
 
 function contentType(filePath: string): string {
@@ -119,11 +123,12 @@ export function createAxiboardServer(options: AxiboardServerOptions): AxiboardSe
   const port = options.port ?? Number(process.env.PORT ?? 3000);
   const host = options.host ?? process.env.HOST ?? "0.0.0.0";
   const staticDir = path.resolve(options.staticDir);
+  const fileStore = options.fileStore ?? getFileStore(options.dataDir);
 
   const server = createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
 
-    if (await handleOrchestratorRequest(req, res, url.pathname)) {
+    if (await handleApiRequest(req, res, url.pathname, fileStore)) {
       return;
     }
 

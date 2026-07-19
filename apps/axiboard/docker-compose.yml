@@ -9,3 +9,8 @@ services:
       PORT: "3000"
       HOST: "0.0.0.0"
       # OPENAI_API_KEY: sk-...
+    volumes:
+      - axiboard-data:/app/apps/axiboard/data
+
+volumes:
+  axiboard-data:

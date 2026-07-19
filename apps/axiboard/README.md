@@ -25,6 +25,7 @@ pnpm --filter @axicharts/axiboard start
 | `PORT` | `3000` | HTTP listen port |
 | `HOST` | `0.0.0.0` | Bind address |
 | `AXIBOARD_STATIC_DIR` | `dist/` next to server bundle | Vite build output |
+| `AXIBOARD_DATA_DIR` | `./data` (cwd) | Workspace + R&D session JSON |
 | `OPENAI_API_KEY` | — | Optional server default LLM key |
 | `OPENAI_MODEL` | — | Optional model override |
 | `OPENAI_BASE_URL` | — | Optional OpenAI-compatible base URL |
@@ -39,6 +40,10 @@ Users can still BYOK via `POST /api/orchestrator/byok` and `x-axiboard-session`.
 | `POST` | `/api/orchestrator/byok` |
 | `POST` | `/api/orchestrator/plan` |
 | `POST` | `/api/orchestrator/chat` |
+| `GET` | `/api/workspaces` |
+| `POST` | `/api/workspaces` |
+| `GET` | `/api/rnd/:slug` (`ledger` \| `sales` \| `attendance`) |
+| `POST` | `/api/rnd/:slug` |
 
 ## Docker
 

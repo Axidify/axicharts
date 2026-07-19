@@ -1,0 +1,52 @@
+import { mkdtemp } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { WORKSPACE_STORE_VERSION } from "@axicharts/charts-runtime/workspace";
+import type { WorkspaceStore } from "@axicharts/charts-runtime/workspace";
+import { describe, expect, it } from "vitest";
+import { AxiboardFileStore } from "./fileStore";
+import type { RndSession } from "./types";
+
+function sampleWorkspace(): WorkspaceStore {
+  return {
+    version: WORKSPACE_STORE_VERSION,
+    activeWorkspaceId: "ws-1",
+    activeDashboardId: "dash-1",
+    workspaces: [
+      {
+        id: "ws-1",
+        name: "Test workspace",
+        dashboards: [
+          {
+            id: "dash-1",
+            name: "Dashboard",
+            updatedAt: "2026-07-19T00:00:00.000Z",
+            specJson: "{}",
+          },
+        ],
+      },
+    ],
+  };
+}
+
+describe("AxiboardFileStore", () => {
+  it("persists workspace and R&D sessions to disk", async () => {
+    const dataDir = await mkdtemp(path.join(os.tmpdir(), "axiboard-data-"));
+    const store = new AxiboardFileStore(dataDir);
+    const workspace = sampleWorkspace();
+
+    await store.saveWorkspace(workspace);
+    await expect(store.getWorkspace()).resolves.toEqual(workspace);
+
+    const session: RndSession = {
+      csv: "a,b\n1,2",
+      persona: "executive",
+      followUpIntents: ["kpi"],
+      updatedAt: "2026-07-19T12:00:00.000Z",
+    };
+    await store.saveRndSession("ledger", session);
+
+    const reloaded = new AxiboardFileStore(dataDir);
+    await expect(reloaded.getRndSession("ledger")).resolves.toEqual(session);
+  });
+});
