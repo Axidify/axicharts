@@ -1,16 +1,24 @@
 import { useMemo, type ReactElement } from "react";
-import type { StatTone } from "../stat/Stat";
+import type { StatTone, StatSurface } from "../stat/Stat";
 import { buildSingleValueA11yDescriptor } from "../a11y/singleValueDescriptor";
 import { SingleValueChartA11yRoot } from "../a11y/SingleValueChartA11yRoot";
 import { useOptionalChartLayout } from "../container/useOptionalChartLayout";
 import { resolveTagStatTone } from "../alarm/tagTones";
 import { usePresentationNumericCountUp } from "../stat/usePresentationCountUp";
 
-const TONE_STROKE: Record<StatTone, string> = {
-  neutral: "#3b82f6",
-  success: "#22c55e",
-  warning: "#f59e0b",
-  critical: "#ef4444",
+const TONE_VALUE: Record<StatSurface, Record<StatTone, string>> = {
+  dark: {
+    neutral: "#e2e8f0",
+    success: "#4ade80",
+    warning: "#fbbf24",
+    critical: "#f87171",
+  },
+  light: {
+    neutral: "#0f172a",
+    success: "#16a34a",
+    warning: "#d97706",
+    critical: "#dc2626",
+  },
 };
 
 export type GaugeProps = {
@@ -20,6 +28,8 @@ export type GaugeProps = {
   label?: string;
   unit?: string;
   tone?: StatTone;
+  /** Text/track palette — defaults to light in presentation mode. */
+  surface?: StatSurface;
   warningAt?: number;
   criticalAt?: number;
 };
@@ -63,11 +73,14 @@ export function Gauge({
   label,
   unit = "",
   tone,
+  surface: surfaceProp,
   warningAt,
   criticalAt,
 }: GaugeProps): ReactElement {
   const layout = useOptionalChartLayout();
   const presentation = layout?.mode === "presentation";
+  const surface: StatSurface =
+    surfaceProp ?? (presentation ? "light" : "dark");
   const animatedValue = usePresentationNumericCountUp(value, presentation);
   const resolvedTone =
     tone ??
@@ -77,16 +90,22 @@ export function Gauge({
   const height = layout?.ready ? layout.size.height : 120;
 
   const cx = width / 2;
-  const cy = height * 0.82;
-  const r = Math.min(width, height * 1.2) * 0.36;
+  const cy = height * 0.86;
+  const r = Math.min(width, height * 1.1) * 0.33;
+  const strokeWidth = Math.max(7, Math.min(11, r * 0.13));
   const start = Math.PI;
   const end = 0;
   const span = max - min || 1;
   const clamped = Math.min(max, Math.max(min, animatedValue));
   const fraction = (clamped - min) / span;
   const valueEnd = start - fraction * Math.PI;
-  const stroke = TONE_STROKE[resolvedTone];
-  const track = "#334155";
+  const stroke = TONE_VALUE[surface][resolvedTone];
+  const track = surface === "light" ? "#e2e8f0" : "#334155";
+  const labelColor = surface === "light" ? "#64748b" : "#94a3b8";
+  const tickColor = surface === "light" ? "#94a3b8" : "#64748b";
+  const valueFontSize = Math.min(Math.max(13, width * 0.095), r * 0.34);
+  const valueY = cy - r * 0.24;
+  const labelY = valueY + valueFontSize * 0.72;
   const display =
     unit === "%" ? `${clamped.toFixed(0)}%` : `${clamped.toFixed(0)}${unit}`;
   const descriptor = useMemo(
@@ -118,22 +137,23 @@ export function Gauge({
           d={arcPath(cx, cy, r, start, end)}
           fill="none"
           stroke={track}
-          strokeWidth={10}
+          strokeWidth={strokeWidth}
           strokeLinecap="round"
         />
         <path
           d={arcPath(cx, cy, r, start, valueEnd)}
           fill="none"
           stroke={stroke}
-          strokeWidth={10}
+          strokeWidth={strokeWidth}
           strokeLinecap="round"
         />
         <text
           x={cx}
-          y={cy - r * 0.15}
+          y={valueY}
           textAnchor="middle"
-          fill="#e2e8f0"
-          fontSize={Math.max(14, width * 0.14)}
+          dominantBaseline="middle"
+          fill={stroke}
+          fontSize={valueFontSize}
           fontWeight={600}
           fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
         >
@@ -142,18 +162,19 @@ export function Gauge({
         {label ? (
           <text
             x={cx}
-            y={cy + 8}
+            y={labelY}
             textAnchor="middle"
-            fill="#94a3b8"
-            fontSize={11}
+            dominantBaseline="hanging"
+            fill={labelColor}
+            fontSize={Math.max(11, valueFontSize * 0.32)}
           >
             {label}
           </text>
         ) : null}
-        <text x={cx - r} y={cy + 14} textAnchor="middle" fill="#64748b" fontSize={9}>
+        <text x={cx - r} y={cy + 12} textAnchor="middle" fill={tickColor} fontSize={9}>
           {min}
         </text>
-        <text x={cx + r} y={cy + 14} textAnchor="middle" fill="#64748b" fontSize={9}>
+        <text x={cx + r} y={cy + 12} textAnchor="middle" fill={tickColor} fontSize={9}>
           {max}
         </text>
       </svg>

@@ -34,7 +34,7 @@ function PresentationWall(): ReactElement {
         <Stat value="62.4%" label="Gross margin" tone="success" surface="light" />
       </ChartContainer>
       <ChartContainer theme={presentationTheme} mode="presentation" height={180}>
-        <Gauge value={78} label="SLO health" unit="%" tone="success" />
+        <Gauge value={78} label="SLO health" unit="%" tone="success" surface="light" />
       </ChartContainer>
       <ChartContainer theme={presentationTheme} mode="presentation" height={220}>
         <LineChart
