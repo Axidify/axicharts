@@ -69,4 +69,12 @@ describe("C157 planDashboardFromRows", () => {
     expect(catalogStep?.notes).toMatch(/persona/);
     expect(inferFieldRoles(rows).length).toBeGreaterThan(0);
   });
+
+  it("C170 applies panel budget caps", () => {
+    const rows = parseTabular(PIPELINE_TEXT);
+    const plan = planDashboardFromRows(rows)!;
+    expect(plan.kpis.length).toBeLessThanOrEqual(4);
+    expect(plan.charts.length).toBeLessThanOrEqual(4);
+    expect(plan.decisions.some((decision) => decision.api === "panelBudget")).toBe(true);
+  });
 });

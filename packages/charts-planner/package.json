@@ -42,7 +42,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
-    "@axicharts/charts-spec": "^0.4.16"
+    "@axicharts/charts-spec": "^0.4.18"
   },
   "devDependencies": {
     "@axicharts/charts-spec": "workspace:*",

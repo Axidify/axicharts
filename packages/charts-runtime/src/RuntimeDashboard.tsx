@@ -2,6 +2,7 @@
 
 import type { ReactElement } from "react";
 import { DashboardEmbed } from "./DashboardEmbed";
+import { HybridDashboard } from "./HybridDashboard";
 import { MosaicWall } from "./MosaicWall";
 import { PanelsDashboard } from "./PanelsDashboard";
 import type { RuntimeDashboardSpec, AdapterFixtureHrefResolver } from "./types";
@@ -27,6 +28,19 @@ export function RuntimeDashboard({
     return (
       <div className={className} style={{ width: "100%", height: "100%" }}>
         <PanelsDashboard panels={spec.panels} />
+      </div>
+    );
+  }
+
+  if (spec.layout === "hybrid") {
+    return (
+      <div className={className} style={{ width: "100%", height: "100%" }}>
+        <HybridDashboard
+          hybrid={spec.hybrid}
+          alarmScopeId={alarmScopeId}
+          alarmStorage={alarmStorage}
+          adapterFixtureHref={adapterFixtureHref}
+        />
       </div>
     );
   }

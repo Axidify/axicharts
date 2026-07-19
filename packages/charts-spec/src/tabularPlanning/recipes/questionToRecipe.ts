@@ -15,6 +15,25 @@ const STAGE_ORDER = [
   "Closed Lost",
 ] as const;
 
+const CATEGORY_ORDER = [
+  "Payroll",
+  "Rent",
+  "Marketing",
+  "Operations",
+  "Travel",
+  "Software",
+  "Utilities",
+] as const;
+
+const PAYMENT_METHOD_ORDER = ["Card", "ACH", "Wire", "Check", "Cash"] as const;
+
+function resolveStageOrder(question: AnalyticalQuestion): readonly string[] | undefined {
+  if (question.dimensionKey === "stage") return STAGE_ORDER;
+  if (question.dimensionKey === "category") return CATEGORY_ORDER;
+  if (question.dimensionKey === "payment_method") return PAYMENT_METHOD_ORDER;
+  return undefined;
+}
+
 function resolveMeasure(fieldProfiles: FieldProfile[], pattern?: RegExp): string | undefined {
   return findField(fieldProfiles, pattern ?? /value|amount|revenue|hours|balance|debit|credit/i, "measure");
 }
@@ -123,7 +142,7 @@ export function questionToRecipe(
     aggregates: valueField
       ? { [yField]: { op: "sum", field: valueField } }
       : { [yField]: { op: "count" } },
-    stageOrder: question.dimensionKey === "stage" ? STAGE_ORDER : undefined,
+    stageOrder: resolveStageOrder(question),
   };
 
   if (question.id === "sales.chart.open_by_stage") {

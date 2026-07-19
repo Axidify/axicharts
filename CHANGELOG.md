@@ -10,6 +10,18 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.18] - 2026-07-19
+
+### Added
+
+- **C170** — `PANEL_BUDGET` caps in `planDashboardFromRows`; ledger category/payment-method ordering in recipes
+- **C171** — `columns` / `gap` on `PanelsDashboardSpec`; CSS grid chart layout in `PanelsDashboard`
+- **C172** — `layout: "hybrid"` — tabular panels + live mosaic wall (`HybridDashboard`); example `ops-tabular-hybrid.runtime.json`
+
+### Axiboard app (monorepo, not npm)
+
+- **C170** — `AuthStatus` sign-out in app header when auth enabled
+
 ## [0.4.17] - 2026-07-19
 
 ### Axiboard app (monorepo, not npm)

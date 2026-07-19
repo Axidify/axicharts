@@ -64,6 +64,47 @@ describe("runtimeSpec", () => {
     expect(parsed.wall.cells).toHaveLength(1);
   });
 
+  it("parses hybrid layout specs (C172)", () => {
+    const parsed = parseRuntimeSpec(
+      JSON.stringify({
+        layout: "hybrid",
+        hybrid: {
+          title: "Ops + tabular",
+          panels: {
+            title: "Ledger KPIs",
+            kpis: [],
+            charts: [
+              {
+                panel: {
+                  type: "stat",
+                  title: "Balance",
+                  props: { label: "Balance", value: "RM 8,050" },
+                },
+                rows: [],
+              },
+            ],
+            columns: 2,
+          },
+          wall: {
+            title: "Line 3 MQTT",
+            theme: "industrial",
+            mode: "live",
+            dataSource: {
+              type: "mqtt",
+              url: "mqtt://broker.example.com",
+              topic: "plant/line3/metrics",
+            },
+            cells: [{ id: "ops", template: "ops-2x2" }],
+          },
+        },
+      }),
+    );
+
+    expect(parsed.layout).toBe("hybrid");
+    expect(parsed.hybrid.panels.columns).toBe(2);
+    expect(parsed.hybrid.wall.dataSource?.type).toBe("mqtt");
+  });
+
   it("rejects unknown templates", () => {
     const result = validateRuntimeSpecRaw({
       layout: "embed",

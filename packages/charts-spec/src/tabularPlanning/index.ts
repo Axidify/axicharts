@@ -37,6 +37,7 @@ export {
 } from "./enrich/types";
 export { applyKpiToRecipe, applyRecipeData, formatKpiDisplay, resolveKpiValue } from "./applyRecipeData";
 export {
+  PANEL_BUDGET,
   planDashboardFromRows,
   type PlanDashboardFromRowsOptions,
   type TabularDashboardPlan,

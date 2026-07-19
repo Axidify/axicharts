@@ -4,7 +4,7 @@ export type SavedDashboard = {
   updatedAt: string;
   specJson: string;
   meta?: {
-    layout: "embed" | "mosaic" | "panels";
+    layout: "embed" | "mosaic" | "panels" | "hybrid";
     feed: "static" | "historian" | "websocket" | "mqtt" | "rest" | "mock-live";
     template?: string;
     mosaicPreset?: string;

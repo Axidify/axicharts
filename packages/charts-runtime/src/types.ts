@@ -177,11 +177,22 @@ export type PanelsDashboardSpec = {
   theme?: ThemeName;
   mode?: ChartMode;
   vertical?: string;
+  /** Mosaic-style column count for chart grid (C171) */
+  columns?: number;
+  gap?: number;
   /** Raw CSV for replan / follow-up chat */
   sourceCsv?: string;
   decisions?: TabularPlanDecision[];
   kpis: TabularPanelBlock[];
   charts: TabularPanelBlock[];
+};
+
+export type HybridDashboardSpec = {
+  version?: string;
+  title?: string;
+  subtitle?: string;
+  panels: PanelsDashboardSpec;
+  wall: MosaicWallSpec;
 };
 
 export type RuntimeDashboardSpec =
@@ -196,4 +207,8 @@ export type RuntimeDashboardSpec =
   | {
       layout: "panels";
       panels: PanelsDashboardSpec;
+    }
+  | {
+      layout: "hybrid";
+      hybrid: HybridDashboardSpec;
     };

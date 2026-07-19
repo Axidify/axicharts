@@ -39,6 +39,7 @@ import {
 } from "./api/workspaceClient";
 import { TabularUploadView } from "./tabular/TabularUploadView";
 import { TabularDashboardView } from "./TabularDashboardView";
+import { AuthStatus } from "./AuthStatus";
 import type { OrchestratorChatResult } from "./api/orchestratorClient";
 import { buildTabularRuntimeSpec, isPanelsRuntimeSpec } from "./runtime/tabularRuntimeSpec";
 import {
@@ -497,6 +498,7 @@ export function App(): ReactElement {
           </div>
         </div>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <AuthStatus />
           <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
             Layout
             <select

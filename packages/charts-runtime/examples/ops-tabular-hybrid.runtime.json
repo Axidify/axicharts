@@ -1,0 +1,66 @@
+{
+  "$schema": "https://axidify.github.io/axicharts/schema/runtime-spec.schema.json",
+  "layout": "hybrid",
+  "hybrid": {
+    "version": "0.1",
+    "title": "Finance + live ops",
+    "subtitle": "Static ledger panels above MQTT plant wall",
+    "panels": {
+      "title": "Ledger snapshot",
+      "vertical": "ledger",
+      "columns": 2,
+      "gap": 16,
+      "kpis": [
+        {
+          "questionId": "ledger.kpi.balance",
+          "panel": {
+            "type": "stat",
+            "title": "Closing balance",
+            "props": { "label": "Closing balance", "value": "RM 8,050", "monospace": true }
+          },
+          "rows": []
+        }
+      ],
+      "charts": [
+        {
+          "questionId": "ledger.chart.balance_trend",
+          "panel": {
+            "type": "cartesian",
+            "title": "Balance over time",
+            "marks": [{ "type": "line", "xField": "Date", "yField": "value" }]
+          },
+          "rows": [
+            { "Date": "2026-07-01", "value": -3500 },
+            { "Date": "2026-07-02", "value": 8500 },
+            { "Date": "2026-07-03", "value": 8050 }
+          ]
+        }
+      ]
+    },
+    "wall": {
+      "title": "Line 3 MQTT",
+      "subtitle": "Sparkplug topic bind",
+      "theme": "industrial",
+      "mode": "live",
+      "columns": 2,
+      "dataSource": {
+        "type": "mqtt",
+        "url": "mqtt://broker.example.com",
+        "topic": "plant/line3/metrics",
+        "staleAfterMs": 10000,
+        "reconnectDelayMs": 3000
+      },
+      "cells": [
+        { "id": "cpu", "template": "ops-2x2", "title": "CPU", "dataPath": "cells.0" },
+        { "id": "memory", "template": "ops-2x2", "title": "Memory", "dataPath": "cells.1" }
+      ],
+      "data": {
+        "categories": ["08:00", "09:00", "10:00", "11:00"],
+        "cells": [
+          { "title": "CPU", "data": [22, 28, 31, 34], "suffix": "%" },
+          { "title": "Memory", "data": [55, 58, 60, 59], "suffix": "%" }
+        ]
+      }
+    }
+  }
+}

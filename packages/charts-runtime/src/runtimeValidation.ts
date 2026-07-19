@@ -292,6 +292,8 @@ function validatePanelsDashboard(
     theme: raw.theme as PanelsDashboardSpec["theme"],
     mode: raw.mode as PanelsDashboardSpec["mode"],
     vertical: typeof raw.vertical === "string" ? raw.vertical : undefined,
+    columns: typeof raw.columns === "number" ? raw.columns : undefined,
+    gap: typeof raw.gap === "number" ? raw.gap : undefined,
     sourceCsv: typeof raw.sourceCsv === "string" ? raw.sourceCsv : undefined,
     decisions: decisions.length > 0 ? decisions : undefined,
     kpis,
@@ -315,6 +317,28 @@ export function validateRuntimeSpecRaw(raw: unknown): RuntimeValidationResult {
     );
     if (errors.length > 0) return { ok: false, errors };
     return { ok: true, spec: { layout: "panels", panels } };
+  }
+
+  if (raw.layout === "hybrid") {
+    const hybridRaw = isRecord(raw.hybrid) ? raw.hybrid : raw;
+    const panelsRaw = isRecord(hybridRaw.panels) ? hybridRaw.panels : {};
+    const wallRaw = isRecord(hybridRaw.wall) ? hybridRaw.wall : {};
+    const panels = validatePanelsDashboard(panelsRaw, "hybrid.panels", errors);
+    const wall = validateMosaicWall(wallRaw, "hybrid.wall", errors);
+    if (errors.length > 0) return { ok: false, errors };
+    return {
+      ok: true,
+      spec: {
+        layout: "hybrid",
+        hybrid: {
+          version: typeof hybridRaw.version === "string" ? hybridRaw.version : undefined,
+          title: typeof hybridRaw.title === "string" ? hybridRaw.title : undefined,
+          subtitle: typeof hybridRaw.subtitle === "string" ? hybridRaw.subtitle : undefined,
+          panels,
+          wall,
+        },
+      },
+    };
   }
 
   if (raw.layout === "mosaic") {

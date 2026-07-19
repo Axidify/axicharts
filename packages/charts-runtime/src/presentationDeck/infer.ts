@@ -38,6 +38,25 @@ export function inferPresentationDeck(spec: RuntimeDashboardSpec): PresentationD
     };
   }
 
+  if (spec.layout === "hybrid") {
+    return {
+      version: 1,
+      slides: [
+        ...spec.hybrid.panels.charts.map((block, index) => ({
+          id: block.questionId ?? `tabular-${index}`,
+          title: block.panel.title,
+          section: "full" as const,
+        })),
+        ...spec.hybrid.wall.cells.map((cell) => ({
+          id: `live-${cell.id}`,
+          title: cell.title,
+          subtitle: cell.subtitle,
+          section: "full" as const,
+        })),
+      ],
+    };
+  }
+
   if (spec.layout === "mosaic") {
     return {
       version: 1,

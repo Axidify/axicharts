@@ -10,7 +10,7 @@ import type { TabularEnrichment } from "./enrich/types";
 import { applyKpiToRecipe, applyRecipeData, formatKpiDisplay, kpiTone } from "./applyRecipeData";
 import { findQuestionsForIntent, rankQuestions } from "./rankQuestions";
 import { compileRecipe, questionToRecipe } from "./recipes";
-import type { AnalyticalQuestion, Persona } from "./types";
+import type { AnalyticalQuestion, Persona, RankQuestionsResult } from "./types";
 
 export type TabularPlanDecision = {
   step: string;
@@ -91,6 +91,12 @@ const DEFAULT_CHART_IDS: Partial<Record<VerticalId, string[]>> = {
   ],
 };
 
+/** C170 — cap default panels per dashboard; ranked catalog fills slots first. */
+export const PANEL_BUDGET = {
+  maxKpis: 4,
+  maxCharts: 4,
+} as const;
+
 const KPI_LABELS: Record<string, string> = {
   "sales.kpi.total_pipeline": "Total pipeline",
   "sales.kpi.weighted_forecast": "Weighted forecast",
@@ -124,6 +130,7 @@ function syntheticQuestion(questionId: string, vertical: VerticalId): Analytical
       personas: ["manager"],
       basePriority: 7,
       kind: "chart",
+      dimensionKey: "cost_center",
     };
   }
   if (questionId.startsWith("ledger.kpi.total_") || questionId === "attendance.kpi.avg_hours_present") {
@@ -222,6 +229,18 @@ function uniqueIds(ids: string[]): string[] {
   return [...new Set(ids)];
 }
 
+function selectQuestionIds(
+  defaults: string[],
+  ranked: RankQuestionsResult,
+  kinds: Array<AnalyticalQuestion["kind"]>,
+  limit: number,
+): string[] {
+  const fromRank = ranked.ranked
+    .filter((entry) => kinds.includes(entry.question.kind))
+    .map((entry) => entry.question.id);
+  return uniqueIds([...defaults, ...fromRank]).slice(0, limit);
+}
+
 /**
  * C157 — unified tabular dashboard planner (L2–L5 pipeline).
  */
@@ -296,8 +315,25 @@ export function planDashboardFromRows(
   const dashboardIntent =
     options.intent ?? DASHBOARD_INTENTS[vertical] ?? `Tabular dashboard — ${vertical}`;
 
-  const kpiIds = uniqueIds(DEFAULT_KPI_IDS[vertical] ?? []);
-  const chartIds = uniqueIds(DEFAULT_CHART_IDS[vertical] ?? []);
+  const kpiIds = selectQuestionIds(
+    DEFAULT_KPI_IDS[vertical] ?? [],
+    ranked,
+    ["kpi"],
+    PANEL_BUDGET.maxKpis,
+  );
+  const chartIds = selectQuestionIds(
+    DEFAULT_CHART_IDS[vertical] ?? [],
+    ranked,
+    ["chart", "table"],
+    PANEL_BUDGET.maxCharts,
+  );
+
+  pushDecision(decisions, {
+    step: "Panel budget",
+    api: "panelBudget",
+    status: "ok",
+    notes: `${kpiIds.length} KPIs · ${chartIds.length} charts (max ${PANEL_BUDGET.maxKpis}/${PANEL_BUDGET.maxCharts})`,
+  });
 
   const kpis = kpiIds
     .map((id) => compileQuestionBlock(id, enrichment, dataProfile, decisions, "KPI"))

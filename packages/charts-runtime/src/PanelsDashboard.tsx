@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactElement } from "react";
-import { Chart, PanelSpecGrid } from "@axicharts/charts-spec";
+import { Chart } from "@axicharts/charts-spec";
 import type { PanelsDashboardSpec } from "./types";
 
 const kpiStyle = {
@@ -18,6 +18,9 @@ export type PanelsDashboardProps = {
 };
 
 export function PanelsDashboard({ panels, className }: PanelsDashboardProps): ReactElement {
+  const columns = panels.columns ?? 2;
+  const gap = panels.gap ?? 16;
+
   return (
     <div className={className} style={{ width: "100%" }}>
       {(panels.title || panels.subtitle) && (
@@ -48,13 +51,20 @@ export function PanelsDashboard({ panels, className }: PanelsDashboardProps): Re
       ) : null}
 
       {panels.charts.length > 0 ? (
-        <PanelSpecGrid
-          panels={panels.charts.map((block) => ({
-            panel: block.panel,
-            data: { rows: block.rows },
-            title: block.panel.title,
-          }))}
-        />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+            gap,
+            width: "100%",
+          }}
+        >
+          {panels.charts.map((block) => (
+            <div key={block.panel.title} style={{ minWidth: 0 }}>
+              <Chart panel={block.panel} data={{ rows: block.rows }} height={280} />
+            </div>
+          ))}
+        </div>
       ) : null}
     </div>
   );
