@@ -81,6 +81,9 @@ export type CreateCartesianPanelInput = {
   dataProfile?: DataProfile;
   fields?: string[];
   xField?: string;
+  /** C148c — explicit quantitative field(s); overrides intent heuristics. */
+  yField?: string;
+  yFields?: string[];
   mode?: ChartMode;
   theme?: ThemeName;
 };
@@ -120,7 +123,29 @@ export function createCartesianPanel(
     numericFields.find((field) => /target|plan|forecast|margin/i.test(field)) ??
     numericFields.find((field) => field !== revenueField);
 
-  if (BAR_INTENT_RE.test(intent) && revenueField) {
+  const explicitYFields =
+    input.yFields ?? (input.yField ? [input.yField] : undefined);
+
+  if (explicitYFields?.length) {
+    const markType: "bar" | "line" | "area" = BAR_INTENT_RE.test(intent)
+      ? "bar"
+      : AREA_INTENT_RE.test(intent)
+        ? "area"
+        : "line";
+    matchedRules.push(`explicit-${markType}`);
+    for (const field of explicitYFields) {
+      if (!numericFields.includes(field) && !fields.includes(field)) continue;
+      marks.push({
+        type: markType,
+        field,
+        label: field,
+        ...(markType === "bar" && (intent.includes("label") || intent.includes("value"))
+          ? { labels: true }
+          : {}),
+        ...(markType === "line" && intent.includes("smooth") ? { curve: "monotone" as const } : {}),
+      });
+    }
+  } else if (BAR_INTENT_RE.test(intent) && revenueField) {
     matchedRules.push("bar");
     marks.push({
       type: "bar",
@@ -130,7 +155,7 @@ export function createCartesianPanel(
     });
   }
 
-  if (LINE_INTENT_RE.test(intent) && (targetField ?? revenueField)) {
+  if (LINE_INTENT_RE.test(intent) && (targetField ?? revenueField) && !explicitYFields?.length) {
     matchedRules.push("line");
     marks.push({
       type: "line",
@@ -140,7 +165,7 @@ export function createCartesianPanel(
     });
   }
 
-  if (AREA_INTENT_RE.test(intent) && revenueField) {
+  if (AREA_INTENT_RE.test(intent) && revenueField && !explicitYFields?.length) {
     matchedRules.push("area");
     marks.push({
       type: "area",
@@ -188,9 +213,9 @@ export function createCartesianPanel(
     if (dataMarks[1]) dataMarks[1].yAxisId = "right";
   }
 
-  const hasDataMark = matchedRules.some((rule) =>
-    rule === "bar" || rule === "line" || rule === "area",
-  );
+  const hasDataMark =
+    marks.some((mark) => mark.type === "bar" || mark.type === "line" || mark.type === "area") ||
+    matchedRules.some((rule) => rule === "bar" || rule === "line" || rule === "area");
   const vague = isVagueIntent(intent);
   const reviewReason: PlannerReviewReason = !hasDataMark
     ? vague

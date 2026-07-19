@@ -8,6 +8,8 @@ export type {
   DataProfile,
   FieldEncoding,
   FieldFormat,
+  FieldProfile,
+  FieldRole,
   FieldType,
   MetricKind,
   MetricProfile,
@@ -168,6 +170,19 @@ export {
   type TooltipVariant,
 } from "./panelChrome";
 export { asRows, pluckField, readArray, readNumber } from "./data";
+export {
+  aggregateRows,
+  type AggregateOp,
+  type AggregateRowsOptions,
+  type AggregateSpec,
+} from "./aggregateRows";
+export {
+  inferFieldRoles,
+  fieldProfilesToDataProfile,
+  roleOfField,
+  type InferFieldRolesOptions,
+} from "./inferFieldRoles";
+export { PanelSpecGrid, type PanelSpecGridProps } from "./PanelSpecGrid";
 export {
   validateCartesianPanelSchemaRaw,
   validateDataProfileSchemaRaw,

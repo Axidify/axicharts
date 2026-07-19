@@ -274,6 +274,14 @@ export type AnnotationSpec =
 
 export type MetricKind = "gauge" | "counter" | "histogram" | "ohlc" | "distribution";
 
+export type FieldRole = "time" | "dimension" | "measure" | "identifier";
+
+export type FieldProfile = {
+  name: string;
+  role: FieldRole;
+  format?: FieldFormat;
+};
+
 export type MetricProfile = {
   name: string;
   tags?: Record<string, string>;
@@ -285,6 +293,8 @@ export type DataProfile = {
   metrics: MetricProfile[];
   /** Known row fields from data profiling — used to infer encoding.color and encoding.size. */
   fields?: string[];
+  /** C148a — semantic roles for tabular / agent planners. */
+  fieldProfiles?: FieldProfile[];
 };
 
 export type SpecData = Record<string, unknown>[] | Record<string, unknown>;

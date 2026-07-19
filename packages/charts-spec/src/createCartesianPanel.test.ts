@@ -99,6 +99,19 @@ describe("createCartesianPanel", () => {
     expect(reviewReason).toBe("vague_intent");
     expect(matchedRules).toEqual([]);
   });
+
+  it("honors explicit yField over revenue heuristics", () => {
+    const { panel, needsReview, matchedRules } = createCartesianPanel({
+      intent: "bar chart with value labels",
+      fields: ["category", "debit", "credit"],
+      xField: "category",
+      yField: "credit",
+    });
+
+    expect(needsReview).toBe(false);
+    expect(matchedRules).toContain("explicit-bar");
+    expect(panel.marks?.some((mark) => mark.type === "bar" && mark.field === "credit")).toBe(true);
+  });
 });
 
 describe("reviseCartesianPanel", () => {

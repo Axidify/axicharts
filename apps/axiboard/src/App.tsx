@@ -32,6 +32,7 @@ import { ShareDialog } from "./ShareDialog";
 import { PluginStrip } from "./PluginStrip";
 import { FeedIntentGlossary } from "./FeedIntentGlossary";
 import { WorkspaceSidebar } from "./WorkspaceSidebar";
+import { LedgerRndView } from "./rnd/LedgerRndView";
 import {
   buildRuntimeSpec,
   defaultSeedSpec,
@@ -130,6 +131,7 @@ export function App(): ReactElement {
   const [importJson, setImportJson] = useState("");
   const [importFilename, setImportFilename] = useState<string | undefined>();
   const [importPresetId, setImportPresetId] = useState<string | undefined>();
+  const [ledgerRndOpen, setLedgerRndOpen] = useState(false);
 
   useEffect(() => {
     const loaded = loadWorkspaceStore(localStorage, undefined, defaultSeedSpec());
@@ -467,6 +469,9 @@ export function App(): ReactElement {
               </select>
             </label>
           )}
+          <button type="button" onClick={() => setLedgerRndOpen(true)} style={buttonStyle}>
+            R&D Ledger
+          </button>
           <button type="button" onClick={() => setPlannerOpen(true)} style={buttonStyle}>
             Plan
           </button>
@@ -519,15 +524,21 @@ export function App(): ReactElement {
           onShareWorkspace={handleShareWorkspace}
           onDeleteDashboard={handleDeleteDashboard}
         />
-        <main style={{ flex: 1, padding: 24, maxWidth: presentation ? 1100 : 900 }}>
-          <RuntimeDashboard
-            spec={activeSpec}
-            presentation={presentation}
-            alarmScopeId={activeDashboard.id}
-            alarmStorage={localStorage}
-            adapterFixtureHref={resolveAdapterFixtureHref}
-          />
-          <PluginStrip />
+        <main style={{ flex: 1, padding: 24, maxWidth: ledgerRndOpen ? 1200 : presentation ? 1100 : 900 }}>
+          {ledgerRndOpen ? (
+            <LedgerRndView onExit={() => setLedgerRndOpen(false)} />
+          ) : (
+            <>
+              <RuntimeDashboard
+                spec={activeSpec}
+                presentation={presentation}
+                alarmScopeId={activeDashboard.id}
+                alarmStorage={localStorage}
+                adapterFixtureHref={resolveAdapterFixtureHref}
+              />
+              <PluginStrip />
+            </>
+          )}
         </main>
       </div>
       <PlannerPanel

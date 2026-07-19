@@ -47,6 +47,23 @@
       "items": {
         "type": "string"
       }
+    },
+    "fieldProfiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "role"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "role": {
+            "enum": ["time", "dimension", "measure", "identifier"]
+          },
+          "format": {
+            "enum": ["number", "currency", "percent", "compact"]
+          }
+        }
+      }
     }
   }
 }

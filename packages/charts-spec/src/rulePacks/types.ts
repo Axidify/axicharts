@@ -1,6 +1,6 @@
 import type { MetricProfile, PanelSpec } from "../types";
 
-export type VerticalId = "finance" | "trading" | "ops";
+export type VerticalId = "finance" | "ledger" | "trading" | "ops";
 
 export type VerticalPanelContext = {
   metric: MetricProfile;
