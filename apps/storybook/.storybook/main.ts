@@ -24,6 +24,10 @@ const config: StorybookConfig = {
             root,
             "packages/charts/src/entry/quick.ts",
           ),
+          "@axicharts/charts/cartesian": path.resolve(
+            root,
+            "packages/charts/src/entry/cartesian.ts",
+          ),
           "@axicharts/charts/studio": path.resolve(
             root,
             "packages/charts/src/entry/studio.ts",

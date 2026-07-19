@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, type CSSProperties, type ReactElement } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactElement } from "react";
 import { Chart } from "../Chart";
 import {
   BLOCKS_PLAYGROUND_PRESETS,
@@ -10,6 +10,11 @@ import {
 } from "./presets";
 import { evaluatePlaygroundSpec, parsePlaygroundData } from "./evaluate";
 import { createCartesianPanel } from "../createCartesianPanel";
+import {
+  dataColumnsChanged,
+  dataFieldSignature,
+  plannerReviewMessage,
+} from "./playgroundReview";
 
 export type BlocksPlaygroundProps = {
   initialPresetId?: string;
@@ -109,6 +114,8 @@ export function BlocksPlayground({
   const [intent, setIntent] = useState(initial.intent ?? "");
   const [needsReview, setNeedsReview] = useState(false);
   const [reviewReason, setReviewReason] = useState<string | null>(null);
+  const [specRemapped, setSpecRemapped] = useState(false);
+  const dataFieldSignatureRef = useRef<string | null>(null);
 
   const loadPreset = useCallback((preset: BlocksPlaygroundPreset) => {
     setPresetId(preset.id);
@@ -117,11 +124,57 @@ export function BlocksPlayground({
     setDataText(JSON.stringify(preset.rows, null, 2));
     setNeedsReview(false);
     setReviewReason(null);
+    setSpecRemapped(false);
+    dataFieldSignatureRef.current = dataFieldSignature(preset.rows);
   }, []);
 
   const dataParse = useMemo(() => parsePlaygroundData(dataText), [dataText]);
   const dataParseError = dataParse.ok ? undefined : dataParse.error;
   const parsedRows = dataParse.ok ? dataParse.rows : rows;
+  const currentDataSignature = useMemo(
+    () => (dataParse.ok ? dataFieldSignature(parsedRows) : ""),
+    [dataParse.ok, parsedRows],
+  );
+
+  const applyPlannerResult = useCallback(
+    (result: ReturnType<typeof createCartesianPanel>, remapped = false) => {
+      setSpecText(JSON.stringify(result.panel, null, 2));
+      setNeedsReview(result.needsReview);
+      setReviewReason(result.reviewReason);
+      if (remapped) {
+        setSpecRemapped(true);
+        window.setTimeout(() => setSpecRemapped(false), 4000);
+      }
+    },
+    [],
+  );
+
+  const generateFromIntent = useCallback(
+    (remapped = false) => {
+      const fields =
+        parsedRows.length > 0
+          ? Object.keys(parsedRows[0] ?? {})
+          : Object.keys(initial.rows[0] ?? {});
+      applyPlannerResult(createCartesianPanel({ intent, fields }), remapped);
+    },
+    [applyPlannerResult, initial.rows, intent, parsedRows],
+  );
+
+  useEffect(() => {
+    if (!dataParse.ok || !intent.trim()) return;
+
+    if (dataFieldSignatureRef.current === null) {
+      dataFieldSignatureRef.current = currentDataSignature;
+      return;
+    }
+
+    if (
+      dataColumnsChanged(dataFieldSignatureRef.current, currentDataSignature)
+    ) {
+      dataFieldSignatureRef.current = currentDataSignature;
+      generateFromIntent(true);
+    }
+  }, [currentDataSignature, dataParse.ok, generateFromIntent, intent]);
 
   const evaluation = useMemo(
     () => evaluatePlaygroundSpec(specText, parsedRows),
@@ -130,6 +183,26 @@ export function BlocksPlayground({
 
   const canShowChart =
     evaluation.canRender && evaluation.panel && !dataParseError;
+
+  const dataSpecMismatch = evaluation.errors.some(
+    (error) => error.code === "UNKNOWN_FIELD",
+  );
+
+  const reviewBannerText =
+    needsReview && reviewReason
+      ? plannerReviewMessage(reviewReason as "vague_intent" | "no_data_mark")
+      : null;
+
+  const reviewBannerStyle: CSSProperties = {
+    marginTop: 12,
+    padding: "10px 12px",
+    borderRadius: 8,
+    border: "1px solid #f59e0b",
+    background: "#fffbeb",
+    fontSize: 12,
+    color: "#92400e",
+    fontWeight: 500,
+  };
 
   const gridStyle: CSSProperties = compact
     ? { display: "grid", gap: 12, gridTemplateColumns: "1fr" }
@@ -195,37 +268,29 @@ export function BlocksPlayground({
           <button
             type="button"
             style={chipStyle}
-            onClick={() => {
-              const fields =
-                parsedRows.length > 0
-                  ? Object.keys(parsedRows[0] ?? {})
-                  : Object.keys(initial.rows[0] ?? {});
-              const result = createCartesianPanel({ intent, fields });
-              setSpecText(JSON.stringify(result.panel, null, 2));
-              setNeedsReview(result.needsReview);
-              setReviewReason(result.reviewReason);
-            }}
+            onClick={() => generateFromIntent()}
           >
             Generate spec
           </button>
         </div>
-        {needsReview ? (
+        {specRemapped ? (
           <div
+            role="status"
             style={{
+              ...reviewBannerStyle,
               marginTop: 12,
-              padding: "10px 12px",
-              borderRadius: 8,
-              border: "1px solid #fcd34d",
-              background: "#fffbeb",
-              fontSize: 12,
-              color: "#92400e",
+              borderColor: "#93c5fd",
+              background: "#eff6ff",
+              color: "#1e40af",
             }}
           >
-            {reviewReason === "vague_intent"
-              ? "Intent is too vague — name a chart type (bar, line, area) and what to plot. No marks were generated."
-              : reviewReason === "no_data_mark"
-                ? "Intent matched overlays only (rule/band) — add a data mark (bar, line, area) or refine your intent."
-                : "Generated spec needs review — adjust marks manually or refine your intent."}
+            Data columns changed — spec remapped from current intent.
+          </div>
+        ) : null}
+        {reviewBannerText ? (
+          <div role="alert" style={reviewBannerStyle}>
+            <strong style={{ display: "block", marginBottom: 4 }}>Planner needs review</strong>
+            {reviewBannerText}
           </div>
         ) : null}
       </div>
@@ -258,6 +323,18 @@ export function BlocksPlayground({
               }}
             >
               Data parse error: {dataParseError}
+            </div>
+          ) : dataSpecMismatch && !intent.trim() ? (
+            <div
+              style={{
+                padding: "8px 12px",
+                borderTop: "1px solid #e2e8f0",
+                fontSize: 11,
+                color: "#b45309",
+              }}
+            >
+              Data columns don&apos;t match the spec. Add an intent and click Generate spec, or
+              edit marks manually.
             </div>
           ) : null}
         </div>
@@ -294,6 +371,21 @@ export function BlocksPlayground({
             }}
           />
           <div style={{ padding: "8px 12px", borderTop: "1px solid #e2e8f0", fontSize: 11 }}>
+            {reviewBannerText ? (
+              <div
+                role="alert"
+                style={{
+                  marginBottom: 8,
+                  padding: "8px 10px",
+                  borderRadius: 6,
+                  border: "1px solid #f59e0b",
+                  background: "#fffbeb",
+                  color: "#92400e",
+                }}
+              >
+                <strong>Planner:</strong> {reviewBannerText}
+              </div>
+            ) : null}
             {evaluation.parseError ? (
               <span style={{ color: "#b91c1c" }}>Parse: {evaluation.parseError}</span>
             ) : evaluation.errors.length > 0 ? (
