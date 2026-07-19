@@ -1,5 +1,5 @@
 import {
-  compilePanel,
+  blockMarksToChartProps,
   createCartesianPanel,
   createTablePanel,
   listCartesianMarks,
@@ -15,7 +15,7 @@ import {
   type Persona,
   type SpecData,
   type ThemeName,
-} from "@axicharts/charts-spec";
+} from "@axicharts/charts-spec/planning";
 import { planDashboardForMcp } from "./planDashboardMcp";
 import { describeDataProfile } from "./describeDataProfile";
 
@@ -185,8 +185,16 @@ export function handleCompileCartesianPanel(args: {
     return jsonResult({ ok: false, errors: validation.errors }, true);
   }
   const panel = normalizeToCartesian(args.spec);
+  const rows = asRowArray(args.rows) ?? [];
   try {
-    compilePanel(panel, asRowArray(args.rows) ?? []);
+    const compiled = blockMarksToChartProps(rows, panel.marks ?? []);
+    if (
+      compiled.series.length === 0 &&
+      compiled.referenceLines.length === 0 &&
+      compiled.thresholdBands.length === 0
+    ) {
+      throw new Error("No series or overlay marks resolved from rows");
+    }
   } catch (error) {
     return jsonResult(
       {

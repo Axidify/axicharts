@@ -6,7 +6,7 @@ import {
   type DomainSemantics,
   type FieldProfile,
   type FieldRole,
-} from "@axicharts/charts-spec";
+} from "@axicharts/charts-spec/planning";
 
 export type DataProfileLike = {
   fields?: string[];

@@ -1,8 +1,12 @@
-import { rankQuestions, type Persona, type TabularPlanBlock } from "@axicharts/charts-spec";
+import {
+  rankQuestions,
+  type Persona,
+  type TabularPlanBlock,
+} from "@axicharts/charts-spec/planning";
 import {
   planDashboardFromRows,
   type PlannerDashboardPlan,
-} from "@axicharts/charts-planner";
+} from "@axicharts/charts-planner/tabular";
 
 export type McpDashboardBlock = {
   questionId: string;
