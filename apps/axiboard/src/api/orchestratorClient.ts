@@ -31,6 +31,7 @@ async function postJson<T>(path: string, body: unknown, apiKey?: string): Promis
   const response = await fetch(path, {
     method: "POST",
     headers,
+    credentials: "include",
     body: JSON.stringify(body),
   });
 

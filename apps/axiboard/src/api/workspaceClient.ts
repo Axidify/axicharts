@@ -7,7 +7,7 @@ type WorkspaceResponse = {
 };
 
 export async function fetchWorkspaceStore(): Promise<WorkspaceStore | null> {
-  const response = await fetch("/api/workspaces");
+  const response = await fetch("/api/workspaces", { credentials: "include" });
   const payload = (await response.json()) as WorkspaceResponse;
   if (!response.ok || !payload.ok) {
     throw new Error(payload.error ?? "Failed to load workspace");
@@ -19,6 +19,7 @@ export async function saveWorkspaceStoreToServer(store: WorkspaceStore): Promise
   const response = await fetch("/api/workspaces", {
     method: "POST",
     headers: { "content-type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ store }),
   });
   const payload = (await response.json()) as { ok: boolean; error?: string };

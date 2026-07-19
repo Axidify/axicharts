@@ -34,10 +34,10 @@ describe("AxiboardFileStore", () => {
     const store = new AxiboardFileStore(dataDir);
     const workspace = sampleWorkspace();
 
-    await store.saveWorkspace(workspace);
-    await expect(store.getWorkspace()).resolves.toEqual(workspace);
+    await store.saveWorkspace("default", workspace);
+    await expect(store.getWorkspace("default")).resolves.toEqual(workspace);
 
     const reloaded = new AxiboardFileStore(dataDir);
-    await expect(reloaded.getWorkspace()).resolves.toEqual(workspace);
+    await expect(reloaded.getWorkspace("default")).resolves.toEqual(workspace);
   });
 });

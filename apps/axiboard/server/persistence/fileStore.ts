@@ -1,11 +1,13 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { WorkspaceStore } from "@axicharts/charts-runtime/workspace";
+import { getDefaultUserId } from "../auth/config";
 import { createEmptyPersistence, type AxiboardPersistence } from "./types";
 import { isAxiboardPersistence } from "./validate";
 import type { AxiboardWorkspaceStore } from "./store";
 
 const STATE_FILE = "state.json";
+const LEGACY_STATE_FILE = "state.json";
 
 export function resolveDataDir(): string {
   const configured = process.env.AXIBOARD_DATA_DIR?.trim();
@@ -13,51 +15,74 @@ export function resolveDataDir(): string {
   return path.resolve(process.cwd(), "data");
 }
 
+function safeUserId(userId: string): string {
+  return userId.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
 export class AxiboardFileStore implements AxiboardWorkspaceStore {
-  private state: AxiboardPersistence = createEmptyPersistence();
-  private loaded = false;
+  private cache = new Map<string, AxiboardPersistence>();
+  private loaded = new Set<string>();
 
   constructor(private readonly dataDir: string) {}
 
-  private statePath(): string {
-    return path.join(this.dataDir, STATE_FILE);
+  private statePath(userId: string): string {
+    return path.join(this.dataDir, "users", safeUserId(userId), STATE_FILE);
   }
 
-  async load(): Promise<AxiboardPersistence> {
-    if (this.loaded) return this.state;
-
-    await mkdir(this.dataDir, { recursive: true });
-    try {
-      const raw = await readFile(this.statePath(), "utf8");
-      const parsed = JSON.parse(raw) as unknown;
-      if (isAxiboardPersistence(parsed)) {
-        this.state = parsed;
-      }
-    } catch {
-      this.state = createEmptyPersistence();
+  private async load(userId: string): Promise<AxiboardPersistence> {
+    if (this.loaded.has(userId)) {
+      return this.cache.get(userId) ?? createEmptyPersistence();
     }
 
-    this.loaded = true;
-    return this.state;
+    const statePath = this.statePath(userId);
+    await mkdir(path.dirname(statePath), { recursive: true });
+    let state = createEmptyPersistence();
+    try {
+      const raw = await readFile(statePath, "utf8");
+      const parsed = JSON.parse(raw) as unknown;
+      if (isAxiboardPersistence(parsed)) {
+        state = parsed;
+      }
+    } catch {
+      if (userId === getDefaultUserId()) {
+        state = await this.loadLegacyState();
+      }
+    }
+
+    this.cache.set(userId, state);
+    this.loaded.add(userId);
+    return state;
   }
 
-  private async persist(): Promise<void> {
-    await mkdir(this.dataDir, { recursive: true });
-    const target = this.statePath();
+  private async loadLegacyState(): Promise<AxiboardPersistence> {
+    try {
+      const raw = await readFile(path.join(this.dataDir, LEGACY_STATE_FILE), "utf8");
+      const parsed = JSON.parse(raw) as unknown;
+      if (isAxiboardPersistence(parsed)) return parsed;
+    } catch {
+      // no legacy file
+    }
+    return createEmptyPersistence();
+  }
+
+  private async persist(userId: string): Promise<void> {
+    const state = await this.load(userId);
+    const target = this.statePath(userId);
     const temp = `${target}.${process.pid}.tmp`;
-    await writeFile(temp, JSON.stringify(this.state, null, 2), "utf8");
+    await writeFile(temp, JSON.stringify(state, null, 2), "utf8");
     await rename(temp, target);
   }
 
-  async getWorkspace(): Promise<WorkspaceStore | null> {
-    const state = await this.load();
+  async getWorkspace(userId: string): Promise<WorkspaceStore | null> {
+    const state = await this.load(userId);
     return state.workspace ?? null;
   }
 
-  async saveWorkspace(store: WorkspaceStore): Promise<void> {
-    await this.load();
-    this.state.workspace = store;
-    await this.persist();
+  async saveWorkspace(userId: string, store: WorkspaceStore): Promise<void> {
+    const state = await this.load(userId);
+    state.workspace = store;
+    this.cache.set(userId, state);
+    await this.persist(userId);
   }
 }
 

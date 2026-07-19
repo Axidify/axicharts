@@ -43,7 +43,7 @@ describe("C163 workspace persistence API", () => {
       port: 0,
       host: "127.0.0.1",
       staticDir,
-      fileStore,
+      workspaceStore: fileStore,
     });
 
     await listen();

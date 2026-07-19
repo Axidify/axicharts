@@ -3,8 +3,6 @@ import pg from "pg";
 import type { AxiboardWorkspaceStore } from "./store";
 import { isWorkspaceStore } from "./validate";
 
-const DEFAULT_ROW_ID = "default";
-
 const INIT_SQL = `
 CREATE TABLE IF NOT EXISTS axiboard_workspace (
   id TEXT PRIMARY KEY,
@@ -24,11 +22,11 @@ export class AxiboardPostgresStore implements AxiboardWorkspaceStore {
     this.initialized = true;
   }
 
-  async getWorkspace(): Promise<WorkspaceStore | null> {
+  async getWorkspace(userId: string): Promise<WorkspaceStore | null> {
     await this.ensureSchema();
     const result = await this.pool.query<{ store: unknown }>(
       "SELECT store FROM axiboard_workspace WHERE id = $1",
-      [DEFAULT_ROW_ID],
+      [userId],
     );
     const row = result.rows[0];
     if (!row) return null;
@@ -36,13 +34,13 @@ export class AxiboardPostgresStore implements AxiboardWorkspaceStore {
     return row.store;
   }
 
-  async saveWorkspace(store: WorkspaceStore): Promise<void> {
+  async saveWorkspace(userId: string, store: WorkspaceStore): Promise<void> {
     await this.ensureSchema();
     await this.pool.query(
       `INSERT INTO axiboard_workspace (id, store, updated_at)
        VALUES ($1, $2::jsonb, now())
        ON CONFLICT (id) DO UPDATE SET store = EXCLUDED.store, updated_at = now()`,
-      [DEFAULT_ROW_ID, JSON.stringify(store)],
+      [userId, JSON.stringify(store)],
     );
   }
 

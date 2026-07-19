@@ -1,5 +1,6 @@
 import { parseTabular } from "@axicharts/charts-spec/planning";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { resolveAuthContext } from "../auth/context";
 import { runOrchestratorChat } from "../orchestrator/chat";
 import { runTabularPlan } from "../orchestrator/plan";
 import {
@@ -7,20 +8,13 @@ import {
   getSession,
   updateSessionByok,
 } from "../orchestrator/sessionStore";
-import type { ByokConfig, OrchestratorChatRequest } from "../types";
+import { getUserByokStore } from "../persistence/resolveStore";
+import type { ByokConfig } from "../types";
+import { parseJsonBody } from "./jsonBody";
+import { byokBodySchema, tabularInputSchema } from "./schemas";
 
 const SESSION_HEADER = "x-axiboard-session";
 const API_KEY_HEADER = "x-axiboard-api-key";
-
-async function readJsonBody<T>(req: IncomingMessage): Promise<T> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of req) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  }
-  const text = Buffer.concat(chunks).toString("utf8");
-  if (!text.trim()) return {} as T;
-  return JSON.parse(text) as T;
-}
 
 function sendJson(res: ServerResponse, status: number, payload: unknown): void {
   res.statusCode = status;
@@ -28,10 +22,17 @@ function sendJson(res: ServerResponse, status: number, payload: unknown): void {
   res.end(JSON.stringify(payload));
 }
 
-function resolveByok(req: IncomingMessage): ByokConfig | undefined {
+async function resolveByok(req: IncomingMessage): Promise<ByokConfig | undefined> {
   const headerKey = req.headers[API_KEY_HEADER];
   if (typeof headerKey === "string" && headerKey.trim()) {
     return { apiKey: headerKey.trim() };
+  }
+
+  const auth = resolveAuthContext(req);
+  if (auth.enabled && auth.authenticated) {
+    const userStore = getUserByokStore();
+    const stored = await userStore?.getByok(auth.userId);
+    if (stored) return stored;
   }
 
   const sessionId = req.headers[SESSION_HEADER];
@@ -49,7 +50,7 @@ function resolveByok(req: IncomingMessage): ByokConfig | undefined {
   return undefined;
 }
 
-function rowsFromRequest(body: OrchestratorChatRequest): Record<string, unknown>[] {
+function rowsFromBody(body: { csv?: string; rows?: Array<Record<string, unknown>> }): Record<string, unknown>[] {
   if (body.csv?.trim()) return parseTabular(body.csv);
   return body.rows ?? [];
 }
@@ -73,33 +74,45 @@ export async function handleOrchestratorRequest(
 
   try {
     if (pathname === "/api/orchestrator/byok") {
-      const body = await readJsonBody<ByokConfig & { sessionId?: string }>(req);
-      if (!body.apiKey?.trim()) {
-        sendJson(res, 400, { ok: false, error: "apiKey required" });
+      const parsed = await parseJsonBody(req, byokBodySchema);
+      if (!parsed.ok) {
+        sendJson(res, 400, { ok: false, error: parsed.error });
         return true;
       }
+
+      const body = parsed.data;
       const byok: ByokConfig = {
         apiKey: body.apiKey.trim(),
         model: body.model,
         baseUrl: body.baseUrl,
       };
+
+      const auth = resolveAuthContext(req);
+      const userStore = getUserByokStore();
+      if (auth.enabled && auth.authenticated && userStore) {
+        await userStore.saveByok(auth.userId, byok);
+        sendJson(res, 200, { ok: true, userId: auth.userId, persisted: "user" });
+        return true;
+      }
+
       if (body.sessionId && updateSessionByok(body.sessionId, byok)) {
-        sendJson(res, 200, { ok: true, sessionId: body.sessionId });
+        sendJson(res, 200, { ok: true, sessionId: body.sessionId, persisted: "session" });
         return true;
       }
       const sessionId = createSession(byok);
-      sendJson(res, 200, { ok: true, sessionId });
+      sendJson(res, 200, { ok: true, sessionId, persisted: "session" });
       return true;
     }
 
-    const body = await readJsonBody<OrchestratorChatRequest>(req);
-    const rows = rowsFromRequest(body);
-    if (rows.length === 0) {
-      sendJson(res, 400, { ok: false, error: "csv or rows required" });
+    const parsed = await parseJsonBody(req, tabularInputSchema);
+    if (!parsed.ok) {
+      sendJson(res, 400, { ok: false, error: parsed.error });
       return true;
     }
 
-    const byok = resolveByok(req);
+    const body = parsed.data;
+    const rows = rowsFromBody(body);
+    const byok = await resolveByok(req);
 
     if (pathname === "/api/orchestrator/plan") {
       const plan = runTabularPlan(rows, {

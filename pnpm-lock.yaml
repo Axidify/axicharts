@@ -74,6 +74,9 @@ importers:
       uplot:
         specifier: ^1.6.31
         version: 1.6.32
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@axicharts/charts-mcp':
         specifier: workspace:*

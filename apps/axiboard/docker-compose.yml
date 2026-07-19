@@ -9,6 +9,8 @@ services:
       PORT: "3000"
       HOST: "0.0.0.0"
       # OPENAI_API_KEY: sk-...
+      # AXIBOARD_AUTH_SECRET: change-me-to-a-long-random-string
+      # AXIBOARD_AUTH_TOKENS: alice:token-for-alice,bob:token-for-bob
     volumes:
       - axiboard-data:/app/apps/axiboard/data
 

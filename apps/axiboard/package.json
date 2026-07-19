@@ -26,7 +26,8 @@
     "pg": "^8.14.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "uplot": "^1.6.31"
+    "uplot": "^1.6.31",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@axicharts/charts-mcp": "workspace:*",

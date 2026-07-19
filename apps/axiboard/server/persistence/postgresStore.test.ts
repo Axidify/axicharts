@@ -34,10 +34,10 @@ describe.skipIf(!databaseUrl)("AxiboardPostgresStore", () => {
     const workspace = sampleWorkspace();
 
     try {
-      await store.saveWorkspace(workspace);
-      await expect(store.getWorkspace()).resolves.toEqual(workspace);
+      await store.saveWorkspace("integration-user", workspace);
+      await expect(store.getWorkspace("integration-user")).resolves.toEqual(workspace);
     } finally {
-      await pool.query("DELETE FROM axiboard_workspace WHERE id = 'default'");
+      await pool.query("DELETE FROM axiboard_workspace WHERE id = 'integration-user'");
       await store.close();
     }
   });

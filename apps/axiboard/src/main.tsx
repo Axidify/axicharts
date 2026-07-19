@@ -6,6 +6,7 @@ import "@axicharts/charts-sankey/register";
 import "@axicharts/charts-gantt/register";
 import "@axicharts/charts-tank/register";
 import { App } from "./App";
+import { AuthGate } from "./AuthGate";
 
 const root = document.getElementById("root");
 if (!root) {
@@ -14,6 +15,8 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <App />
+    <AuthGate>
+      <App />
+    </AuthGate>
   </StrictMode>,
 );
