@@ -34,6 +34,8 @@ export type {
   MockLiveDataSourceSpec,
   MosaicCellSpec,
   MosaicWallSpec,
+  PanelsDashboardSpec,
+  TabularPanelBlock,
   MqttClientLike,
   MqttConnectFn,
   MqttDataSourceSpec,
@@ -56,6 +58,7 @@ export { AdapterHealthStrip, type AdapterHealthItem, type AdapterHealthStripProp
 export { DashboardEmbed, type DashboardEmbedProps } from "./DashboardEmbed";
 export { MosaicWall, type MosaicWallProps } from "./MosaicWall";
 export { RuntimeDashboard, type RuntimeDashboardProps } from "./RuntimeDashboard";
+export { PanelsDashboard, type PanelsDashboardProps } from "./PanelsDashboard";
 export { inferPresentationDeck, resolvePresentationDeck } from "./presentationDeck/infer";
 export type {
   PresentationDeckSlideSection,

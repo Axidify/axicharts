@@ -43,7 +43,7 @@ export const OPS_DATA = {
   ],
 };
 
-export type LayoutMode = "embed" | "mosaic";
+export type LayoutMode = "embed" | "mosaic" | "panels";
 export type FeedMode = "static" | "historian" | "websocket" | "mqtt" | "rest" | "mock-live";
 export type LiveFeedMode = Exclude<FeedMode, "static">;
 
@@ -431,6 +431,8 @@ export function hydrateRuntimeSpec(
   feed: FeedMode,
   presentation = false,
 ): RuntimeDashboardSpec {
+  if (spec.layout === "panels") return spec;
+
   if (presentation) return spec;
 
   if (spec.layout === "mosaic") {

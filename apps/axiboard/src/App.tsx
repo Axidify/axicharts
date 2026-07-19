@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState, type ReactElement } from "react";
-import type { TemplateId } from "@axicharts/charts-spec";
+import { useCallback, useEffect, useMemo, useState, type ReactElement } from "react";
+import type { Persona, TemplateId } from "@axicharts/charts-spec";
 import {
   RuntimeDashboard,
   inferPresentationDeck,
@@ -38,6 +38,9 @@ import {
   saveWorkspaceStoreToServer,
 } from "./api/workspaceClient";
 import { TabularRndView } from "./rnd/TabularRndView";
+import { TabularDashboardView } from "./TabularDashboardView";
+import type { OrchestratorChatResult } from "./api/orchestratorClient";
+import { buildTabularRuntimeSpec, isPanelsRuntimeSpec } from "./runtime/tabularRuntimeSpec";
 import {
   buildRuntimeSpec,
   defaultSeedSpec,
@@ -137,6 +140,7 @@ export function App(): ReactElement {
   const [importFilename, setImportFilename] = useState<string | undefined>();
   const [importPresetId, setImportPresetId] = useState<string | undefined>();
   const [tabularRndOpen, setTabularRndOpen] = useState(false);
+  const [tabularEditCsv, setTabularEditCsv] = useState<string | undefined>();
   const [appliedPlan, setAppliedPlan] = useState<DashboardPlan | null>(null);
 
   useEffect(() => {
@@ -191,6 +195,11 @@ export function App(): ReactElement {
   }, [feed, layout]);
 
   const builtSpec = useMemo(() => {
+    if (store && layout === "panels") {
+      const saved = parseDashboardSpec(getActiveDashboard(store));
+      if (saved.layout === "panels") return saved;
+    }
+
     const next = buildRuntimeSpec({ template, layout, feed, presentation, mosaicPreset });
     if (!store || layout !== "embed") return next;
 
@@ -210,9 +219,15 @@ export function App(): ReactElement {
 
   const activeSpec = useMemo((): RuntimeDashboardSpec | null => {
     if (!store) return null;
-    if (dirty) return builtSpec;
     const dashboard = getActiveDashboard(store);
-    return hydrateRuntimeSpec(parseDashboardSpec(dashboard), feed, presentation);
+    const saved = parseDashboardSpec(dashboard);
+
+    if (saved.layout === "panels") {
+      return saved;
+    }
+
+    if (dirty) return builtSpec;
+    return hydrateRuntimeSpec(saved, feed, presentation);
   }, [store, dirty, builtSpec, feed, presentation]);
 
   const persist = (next: WorkspaceStore): void => {
@@ -224,12 +239,26 @@ export function App(): ReactElement {
   };
 
   const builderMeta = useMemo(() => {
+    const dashboard = store ? getActiveDashboard(store) : null;
+    if (activeSpec?.layout === "panels") {
+      return {
+        layout: "panels" as const,
+        feed: "static" as const,
+        source: "tabular" as const,
+        persona: dashboard?.meta?.persona,
+        followUpIntents: dashboard?.meta?.followUpIntents,
+        vertical: dashboard?.meta?.vertical,
+        dashboardIntent: dashboard?.meta?.dashboardIntent,
+        presentation,
+      };
+    }
+
     const chartConfig =
       activeSpec?.layout === "embed" ? activeSpec.dashboard.chartConfig : undefined;
     const presentationDeck =
       activeSpec && presentation ? inferPresentationDeck(activeSpec) : undefined;
     return { layout, feed, template, presentation, mosaicPreset, chartConfig, presentationDeck };
-  }, [layout, feed, template, presentation, mosaicPreset, activeSpec]);
+  }, [store, layout, feed, template, presentation, mosaicPreset, activeSpec]);
 
   const handleSave = (): void => {
     if (!store || !activeSpec) return;
@@ -317,6 +346,55 @@ export function App(): ReactElement {
     setShareOpen(true);
   };
 
+  const handleApplyTabularPlan = useCallback(
+    (
+      plan: OrchestratorChatResult,
+      rawText: string,
+      persona: Persona,
+      followUpIntents: string[],
+    ): void => {
+      if (!store) return;
+      const spec = buildTabularRuntimeSpec(plan, rawText);
+      const meta = {
+        layout: "panels" as const,
+        feed: "static" as const,
+        source: "tabular" as const,
+        persona,
+        followUpIntents,
+        vertical: plan.vertical,
+        dashboardIntent: plan.dashboardIntent,
+        presentation: false,
+      };
+      persist(
+        saveDashboardSpec(store, store.activeWorkspaceId, store.activeDashboardId, spec, { meta }),
+      );
+      setLayout("panels");
+      setFeed("static");
+      setDirty(false);
+      setTabularRndOpen(false);
+      setTabularEditCsv(undefined);
+    },
+    [store],
+  );
+
+  const handleTabularPlanUpdate = useCallback(
+    (spec: ReturnType<typeof buildTabularRuntimeSpec>, meta: NonNullable<typeof builderMeta>) => {
+      if (!store) return;
+      const next = saveDashboardSpec(
+        store,
+        store.activeWorkspaceId,
+        store.activeDashboardId,
+        spec,
+        { meta },
+      );
+      persist(next);
+      setLayout("panels");
+      setFeed("static");
+      setDirty(false);
+    },
+    [store],
+  );
+
   const handleApplyPlan = (plan: DashboardPlan): void => {
     applyPlan(plan, setTemplate, setLayout, setFeed, setPresentation, setMosaicPreset);
     setAppliedPlan(plan.panels.length > 0 ? plan : null);
@@ -379,8 +457,10 @@ export function App(): ReactElement {
   const activeDashboard = getActiveDashboard(store);
   const activeWorkspace = store.workspaces.find((item) => item.id === store.activeWorkspaceId);
   const canDeleteDashboard = (activeWorkspace?.dashboards.length ?? 0) > 1;
+  const isTabularDashboard = activeSpec?.layout === "panels";
   const showPlannerPanels =
     !tabularRndOpen &&
+    !isTabularDashboard &&
     feed === "static" &&
     layout === "embed" &&
     (appliedPlan?.panels.length ?? 0) > 0;
@@ -420,60 +500,65 @@ export function App(): ReactElement {
           <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
             Layout
             <select
-              value={layout}
+              value={isTabularDashboard ? "panels" : layout}
               onChange={(event) => {
-                setLayout(event.target.value as LayoutMode);
+                const next = event.target.value as LayoutMode;
+                if (next === "panels") return;
+                setLayout(next);
                 setDirty(true);
               }}
               style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
             >
               <option value="embed">Single embed</option>
               <option value="mosaic">Mosaic wall</option>
+              {isTabularDashboard ? <option value="panels">Tabular panels</option> : null}
             </select>
           </label>
-          <label
-            style={{
-              fontSize: 12,
-              display: "inline-flex",
-              gap: 8,
-              alignItems: "center",
-              position: "relative",
-            }}
-          >
-            Feed
-            <select
-              value={feed}
-              onChange={(event) => {
-                setFeed(event.target.value as FeedMode);
-                setDirty(true);
+          {!isTabularDashboard ? (
+            <label
+              style={{
+                fontSize: 12,
+                display: "inline-flex",
+                gap: 8,
+                alignItems: "center",
+                position: "relative",
               }}
-              style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
             >
-              <option value="historian">Historian (mock)</option>
-              <option value="rest">REST (mock)</option>
-              <option value="mock-live">Mock-live (mock)</option>
-              <option value="websocket">WebSocket (mock)</option>
-              <option value="mqtt">MQTT (mock)</option>
-              <option value="static">Static</option>
-            </select>
-            <a
-              href={feedAdapterGalleryDeepLink(feed, layout)}
-              target="_blank"
-              rel="noreferrer"
-              style={{ color: "#93c5fd", textDecoration: "none" }}
-              title="Open adapter fixture in docs gallery"
-            >
-              Fixture
-            </a>
-            <FeedIntentGlossary
-              feed={feed}
-              layout={layout}
-              onSelectFeed={(next) => {
-                setFeed(next);
-                setDirty(true);
-              }}
-            />
-          </label>
+              Feed
+              <select
+                value={feed}
+                onChange={(event) => {
+                  setFeed(event.target.value as FeedMode);
+                  setDirty(true);
+                }}
+                style={{ fontSize: 12, padding: "4px 8px", borderRadius: 6 }}
+              >
+                <option value="historian">Historian (mock)</option>
+                <option value="rest">REST (mock)</option>
+                <option value="mock-live">Mock-live (mock)</option>
+                <option value="websocket">WebSocket (mock)</option>
+                <option value="mqtt">MQTT (mock)</option>
+                <option value="static">Static</option>
+              </select>
+              <a
+                href={feedAdapterGalleryDeepLink(feed, layout)}
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "#93c5fd", textDecoration: "none" }}
+                title="Open adapter fixture in docs gallery"
+              >
+                Fixture
+              </a>
+              <FeedIntentGlossary
+                feed={feed}
+                layout={layout}
+                onSelectFeed={(next) => {
+                  setFeed(next);
+                  setDirty(true);
+                }}
+              />
+            </label>
+          ) : null}
           <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
             <input
               type="checkbox"
@@ -485,7 +570,7 @@ export function App(): ReactElement {
             />
             Presentation
           </label>
-          {layout === "embed" ? (
+          {layout === "embed" && !isTabularDashboard ? (
             <TemplatePicker
               value={template}
               onChange={(value) => {
@@ -494,7 +579,7 @@ export function App(): ReactElement {
               }}
               label="Template"
             />
-          ) : (
+          ) : layout === "mosaic" && !isTabularDashboard ? (
             <label style={{ fontSize: 12, display: "inline-flex", gap: 8, alignItems: "center" }}>
               Preset
               <select
@@ -512,16 +597,27 @@ export function App(): ReactElement {
                 ))}
               </select>
             </label>
-          )}
-          <button type="button" onClick={() => setTabularRndOpen(true)} style={buttonStyle}>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => {
+              setTabularEditCsv(undefined);
+              setTabularRndOpen(true);
+            }}
+            style={buttonStyle}
+          >
             Upload CSV
           </button>
-          <button type="button" onClick={() => setPlannerOpen(true)} style={buttonStyle}>
-            Plan
-          </button>
-          <button type="button" onClick={() => setPresenting(true)} style={buttonStyle}>
-            Present
-          </button>
+          {!isTabularDashboard ? (
+            <button type="button" onClick={() => setPlannerOpen(true)} style={buttonStyle}>
+              Plan
+            </button>
+          ) : null}
+          {!isTabularDashboard ? (
+            <button type="button" onClick={() => setPresenting(true)} style={buttonStyle}>
+              Present
+            </button>
+          ) : null}
           <button type="button" onClick={() => setEmbedOpen(true)} style={buttonStyle}>
             Embed
           </button>
@@ -568,9 +664,26 @@ export function App(): ReactElement {
           onShareWorkspace={handleShareWorkspace}
           onDeleteDashboard={handleDeleteDashboard}
         />
-        <main style={{ flex: 1, padding: 24, maxWidth: tabularRndOpen ? 1200 : presentation ? 1100 : 900 }}>
+        <main style={{ flex: 1, padding: 24, maxWidth: tabularRndOpen || isTabularDashboard ? 1200 : presentation ? 1100 : 900 }}>
           {tabularRndOpen ? (
-            <TabularRndView onExit={() => setTabularRndOpen(false)} />
+            <TabularRndView
+              onExit={() => {
+                setTabularRndOpen(false);
+                setTabularEditCsv(undefined);
+              }}
+              onApply={handleApplyTabularPlan}
+              initialCsv={tabularEditCsv}
+            />
+          ) : isTabularDashboard && isPanelsRuntimeSpec(activeSpec) ? (
+            <TabularDashboardView
+              panels={activeSpec.panels}
+              meta={activeDashboard.meta}
+              onPlanUpdate={handleTabularPlanUpdate}
+              onEditSource={() => {
+                setTabularEditCsv(activeSpec.panels.sourceCsv);
+                setTabularRndOpen(true);
+              }}
+            />
           ) : showPlannerPanels && appliedPlan ? (
             <PlannerPanelsWorkspace plan={appliedPlan} />
           ) : (

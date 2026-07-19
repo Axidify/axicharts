@@ -4,13 +4,18 @@ export type SavedDashboard = {
   updatedAt: string;
   specJson: string;
   meta?: {
-    layout: "embed" | "mosaic";
+    layout: "embed" | "mosaic" | "panels";
     feed: "static" | "historian" | "websocket" | "mqtt" | "rest" | "mock-live";
     template?: string;
     mosaicPreset?: string;
     presentation?: boolean;
     presentationDeck?: import("../presentationDeck/types").PresentationDeckSpec;
     chartConfig?: import("@axicharts/charts-spec").ChartConfigSpec;
+    source?: "template" | "tabular";
+    persona?: import("@axicharts/charts-spec").Persona;
+    followUpIntents?: string[];
+    vertical?: string;
+    dashboardIntent?: string;
   };
 };
 

@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import { DashboardEmbed } from "./DashboardEmbed";
 import { MosaicWall } from "./MosaicWall";
+import { PanelsDashboard } from "./PanelsDashboard";
 import type { RuntimeDashboardSpec, AdapterFixtureHrefResolver } from "./types";
 
 export type RuntimeDashboardProps = {
@@ -22,6 +23,14 @@ export function RuntimeDashboard({
   alarmStorage,
   adapterFixtureHref,
 }: RuntimeDashboardProps): ReactElement {
+  if (spec.layout === "panels") {
+    return (
+      <div className={className} style={{ width: "100%", height: "100%" }}>
+        <PanelsDashboard panels={spec.panels} />
+      </div>
+    );
+  }
+
   if (spec.layout === "mosaic") {
     const wall = presentation
       ? {

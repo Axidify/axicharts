@@ -10,6 +10,25 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.15] - 2026-07-19
+
+### Added
+
+- **C166** — `layout: "panels"` on `RuntimeDashboardSpec` — `PanelsDashboardSpec` with KPI/chart blocks and per-panel rows
+- **C166** — `PanelsDashboard` component; runtime validation for tabular panels layout
+- **C166** — Presentation deck inference for panels layout
+
+### Fixed
+
+- **CI** — Centralized Vite monorepo aliases (`scripts/vite-monorepo-aliases.ts`) + `check:vite-aliases` gate; renamed internal `planning/` → `tabularPlanning/` to avoid subpath collision
+
+### Axiboard app (monorepo, not npm)
+
+- **C166** — Apply tabular orchestrator plan to main workspace; `TabularDashboardView` with chat follow-ups
+- **C166** — Persist `sourceCsv`, persona, and follow-up intents in dashboard meta
+
+See [RELEASE-v0.4.15.md](./RELEASE-v0.4.15.md).
+
 ## [0.4.14] - 2026-07-19
 
 ### Added

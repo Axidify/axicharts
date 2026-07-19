@@ -27,6 +27,17 @@ function lineOverviewSlides(): PresentationDeckSlideSpec[] {
 }
 
 export function inferPresentationDeck(spec: RuntimeDashboardSpec): PresentationDeckSpec {
+  if (spec.layout === "panels") {
+    return {
+      version: 1,
+      slides: spec.panels.charts.map((block, index) => ({
+        id: block.questionId ?? `chart-${index}`,
+        title: block.panel.title,
+        section: "full" as const,
+      })),
+    };
+  }
+
   if (spec.layout === "mosaic") {
     return {
       version: 1,

@@ -1,7 +1,9 @@
 import type {
   DashboardEmbedSpec,
   MosaicWallSpec,
+  PanelsDashboardSpec,
   RuntimeDashboardSpec,
+  TabularPanelBlock,
 } from "./types";
 
 export type RuntimeValidationIssue = {
@@ -218,11 +220,79 @@ function validateMosaicWall(
   return raw as MosaicWallSpec;
 }
 
+function validatePanelBlock(raw: unknown, path: string, errors: RuntimeValidationIssue[]): TabularPanelBlock | null {
+  if (!isRecord(raw)) {
+    errors.push(issue(path, "panel block must be an object"));
+    return null;
+  }
+  if (!isRecord(raw.panel)) {
+    errors.push(issue(`${path}.panel`, "panel spec is required"));
+    return null;
+  }
+  if (!Array.isArray(raw.rows)) {
+    errors.push(issue(`${path}.rows`, "rows array is required"));
+    return null;
+  }
+  return raw as TabularPanelBlock;
+}
+
+function validatePanelsDashboard(
+  raw: Record<string, unknown>,
+  path: string,
+  errors: RuntimeValidationIssue[],
+): PanelsDashboardSpec {
+  validateTheme(raw.theme, `${path}.theme`, errors);
+  validateMode(raw.mode, `${path}.mode`, errors);
+
+  const kpis: TabularPanelBlock[] = [];
+  if (!Array.isArray(raw.kpis)) {
+    errors.push(issue(`${path}.kpis`, "kpis array is required"));
+  } else {
+    raw.kpis.forEach((block, index) => {
+      const parsed = validatePanelBlock(block, `${path}.kpis[${index}]`, errors);
+      if (parsed) kpis.push(parsed);
+    });
+  }
+
+  const charts: TabularPanelBlock[] = [];
+  if (!Array.isArray(raw.charts)) {
+    errors.push(issue(`${path}.charts`, "charts array is required"));
+  } else {
+    raw.charts.forEach((block, index) => {
+      const parsed = validatePanelBlock(block, `${path}.charts[${index}]`, errors);
+      if (parsed) charts.push(parsed);
+    });
+  }
+
+  return {
+    version: typeof raw.version === "string" ? raw.version : undefined,
+    title: typeof raw.title === "string" ? raw.title : undefined,
+    subtitle: typeof raw.subtitle === "string" ? raw.subtitle : undefined,
+    theme: raw.theme as PanelsDashboardSpec["theme"],
+    mode: raw.mode as PanelsDashboardSpec["mode"],
+    vertical: typeof raw.vertical === "string" ? raw.vertical : undefined,
+    sourceCsv: typeof raw.sourceCsv === "string" ? raw.sourceCsv : undefined,
+    kpis,
+    charts,
+  };
+}
+
 export function validateRuntimeSpecRaw(raw: unknown): RuntimeValidationResult {
   const errors: RuntimeValidationIssue[] = [];
 
   if (!isRecord(raw)) {
     return { ok: false, errors: [issue("$", "runtime spec must be a JSON object")] };
+  }
+
+  if (raw.layout === "panels") {
+    const panelsRaw = isRecord(raw.panels) ? raw.panels : raw;
+    const panels = validatePanelsDashboard(
+      panelsRaw,
+      isRecord(raw.panels) ? "panels" : "$",
+      errors,
+    );
+    if (errors.length > 0) return { ok: false, errors };
+    return { ok: true, spec: { layout: "panels", panels } };
   }
 
   if (raw.layout === "mosaic") {

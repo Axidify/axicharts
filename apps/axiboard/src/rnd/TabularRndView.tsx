@@ -1,6 +1,7 @@
+import type { Persona } from "@axicharts/charts-spec";
+import type { OrchestratorChatResult } from "../api/orchestratorClient";
 import { useMemo, useState, type ChangeEvent, type ReactElement } from "react";
 import { Chart, PanelSpecGrid, classifyTabularDomain } from "@axicharts/charts-spec";
-import type { AgentDecision } from "../../server/types";
 import { OrchestratorChat } from "../chat/OrchestratorChat";
 import { useRndSession } from "../hooks/useOrchestratorPlan";
 import { enrichForDisplay, formatDisplaySummary } from "./enrichForDisplay";
@@ -27,6 +28,13 @@ const kpiStyle = {
 
 export type TabularRndViewProps = {
   onExit: () => void;
+  onApply?: (
+    plan: OrchestratorChatResult,
+    rawText: string,
+    persona: Persona,
+    followUpIntents: string[],
+  ) => void;
+  initialCsv?: string;
 };
 
 function DomainConfidenceBanner({
@@ -109,7 +117,7 @@ function DecisionLog({ decisions }: { decisions: AgentDecision[] }): ReactElemen
   );
 }
 
-export function TabularRndView({ onExit }: TabularRndViewProps): ReactElement {
+export function TabularRndView({ onExit, onApply, initialCsv }: TabularRndViewProps): ReactElement {
   const [fileError, setFileError] = useState<string | null>(null);
 
   const {
@@ -122,9 +130,10 @@ export function TabularRndView({ onExit }: TabularRndViewProps): ReactElement {
     persona,
     setPersona,
     sendMessage,
+    followUpIntents,
   } = useRndSession({
     slug: "tabular",
-    sampleCsv: "",
+    sampleCsv: initialCsv ?? "",
     initialFollowUpIntents: [],
   });
 
@@ -205,6 +214,15 @@ export function TabularRndView({ onExit }: TabularRndViewProps): ReactElement {
           <button type="button" onClick={onExit} style={buttonStyle}>
             Back to workspace
           </button>
+          {onApply && agentPlan && !loading ? (
+            <button
+              type="button"
+              style={{ ...buttonStyle, borderColor: "#22c55e", color: "#bbf7d0" }}
+              onClick={() => onApply(agentPlan, rawText, persona, followUpIntents)}
+            >
+              Apply to dashboard
+            </button>
+          ) : null}
         </div>
       </div>
 

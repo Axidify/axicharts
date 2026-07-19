@@ -1,4 +1,4 @@
-import type { ChartMode, TemplateId, ThemeName } from "@axicharts/charts-spec";
+import type { ChartMode, PanelSpec, TemplateId, ThemeName } from "@axicharts/charts-spec";
 import type { ChartConfigSpec } from "@axicharts/charts-spec";
 
 export const RUNTIME_VERSION = "0.1";
@@ -156,6 +156,25 @@ export type MosaicWallSpec = {
   staleAfterMs?: number;
 };
 
+export type TabularPanelBlock = {
+  questionId?: string;
+  panel: PanelSpec;
+  rows: Array<Record<string, string | number | boolean>>;
+};
+
+export type PanelsDashboardSpec = {
+  version?: string;
+  title?: string;
+  subtitle?: string;
+  theme?: ThemeName;
+  mode?: ChartMode;
+  vertical?: string;
+  /** Raw CSV for replan / follow-up chat */
+  sourceCsv?: string;
+  kpis: TabularPanelBlock[];
+  charts: TabularPanelBlock[];
+};
+
 export type RuntimeDashboardSpec =
   | {
       layout?: "embed";
@@ -164,4 +183,8 @@ export type RuntimeDashboardSpec =
   | {
       layout: "mosaic";
       wall: MosaicWallSpec;
+    }
+  | {
+      layout: "panels";
+      panels: PanelsDashboardSpec;
     };
