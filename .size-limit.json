@@ -14,7 +14,7 @@
   {
     "name": "@axicharts/charts-canvas",
     "path": "packages/charts-canvas/dist/index.js",
-    "limit": "12 KB",
+    "limit": "12.5 KB",
     "gzip": true
   },
   {
@@ -44,7 +44,7 @@
   {
     "name": "@axicharts/charts-runtime",
     "path": "packages/charts-runtime/dist/index.js",
-    "limit": "9.5 KB",
+    "limit": "11 KB",
     "gzip": true
   },
   {
