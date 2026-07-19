@@ -211,6 +211,14 @@ pnpm docs
 
 Gates: G · SaaS clean · H · Rich ops · I · Detailed bars · J · Dual series · K · KPI + chart · L · Grid cells · M · Finance · N · Trading · O · Resources · P · Plugins wall · Q · Program dashboard · **E · Presentation**
 
+## Community
+
+- [Contributing](./CONTRIBUTING.md)
+- [Code of conduct](./CODE_OF_CONDUCT.md)
+- [Changelog](./CHANGELOG.md)
+- [GitHub releases](https://github.com/Axidify/axicharts/releases)
+- Product RFCs and governance: [Dashboarder docs](https://github.com/Axidify/Dashboarder/tree/main/docs)
+
 ## License
 
 MIT
