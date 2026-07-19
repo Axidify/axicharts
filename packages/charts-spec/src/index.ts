@@ -57,10 +57,13 @@ export {
 } from "./blocksPlayground";
 export {
   createCartesianPanel,
+  reviseCartesianPanel,
   listCartesianMarks,
   CARTESIAN_MARK_CATALOG,
   type CreateCartesianPanelInput,
   type CreateCartesianPanelResult,
+  type ReviseCartesianPanelInput,
+  type ReviseCartesianPanelResult,
   type PlannerReviewReason,
   type CartesianMarkCatalogEntry,
 } from "./createCartesianPanel";

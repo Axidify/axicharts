@@ -66,7 +66,7 @@ function metricSuggestsSizeEncoding(metric: MetricProfile): boolean {
 }
 
 function isCartesianPanelType(type: PanelSpec["type"]): boolean {
-  return type === "bar" || type === "line" || type === "area" || type === "scatter";
+  return type === "bar" || type === "line" || type === "area" || type === "scatter" || type === "cartesian";
 }
 
 export function inferSizeEncodingForPanel(args: {
@@ -99,7 +99,8 @@ export function inferSizeEncodingForPanel(args: {
     intentWantsSizeEncoding(args.intent) ||
     intentWantsVerticalSize(args.intent, vertical);
   const profileMatch =
-    args.type === "bar" && metricSuggestsSizeEncoding(args.metric);
+    (args.type === "bar" || args.type === "cartesian") &&
+    metricSuggestsSizeEncoding(args.metric);
 
   if (!intentMatch && !profileMatch) return undefined;
 

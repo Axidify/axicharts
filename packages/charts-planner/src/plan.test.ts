@@ -106,7 +106,7 @@ describe("planFromIntent", () => {
       "Linear latency trend",
     );
 
-    expect(plan.panels[0]?.props?.style).toEqual({ line: { curve: "linear" } });
+    expect(plan.panels[0]?.marks?.[0]).toMatchObject({ type: "line", curve: "linear" });
   });
 
   it("finance vertical: infers waterfall from variance intent", () => {
@@ -160,6 +160,30 @@ describe("planFromIntent", () => {
     );
 
     expect(plan.template).toBe("sre-incident");
+  });
+
+  it("emits cartesian panels for cartesian metric paths", () => {
+    const plan = planFromIntent(profile, "Line 3 night shift overview");
+    expect(plan.panels.every((panel) => panel.type === "cartesian")).toBe(true);
+    expect(plan.panels.every((panel) => panel.marks && panel.marks.length > 0)).toBe(true);
+  });
+
+  it("finance vertical: dual-axis revenue vs margin emits cartesian marks", () => {
+    const plan = planFromIntent(
+      {
+        metrics: [{ name: "revenue", unit: "USD", tags: { vertical: "finance" } }],
+        fields: ["period", "revenue", "margin"],
+      },
+      "Revenue vs margin dual axis combo",
+    );
+
+    expect(plan.panels[0]?.type).toBe("cartesian");
+    expect(plan.panels[0]?.marks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: "bar", field: "revenue" }),
+        expect.objectContaining({ type: "line", field: "margin", yAxisId: "right" }),
+      ]),
+    );
   });
 
   it("saas vertical: maps growth intent to saas-growth template", () => {

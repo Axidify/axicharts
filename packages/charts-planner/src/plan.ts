@@ -158,7 +158,7 @@ export function buildPlannerPrompt(profile: DataProfile, intent: string): string
     '  "feed": "static|historian|websocket|mqtt|rest|mock-live",',
     '  "mosaicPreset": "ops-finance|ops-overview|trading-program|command-center",',
     '  "presentation": boolean,',
-    '  "panels": [ { "specVersion": 1, "type": "line|bar|gauge|table|...", "title": "...", "encoding": { "x": {...}, "y": {...}, "color": { "field": "aboveTarget", "type": "semantic" } } } ]',
+    '  "panels": [ { "specVersion": 1, "type": "cartesian", "title": "...", "encoding": { "x": { "field": "week", "type": "nominal" }, "color": { "field": "aboveTarget", "type": "semantic" } }, "marks": [ { "type": "bar", "field": "revenue", "label": "Revenue" }, { "type": "line", "field": "target", "label": "Target" }, { "type": "rule", "value": 90, "label": "SLO" } ] } ]',
     "}",
     "",
     `Intent: ${intent}`,

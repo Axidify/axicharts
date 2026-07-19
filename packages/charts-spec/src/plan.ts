@@ -1,7 +1,8 @@
-import type { DataProfile, MetricProfile, PanelSpec } from "./types";
+import type { ChartBlockMarkSpec, DataProfile, MetricProfile, PanelSpec } from "./types";
 import { applySpecCompilers } from "./specCompiler";
 import { inferColorEncodingForPanel } from "./colorEncodingPlan";
 import { inferLineCurveForPanel } from "./curveEncodingPlan";
+import { normalizeToCartesian } from "./normalizeToCartesian";
 import { applyVerticalRules } from "./rulePacks/applyVerticalRules";
 import { inferSizeEncodingForPanel } from "./sizeEncodingPlan";
 
@@ -55,6 +56,48 @@ function inferChartType(metric: MetricProfile): PanelSpec["type"] {
   return "line";
 }
 
+type CartesianDataMarkType = "line" | "bar" | "area";
+
+function isCartesianDataType(type: PanelSpec["type"]): type is CartesianDataMarkType {
+  return type === "line" || type === "bar" || type === "area";
+}
+
+function buildCartesianMarks(
+  markType: CartesianDataMarkType,
+  metric: MetricProfile,
+  curve?: "linear" | "monotone",
+): ChartBlockMarkSpec[] {
+  return [
+    {
+      type: markType,
+      field: metric.name,
+      label: metric.name,
+      ...(curve && markType !== "bar" ? { curve } : {}),
+    },
+  ];
+}
+
+function applyCurveToMarks(
+  marks: ChartBlockMarkSpec[],
+  curve: "linear" | "monotone",
+): ChartBlockMarkSpec[] {
+  return marks.map((mark) =>
+    mark.type === "line" || mark.type === "area" ? { ...mark, curve } : mark,
+  );
+}
+
+function finalizeCartesianPanel(panel: PanelSpec): PanelSpec {
+  if (
+    panel.type === "line" ||
+    panel.type === "bar" ||
+    panel.type === "area" ||
+    panel.type === "combo"
+  ) {
+    return normalizeToCartesian(panel);
+  }
+  return panel;
+}
+
 function inferTheme(metric: MetricProfile): PanelSpec["theme"] {
   const tags = metric.tags ?? {};
   if (tags.vertical === "trading" || tags.vertical === "ops") return "live";
@@ -75,30 +118,35 @@ export function planPanelFromMetric(
   metric: MetricProfile,
   options: PlanPanelsOptions & { profileFields?: string[] } = {},
 ): PanelSpec {
-  const type = inferChartType(metric);
+  const inferredType = inferChartType(metric);
+  const cartesian = isCartesianDataType(inferredType);
+  const encodingType: PanelSpec["type"] = cartesian ? "cartesian" : inferredType;
   const theme = inferTheme(metric);
   const mode = inferMode(metric);
 
   const panel: PanelSpec = {
     specVersion: 1,
-    type,
+    type: encodingType,
     title: metric.name,
     theme,
     mode,
-    encoding: {
-      x: { field: "time", type: "nominal" },
-      y: { field: metric.name, type: "quantitative" },
-      value: { field: "value", type: "quantitative" },
-    },
+    encoding: cartesian
+      ? { x: { field: "time", type: "nominal" } }
+      : {
+          x: { field: "time", type: "nominal" },
+          y: { field: metric.name, type: "quantitative" },
+          value: { field: "value", type: "quantitative" },
+        },
+    marks: cartesian ? buildCartesianMarks(inferredType, metric) : undefined,
     valueSuffix: metric.unit ? ` ${metric.unit}` : undefined,
   };
 
-  if (type === "gauge") {
+  if (inferredType === "gauge") {
     panel.encoding = { value: { field: metric.name, type: "quantitative" } };
     panel.props = { label: metric.name, unit: metric.unit ?? "%" };
   }
 
-  if (type === "table") {
+  if (inferredType === "table") {
     panel.encoding = undefined;
     panel.props = {
       columns: [
@@ -112,7 +160,7 @@ export function planPanelFromMetric(
   }
 
   const colorEncoding = inferColorEncodingForPanel({
-    type,
+    type: encodingType,
     metric,
     intent: options.intent,
     profileFields: options.profileFields,
@@ -122,7 +170,7 @@ export function planPanelFromMetric(
   }
 
   const sizeEncoding = inferSizeEncodingForPanel({
-    type,
+    type: encodingType,
     metric,
     intent: options.intent,
     profileFields: options.profileFields,
@@ -132,30 +180,28 @@ export function planPanelFromMetric(
   }
 
   const lineCurve = inferLineCurveForPanel({
-    type,
+    type: encodingType,
     metric,
     intent: options.intent,
   });
-  if (lineCurve) {
-    const existingStyle =
-      panel.props?.style && typeof panel.props.style === "object"
-        ? (panel.props.style as Record<string, unknown>)
-        : {};
-    panel.props = {
-      ...panel.props,
-      style: {
-        ...existingStyle,
-        line: { curve: lineCurve },
-      },
-    };
-  }
 
-  return applyVerticalRules(panel, {
+  const ruled = applyVerticalRules(panel, {
     metric,
     intent: options.intent,
     profileFields: options.profileFields,
     allMetrics: options.allMetrics,
   });
+
+  const finalized = finalizeCartesianPanel(ruled);
+
+  if (lineCurve && finalized.type === "cartesian" && finalized.marks) {
+    return {
+      ...finalized,
+      marks: applyCurveToMarks(finalized.marks, lineCurve),
+    };
+  }
+
+  return finalized;
 }
 
 export function planPanelsFromProfile(

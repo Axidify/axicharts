@@ -21,12 +21,12 @@ describe("vertical rule packs (C90)", () => {
       },
     );
 
-    expect(panel.type).toBe("combo");
-    expect(panel.props?.dualAxis).toBe("auto");
-    expect(panel.encoding?.y).toEqual([
-      { field: "revenue", type: "quantitative", kind: "bar", label: "Revenue" },
-      { field: "margin", type: "quantitative", kind: "line", label: "Margin" },
+    expect(panel.type).toBe("cartesian");
+    expect(panel.marks).toEqual([
+      { type: "bar", field: "revenue", label: "Revenue" },
+      { type: "line", field: "margin", label: "Margin", yAxisId: "right" },
     ]);
+    expect(panel.props?.showValues).toBe(true);
   });
 
   it("finance: maps margin KPI to stat with success tone", () => {
@@ -73,11 +73,10 @@ describe("vertical rule packs (C90)", () => {
       { intent: "RSI momentum follower panel" },
     );
 
-    expect(panel.type).toBe("line");
-    expect(panel.fill).toBe(true);
+    expect(panel.type).toBe("cartesian");
+    expect(panel.marks?.[0]).toMatchObject({ type: "area", tone: "warning" });
     expect(panel.props?.syncId).toBe("rsi");
     expect(panel.props?.syncFollower).toBe("ohlc");
-    expect(panel.props?.tone).toBe("warning");
   });
 
   it("trading: infers side color encoding from vertical intent phrases", () => {
@@ -119,18 +118,18 @@ describe("vertical rule packs (C90)", () => {
       { intent: "Latency vs SLO threshold band" },
     );
 
-    expect(panel.type).toBe("line");
-    expect(panel.props?.thresholdBands).toEqual([
-      { min: 0, max: 500, label: "SLO band", tone: "warning" },
-    ]);
-    expect(panel.props?.annotations).toEqual([
-      {
-        type: "line",
-        value: 500,
-        label: "SLO limit",
-        tone: "critical",
-      },
-    ]);
+    expect(panel.type).toBe("cartesian");
+    expect(panel.marks?.[0]).toMatchObject({
+      type: "line",
+      field: "p95_latency",
+      label: "p95_latency",
+    });
+    expect(panel.marks).toEqual(
+      expect.arrayContaining([
+        { type: "band", min: 0, max: 500, label: "SLO band", tone: "warning" },
+        { type: "rule", value: 500, label: "SLO limit", tone: "critical" },
+      ]),
+    );
   });
 
   it("ops: maps errors metric to live bar chart", () => {
@@ -139,7 +138,8 @@ describe("vertical rule packs (C90)", () => {
       { intent: "Line 3 error rate bar" },
     );
 
-    expect(panel.type).toBe("bar");
+    expect(panel.type).toBe("cartesian");
+    expect(panel.marks).toEqual([{ type: "bar", field: "errors", label: "errors" }]);
     expect(panel.mode).toBe("live");
   });
 
@@ -158,6 +158,7 @@ describe("vertical rule packs (C90)", () => {
 
     expect(panels[0]?.type).toBe("stat");
     expect(panels[1]?.type).toBe("candlestick");
-    expect(panels[2]?.type).toBe("line");
+    expect(panels[2]?.type).toBe("cartesian");
+    expect(panels[2]?.marks?.[0]?.type).toBe("line");
   });
 });

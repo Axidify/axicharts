@@ -42,9 +42,13 @@ function applyOpsPanelRules(panel: PanelSpec, ctx: VerticalPanelContext): PanelS
   if (/errors?|fault|defect|reject/.test(name)) {
     return {
       ...panel,
-      type: "bar",
+      type: "cartesian",
       theme: "live",
       mode: "live",
+      encoding: {
+        x: panel.encoding?.x ?? { field: "time", type: "nominal" },
+      },
+      marks: [{ type: "bar", field: ctx.metric.name, label: ctx.metric.name }],
     };
   }
 
@@ -55,23 +59,17 @@ function applyOpsPanelRules(panel: PanelSpec, ctx: VerticalPanelContext): PanelS
     const sloMax = /p99|p95/.test(name) ? 500 : 200;
     return {
       ...panel,
-      type: panel.type === "bar" ? "line" : panel.type,
+      type: "cartesian",
       theme: "live",
       mode: "live",
-      props: {
-        ...panel.props,
-        thresholdBands: [
-          { min: 0, max: sloMax, label: "SLO band", tone: "warning" },
-        ],
-        annotations: [
-          {
-            type: "line",
-            value: sloMax,
-            label: "SLO limit",
-            tone: "critical",
-          },
-        ],
+      encoding: {
+        x: panel.encoding?.x ?? { field: "time", type: "nominal" },
       },
+      marks: [
+        { type: "line", field: ctx.metric.name, label: ctx.metric.name },
+        { type: "band", min: 0, max: sloMax, label: "SLO band", tone: "warning" },
+        { type: "rule", value: sloMax, label: "SLO limit", tone: "critical" },
+      ],
     };
   }
 

@@ -138,7 +138,7 @@ Empirical simulation: 24 scenarios in `src/compositionSimulation.ts` — run `pn
 | C136 | ✅ branch `feat/rfc-002-c136-cartesian` | `validateCartesianSpec`, `normalizeToCartesian`, `type: "cartesian"` |
 | C137 | ✅ branch `feat/rfc-002-c136-cartesian` | Public `CartesianChart` shell; composable eject |
 | C138 | ✅ branch | Blocks Playground — spec ↔ chart ↔ JSX; presets + agent skill |
-| C139 | 🚧 branch | `createCartesianPanel` + `listCartesianMarks` rules prototype |
+| C139 | ✅ branch | `createCartesianPanel`, `reviseCartesianPanel`, planner cartesian emits |
 | C140 | Planned | `@axicharts/charts-mcp` |
 
 ## Blocks Playground (C138)

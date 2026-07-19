@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createCartesianPanel } from "./createCartesianPanel";
+import { createCartesianPanel, reviseCartesianPanel } from "./createCartesianPanel";
 import { validateCartesianSpec } from "./cartesianValidation";
 
 const ROWS = [
@@ -98,5 +98,50 @@ describe("createCartesianPanel", () => {
     expect(needsReview).toBe(true);
     expect(reviewReason).toBe("vague_intent");
     expect(matchedRules).toEqual([]);
+  });
+});
+
+describe("reviseCartesianPanel", () => {
+  it("appends rule and line marks across turns", () => {
+    const { panel: barPanel } = createCartesianPanel({
+      intent: "weekly revenue bars",
+      fields: ["week", "revenue", "target"],
+    });
+
+    const { panel, matchedRules } = reviseCartesianPanel({
+      spec: barPanel,
+      instruction: "add target line and quota at 50",
+      dataProfile: { fields: ["week", "revenue", "target"] },
+    });
+
+    expect(panel.type).toBe("cartesian");
+    expect(matchedRules).toEqual(expect.arrayContaining(["line", "rule-slo"]));
+    expect(panel.marks?.some((mark) => mark.type === "line" && mark.field === "target")).toBe(
+      true,
+    );
+    expect(panel.marks?.some((mark) => mark.type === "rule" && mark.value === 50)).toBe(true);
+  });
+
+  it("normalizes legacy line spec before revising", () => {
+    const { panel, matchedRules } = reviseCartesianPanel({
+      spec: {
+        specVersion: 1,
+        type: "line",
+        encoding: {
+          x: { field: "week" },
+          y: { field: "revenue" },
+        },
+      },
+      instruction: "add healthy band 44-52",
+      dataProfile: { fields: ["week", "revenue"] },
+    });
+
+    expect(panel.type).toBe("cartesian");
+    expect(matchedRules).toContain("band-healthy");
+    expect(
+      panel.marks?.some(
+        (mark) => mark.type === "band" && mark.min === 44 && mark.max === 52,
+      ),
+    ).toBe(true);
   });
 });

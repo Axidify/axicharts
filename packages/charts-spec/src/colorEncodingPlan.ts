@@ -66,7 +66,7 @@ function metricSuggestsConditionalColor(metric: MetricProfile): boolean {
 }
 
 function isCartesianPanelType(type: PanelSpec["type"]): boolean {
-  return type === "bar" || type === "line" || type === "area";
+  return type === "bar" || type === "line" || type === "area" || type === "cartesian";
 }
 
 function encodingTypeForField(field: string): ColorEncoding["type"] {
@@ -102,7 +102,10 @@ export function inferColorEncodingForPanel(args: {
     intentWantsColorEncoding(args.intent) ||
     intentWantsVerticalColor(args.intent, vertical);
   const profileMatch =
-    metricSuggestsConditionalColor(args.metric) || args.type === "bar";
+    metricSuggestsConditionalColor(args.metric) ||
+    args.type === "bar" ||
+    (args.type === "cartesian" &&
+      args.metric.name.toLowerCase().includes("volume"));
 
   if (intentMatch || profileMatch) {
     return { field: matched, type: encodingTypeForField(matched) };

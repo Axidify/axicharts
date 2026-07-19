@@ -2,7 +2,7 @@
 
 Server-side dashboard planner for AxiCharts. Converts metric profiles and natural-language intent into validated `charts-spec` plans, with rules fallback when LLM output is invalid.
 
-**Direction (RFC-002):** Migrate cartesian panels to **`createCartesianPanel`** — one tool that emits `type: "cartesian"` + `marks[]` only (C139). Today rule packs still emit legacy `combo` / `line`; normalization layer in charts-spec accepts both until planner migration lands.
+**Cartesian panels (RFC-002 / C139):** Cartesian rule paths emit **`type: "cartesian"` + `marks[]` only** via `planPanelsFromProfile` and vertical rule packs. Use **`createCartesianPanel`** / **`reviseCartesianPanel`** from `@axicharts/charts-spec` for single-panel agent tools. Non-cartesian types (`pie`, `gauge`, `stat`, `candlestick`, etc.) are unchanged.
 
 See [charts-spec/CARTESIAN.md](../charts-spec/CARTESIAN.md).
 
@@ -27,9 +27,9 @@ Beyond C71/C78 color/size/curve inference, vertical packs enrich `PanelSpec` fro
 
 | Vertical | Examples inferred |
 |----------|-------------------|
-| **finance** | waterfall for variance/bridge; dual-axis `combo` for revenue vs margin; `stat` KPI tones; `vsPlan` color fields |
-| **trading** | candlestick + `volumeField` + brush/sync hints; RSI follower line; `side`/`pnl` color fields |
-| **ops** | `alert` panel for alarms; `gauge` thresholds; SLO `thresholdBands` on latency; severity color fields |
+| **finance** | waterfall for variance/bridge; dual-axis `cartesian` (bar + line marks) for revenue vs margin; `stat` KPI tones; `vsPlan` color fields |
+| **trading** | candlestick + `volumeField` + brush/sync hints; RSI follower `cartesian` area mark; `side`/`pnl` color fields |
+| **ops** | `alert` panel for alarms; `gauge` thresholds; SLO `rule` + `band` marks on latency `cartesian`; severity color fields |
 
 ```bash
 charts-planner plan examples/finance.profile.json --intent "P&L variance waterfall"
