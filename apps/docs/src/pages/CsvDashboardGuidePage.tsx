@@ -54,8 +54,7 @@ export function CsvDashboardGuidePage(): ReactElement {
       <pre style={codeBlock("#0f172a", "#e2e8f0")}>{INSTALL_MINIMAL_CODE}</pre>
       <p style={{ ...docBodyStyle(), fontSize: 13 }}>
         Lockstep: planner <code>0.2.1+</code> peers spec/charts <code>0.4.3+</code> — install spec at
-        the app level. See{" "}
-        <Link to="/guides/troubleshooting">version mismatch</Link>.
+        the app level. See <Link to="/guides/versions">version matrix</Link>.
       </p>
       <details style={{ marginTop: 12, fontSize: 13, color: "#475569" }}>
         <summary style={{ cursor: "pointer", fontWeight: 500 }}>Full bundle note</summary>

@@ -19,6 +19,7 @@ const topLinks = [
 
 const advancedLinks = [
   { to: "/guides/csv-dashboard", label: "CSV dashboard" },
+  { to: "/guides/versions", label: "Version matrix" },
   { to: "/templates/community", label: "Community templates" },
   { to: "/verticals", label: "Verticals" },
   { to: "/spec", label: "Spec layer" },

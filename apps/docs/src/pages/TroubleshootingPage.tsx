@@ -93,8 +93,9 @@ const LatencyPanel = dynamic(
         <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
           Keep <code>@axicharts/charts</code>, <code>@axicharts/charts-theme</code>, and{" "}
           <code>@axicharts/charts-core</code> on the <strong>same minor version</strong>. CI runs{" "}
-          <code>pnpm check:versions</code> in the monorepo; scaffolds pin matching <code>latest</code> on
-          both charts packages.
+          <code>pnpm check:versions</code> in the monorepo. See the{" "}
+          <Link to="/guides/versions">version matrix</Link> for path-specific combos (CSV, full,
+          runtime, planner).
         </p>
         <p style={{ margin: "12px 0 0", fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
           <strong>Planner + spec:</strong> install <code>@axicharts/charts-spec</code> at the app level

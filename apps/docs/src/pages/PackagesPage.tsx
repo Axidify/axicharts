@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { Link } from "react-router-dom";
 
 const PACKAGES = [
   { name: "@axicharts/charts", description: "React API — charts, primitives, registry" },
@@ -7,6 +8,8 @@ const PACKAGES = [
   { name: "@axicharts/charts-echarts", description: "pie, candlestick, waterfall, heatmap" },
   { name: "@axicharts/charts-core", description: "layout math + tick formatters" },
   { name: "@axicharts/charts-spec", description: "templates, planner, eject CLI" },
+  { name: "@axicharts/charts-planner", description: "intent → dashboard plan (peers charts-spec)" },
+  { name: "@axicharts/charts-full", description: "meta-package — charts + spec + runtime + theme" },
   { name: "@axicharts/charts-runtime", description: "adapters, embed SDK, spec portability" },
   { name: "@axicharts/charts-tank", description: "community tank level plugin (registerChartType)" },
   { name: "@axicharts/charts-geo", description: "community regional geo map plugin (registerChartType)" },
@@ -37,6 +40,9 @@ export function PackagesPage(): ReactElement {
           ))}
         </tbody>
       </table>
+      <p style={{ marginTop: 20, fontSize: 14, color: "#475569" }}>
+        Keep platform packages on one minor — see <Link to="/guides/versions">version matrix</Link>.
+      </p>
     </div>
   );
 }

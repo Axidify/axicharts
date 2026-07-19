@@ -21,6 +21,7 @@ import { BrandingPage } from "./pages/BrandingPage";
 import { ThemePlaygroundPage } from "./pages/ThemePlaygroundPage";
 import { BenchmarksPage } from "./pages/BenchmarksPage";
 import { TroubleshootingPage } from "./pages/TroubleshootingPage";
+import { VersionMatrixPage } from "./pages/VersionMatrixPage";
 import { ChoosingPathPage } from "./pages/ChoosingPathPage";
 import { CsvDashboardGuidePage } from "./pages/CsvDashboardGuidePage";
 import { ImportsGuidePage } from "./pages/ImportsGuidePage";
@@ -40,6 +41,7 @@ export function App(): ReactElement {
           <Route path="guides/branding" element={<BrandingPage />} />
           <Route path="guides/agent-cartesian" element={<AgentCartesianGuidePage />} />
           <Route path="guides/csv-dashboard" element={<CsvDashboardGuidePage />} />
+          <Route path="guides/versions" element={<VersionMatrixPage />} />
           <Route path="guides/troubleshooting" element={<TroubleshootingPage />} />
           <Route path="verticals" element={<VerticalsPage />} />
           <Route path="compare" element={<ComparePage />} />

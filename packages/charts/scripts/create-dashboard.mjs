@@ -1,6 +1,17 @@
 #!/usr/bin/env node
+import { readFileSync } from "node:fs";
 import { mkdir, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+
+function readPlatformVersionRange() {
+  const chartsPkg = JSON.parse(
+    readFileSync(path.join(scriptDir, "../package.json"), "utf8"),
+  );
+  return `^${chartsPkg.version}`;
+}
 
 const CATEGORIES = [
   "cartesian",
@@ -169,20 +180,21 @@ function categorySample(category) {
 }
 
 function packageJson(targetDir, category, preset = null) {
+  const platformRange = readPlatformVersionRange();
   const needsEcharts =
     preset === "full" || ["distribution", "financial", "matrix"].includes(category);
   const dependencies =
     preset === "full"
       ? {
-          "@axicharts/charts-full": "latest",
+          "@axicharts/charts-full": platformRange,
           react: "^19.0.0",
           "react-dom": "^19.0.0",
           uplot: "^1.6.31",
           echarts: "^5.6.0",
         }
       : {
-          "@axicharts/charts": "latest",
-          "@axicharts/charts-theme": "latest",
+          "@axicharts/charts": platformRange,
+          "@axicharts/charts-theme": platformRange,
           react: "^19.0.0",
           "react-dom": "^19.0.0",
           uplot: "^1.6.31",
@@ -389,6 +401,8 @@ createRoot(document.getElementById("root")!).render(
     "README.md": `# ${path.basename(targetDir)}
 
 Scaffolded with \`npx @axicharts/charts create-dashboard\` (${preset === "full" ? "preset: **full**" : `category: **${category}**`}).
+
+Version lockstep: https://axidify.github.io/axicharts/guides/versions
 
 \`\`\`bash
 pnpm install

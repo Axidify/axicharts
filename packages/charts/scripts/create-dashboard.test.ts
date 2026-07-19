@@ -1,6 +1,8 @@
 import { mkdtemp, readFile, realpath, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   buildDashboardFiles,
@@ -92,7 +94,7 @@ describe("create-dashboard scaffold", () => {
     expect(app).toContain("@axicharts/charts-full");
     expect(app).toContain("@axicharts/charts-full/theme");
     expect(app).toContain("LineChart");
-    expect(pkg.dependencies["@axicharts/charts-full"]).toBe("latest");
+    expect(pkg.dependencies["@axicharts/charts-full"]).toMatch(/^\^0\.\d+\.\d+$/);
     expect(pkg.dependencies.echarts).toBe("^5.6.0");
     expect(pkg.dependencies.uplot).toBe("^1.6.31");
   });
@@ -108,7 +110,7 @@ describe("create-dashboard scaffold", () => {
     expect(app).toContain("StudioLineChart");
     expect(app).toContain('data-theme="studio"');
     expect(app).toContain("studio-tokens.css");
-    expect(pkg.dependencies["@axicharts/charts"]).toBe("latest");
+    expect(pkg.dependencies["@axicharts/charts"]).toMatch(/^\^0\.\d+\.\d+$/);
   });
 
   it("rejects unknown categories", () => {
@@ -129,9 +131,8 @@ describe("create-dashboard scaffold", () => {
     expect(app).toContain("QuickLineChart");
     expect(tokens).toContain("--chart-1");
     expect(pkg.dependencies.echarts).toBeUndefined();
-    expect(pkg.dependencies["@axicharts/charts"]).toBe(
-      pkg.dependencies["@axicharts/charts-theme"],
-    );
+    expect(pkg.dependencies["@axicharts/charts"]).toMatch(/^\^0\.\d+\.\d+$/);
+    expect(pkg.dependencies["@axicharts/charts-theme"]).toMatch(/^\^0\.\d+\.\d+$/);
   });
 
   it("scaffolds distribution PieChart sample", async () => {
@@ -166,5 +167,34 @@ describe("create-dashboard scaffold", () => {
     } finally {
       process.chdir(originalCwd);
     }
+  });
+
+  it("bin entry scaffolds via npx-style invocation", async () => {
+    const dir = await makeTempDir();
+    const bin = path.join(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "../bin/create-dashboard.mjs",
+    );
+
+    const exitCode = await new Promise<number>((resolve, reject) => {
+      const child = spawn(process.execPath, [bin, dir], { stdio: "pipe" });
+      let stderr = "";
+      child.stderr.on("data", (chunk) => {
+        stderr += chunk.toString();
+      });
+      child.on("error", reject);
+      child.on("close", (code) => {
+        if (code !== 0) {
+          reject(new Error(stderr || `exit ${code}`));
+          return;
+        }
+        resolve(code ?? 0);
+      });
+    });
+
+    expect(exitCode).toBe(0);
+    await expect(readFile(path.join(dir, "package.json"), "utf8")).resolves.toContain(
+      "@axicharts/charts",
+    );
   });
 });

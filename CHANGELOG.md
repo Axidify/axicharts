@@ -8,9 +8,16 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
+## [0.4.5] - 2026-07-19
+
 ### Added
 
-- **C147c** — [CSV → dashboard guide](https://axidify.github.io/axicharts/guides/csv-dashboard) (Path 2): parse → profile → `planFromIntent` → `Chart` panels; `apps/csv-dashboard` Vite example; linked from Choosing your path
+- **C147d** — Version matrix guide at `/guides/versions` (planner ↔ spec ↔ charts-full ↔ runtime combos)
+
+### Changed
+
+- `pnpm check:versions` — lockstep includes charts-spec, charts-runtime, charts-full
+- `create-dashboard` — scaffold `package.json` pins `^<platform>` instead of `latest`
 
 ## [0.4.4] - 2026-07-19
 

@@ -18,6 +18,8 @@ npm install @axicharts/charts-planner @axicharts/charts-spec
 |-------------------------------|---------|-----------|
 | `0.4.3+` | `@axicharts/charts-planner@0.2.1+` | `@axicharts/charts-spec@^0.4.3` |
 
+Full matrix: [Version matrix guide](https://axidify.github.io/axicharts/guides/versions).
+
 ## Rules + intent planner
 
 ```ts
