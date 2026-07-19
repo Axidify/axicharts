@@ -46,4 +46,26 @@ describe("UPlotCombo", () => {
     expect(options.series?.[2]?.scale).toBe("y2");
     expect(options.axes?.length).toBe(3);
   });
+
+  it("stacks bar series when stacked is enabled", () => {
+    const barLayoutsRef = { current: [] as never[] };
+    const options = buildComboOptions({
+      width: 320,
+      height: 200,
+      categories: ["W1", "W2"],
+      series: [
+        { name: "A", kind: "bar", data: [40, 30] },
+        { name: "B", kind: "bar", data: [20, 50] },
+        { name: "Trend", kind: "line", data: [12, 9] },
+      ],
+      theme: cleanTheme,
+      stacked: true,
+      barLayoutsRef,
+    });
+
+    expect(options.series?.[1]?.stack).toBeDefined();
+    expect(options.series?.[2]?.stack).toBeDefined();
+    expect(options.series?.[3]?.stack).toBeUndefined();
+    expect(options.scales?.y2).toBeUndefined();
+  });
 });

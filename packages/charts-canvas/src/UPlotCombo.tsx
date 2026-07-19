@@ -21,6 +21,7 @@ import { resolveSeriesColor } from "./seriesColor";
 import { lineSeriesPaths, resolveLineCurve } from "./linePaths";
 import { axisCategoryValues } from "./axisCategoryLabel";
 import { shouldUseDualAxis } from "./dualAxis";
+import { shouldStackSeries, STACK_GROUP } from "./stack";
 
 type BarLayout = {
   left: number;
@@ -54,6 +55,7 @@ export function buildComboOptions(
     showValues = false,
     valueSuffix = "",
     dualAxis = "auto",
+    stacked = false,
     referenceLines = [],
     thresholdBands = [],
     annotations = [],
@@ -89,7 +91,10 @@ export function buildComboOptions(
     thresholdBandsResolved.length > 0 ||
     referenceLinesResolved.length > 0 ||
     extraY.length > 0;
-  const useDualAxis = shouldUseDualAxis(series, dualAxis);
+  const barCount = series.filter((item) => item.kind === "bar").length;
+  const stackBars = shouldStackSeries(stacked, barCount);
+  const showBarValues = showValues && !stackBars;
+  const useDualAxis = stackBars ? false : shouldUseDualAxis(series, dualAxis);
 
   return {
     width,
@@ -211,6 +216,7 @@ export function buildComboOptions(
             stroke: color,
             fill: color,
             width: 0,
+            stack: stackBars ? STACK_GROUP : undefined,
             paths: uPlot.paths.bars!({
               gap: gapPx,
               size: [0.45, 100],
@@ -220,7 +226,7 @@ export function buildComboOptions(
                 if (seriesIdx === 1 && idx === 0) {
                   barLayoutsRef.current = [];
                 }
-                if (showValues) {
+                if (showBarValues) {
                   barLayoutsRef.current.push({
                     left,
                     top,
@@ -269,7 +275,7 @@ export function buildComboOptions(
           labels: plotLabels,
           markers: plotMarkers,
           categories,
-          onDraw: showValues
+          onDraw: showBarValues
             ? (u) => {
                 const ctx = u.ctx;
                 ctx.save();
@@ -373,6 +379,7 @@ export function UPlotCombo(props: UPlotComboProps): ReactElement {
     props.plotLabels,
     props.plotMarkers,
     props.dualAxis,
+    props.stacked,
     showAxes,
     showCursor,
     useNativeLegend,

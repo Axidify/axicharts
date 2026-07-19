@@ -121,6 +121,7 @@ export type UPlotComboProps = {
   showValues?: boolean;
   valueSuffix?: string;
   dualAxis?: DualAxisMode;
+  stacked?: boolean;
   referenceLines?: ReferenceLine[];
   thresholdBands?: ThresholdBand[];
   annotations?: ChartAnnotation[];

@@ -52,6 +52,7 @@ export type CartesianChartProps = {
   valueSuffix?: string;
   curve?: LineCurve;
   dualAxis?: DualAxisMode;
+  stacked?: boolean;
   referenceLines?: ReferenceLine[];
   thresholdBands?: ThresholdBand[];
   annotations?: ChartAnnotation[];
@@ -72,6 +73,7 @@ type CartesianPlotProps = {
   valueSuffix?: string;
   curve?: LineCurve;
   dualAxis?: DualAxisMode;
+  stacked?: boolean;
   referenceLines?: ReferenceLine[];
   thresholdBands?: ThresholdBand[];
   annotations?: ChartAnnotation[];
@@ -89,6 +91,7 @@ function CartesianPlot({
   valueSuffix,
   curve,
   dualAxis,
+  stacked,
   referenceLines,
   thresholdBands,
   annotations,
@@ -122,6 +125,7 @@ function CartesianPlot({
         showValues={showValues}
         valueSuffix={valueSuffix}
         dualAxis={dualAxis}
+        stacked={stacked}
         referenceLines={referenceLines}
         thresholdBands={thresholdBands}
         annotations={annotations}
@@ -186,6 +190,7 @@ export function CartesianChart({
   valueSuffix: valueSuffixProp,
   curve: curveProp,
   dualAxis = "auto",
+  stacked = false,
   referenceLines,
   thresholdBands,
   annotations,
@@ -305,6 +310,7 @@ export function CartesianChart({
             valueSuffix={valueSuffix}
             curve={curve}
             dualAxis={dualAxis}
+            stacked={stacked}
             referenceLines={annotationProps.referenceLines}
             thresholdBands={annotationProps.thresholdBands}
             annotations={annotationProps.annotations}
