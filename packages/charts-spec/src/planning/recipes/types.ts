@@ -65,6 +65,10 @@ export type GeometryInput = {
   yField?: string;
   yFields?: string[];
   dimensionKey?: string;
+  /** C165 — L1 profile hints for geometry selection. */
+  grain?: import("../../types").TabularGrain;
+  timeSpan?: import("../../types").TimeSpan;
+  cardinalities?: Record<string, number>;
 };
 
 export function findField(

@@ -257,6 +257,18 @@ export function TabularRndView({ onExit }: TabularRndViewProps): ReactElement {
 
           <p style={{ fontSize: 12, color: "#94a3b8", margin: "0 0 16px" }}>
             {display ? `${formatDisplaySummary(display)} · ` : ""}
+            {agentPlan.dataProfile.grain ? (
+              <>
+                grain <code>{agentPlan.dataProfile.grain}</code>
+                {agentPlan.dataProfile.timeSpan ? (
+                  <>
+                    {" "}
+                    · {agentPlan.dataProfile.timeSpan.from}→{agentPlan.dataProfile.timeSpan.to}
+                  </>
+                ) : null}
+                {" · "}
+              </>
+            ) : null}
             agent feed <code>{agentPlan.dashboardPlan.feed}</code> · template{" "}
             <code>{agentPlan.dashboardPlan.template}</code> · vertical{" "}
             <code>{agentPlan.vertical}</code>

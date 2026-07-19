@@ -11,7 +11,9 @@ const PIPELINE_TEXT = `| Opportunity ID | Customer | Salesperson | Stage | Value
 | OPP-001 | ABC | Amir | Proposal | 85,000 | 70% | 2026-08-15 | Referral |`;
 
 const LEDGER_TEXT = `| Date | Transaction ID | Category | Debit (RM) | Credit (RM) | Balance (RM) | Payment Method |
-| 2026-07-01 | TXN-001 | Rent | 3500 | 0 | -3500 | Bank |`;
+| 2026-07-01 | TXN-001 | Rent | 3500 | 0 | -3500 | Bank |
+| 2026-07-02 | TXN-002 | Payroll | 12000 | 0 | -15500 | Bank |
+| 2026-07-03 | TXN-003 | Sales | 0 | 8500 | -7000 | Cash |`;
 
 describe("C156 planning — persona + question catalogs", () => {
   it("infers executive persona from board deck intent", () => {
@@ -88,16 +90,17 @@ describe("C156 planning — persona + question catalogs", () => {
   });
 });
 
-describe("C164 planDashboardFromRows — domain decision log", () => {
-  it("records classifyTabularDomain in decisions with confidence", async () => {
+describe("C165 planDashboardFromRows — L1 profile", () => {
+  it("records profileTabular grain and time span in decisions", async () => {
     const { planDashboardFromRows } = await import("./planDashboardFromRows");
     const rows = parseTabular(LEDGER_TEXT);
     const plan = planDashboardFromRows(rows);
     expect(plan).not.toBeNull();
+    expect(plan!.dataProfile.grain).toBe("transaction");
+    expect(plan!.dataProfile.timeSpan?.from).toBe("2026-07-01");
 
-    const domainDecision = plan!.decisions.find((entry) => entry.api === "classifyTabularDomain");
-    expect(domainDecision).toBeDefined();
-    expect(domainDecision!.notes).toMatch(/vertical ledger/);
-    expect(domainDecision!.notes).toMatch(/confidence \d+%/);
+    const l1 = plan!.decisions.find((entry) => entry.api === "profileTabular");
+    expect(l1).toBeDefined();
+    expect(l1!.notes).toMatch(/grain transaction/);
   });
 });

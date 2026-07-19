@@ -1,3 +1,4 @@
+import type { DataProfile } from "../../types";
 import type { AnalyticalQuestion } from "../types";
 import type { FieldProfile } from "../../types";
 import type { VerticalId } from "../../rulePacks/types";
@@ -26,12 +27,21 @@ function resolveTime(fieldProfiles: FieldProfile[]): string | undefined {
   return findField(fieldProfiles, /date|time|period|week|month/i, "time");
 }
 
+function geometryHints(profile?: Pick<DataProfile, "grain" | "timeSpan" | "cardinalities">) {
+  return {
+    grain: profile?.grain,
+    timeSpan: profile?.timeSpan,
+    cardinalities: profile?.cardinalities,
+  };
+}
+
 /**
  * C158 — build a panel recipe from a catalog question + field profiles.
  */
 export function questionToRecipe(
   question: AnalyticalQuestion,
   fieldProfiles: FieldProfile[],
+  dataProfile?: Pick<DataProfile, "grain" | "timeSpan" | "cardinalities">,
 ): PanelRecipe | null {
   const vertical = question.verticals[0];
   const requires = question.requires;
@@ -41,6 +51,7 @@ export function questionToRecipe(
       kind: "kpi",
       intent: question.intent,
       fieldProfiles,
+      ...geometryHints(dataProfile),
     });
     return {
       questionId: question.id,
@@ -57,6 +68,7 @@ export function questionToRecipe(
       kind: "table",
       intent: question.intent,
       fieldProfiles,
+      ...geometryHints(dataProfile),
     });
     return {
       questionId: question.id,
@@ -94,6 +106,7 @@ export function questionToRecipe(
     xField: timeField ?? xField,
     yField,
     dimensionKey: question.dimensionKey,
+    ...geometryHints(dataProfile),
   });
 
   const recipe: PanelRecipe = {
@@ -190,8 +203,9 @@ function buildTableColumns(
 export function questionsToRecipes(
   questions: AnalyticalQuestion[],
   fieldProfiles: FieldProfile[],
+  dataProfile?: Pick<DataProfile, "grain" | "timeSpan" | "cardinalities">,
 ): PanelRecipe[] {
   return questions
-    .map((question) => questionToRecipe(question, fieldProfiles))
+    .map((question) => questionToRecipe(question, fieldProfiles, dataProfile))
     .filter((recipe): recipe is PanelRecipe => recipe != null);
 }

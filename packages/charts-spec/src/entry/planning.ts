@@ -15,5 +15,11 @@ export { validateCartesianSpec, type CartesianValidationIssue } from "../cartesi
 export { planPanelFromMetric, planPanelsFromProfile, suggestTemplate } from "../plan";
 export { isRegisteredTemplate } from "../templateRegistry";
 export { SPEC_VERSION } from "../types";
-export type { DataProfile, FieldProfile, PanelSpec, TemplateId } from "../types";
+export type { DataProfile, FieldProfile, PanelSpec, TabularGrain, TemplateId, TimeSpan } from "../types";
+export {
+  profileTabular,
+  computeCardinalities,
+  inferGrain,
+  inferTimeSpan,
+} from "../profileTabular";
 export * from "../planning";

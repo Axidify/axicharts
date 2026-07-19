@@ -1,9 +1,9 @@
 import type { DomainSemantics } from "../classifyTabularDomain";
 import type { VerticalId } from "../rulePacks/types";
-import type { DataProfile, FieldProfile, PanelSpec } from "../types";
+import type { DataProfile, PanelSpec } from "../types";
 import { classifyTabularDomain, enrichProfileWithDomain } from "../classifyTabularDomain";
 import { validateCartesianSpec, type CartesianValidationIssue } from "../cartesianValidation";
-import { fieldProfilesToDataProfile, inferFieldRoles } from "../inferFieldRoles";
+import { profileTabular } from "../profileTabular";
 import { questionsForVertical } from "./catalogs";
 import { enrichTabular } from "./enrich";
 import type { TabularEnrichment } from "./enrich/types";
@@ -153,7 +153,7 @@ function compileQuestionBlock(
 
   if (!question) return null;
 
-  const baseRecipe = questionToRecipe(question, enrichment.fieldProfiles);
+  const baseRecipe = questionToRecipe(question, enrichment.fieldProfiles, dataProfile);
   if (!baseRecipe) return null;
 
   let recipe = applyRecipeData(baseRecipe, enrichment);
@@ -232,15 +232,22 @@ export function planDashboardFromRows(
   if (rows.length === 0) return null;
 
   const decisions: TabularPlanDecision[] = [];
-  const fieldProfiles: FieldProfile[] = options.enrichment?.fieldProfiles ?? inferFieldRoles(rows);
+  const tabularProfile: DataProfile = profileTabular(rows);
+  if (options.enrichment?.fieldProfiles) {
+    tabularProfile.fieldProfiles = options.enrichment.fieldProfiles;
+    tabularProfile.fields = options.enrichment.fieldProfiles.map((field) => field.name);
+  }
+  const fieldProfiles = tabularProfile.fieldProfiles ?? [];
 
   pushDecision(decisions, {
-    step: "Profile",
-    api: "inferFieldRoles + fieldProfilesToDataProfile",
+    step: "L1 Profile",
+    api: "profileTabular",
     status: "ok",
-    notes: `${fieldProfiles.length} fields — ${fieldProfiles
-      .map((field) => `${field.name}:${field.role}`)
-      .join(", ")}`,
+    notes: `${fieldProfiles.length} fields — grain ${tabularProfile.grain ?? "unknown"} · ${
+      tabularProfile.timeSpan
+        ? `time ${tabularProfile.timeSpan.from}→${tabularProfile.timeSpan.to}`
+        : "no time span"
+    } · cardinalities ${Object.keys(tabularProfile.cardinalities ?? {}).length}`,
   });
 
   const domain = classifyTabularDomain({ fieldProfiles });
@@ -270,6 +277,7 @@ export function planDashboardFromRows(
     context: { persona: options.persona },
     kinds: ["chart", "table", "kpi"],
     limit: 12,
+    dataProfile: tabularProfile,
   });
 
   pushDecision(decisions, {
@@ -282,10 +290,7 @@ export function planDashboardFromRows(
       .join(", ")}`,
   });
 
-  const dataProfile = enrichProfileWithDomain({
-    ...fieldProfilesToDataProfile(fieldProfiles),
-    fieldProfiles,
-  }).profile;
+  const dataProfile = enrichProfileWithDomain(tabularProfile).profile;
 
   const vertical: VerticalId = enrichment.vertical;
   const dashboardIntent =

@@ -64,6 +64,25 @@
           }
         }
       }
+    },
+    "grain": {
+      "enum": ["transaction", "entity", "daily", "unknown"]
+    },
+    "timeSpan": {
+      "type": "object",
+      "required": ["field", "from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "field": { "type": "string" },
+        "from": { "type": "string" },
+        "to": { "type": "string" }
+      }
+    },
+    "cardinalities": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      }
     }
   }
 }

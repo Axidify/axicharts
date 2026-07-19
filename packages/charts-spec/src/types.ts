@@ -295,6 +295,20 @@ export type DataProfile = {
   fields?: string[];
   /** C148a — semantic roles for tabular / agent planners. */
   fieldProfiles?: FieldProfile[];
+  /** C165 — row grain inferred from identifiers + time columns. */
+  grain?: TabularGrain;
+  /** C165 — min/max on the primary time field when parseable. */
+  timeSpan?: TimeSpan;
+  /** C165 — distinct value counts for dimension / time / identifier fields. */
+  cardinalities?: Record<string, number>;
+};
+
+export type TabularGrain = "transaction" | "entity" | "daily" | "unknown";
+
+export type TimeSpan = {
+  field: string;
+  from: string;
+  to: string;
 };
 
 export type SpecData = Record<string, unknown>[] | Record<string, unknown>;

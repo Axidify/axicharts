@@ -6,6 +6,8 @@ export type {
   ColorEncoding,
   DashboardSpec,
   DataProfile,
+  TabularGrain,
+  TimeSpan,
   FieldEncoding,
   FieldFormat,
   FieldProfile,
@@ -230,6 +232,14 @@ export {
   roleOfField,
   type InferFieldRolesOptions,
 } from "./inferFieldRoles";
+export {
+  profileTabular,
+  computeCardinalities,
+  inferGrain,
+  inferTimeSpan,
+  HIGH_CARDINALITY_BAR,
+  type TabularProfileContext,
+} from "./profileTabular";
 export { PanelSpecGrid, type PanelSpecGridProps } from "./PanelSpecGrid";
 export {
   validateCartesianPanelSchemaRaw,

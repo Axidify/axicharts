@@ -2,6 +2,7 @@ import {
   classifyTabularDomain,
   fieldProfilesToDataProfile,
   inferFieldRoles,
+  profileTabular,
   type DomainSemantics,
   type FieldProfile,
   type FieldRole,
@@ -28,6 +29,9 @@ export type DescribeDataProfileResult = {
   fieldProfiles?: FieldProfile[];
   rowCount: number;
   domain?: DomainSemantics;
+  grain?: string;
+  timeSpan?: { field: string; from: string; to: string };
+  cardinalities?: Record<string, number>;
 };
 
 function mapRole(role: FieldRole): DescribedField["role"] {
@@ -91,11 +95,17 @@ export function describeDataProfile(input: {
             role: inferFieldRoles([{ [name]: 0 }], { hints: {} })[0]?.role ?? "dimension",
           }));
 
+  const tabularProfile =
+    rows.length > 0 ? profileTabular(rows) : fieldProfilesToDataProfile(fieldProfiles);
+
   return {
     rowCount: rows.length,
-    fieldProfiles,
-    domain: classifyTabularDomain({ fieldProfiles }),
-    fields: fieldProfiles.map((profile) => ({
+    fieldProfiles: tabularProfile.fieldProfiles ?? fieldProfiles,
+    domain: classifyTabularDomain({ fieldProfiles: tabularProfile.fieldProfiles ?? fieldProfiles }),
+    grain: tabularProfile.grain,
+    timeSpan: tabularProfile.timeSpan,
+    cardinalities: tabularProfile.cardinalities,
+    fields: (tabularProfile.fieldProfiles ?? fieldProfiles).map((profile) => ({
       field: profile.name,
       role: mapRole(profile.role),
       semanticRole: profile.role,
@@ -106,6 +116,5 @@ export function describeDataProfile(input: {
 }
 
 export function rowsToDataProfile(rows: SpecDataLike): DataProfileLike {
-  const fieldProfiles = inferFieldRoles(rows);
-  return fieldProfilesToDataProfile(fieldProfiles);
+  return profileTabular(rows);
 }

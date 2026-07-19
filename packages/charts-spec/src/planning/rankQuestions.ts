@@ -10,10 +10,13 @@ import type {
   RankQuestionsInput,
   RankQuestionsResult,
 } from "./types";
+import { HIGH_CARDINALITY_BAR } from "../profileTabular";
 
 const PERSONA_BOOST = 12;
 const PERSONA_PARTIAL_BOOST = 4;
 const DEDUP_PENALTY = 6;
+const HIGH_CARDINALITY_PENALTY = 8;
+const TIME_SPAN_BOOST = 4;
 
 function fieldMatchesPattern(fieldProfiles: FieldProfile[], pattern?: RegExp): boolean {
   if (!pattern) return true;
@@ -42,7 +45,11 @@ function meetsRequirements(
   return true;
 }
 
-function scoreQuestion(question: AnalyticalQuestion, persona: Persona): RankedQuestion {
+function scoreQuestion(
+  question: AnalyticalQuestion,
+  persona: Persona,
+  input: RankQuestionsInput,
+): RankedQuestion {
   const reasons: string[] = [`base:${question.basePriority}`];
   let score = question.basePriority;
 
@@ -52,6 +59,34 @@ function scoreQuestion(question: AnalyticalQuestion, persona: Persona): RankedQu
   } else if (question.personas.includes("manager")) {
     score += PERSONA_PARTIAL_BOOST;
     reasons.push("persona:manager-fallback");
+  }
+
+  const profile = input.dataProfile;
+  if (question.kind === "chart" && question.dimensionKey && profile?.cardinalities) {
+    const dimensionField = input.fieldProfiles.find(
+      (field) =>
+        field.role === "dimension" &&
+        new RegExp(question.dimensionKey!, "i").test(field.name),
+    )?.name;
+    const cardinality =
+      (dimensionField && profile.cardinalities[dimensionField]) ??
+      Object.entries(profile.cardinalities).find(([name]) =>
+        new RegExp(question.dimensionKey!, "i").test(name),
+      )?.[1];
+    if (cardinality != null && cardinality > HIGH_CARDINALITY_BAR) {
+      score -= HIGH_CARDINALITY_PENALTY;
+      reasons.push(`cardinality:${cardinality}`);
+    }
+  }
+
+  if (
+    profile?.timeSpan &&
+    question.requires?.timeField &&
+    question.kind === "chart" &&
+    profile.timeSpan.from !== profile.timeSpan.to
+  ) {
+    score += TIME_SPAN_BOOST;
+    reasons.push("timeSpan:trend");
   }
 
   return { question, score, reasons };
@@ -75,7 +110,7 @@ export function rankQuestions(input: RankQuestionsInput): RankQuestionsResult {
   const candidates = catalog
     .filter((question) => kinds == null || kinds.includes(question.kind))
     .filter((question) => meetsRequirements(question, input.fieldProfiles))
-    .map((question) => scoreQuestion(question, persona))
+    .map((question) => scoreQuestion(question, persona, input))
     .sort((a, b) => b.score - a.score);
 
   const ranked: RankedQuestion[] = [];

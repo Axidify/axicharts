@@ -43,6 +43,8 @@ export type RankQuestionsInput = {
   context?: PlanningContext;
   kinds?: AnalyticalQuestion["kind"][];
   limit?: number;
+  /** C165 — grain, cardinalities, and time span for ranking tweaks. */
+  dataProfile?: Pick<DataProfile, "grain" | "timeSpan" | "cardinalities">;
 };
 
 export type RankQuestionsResult = {

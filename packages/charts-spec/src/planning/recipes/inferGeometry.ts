@@ -1,3 +1,4 @@
+import { HIGH_CARDINALITY_BAR } from "../../profileTabular";
 import type { ChartGeometry, GeometryInput } from "./types";
 import { roleOf } from "./types";
 
@@ -24,11 +25,23 @@ export function inferChartGeometry(input: GeometryInput): ChartGeometry {
   }
 
   const xRole = input.xField ? roleOf(input.fieldProfiles, input.xField) : undefined;
+  const xCardinality = input.xField ? input.cardinalities?.[input.xField] : undefined;
+
   if (
     xRole === "time" ||
     /over\s*time|trend|time\s*series|monotone/.test(intent)
   ) {
     rules.push("geometry:time-line");
+    return { panelType: "cartesian", markType: "line", rules };
+  }
+
+  if (
+    xRole === "time" &&
+    input.timeSpan &&
+    input.timeSpan.from !== input.timeSpan.to &&
+    (input.grain === "transaction" || input.grain === "daily")
+  ) {
+    rules.push("geometry:time-span-line");
     return { panelType: "cartesian", markType: "line", rules };
   }
 
@@ -55,6 +68,16 @@ export function inferChartGeometry(input: GeometryInput): ChartGeometry {
   if (/area|cumulative|mrr/.test(intent)) {
     rules.push("geometry:area");
     return { panelType: "cartesian", markType: "area", rules };
+  }
+
+  if (xCardinality != null && xCardinality > HIGH_CARDINALITY_BAR) {
+    rules.push("geometry:high-cardinality-horizontal-bar");
+    return {
+      panelType: "cartesian",
+      markType: "bar",
+      orientation: "horizontal",
+      rules,
+    };
   }
 
   rules.push("geometry:nominal-bar");
