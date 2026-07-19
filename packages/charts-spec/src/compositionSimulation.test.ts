@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   runCompositionSimulations,
@@ -45,10 +45,14 @@ describe("composition simulation (RFC-002 feasibility)", () => {
     }
   });
 
-  it("writes simulation report for Dashboarder RFC-002", () => {
+  const dashboarderRepo = resolve(import.meta.dirname, "../../../../Dashboarder");
+
+  it.skipIf(!existsSync(dashboarderRepo))(
+    "writes simulation report for Dashboarder RFC-002",
+    () => {
     const dashboarderPath = resolve(
-      import.meta.dirname,
-      "../../../../Dashboarder/docs/charts/rfcs/RFC-002-composition-simulation.md",
+      dashboarderRepo,
+      "docs/charts/rfcs/RFC-002-composition-simulation.md",
     );
     const body = `# RFC-002 composition simulation results
 
@@ -76,7 +80,9 @@ ${summary.gaps
   .map((r) => `- **${r.id}** (${r.description}): today \`${r.outcome}\` → RFC \`${r.rfcRecommendation}\``)
   .join("\n")}
 `;
+    mkdirSync(resolve(dashboarderPath, ".."), { recursive: true });
     writeFileSync(dashboarderPath, body, "utf8");
     expect(summary.gaps.length).toBeGreaterThan(0);
-  });
+  },
+  );
 });
