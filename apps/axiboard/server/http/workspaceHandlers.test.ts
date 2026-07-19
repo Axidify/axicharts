@@ -30,7 +30,7 @@ function sampleWorkspace(): WorkspaceStore {
 }
 
 describe("C163 workspace persistence API", () => {
-  it("GET/POST /api/workspaces and /api/rnd/:slug", async () => {
+  it("GET/POST /api/workspaces", async () => {
     const staticDir = await mkdtemp(path.join(os.tmpdir(), "axiboard-static-"));
     const dataDir = await mkdtemp(path.join(os.tmpdir(), "axiboard-data-"));
     await writeFile(
@@ -67,22 +67,6 @@ describe("C163 workspace persistence API", () => {
 
       const loaded = await fetch(`${base}/api/workspaces`);
       expect(await loaded.json()).toEqual({ ok: true, store: workspace });
-
-      const rndSession = {
-        csv: "Date,Amount\n2026-01-01,10",
-        persona: "manager",
-        followUpIntents: ["show trend"],
-        updatedAt: "2026-07-19T12:00:00.000Z",
-      };
-      const saveRnd = await fetch(`${base}/api/rnd/ledger`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ session: rndSession }),
-      });
-      expect(saveRnd.status).toBe(200);
-
-      const loadRnd = await fetch(`${base}/api/rnd/ledger`);
-      expect(await loadRnd.json()).toEqual({ ok: true, session: rndSession });
     } finally {
       await new Promise<void>((resolve, reject) => {
         server.close((error) => (error ? reject(error) : resolve()));

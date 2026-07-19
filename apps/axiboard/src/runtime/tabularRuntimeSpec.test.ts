@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createDefaultDashboard, parseDashboardSpec, parseRuntimeSpec, serializeRuntimeSpec } from "@axicharts/charts-runtime";
 import { buildTabularRuntimeSpec } from "./tabularRuntimeSpec";
 import type { OrchestratorChatResult } from "../api/orchestratorClient";
 
@@ -31,7 +32,9 @@ const samplePlan = {
       validationIssues: [],
     },
   ],
-  decisions: [],
+  decisions: [
+    { step: "L1 Profile", api: "profileTabular", status: "ok", notes: "3 fields" },
+  ],
   dataProfile: { fields: [] },
   persona: "manager",
   vertical: "ledger",
@@ -42,14 +45,32 @@ const samplePlan = {
   llm: { used: false },
 } as OrchestratorChatResult;
 
+const sourceCsv = "Date,Amount\n2026-01-01,10";
+
 describe("buildTabularRuntimeSpec", () => {
   it("maps orchestrator result to panels runtime spec", () => {
-    const spec = buildTabularRuntimeSpec(samplePlan, "Date,Amount\n2026-01-01,10");
+    const spec = buildTabularRuntimeSpec(samplePlan, sourceCsv);
     expect(spec.layout).toBe("panels");
     if (spec.layout !== "panels") return;
     expect(spec.panels.vertical).toBe("ledger");
     expect(spec.panels.sourceCsv).toContain("Date,Amount");
     expect(spec.panels.kpis).toHaveLength(1);
     expect(spec.panels.charts).toHaveLength(1);
+    expect(spec.panels.decisions).toHaveLength(1);
+  });
+
+  it("round-trips through workspace spec JSON", () => {
+    const spec = buildTabularRuntimeSpec(samplePlan, sourceCsv);
+    const dashboard = createDefaultDashboard("Ledger", spec);
+    const parsed = parseDashboardSpec(dashboard);
+    expect(parsed.layout).toBe("panels");
+    if (parsed.layout !== "panels") return;
+    expect(parsed.panels.sourceCsv).toBe(sourceCsv);
+    expect(parsed.panels.decisions).toEqual(spec.panels.decisions);
+    expect(parsed.panels.kpis).toHaveLength(1);
+    expect(parsed.panels.charts).toHaveLength(1);
+
+    const reloaded = parseRuntimeSpec(serializeRuntimeSpec(spec));
+    expect(reloaded.layout).toBe("panels");
   });
 });

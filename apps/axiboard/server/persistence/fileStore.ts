@@ -1,12 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { WorkspaceStore } from "@axicharts/charts-runtime/workspace";
-import {
-  createEmptyPersistence,
-  type AxiboardPersistence,
-  type RndSession,
-  type RndSlug,
-} from "./types";
+import { createEmptyPersistence, type AxiboardPersistence } from "./types";
 import { isAxiboardPersistence } from "./validate";
 
 const STATE_FILE = "state.json";
@@ -61,17 +56,6 @@ export class AxiboardFileStore {
   async saveWorkspace(store: WorkspaceStore): Promise<void> {
     await this.load();
     this.state.workspace = store;
-    await this.persist();
-  }
-
-  async getRndSession(slug: RndSlug): Promise<RndSession | null> {
-    const state = await this.load();
-    return state.rnd[slug] ?? null;
-  }
-
-  async saveRndSession(slug: RndSlug, session: RndSession): Promise<void> {
-    await this.load();
-    this.state.rnd[slug] = session;
     await this.persist();
   }
 }

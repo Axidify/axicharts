@@ -264,6 +264,27 @@ function validatePanelsDashboard(
     });
   }
 
+  const decisions: PanelsDashboardSpec["decisions"] = [];
+  if (Array.isArray(raw.decisions)) {
+    raw.decisions.forEach((entry, index) => {
+      if (!isRecord(entry)) {
+        errors.push(issue(`${path}.decisions[${index}]`, "decision must be an object"));
+        return;
+      }
+      if (typeof entry.step !== "string" || typeof entry.api !== "string") {
+        errors.push(issue(`${path}.decisions[${index}]`, "decision step and api are required"));
+        return;
+      }
+      decisions.push({
+        step: entry.step,
+        api: entry.api,
+        intent: typeof entry.intent === "string" ? entry.intent : undefined,
+        status: typeof entry.status === "string" ? entry.status : "ok",
+        notes: typeof entry.notes === "string" ? entry.notes : "",
+      });
+    });
+  }
+
   return {
     version: typeof raw.version === "string" ? raw.version : undefined,
     title: typeof raw.title === "string" ? raw.title : undefined,
@@ -272,6 +293,7 @@ function validatePanelsDashboard(
     mode: raw.mode as PanelsDashboardSpec["mode"],
     vertical: typeof raw.vertical === "string" ? raw.vertical : undefined,
     sourceCsv: typeof raw.sourceCsv === "string" ? raw.sourceCsv : undefined,
+    decisions: decisions.length > 0 ? decisions : undefined,
     kpis,
     charts,
   };

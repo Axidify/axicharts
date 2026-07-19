@@ -14,6 +14,13 @@ export function buildTabularRuntimeSpec(
       mode: "static",
       vertical: plan.vertical,
       sourceCsv,
+      decisions: plan.decisions.map(({ step, api, intent, status, notes }) => ({
+        step,
+        api,
+        intent,
+        status,
+        notes,
+      })),
       kpis: plan.kpis.map(({ questionId, panel, rows }) => ({ questionId, panel, rows })),
       charts: plan.charts.map(({ questionId, panel, rows }) => ({ questionId, panel, rows })),
     },

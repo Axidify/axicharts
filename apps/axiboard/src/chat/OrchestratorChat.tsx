@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type ReactElement } from "react";
 import type { Persona } from "@axicharts/charts-spec";
-import { PersonaSelect } from "../rnd/PersonaSelect";
+import { PersonaSelect } from "../tabular/PersonaSelect";
 import { ByokSettings } from "./ByokSettings";
 
 const buttonStyle = {

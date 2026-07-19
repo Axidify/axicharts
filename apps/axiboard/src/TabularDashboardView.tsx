@@ -3,6 +3,7 @@ import { PanelsDashboard, type PanelsDashboardSpec } from "@axicharts/charts-run
 import type { SavedDashboard } from "@axicharts/charts-runtime/workspace";
 import type { OrchestratorChatResult } from "./api/orchestratorClient";
 import { OrchestratorChat } from "./chat/OrchestratorChat";
+import { DecisionLog } from "./tabular/DecisionLog";
 import { useOrchestratorPlan } from "./hooks/useOrchestratorPlan";
 import { buildTabularRuntimeSpec } from "./runtime/tabularRuntimeSpec";
 
@@ -57,6 +58,7 @@ export function TabularDashboardView({
   }, [result, sourceCsv, meta?.presentation, onPlanUpdate]);
 
   const viewSpec = result ? buildTabularRuntimeSpec(result, sourceCsv).panels : panels;
+  const decisions = result?.decisions ?? panels.decisions ?? [];
 
   return (
     <div>
@@ -95,6 +97,8 @@ export function TabularDashboardView({
       {error ? (
         <div style={{ marginBottom: 12, fontSize: 12, color: "#f87171" }}>{error}</div>
       ) : null}
+
+      <DecisionLog decisions={decisions} />
 
       <PanelsDashboard panels={viewSpec} />
     </div>

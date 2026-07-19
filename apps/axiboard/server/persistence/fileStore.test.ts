@@ -5,7 +5,6 @@ import { WORKSPACE_STORE_VERSION } from "@axicharts/charts-runtime/workspace";
 import type { WorkspaceStore } from "@axicharts/charts-runtime/workspace";
 import { describe, expect, it } from "vitest";
 import { AxiboardFileStore } from "./fileStore";
-import type { RndSession } from "./types";
 
 function sampleWorkspace(): WorkspaceStore {
   return {
@@ -30,7 +29,7 @@ function sampleWorkspace(): WorkspaceStore {
 }
 
 describe("AxiboardFileStore", () => {
-  it("persists workspace and R&D sessions to disk", async () => {
+  it("persists workspace to disk", async () => {
     const dataDir = await mkdtemp(path.join(os.tmpdir(), "axiboard-data-"));
     const store = new AxiboardFileStore(dataDir);
     const workspace = sampleWorkspace();
@@ -38,15 +37,7 @@ describe("AxiboardFileStore", () => {
     await store.saveWorkspace(workspace);
     await expect(store.getWorkspace()).resolves.toEqual(workspace);
 
-    const session: RndSession = {
-      csv: "a,b\n1,2",
-      persona: "executive",
-      followUpIntents: ["kpi"],
-      updatedAt: "2026-07-19T12:00:00.000Z",
-    };
-    await store.saveRndSession("ledger", session);
-
     const reloaded = new AxiboardFileStore(dataDir);
-    await expect(reloaded.getRndSession("ledger")).resolves.toEqual(session);
+    await expect(reloaded.getWorkspace()).resolves.toEqual(workspace);
   });
 });

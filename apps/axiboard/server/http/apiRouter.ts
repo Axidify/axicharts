@@ -13,7 +13,7 @@ export async function handleApiRequest(
     return handleOrchestratorRequest(req, res, pathname);
   }
 
-  if (pathname === "/api/workspaces" || pathname.startsWith("/api/rnd/")) {
+  if (pathname === "/api/workspaces") {
     return handleWorkspaceRequest(req, res, pathname, fileStore);
   }
 

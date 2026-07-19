@@ -4,10 +4,9 @@ import {
   fieldProfilesToDataProfile,
   inferFieldRoles,
   parseTabular,
+  planDashboardFromRows,
   validateCartesianSpec,
 } from "./index";
-import { agentPlanAttendanceDashboard } from "../../../apps/axiboard/src/rnd/agentPlanAttendance";
-import { enrichAttendance } from "../../../apps/axiboard/src/rnd/attendanceEnrich";
 
 const ATTENDANCE_TEXT = `| Employee ID | Name        | Department | Date       | Clock In | Clock Out | Hours | Status  |
 | ----------- | ----------- | ---------- | ---------- | -------- | --------- | ----: | ------- |
@@ -21,12 +20,10 @@ describe("C153 attendance agent integration", () => {
     const rows = parseTabular(ATTENDANCE_TEXT);
     const roles = inferFieldRoles(rows);
 
-    // Was broken: Hours → time, Employee ID → dimension
     expect(roles.find((r) => r.name === "Hours")?.role).toBe("measure");
     expect(roles.find((r) => r.name === "Employee ID")?.role).toBe("identifier");
 
     const profile = fieldProfilesToDataProfile(roles);
-    // Was broken: 0 planner panels
     expect(profile.metrics.length).toBeGreaterThan(0);
 
     const plan = planFromIntent(
@@ -35,12 +32,8 @@ describe("C153 attendance agent integration", () => {
     );
     expect(plan.panels.length).toBeGreaterThan(0);
 
-    const enriched = enrichAttendance(rows)!;
-    expect(enriched.kpis.presentCount).toBe(3);
-    expect(enriched.kpis.leaveCount).toBe(1);
-    expect(enriched.kpis.totalHours).toBeCloseTo(27.2, 1);
-
-    const agent = agentPlanAttendanceDashboard(enriched);
+    const agent = planDashboardFromRows(rows)!;
+    expect(agent.vertical).toBe("attendance");
     expect(agent.kpis.length).toBe(4);
     expect(agent.charts.length).toBeGreaterThanOrEqual(3);
 

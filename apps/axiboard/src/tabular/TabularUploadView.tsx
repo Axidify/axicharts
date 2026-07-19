@@ -1,11 +1,11 @@
-import type { Persona } from "@axicharts/charts-spec";
-import type { OrchestratorChatResult } from "../api/orchestratorClient";
 import { useMemo, useState, type ChangeEvent, type ReactElement } from "react";
-import { Chart, PanelSpecGrid, classifyTabularDomain } from "@axicharts/charts-spec";
+import { Chart, PanelSpecGrid, classifyTabularDomain, parseTabular, type Persona } from "@axicharts/charts-spec";
+import type { OrchestratorChatResult } from "../api/orchestratorClient";
 import { OrchestratorChat } from "../chat/OrchestratorChat";
-import { useRndSession } from "../hooks/useOrchestratorPlan";
+import { useOrchestratorPlan } from "../hooks/useOrchestratorPlan";
+import { DecisionLog } from "./DecisionLog";
+import { DomainConfidenceBanner } from "./DomainConfidenceBanner";
 import { enrichForDisplay, formatDisplaySummary } from "./enrichForDisplay";
-import { parseTabular } from "./parseTabular";
 import { TABULAR_SAMPLES, type TabularSampleId } from "./tabularSamples";
 
 const buttonStyle = {
@@ -26,115 +26,43 @@ const kpiStyle = {
   background: "#111827",
 } as const;
 
-export type TabularRndViewProps = {
-  onExit: () => void;
-  onApply?: (
+export type TabularUploadViewProps = {
+  onCancel: () => void;
+  onApply: (
     plan: OrchestratorChatResult,
     rawText: string,
     persona: Persona,
     followUpIntents: string[],
   ) => void;
   initialCsv?: string;
+  initialPersona?: Persona;
+  initialFollowUpIntents?: string[];
 };
 
-function DomainConfidenceBanner({
-  vertical,
-  confidence,
-  needsReview,
-  signals,
-}: {
-  vertical: string;
-  confidence: number;
-  needsReview: boolean;
-  signals: string[];
-}): ReactElement | null {
-  if (!needsReview) return null;
-
-  return (
-    <div
-      style={{
-        marginBottom: 16,
-        padding: "10px 12px",
-        borderRadius: 8,
-        border: "1px solid #854d0e",
-        background: "#422006",
-        fontSize: 12,
-        color: "#fde68a",
-        lineHeight: 1.5,
-      }}
-    >
-      <strong>Domain review:</strong> classified as <code>{vertical}</code> at{" "}
-      {Math.round(confidence * 100)}% confidence.
-      {signals.length > 0 ? (
-        <>
-          {" "}
-          Signals: {signals.slice(0, 4).join(", ")}.
-        </>
-      ) : null}
-    </div>
-  );
-}
-
-function DecisionLog({ decisions }: { decisions: AgentDecision[] }): ReactElement {
-  return (
-    <div
-      style={{
-        marginBottom: 20,
-        padding: 14,
-        borderRadius: 10,
-        border: "1px solid #334155",
-        background: "#111827",
-        fontSize: 11,
-        color: "#94a3b8",
-        lineHeight: 1.6,
-      }}
-    >
-      <div style={{ fontWeight: 600, color: "#e2e8f0", marginBottom: 8 }}>Agent decisions</div>
-      <ol style={{ margin: 0, paddingLeft: 18 }}>
-        {decisions.map((decision, index) => (
-          <li
-            key={`${decision.step}-${decision.api}-${decision.intent ?? index}-${index}`}
-            style={{ marginBottom: 6 }}
-          >
-            <span style={{ color: "#e2e8f0" }}>{decision.step}</span>
-            {" · "}
-            <code>{decision.api}</code>
-            {decision.intent ? (
-              <>
-                {" · "}
-                <em>{decision.intent}</em>
-              </>
-            ) : null}
-            {" — "}
-            {decision.notes}
-            {decision.status === "needs_review" ? (
-              <span style={{ color: "#fbbf24" }}> (needs review)</span>
-            ) : null}
-          </li>
-        ))}
-      </ol>
-    </div>
-  );
-}
-
-export function TabularRndView({ onExit, onApply, initialCsv }: TabularRndViewProps): ReactElement {
+export function TabularUploadView({
+  onCancel,
+  onApply,
+  initialCsv = "",
+  autoPlan = true,
+  initialPersona,
+  initialFollowUpIntents,
+}: TabularUploadViewProps): ReactElement {
+  const [rawText, setRawText] = useState(initialCsv);
   const [fileError, setFileError] = useState<string | null>(null);
 
   const {
-    rawText,
-    setRawText,
-    hydrated,
     result: agentPlan,
     loading,
     error: orchestratorError,
     persona,
     setPersona,
-    sendMessage,
     followUpIntents,
-  } = useRndSession({
-    slug: "tabular",
-    sampleCsv: initialCsv ?? "",
-    initialFollowUpIntents: [],
+    sendMessage,
+  } = useOrchestratorPlan({
+    csv: rawText,
+    initialPersona,
+    initialFollowUpIntents,
+    autoPlan: true,
   });
 
   const previewDomain = useMemo(() => {
@@ -184,15 +112,15 @@ export function TabularRndView({ onExit, onApply, initialCsv }: TabularRndViewPr
         }}
       >
         <div>
-          <div style={{ fontSize: 16, fontWeight: 700 }}>R&D — Tabular CSV → dashboard</div>
+          <div style={{ fontSize: 16, fontWeight: 700 }}>Upload CSV → dashboard</div>
           <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4, maxWidth: 640 }}>
-            Upload any business table — <code>classifyTabularDomain</code> picks the vertical, then{" "}
-            <code>planDashboardFromRows</code> via <code>/api/orchestrator/chat</code>.
+            Upload any business table — domain is inferred automatically, then the orchestrator
+            plans panels via <code>planDashboardFromRows</code>.
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
           <label style={buttonStyle}>
-            Upload CSV
+            Choose file
             <input
               type="file"
               accept=".csv,.tsv,.txt,text/csv,text/plain"
@@ -211,10 +139,10 @@ export function TabularRndView({ onExit, onApply, initialCsv }: TabularRndViewPr
               {sample.label}
             </button>
           ))}
-          <button type="button" onClick={onExit} style={buttonStyle}>
-            Back to workspace
+          <button type="button" onClick={onCancel} style={buttonStyle}>
+            Cancel
           </button>
-          {onApply && agentPlan && !loading ? (
+          {agentPlan && !loading ? (
             <button
               type="button"
               style={{ ...buttonStyle, borderColor: "#22c55e", color: "#bbf7d0" }}
@@ -254,9 +182,9 @@ export function TabularRndView({ onExit, onApply, initialCsv }: TabularRndViewPr
         <div style={{ marginBottom: 12, fontSize: 12, color: "#f87171" }}>{error}</div>
       ) : null}
 
-      {!hasInput || !hydrated ? (
+      {!hasInput ? (
         <p style={{ fontSize: 13, color: "#94a3b8" }}>
-          Upload a CSV or pick a sample dataset — no vertical picker required.
+          Upload a CSV or pick a sample dataset to start planning.
         </p>
       ) : !agentPlan || loading ? (
         <p style={{ fontSize: 13, color: "#94a3b8" }}>
@@ -287,9 +215,7 @@ export function TabularRndView({ onExit, onApply, initialCsv }: TabularRndViewPr
                 {" · "}
               </>
             ) : null}
-            agent feed <code>{agentPlan.dashboardPlan.feed}</code> · template{" "}
-            <code>{agentPlan.dashboardPlan.template}</code> · vertical{" "}
-            <code>{agentPlan.vertical}</code>
+            vertical <code>{agentPlan.vertical}</code>
           </p>
 
           <DecisionLog decisions={agentPlan.decisions} />
@@ -311,32 +237,6 @@ export function TabularRndView({ onExit, onApply, initialCsv }: TabularRndViewPr
           />
         </>
       )}
-
-      <details style={{ marginTop: 24 }}>
-        <summary style={{ fontSize: 12, color: "#94a3b8", cursor: "pointer" }}>
-          Raw input (R&D)
-        </summary>
-        <textarea
-          value={rawText}
-          onChange={(event) => setRawText(event.target.value)}
-          spellCheck={false}
-          placeholder="Paste tabular data or use Upload CSV above…"
-          style={{
-            marginTop: 8,
-            width: "100%",
-            minHeight: 160,
-            boxSizing: "border-box",
-            padding: 12,
-            borderRadius: 8,
-            background: "#020617",
-            border: "1px solid #334155",
-            color: "#e2e8f0",
-            fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-            fontSize: 11,
-            lineHeight: 1.5,
-          }}
-        />
-      </details>
     </div>
   );
 }

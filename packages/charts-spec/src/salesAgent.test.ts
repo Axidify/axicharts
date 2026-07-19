@@ -4,10 +4,9 @@ import {
   fieldProfilesToDataProfile,
   inferFieldRoles,
   parseTabular,
+  planDashboardFromRows,
   validateCartesianSpec,
 } from "./index";
-import { agentPlanPipelineDashboard } from "../../../apps/axiboard/src/rnd/agentPlanPipeline";
-import { enrichPipeline } from "../../../apps/axiboard/src/rnd/pipelineEnrich";
 
 const PIPELINE_TEXT = `| Opportunity ID | Customer          | Salesperson | Stage       | Value (RM) | Probability | Expected Close | Source          |
 | -------------- | ----------------- | ----------- | ----------- | ---------: | ----------: | -------------- | --------------- |
@@ -35,17 +34,8 @@ describe("C154 sales pipeline agent integration", () => {
     );
     expect(plan.panels.length).toBeGreaterThan(0);
 
-    const enriched = enrichPipeline(rows)!;
-    expect(enriched.kpis.opportunityCount).toBe(5);
-    expect(enriched.kpis.openOpportunities).toBe(4);
-    expect(enriched.kpis.totalPipeline).toBe(558000);
-    expect(enriched.kpis.weightedForecast).toBe(417000);
-    expect(enriched.kpis.wonValue).toBe(68000);
-    expect(
-      enriched.valueBySalesperson.find((r) => r.Salesperson === "Amir")?.value,
-    ).toBe(250000);
-
-    const agent = agentPlanPipelineDashboard(enriched);
+    const agent = planDashboardFromRows(rows)!;
+    expect(agent.vertical).toBe("sales");
     expect(agent.kpis.length).toBe(4);
     expect(agent.charts.length).toBeGreaterThanOrEqual(3);
 

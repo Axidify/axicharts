@@ -162,6 +162,14 @@ export type TabularPanelBlock = {
   rows: Array<Record<string, string | number | boolean>>;
 };
 
+export type TabularPlanDecision = {
+  step: string;
+  api: string;
+  intent?: string;
+  status: string;
+  notes: string;
+};
+
 export type PanelsDashboardSpec = {
   version?: string;
   title?: string;
@@ -171,6 +179,7 @@ export type PanelsDashboardSpec = {
   vertical?: string;
   /** Raw CSV for replan / follow-up chat */
   sourceCsv?: string;
+  decisions?: TabularPlanDecision[];
   kpis: TabularPanelBlock[];
   charts: TabularPanelBlock[];
 };

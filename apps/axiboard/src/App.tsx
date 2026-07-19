@@ -37,7 +37,7 @@ import {
   fetchWorkspaceStore,
   saveWorkspaceStoreToServer,
 } from "./api/workspaceClient";
-import { TabularRndView } from "./rnd/TabularRndView";
+import { TabularUploadView } from "./tabular/TabularUploadView";
 import { TabularDashboardView } from "./TabularDashboardView";
 import type { OrchestratorChatResult } from "./api/orchestratorClient";
 import { buildTabularRuntimeSpec, isPanelsRuntimeSpec } from "./runtime/tabularRuntimeSpec";
@@ -139,7 +139,7 @@ export function App(): ReactElement {
   const [importJson, setImportJson] = useState("");
   const [importFilename, setImportFilename] = useState<string | undefined>();
   const [importPresetId, setImportPresetId] = useState<string | undefined>();
-  const [tabularRndOpen, setTabularRndOpen] = useState(false);
+  const [tabularUploadOpen, setTabularUploadOpen] = useState(false);
   const [tabularEditCsv, setTabularEditCsv] = useState<string | undefined>();
   const [appliedPlan, setAppliedPlan] = useState<DashboardPlan | null>(null);
 
@@ -371,7 +371,7 @@ export function App(): ReactElement {
       setLayout("panels");
       setFeed("static");
       setDirty(false);
-      setTabularRndOpen(false);
+      setTabularUploadOpen(false);
       setTabularEditCsv(undefined);
     },
     [store],
@@ -459,7 +459,7 @@ export function App(): ReactElement {
   const canDeleteDashboard = (activeWorkspace?.dashboards.length ?? 0) > 1;
   const isTabularDashboard = activeSpec?.layout === "panels";
   const showPlannerPanels =
-    !tabularRndOpen &&
+    !tabularUploadOpen &&
     !isTabularDashboard &&
     feed === "static" &&
     layout === "embed" &&
@@ -602,7 +602,7 @@ export function App(): ReactElement {
             type="button"
             onClick={() => {
               setTabularEditCsv(undefined);
-              setTabularRndOpen(true);
+              setTabularUploadOpen(true);
             }}
             style={buttonStyle}
           >
@@ -664,15 +664,17 @@ export function App(): ReactElement {
           onShareWorkspace={handleShareWorkspace}
           onDeleteDashboard={handleDeleteDashboard}
         />
-        <main style={{ flex: 1, padding: 24, maxWidth: tabularRndOpen || isTabularDashboard ? 1200 : presentation ? 1100 : 900 }}>
-          {tabularRndOpen ? (
-            <TabularRndView
-              onExit={() => {
-                setTabularRndOpen(false);
+        <main style={{ flex: 1, padding: 24, maxWidth: tabularUploadOpen || isTabularDashboard ? 1200 : presentation ? 1100 : 900 }}>
+          {tabularUploadOpen ? (
+            <TabularUploadView
+              onCancel={() => {
+                setTabularUploadOpen(false);
                 setTabularEditCsv(undefined);
               }}
               onApply={handleApplyTabularPlan}
               initialCsv={tabularEditCsv}
+              initialPersona={activeDashboard.meta?.persona}
+              initialFollowUpIntents={activeDashboard.meta?.followUpIntents}
             />
           ) : isTabularDashboard && isPanelsRuntimeSpec(activeSpec) ? (
             <TabularDashboardView
@@ -681,7 +683,7 @@ export function App(): ReactElement {
               onPlanUpdate={handleTabularPlanUpdate}
               onEditSource={() => {
                 setTabularEditCsv(activeSpec.panels.sourceCsv);
-                setTabularRndOpen(true);
+                setTabularUploadOpen(true);
               }}
             />
           ) : showPlannerPanels && appliedPlan ? (
