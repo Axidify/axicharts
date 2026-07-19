@@ -2,7 +2,7 @@
 
 import type { ReactElement } from "react";
 import { Dashboard } from "@axicharts/charts-spec";
-import { aggregateSnapshots } from "./aggregateSnapshots";
+import { aggregateSnapshots, mergeDashboardData } from "./aggregateSnapshots";
 import { readAlarms } from "./readAlarms";
 import { RuntimeShell } from "./RuntimeShell";
 import { isLiveDataSource } from "./isLiveDataSource";
@@ -46,10 +46,7 @@ export function DashboardEmbed({
   const mode =
     dashboard.mode ??
     (isLiveDataSource(liveSource) ? "live" : "interactive");
-  const data = {
-    ...(dashboard.data ?? {}),
-    ...snapshot.data,
-  };
+  const data = mergeDashboardData(dashboard.data, snapshot.data);
 
   const fixtureHref =
     singleSource && !multiSources?.length

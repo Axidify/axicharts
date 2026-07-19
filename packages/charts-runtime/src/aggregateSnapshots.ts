@@ -5,6 +5,21 @@ export const EMPTY_SNAPSHOT: DataSourceSnapshot = {
   connection: "idle",
 };
 
+/** Merge feed snapshot over dashboard seed data without wiping static rows on tick 0. */
+export function mergeDashboardData(
+  base: Record<string, unknown> | undefined,
+  incoming: Record<string, unknown>,
+): Record<string, unknown> {
+  if (!base) return incoming;
+  const merged = { ...base, ...incoming };
+  const baseRows = Array.isArray(base.rows) ? base.rows : null;
+  const incomingRows = Array.isArray(incoming.rows) ? incoming.rows : null;
+  if (baseRows && baseRows.length > 0 && (!incomingRows || incomingRows.length === 0)) {
+    merged.rows = baseRows;
+  }
+  return merged;
+}
+
 export function aggregateSnapshots(
   snapshots: Record<string, DataSourceSnapshot>,
   primaryId?: string,

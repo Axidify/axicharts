@@ -8,6 +8,13 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-07-19
+
+### Fixed
+
+- **C147a** — Empty-safe first paint for cartesian panels: loading shell via `ChartContainer` `dataState="loading"` instead of `EMPTY_DATA` throw; static `useDataSource` seeds on first render; `mergeDashboardData` preserves seed rows
+- **C147b** — Planner infers `encoding.x.field` from data profile (`week`/`date`/…) via `inferCategoryFieldFromProfile`, not hardcoded `"time"`
+
 ## [0.4.2] - 2026-07-19
 
 ### Added

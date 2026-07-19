@@ -36,6 +36,7 @@ import {
   DataTable,
   MarkdownPanel,
   EChartsOptionChart,
+  type ChartDataState,
   type AlertItem,
   type PlotSeries,
   type StatTone,
@@ -132,6 +133,7 @@ export type CompileOptions = {
   /** Validate cartesian/blocks panels before compile (default true). */
   validateCartesian?: boolean;
   dataProfile?: import("./types").DataProfile;
+  dataState?: ChartDataState;
 };
 
 function seriesFromEncoding(
@@ -188,6 +190,9 @@ function wrapChart(
       syncId,
       syncFollower,
       ...(liveAnimate != null ? { liveAnimate } : {}),
+      ...(options.dataState && options.dataState !== "ready"
+        ? { dataState: options.dataState }
+        : {}),
     },
     chart,
   );
@@ -218,6 +223,19 @@ function wrapChart(
       spec.title,
     ),
     panel,
+  );
+}
+
+function compileCartesianLoadingShell(
+  spec: PanelSpec,
+  options: CompileOptions,
+  tagTones?: Record<string, SeriesTone>,
+): ReactElement {
+  return wrapChart(
+    spec,
+    createElement("div", { "aria-hidden": true }),
+    { ...options, dataState: "loading" },
+    tagTones,
   );
 }
 
@@ -381,6 +399,9 @@ export function compilePanel(
       }
 
       const cartesian = normalizeToCartesian(resolved);
+      if (rows.length === 0) {
+        return compileCartesianLoadingShell(resolved, options, tagTones);
+      }
       const shouldValidate = options.validateCartesian !== false;
       if (shouldValidate) {
         const validation = validateCartesianSpec(cartesian, {

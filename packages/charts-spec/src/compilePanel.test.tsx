@@ -1062,3 +1062,18 @@ describe("compilePanel echarts escape hatch", () => {
     expect(jsx).toContain('"type":"gauge"');
   });
 });
+
+describe("compilePanel empty data (C147a)", () => {
+  it("does not throw for cartesian panels with no rows", () => {
+    expect(() =>
+      compilePanel(
+        {
+          type: "cartesian",
+          encoding: { x: { field: "week", type: "nominal" } },
+          marks: [{ type: "line", field: "cpu" }],
+        },
+        { rows: [] },
+      ),
+    ).not.toThrow();
+  });
+});

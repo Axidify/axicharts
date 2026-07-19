@@ -5,6 +5,7 @@ import { inferLineCurveForPanel } from "./curveEncodingPlan";
 import { normalizeToCartesian } from "./normalizeToCartesian";
 import { applyVerticalRules } from "./rulePacks/applyVerticalRules";
 import { inferSizeEncodingForPanel } from "./sizeEncodingPlan";
+import { inferCategoryFieldFromProfile } from "./profileInference";
 
 export type PlanPanelsOptions = {
   intent?: string;
@@ -123,6 +124,9 @@ export function planPanelFromMetric(
   const encodingType: PanelSpec["type"] = cartesian ? "cartesian" : inferredType;
   const theme = inferTheme(metric);
   const mode = inferMode(metric);
+  const metricNames =
+    options.allMetrics?.map((m) => m.name) ?? [metric.name];
+  const xField = inferCategoryFieldFromProfile(options.profileFields, metricNames);
 
   const panel: PanelSpec = {
     specVersion: 1,
@@ -131,9 +135,9 @@ export function planPanelFromMetric(
     theme,
     mode,
     encoding: cartesian
-      ? { x: { field: "time", type: "nominal" } }
+      ? { x: { field: xField, type: "nominal" } }
       : {
-          x: { field: "time", type: "nominal" },
+          x: { field: xField, type: "nominal" },
           y: { field: metric.name, type: "quantitative" },
           value: { field: "value", type: "quantitative" },
         },

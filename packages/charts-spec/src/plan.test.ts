@@ -98,6 +98,15 @@ describe("plan", () => {
     expect(panels[0]?.marks?.[0]?.type).toBe("line");
   });
 
+  it("uses profile category field for cartesian x encoding", () => {
+    const panel = planPanelFromMetric(
+      { name: "cpu", unit: "%" },
+      { profileFields: ["week", "cpu", "memory"], allMetrics: [{ name: "cpu" }, { name: "memory" }] },
+    );
+
+    expect(panel.encoding?.x?.field).toBe("week");
+  });
+
   it("infers encoding.color from profile fields for throughput metrics", () => {
     const panel = planPanelFromMetric(
       { name: "throughput", unit: "req/min" },

@@ -1,28 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { aggregateSnapshots } from "./aggregateSnapshots";
-import type { DataSourceSnapshot } from "./types";
+import { mergeDashboardData } from "./aggregateSnapshots";
 
-describe("aggregateSnapshots", () => {
-  it("merges data and surfaces the first error", () => {
-    const snapshots: Record<string, DataSourceSnapshot> = {
-      ops: {
-        data: { categories: ["Mon"], cells: [] },
-        connection: "ready",
-        lastUpdatedAt: 100,
-      },
-      finance: {
-        data: { kpis: [{ label: "Revenue", value: "$1M" }] },
-        connection: "error",
-        error: "HTTP 503",
-        lastUpdatedAt: 200,
-      },
-    };
+describe("mergeDashboardData", () => {
+  it("preserves seed rows when incoming snapshot is empty", () => {
+    const merged = mergeDashboardData(
+      { rows: [{ week: "Mon", cpu: 1 }] },
+      {},
+    );
+    expect(merged.rows).toEqual([{ week: "Mon", cpu: 1 }]);
+  });
 
-    const merged = aggregateSnapshots(snapshots, "ops");
-    expect(merged.connection).toBe("error");
-    expect(merged.error).toBe("HTTP 503");
-    expect(merged.data.categories).toEqual(["Mon"]);
-    expect(merged.data.kpis).toBeTruthy();
-    expect(merged.lastUpdatedAt).toBe(200);
+  it("prefers incoming rows when present", () => {
+    const merged = mergeDashboardData(
+      { rows: [{ week: "Mon", cpu: 1 }] },
+      { rows: [{ week: "Tue", cpu: 2 }] },
+    );
+    expect(merged.rows).toEqual([{ week: "Tue", cpu: 2 }]);
   });
 });
