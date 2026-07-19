@@ -10,6 +10,8 @@ import { gridOptions, hiddenTooltip, seriesPalette } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { resolvePieSliceColor } from "./pieSliceColor";
+import { pieGapOptions } from "./pieGapOptions";
+import { pieOuterRadius } from "./pieLayout";
 import type { PieSlice } from "./types";
 
 export type EChartsPieProps = {
@@ -24,16 +26,6 @@ export type EChartsPieProps = {
   graphics?: ChartGraphicElement[];
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
-
-function pieSegmentBorderColor(theme: ChartTheme): string {
-  const dark = theme.name === "live" || theme.name === "industrial";
-  return dark ? "#0f172a" : "#ffffff";
-}
-
-function pieOuterRadius(theme: ChartTheme, innerRadius: number): string | [string, string] {
-  const outer = theme.name === "presentation" ? "72%" : "70%";
-  return innerRadius > 0 ? [`${innerRadius}%`, outer] : outer;
-}
 
 export function EChartsPie({
   width,
@@ -52,7 +44,7 @@ export function EChartsPie({
   const chrome = resolveChartChrome(theme);
   const labelColor = echartsColor(chrome.axis);
   const palette = seriesPalette(theme);
-  const segmentBorder = pieSegmentBorderColor(theme);
+  const gap = pieGapOptions(innerRadius);
 
   const data = slices.map((slice, index) => ({
     name: slice.name,
@@ -71,18 +63,14 @@ export function EChartsPie({
           type: "pie",
           radius: pieOuterRadius(theme, innerRadius),
           center: ["50%", "50%"],
-          padAngle: presentation ? 2.5 : 2,
+          padAngle: gap.padAngle,
           avoidLabelOverlap: true,
           minShowLabelAngle: 8,
           data,
-          itemStyle: {
-            borderColor: segmentBorder,
-            borderWidth: 2,
-            borderRadius: innerRadius > 0 ? 6 : 3,
-          },
+          itemStyle: gap.itemStyle,
           emphasis: {
-            scale: true,
-            scaleSize: presentation ? 8 : 6,
+            scale: !presentation,
+            scaleSize: 6,
             itemStyle: {
               shadowBlur: 10,
               shadowOffsetX: 0,

@@ -58,7 +58,7 @@ export function EChartsPictorialBar({
     itemStyle: {
       color:
         item.color ??
-        toneColor(item.tone, theme) ??
+        (item.tone ? toneColor(item.tone, theme) : undefined) ??
         palette[index % palette.length],
     },
   }));
