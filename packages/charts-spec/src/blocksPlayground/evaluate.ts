@@ -1,4 +1,5 @@
 import { ejectPanel } from "../eject";
+import { asRows } from "../data";
 import { normalizePanelSpec } from "../parseSpec";
 import { normalizeToCartesian } from "../normalizeToCartesian";
 import {
@@ -90,7 +91,8 @@ export function evaluatePlaygroundSpec(
     ? normalizeToCartesian(spec)
     : spec;
 
-  const validation = validateCartesianSpec(panel, { rows });
+  const rowArray = asRows(rows);
+  const validation = validateCartesianSpec(panel, { rows: rowArray });
   if (!validation.ok) {
     return {
       panel,

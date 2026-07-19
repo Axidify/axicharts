@@ -1,4 +1,4 @@
-import type { ChartBlockMarkSpec, ChartMode, DataProfile, PanelSpec, ThemeName } from "./types";
+import type { ChartBlockMarkSpec, ChartBlockSeriesMark, ChartMode, DataProfile, PanelSpec, ThemeName } from "./types";
 import { normalizeToCartesian } from "./normalizeToCartesian";
 
 export type CartesianMarkCatalogEntry = {
@@ -182,7 +182,7 @@ export function createCartesianPanel(
   if (/dual|secondary|right axis|margin/i.test(intent) && marks.length >= 2) {
     matchedRules.push("dual-axis");
     const dataMarks = marks.filter(
-      (mark): mark is Extract<ChartBlockMarkSpec, { type: "line" | "bar" | "area" }> =>
+      (mark): mark is ChartBlockSeriesMark =>
         mark.type === "line" || mark.type === "bar" || mark.type === "area",
     );
     if (dataMarks[1]) dataMarks[1].yAxisId = "right";
@@ -340,7 +340,7 @@ export function reviseCartesianPanel(
   if (/dual|secondary|right axis|margin/i.test(intent) && marks.length >= 2) {
     matchedRules.push("dual-axis");
     const dataMarks = marks.filter(
-      (mark): mark is Extract<ChartBlockMarkSpec, { type: "line" | "bar" | "area" }> =>
+      (mark): mark is ChartBlockSeriesMark =>
         mark.type === "line" || mark.type === "bar" || mark.type === "area",
     );
     if (dataMarks[1]) dataMarks[1].yAxisId = "right";
@@ -349,9 +349,10 @@ export function reviseCartesianPanel(
   if (/change.*line|switch.*line|as line/i.test(intent) && marks.length > 0) {
     matchedRules.push("mark-type-line");
     const firstData = marks.find(
-      (mark) => mark.type === "bar" || mark.type === "area",
+      (mark): mark is ChartBlockSeriesMark & { type: "bar" | "area" } =>
+        mark.type === "bar" || mark.type === "area",
     );
-    if (firstData && firstData.type !== "line") {
+    if (firstData) {
       const index = marks.indexOf(firstData);
       marks[index] = {
         type: "line",
@@ -365,9 +366,10 @@ export function reviseCartesianPanel(
   if (/change.*bar|switch.*bar|as bar/i.test(intent) && marks.length > 0) {
     matchedRules.push("mark-type-bar");
     const firstData = marks.find(
-      (mark) => mark.type === "line" || mark.type === "area",
+      (mark): mark is ChartBlockSeriesMark & { type: "line" | "area" } =>
+        mark.type === "line" || mark.type === "area",
     );
-    if (firstData && firstData.type !== "bar") {
+    if (firstData) {
       const index = marks.indexOf(firstData);
       marks[index] = {
         type: "bar",

@@ -12,9 +12,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function encodingYToDataMark(item: FieldEncoding): ChartBlockMarkSpec | null {
-  const kind = item.kind ?? "line";
-  const markKind =
-    kind === "bar" ? "bar" : kind === "area" ? "area" : "line";
+  const markKind: "line" | "bar" | "area" =
+    item.kind === "bar" ? "bar" : item.kind === "area" ? "area" : "line";
   return {
     type: markKind,
     field: item.field,

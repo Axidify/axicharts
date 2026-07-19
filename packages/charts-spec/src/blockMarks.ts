@@ -6,7 +6,7 @@ import type {
   ThresholdBand,
 } from "@axicharts/charts-canvas";
 import type { LineCurve } from "@axicharts/charts-theme";
-import type { ChartBlockMarkSpec } from "./types";
+import type { ChartBlockMarkSpec, ChartBlockSeriesMark } from "./types";
 import { pluckField } from "./data";
 
 export type BlockMarksChartProps = {
@@ -22,7 +22,7 @@ export type BlockMarksChartProps = {
 
 function resolveStacked(marks: ChartBlockMarkSpec[]): boolean {
   const barMarks = marks.filter(
-    (mark): mark is Extract<ChartBlockMarkSpec, { type: "bar" }> =>
+    (mark): mark is ChartBlockSeriesMark & { type: "bar" } =>
       isSeriesBlockMark(mark) && mark.type === "bar",
   );
   const stackIds = barMarks
@@ -52,7 +52,7 @@ const SERIES_KINDS = new Set(["line", "bar", "area"]);
 
 export function isSeriesBlockMark(
   mark: ChartBlockMarkSpec,
-): mark is Extract<ChartBlockMarkSpec, { type: "line" | "bar" | "area" }> {
+): mark is ChartBlockSeriesMark {
   return SERIES_KINDS.has(mark.type);
 }
 

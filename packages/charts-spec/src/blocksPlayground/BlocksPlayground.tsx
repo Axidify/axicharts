@@ -152,9 +152,11 @@ export function BlocksPlayground({
   const generateFromIntent = useCallback(
     (remapped = false) => {
       const fields =
-        parsedRows.length > 0
+        Array.isArray(parsedRows) && parsedRows.length > 0
           ? Object.keys(parsedRows[0] ?? {})
-          : Object.keys(initial.rows[0] ?? {});
+          : Array.isArray(initial.rows) && initial.rows.length > 0
+            ? Object.keys(initial.rows[0] ?? {})
+            : [];
       applyPlannerResult(createCartesianPanel({ intent, fields }), remapped);
     },
     [applyPlannerResult, initial.rows, intent, parsedRows],

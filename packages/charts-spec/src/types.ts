@@ -16,7 +16,7 @@ export type FieldEncoding = {
   format?: FieldFormat;
   label?: string;
   /** Combo panels — mark kind for this y channel. */
-  kind?: "line" | "bar";
+  kind?: "line" | "bar" | "area";
 };
 
 /** Color channel for per-mark styling (AI / spec compiler). */
@@ -179,6 +179,8 @@ export type PanelSpec = {
   valueSuffix?: string;
   fill?: boolean;
   stacked?: boolean;
+  /** Bar value labels on cartesian/combo panels. */
+  showValues?: boolean;
   innerRadius?: number;
   /**
    * Cartesian building blocks — line/bar/area series plus rule/band overlays.
