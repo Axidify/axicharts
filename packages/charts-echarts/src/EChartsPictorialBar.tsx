@@ -8,6 +8,7 @@ import {
   axisLabelStyle,
   gridOptions,
   hiddenTooltip,
+  isCompactTile,
   reactAxisPointer,
   seriesPalette,
   splitLineStyle,
@@ -63,9 +64,11 @@ export function EChartsPictorialBar({
     },
   }));
 
+  const compact = isCompactTile(width, height);
+
   const option: EChartsOption = withPresentationAnimation(
     {
-      grid: gridOptions(theme),
+      grid: gridOptions(theme, compact),
       tooltip: hiddenTooltip(),
       axisPointer: reactAxisPointer(),
       xAxis: {

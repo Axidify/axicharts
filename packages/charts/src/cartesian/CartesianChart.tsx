@@ -80,6 +80,7 @@ type CartesianPlotProps = {
   chartGraphics: ChartGraphicElement[];
   draggableMarkers: ReturnType<typeof useCartesianAnnotations>["draggableMarkers"];
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
+  compact?: boolean;
 };
 
 function CartesianPlot({
@@ -98,11 +99,12 @@ function CartesianPlot({
   chartGraphics,
   draggableMarkers,
   onMarkerDragEnd,
+  compact = false,
 }: CartesianPlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync();
   const chrome = getInteractionChrome(mode);
-  const showLegend = chrome.showLegend && series.length > 1;
+  const showLegend = chrome.showLegend && series.length > 1 && !compact;
   const legendHeight = getLegendHeight(showLegend, legendVariant);
   const plotHeight = Math.floor(size.height) - legendHeight;
   const valueBounds = useMemo(() => seriesValueBounds(series), [series]);
@@ -289,7 +291,7 @@ export function CartesianChart({
         width: size.width,
         height: size.height,
         position: "relative",
-        overflow: "hidden",
+        overflow: "visible",
       }}
     >
       <CartesianChartShell
@@ -317,6 +319,7 @@ export function CartesianChart({
             chartGraphics={chartGraphics}
             draggableMarkers={annotationProps.draggableMarkers}
             onMarkerDragEnd={onMarkerDragEnd}
+            compact={compact}
           />
         }
       />

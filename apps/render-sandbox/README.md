@@ -23,6 +23,11 @@ Uses monorepo Vite aliases (`scripts/vite-monorepo-aliases.ts`) so edits to `pac
 | Single category | Centering edge case |
 | IoT telemetry grid | Full 2×2 axiboard reproduction |
 | Bar + line combo | Mixed marks in compact height |
+| Dual-axis combo | Right y2 + overlay insets |
+| Bar value labels | `showValues` top padding |
+| Compact bar (60px) | Sparkline-height bars |
+| KPI stat strip (72px) | PanelsDashboard KPI row |
+| Table panel (320px) | Register at dashboard table height |
 
 ## Layout controls
 
@@ -36,4 +41,4 @@ Storybook (`pnpm storybook`) documents individual components with padded layouts
 
 ## Adding scenarios
 
-Edit `src/scenarios.ts` — add a `RenderScenario` with `checks` describing what reviewers should verify.
+See `docs/render-audit.md` for the full issue tracker and GitHub [#9](https://github.com/Axidify/axicharts/issues/9).

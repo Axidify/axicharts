@@ -26,6 +26,11 @@ import {
   ordinalBarGapPx,
   ordinalBarSize,
 } from "./categoricalScale";
+import {
+  drawStackBarTotals,
+  recordStackBarTotal,
+  type StackBarTotal,
+} from "./stackBarTotals";
 import type { PlotSeries } from "./types";
 
 type BarLayout = {
@@ -94,11 +99,13 @@ function buildOptions({
   plotLabels: plotLabelsProp = [],
   plotMarkers: plotMarkersProp = [],
   barLayoutsRef,
+  stackTotalsRef,
   stacked = false,
   showCursor = false,
   useNativeLegend = true,
 }: UPlotBarProps & {
   barLayoutsRef: React.MutableRefObject<BarLayout[]>;
+  stackTotalsRef: React.MutableRefObject<Map<number, StackBarTotal>>;
 }): uPlot.Options {
   const {
     thresholdBands: thresholdBandsResolved,
@@ -117,19 +124,26 @@ function buildOptions({
   });
 
   const chrome = resolveChromeColors(theme);
-  const gridStroke = chromeGridStroke(theme);
+  const compact = height < 72;
+  const gridStroke = chromeGridStroke(theme, compact);
   const gapPx = ordinalBarGapPx(categories.length, theme.bar.gap);
   const stackSeries = shouldStackSeries(stacked, series.length);
+  const showStackTotals = showValues && stackSeries;
   const showBarValues = showValues && !stackSeries;
   const customFills = hasCustomFills(series) && !stackSeries;
   const customSizes = hasCustomSizes(series) && !stackSeries;
   const customMarks = customFills || customSizes;
+  const showLegend = useNativeLegend && series.length > 1;
+  const topPad =
+    (showBarValues || showStackTotals) && !compact ? 18 : compact ? 4 : 8;
 
   return {
     width,
     height,
     class: "axicharts-uplot",
-    padding: categoryChartPadding(width, categories.length),
+    padding: compact
+      ? [topPad, 6, 4, 6]
+      : categoryChartPadding(width, categories.length, false, topPad),
     cursor: {
       show: showCursor,
       x: true,
@@ -138,7 +152,7 @@ function buildOptions({
     },
     legend: { show: useNativeLegend && series.length > 1 },
     scales: {
-      x: categoryXScale(categories.length),
+      x: compact ? { time: false } : categoryXScale(categories.length),
       y: {
         range: (_u, dataMin, dataMax) => {
           const [expandedMin, expandedMax] = expandYRange(
@@ -165,8 +179,8 @@ function buildOptions({
               ? { stroke: gridStroke, width: theme.grid.strokeWidth }
               : { show: false },
             ticks: { show: false },
-            values: axisCategoryValues(categories, width),
-            size: categoryAxisSize(),
+            values: axisCategoryValues(categories, compact ? undefined : width),
+            size: compact ? 0 : categoryAxisSize(),
             font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
             gap: 8,
           },
@@ -176,7 +190,7 @@ function buildOptions({
               ? { stroke: gridStroke, width: theme.grid.strokeWidth }
               : { show: false },
             ticks: { show: false },
-            size: 32,
+            size: compact ? 0 : 32,
             font: theme.values.monospace
               ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
               : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
@@ -214,6 +228,18 @@ function buildOptions({
 
               if (seriesIdx === 1 && idx === 0) {
                 barLayoutsRef.current = [];
+                stackTotalsRef.current.clear();
+              }
+
+              if (showStackTotals) {
+                recordStackBarTotal(
+                  stackTotalsRef.current,
+                  idx,
+                  adjustedLeft,
+                  top,
+                  width,
+                  value,
+                );
               }
 
               if (paintCustom || showBarValues) {
@@ -260,22 +286,34 @@ function buildOptions({
               }
             }
 
-            if (!showBarValues) return;
+            if (!showBarValues && !showStackTotals) return;
 
-            ctx.save();
-            ctx.fillStyle = chrome.axis;
-            ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "bottom";
+            if (showBarValues) {
+              ctx.save();
+              ctx.fillStyle = chrome.axis;
+              ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
+              ctx.textAlign = "center";
+              ctx.textBaseline = "bottom";
 
-            for (const layout of layouts) {
-              const label = formatValue(layout.value, valueSuffix);
-              const x = layout.left + layout.width / 2;
-              const y = layout.top - 4;
-              ctx.fillText(label, x, y);
+              for (const layout of layouts) {
+                const label = formatValue(layout.value, valueSuffix);
+                const x = layout.left + layout.width / 2;
+                const y = layout.top - 4;
+                ctx.fillText(label, x, y);
+              }
+
+              ctx.restore();
             }
 
-            ctx.restore();
+            if (showStackTotals) {
+              drawStackBarTotals(
+                ctx,
+                stackTotalsRef.current,
+                valueSuffix,
+                chrome.axis,
+                formatValue,
+              );
+            }
           },
         }) as (u: uPlot) => void,
       ],
@@ -308,6 +346,7 @@ export function UPlotBar(props: UPlotBarProps): ReactElement {
   const rootRef = useRef<HTMLDivElement>(null);
   const plotRef = useRef<uPlot | null>(null);
   const barLayoutsRef = useRef<BarLayout[]>([]);
+  const stackTotalsRef = useRef<Map<number, StackBarTotal>>(new Map());
   const onCursorRef = useRef(onCursor);
   const onSyncIndexRef = useRef(onSyncIndex);
   const applyingSyncRef = useRef(false);
@@ -315,7 +354,7 @@ export function UPlotBar(props: UPlotBarProps): ReactElement {
   onSyncIndexRef.current = onSyncIndex;
 
   const options = useMemo(() => {
-    const base = buildOptions({ ...props, barLayoutsRef });
+    const base = buildOptions({ ...props, barLayoutsRef, stackTotalsRef });
     if (!showCursor && !onSyncIndexRef.current) {
       return base;
     }
@@ -413,7 +452,7 @@ export function UPlotBar(props: UPlotBarProps): ReactElement {
         width,
         height,
         background: CANVAS_BG,
-        overflow: "hidden",
+        overflow: "visible",
       }}
     />
   );

@@ -73,6 +73,7 @@ export function DataTable({
         <table
           style={{
             width: "100%",
+            tableLayout: "fixed",
             borderCollapse: "collapse",
             fontSize,
           }}
@@ -89,6 +90,8 @@ export function DataTable({
                     fontWeight: 600,
                     padding: cellPadding,
                     borderBottom: `1px solid ${borderColor}`,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -114,6 +117,9 @@ export function DataTable({
                         fontFamily: column.monospace
                           ? "ui-monospace, SFMono-Regular, Menlo, monospace"
                           : undefined,
+                        maxWidth: 0,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
                       }}
                     >

@@ -27,6 +27,11 @@ import {
   ordinalBarGapPx,
   ordinalBarSize,
 } from "./categoricalScale";
+import {
+  drawStackBarTotals,
+  recordStackBarTotal,
+  type StackBarTotal,
+} from "./stackBarTotals";
 import { shouldUseDualAxis } from "./dualAxis";
 import { shouldStackSeries, STACK_GROUP } from "./stack";
 
@@ -48,6 +53,7 @@ function formatValue(value: number, suffix = ""): string {
 export function buildComboOptions(
   props: UPlotComboProps & {
     barLayoutsRef: MutableRefObject<BarLayout[]>;
+    stackTotalsRef: MutableRefObject<Map<number, StackBarTotal>>;
   },
 ): uPlot.Options {
   const {
@@ -70,6 +76,7 @@ export function buildComboOptions(
     plotLabels: plotLabelsProp = [],
     plotMarkers: plotMarkersProp = [],
     barLayoutsRef,
+    stackTotalsRef,
     showCursor = false,
     useNativeLegend = true,
   } = props;
@@ -91,7 +98,8 @@ export function buildComboOptions(
   });
 
   const chrome = resolveChromeColors(theme);
-  const gridStroke = chromeGridStroke(theme);
+  const compact = height < 72;
+  const gridStroke = chromeGridStroke(theme, compact);
   const gapPx = ordinalBarGapPx(categories.length, theme.bar.gap);
   const fillOpacity = theme.area.fillOpacity;
   const annotateY =
@@ -100,14 +108,20 @@ export function buildComboOptions(
     extraY.length > 0;
   const barCount = series.filter((item) => item.kind === "bar").length;
   const stackBars = shouldStackSeries(stacked, barCount);
+  const showStackTotals = showValues && stackBars;
   const showBarValues = showValues && !stackBars;
   const useDualAxis = stackBars ? false : shouldUseDualAxis(series, dualAxis);
+  const showLegend = useNativeLegend && series.length > 1;
+  const topPad =
+    (showBarValues || showStackTotals) && !compact ? 18 : compact ? 4 : 8;
 
   return {
     width,
     height,
     class: "axicharts-uplot",
-    padding: categoryChartPadding(width, categories.length, useDualAxis),
+    padding: compact
+      ? [topPad, 6, 4, 6]
+      : categoryChartPadding(width, categories.length, useDualAxis, topPad),
     cursor: {
       show: showCursor,
       x: true,
@@ -116,7 +130,7 @@ export function buildComboOptions(
     },
     legend: { show: useNativeLegend && series.length > 1 },
     scales: {
-      x: categoryXScale(categories.length),
+      x: compact ? { time: false } : categoryXScale(categories.length),
       y: useDualAxis
         ? annotateY
           ? {
@@ -170,8 +184,8 @@ export function buildComboOptions(
               ? { stroke: gridStroke, width: theme.grid.strokeWidth }
               : { show: false },
             ticks: { show: false },
-            values: axisCategoryValues(categories, width),
-            size: categoryAxisSize(),
+            values: axisCategoryValues(categories, compact ? undefined : width),
+            size: compact ? 0 : categoryAxisSize(),
             font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
             gap: 8,
           },
@@ -181,7 +195,7 @@ export function buildComboOptions(
               ? { stroke: gridStroke, width: theme.grid.strokeWidth }
               : { show: false },
             ticks: { show: false },
-            size: 32,
+            size: compact ? 0 : 32,
             font: theme.values.monospace
               ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
               : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
@@ -195,7 +209,7 @@ export function buildComboOptions(
                   stroke: chrome.axis,
                   grid: { show: false },
                   ticks: { show: false },
-                  size: 32,
+                  size: compact ? 0 : 32,
                   font: theme.values.monospace
                     ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
                     : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
@@ -232,6 +246,17 @@ export function buildComboOptions(
                   (u.data[seriesIdx] as number[] | undefined)?.[idx] ?? 0;
                 if (seriesIdx === 1 && idx === 0) {
                   barLayoutsRef.current = [];
+                  stackTotalsRef.current.clear();
+                }
+                if (showStackTotals) {
+                  recordStackBarTotal(
+                    stackTotalsRef.current,
+                    idx,
+                    left,
+                    top,
+                    barWidth,
+                    value,
+                  );
                 }
                 if (showBarValues) {
                   barLayoutsRef.current.push({
@@ -282,24 +307,35 @@ export function buildComboOptions(
           labels: plotLabels,
           markers: plotMarkers,
           categories,
-          onDraw: showBarValues
+          onDraw: showBarValues || showStackTotals
             ? (u) => {
                 const ctx = u.ctx;
-                ctx.save();
-                ctx.fillStyle = chrome.axis;
-                ctx.font = theme.values.monospace
-                  ? "10px ui-monospace, SFMono-Regular, Menlo, monospace"
-                  : "10px ui-sans-serif, system-ui, -apple-system, sans-serif";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "bottom";
-                for (const layout of barLayoutsRef.current) {
-                  ctx.fillText(
-                    formatValue(layout.value, valueSuffix),
-                    layout.left + layout.width / 2,
-                    layout.top - 4,
+                if (showBarValues) {
+                  ctx.save();
+                  ctx.fillStyle = chrome.axis;
+                  ctx.font = theme.values.monospace
+                    ? "10px ui-monospace, SFMono-Regular, Menlo, monospace"
+                    : "10px ui-sans-serif, system-ui, -apple-system, sans-serif";
+                  ctx.textAlign = "center";
+                  ctx.textBaseline = "bottom";
+                  for (const layout of barLayoutsRef.current) {
+                    ctx.fillText(
+                      formatValue(layout.value, valueSuffix),
+                      layout.left + layout.width / 2,
+                      layout.top - 4,
+                    );
+                  }
+                  ctx.restore();
+                }
+                if (showStackTotals) {
+                  drawStackBarTotals(
+                    ctx,
+                    stackTotalsRef.current,
+                    valueSuffix,
+                    chrome.axis,
+                    formatValue,
                   );
                 }
-                ctx.restore();
               }
             : undefined,
         }) as (u: uPlot) => void,
@@ -333,6 +369,7 @@ export function UPlotCombo(props: UPlotComboProps): ReactElement {
   const rootRef = useRef<HTMLDivElement>(null);
   const plotRef = useRef<uPlot | null>(null);
   const barLayoutsRef = useRef<BarLayout[]>([]);
+  const stackTotalsRef = useRef<Map<number, StackBarTotal>>(new Map());
   const onCursorRef = useRef(onCursor);
   const onSyncIndexRef = useRef(onSyncIndex);
   const applyingSyncRef = useRef(false);
@@ -340,7 +377,7 @@ export function UPlotCombo(props: UPlotComboProps): ReactElement {
   onSyncIndexRef.current = onSyncIndex;
 
   const options = useMemo(() => {
-    const base = buildComboOptions({ ...props, barLayoutsRef });
+    const base = buildComboOptions({ ...props, barLayoutsRef, stackTotalsRef });
     if (!showCursor && !onSyncIndexRef.current) {
       return base;
     }
@@ -438,7 +475,7 @@ export function UPlotCombo(props: UPlotComboProps): ReactElement {
         width,
         height,
         background: CANVAS_BG,
-        overflow: "hidden",
+        overflow: "visible",
       }}
     />
   );

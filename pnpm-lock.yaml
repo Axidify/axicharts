@@ -870,6 +870,9 @@ importers:
       '@axicharts/charts':
         specifier: workspace:*
         version: link:../charts
+      '@axicharts/charts-andon':
+        specifier: workspace:*
+        version: link:../charts-andon
       '@axicharts/charts-canvas':
         specifier: workspace:*
         version: link:../charts-canvas
@@ -885,6 +888,9 @@ importers:
       '@axicharts/charts-sankey':
         specifier: workspace:*
         version: link:../charts-sankey
+      '@axicharts/charts-tank':
+        specifier: workspace:*
+        version: link:../charts-tank
       '@axicharts/charts-theme':
         specifier: workspace:*
         version: link:../charts-theme
@@ -895,9 +901,6 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1(ajv@8.20.0)
     devDependencies:
-      '@axicharts/charts-tank':
-        specifier: workspace:*
-        version: link:../charts-tank
       '@napi-rs/canvas':
         specifier: ^1.0.2
         version: 1.0.2

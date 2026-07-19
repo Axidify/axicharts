@@ -3,6 +3,8 @@ import { cleanTheme } from "@axicharts/charts-theme";
 import { buildComboOptions } from "./UPlotCombo";
 
 describe("UPlotCombo", () => {
+  const stackTotalsRef = { current: new Map() };
+
   it("assigns bar paths to bar series and line paths to line series", () => {
     const barLayoutsRef = { current: [] as never[] };
     const options = buildComboOptions({
@@ -15,6 +17,7 @@ describe("UPlotCombo", () => {
       ],
       theme: cleanTheme,
       barLayoutsRef,
+      stackTotalsRef,
     });
 
     const barSeries = options.series?.[1];
@@ -39,6 +42,7 @@ describe("UPlotCombo", () => {
       theme: cleanTheme,
       dualAxis: true,
       barLayoutsRef,
+      stackTotalsRef,
     });
 
     expect(options.scales?.y2).toBeDefined();
@@ -61,12 +65,45 @@ describe("UPlotCombo", () => {
       theme: cleanTheme,
       stacked: true,
       barLayoutsRef,
+      stackTotalsRef,
     });
 
     expect(options.series?.[1]?.stack).toBeDefined();
     expect(options.series?.[2]?.stack).toBeDefined();
     expect(options.series?.[3]?.stack).toBeUndefined();
     expect(options.scales?.y2).toBeUndefined();
+  });
+
+  it("uses compact padding when height is below 72px", () => {
+    const barLayoutsRef = { current: [] as never[] };
+    const options = buildComboOptions({
+      width: 200,
+      height: 60,
+      categories: ["A", "B"],
+      series: [{ name: "count", kind: "bar", data: [3, 1] }],
+      theme: cleanTheme,
+      barLayoutsRef,
+      stackTotalsRef,
+    });
+
+    expect(options.padding).toEqual([4, 6, 4, 6]);
+    expect(options.axes?.[0]?.size).toBe(0);
+  });
+
+  it("reserves top padding when showValues is enabled", () => {
+    const barLayoutsRef = { current: [] as never[] };
+    const options = buildComboOptions({
+      width: 320,
+      height: 200,
+      categories: ["Online", "Warning"],
+      series: [{ name: "count", kind: "bar", data: [3, 1] }],
+      theme: cleanTheme,
+      showValues: true,
+      barLayoutsRef,
+      stackTotalsRef,
+    });
+
+    expect(options.padding?.[0]).toBeGreaterThanOrEqual(18);
   });
 
   it("uses padded ordinal x scale for categorical charts", () => {
@@ -78,6 +115,7 @@ describe("UPlotCombo", () => {
       series: [{ name: "count", kind: "bar", data: [3, 1] }],
       theme: cleanTheme,
       barLayoutsRef,
+      stackTotalsRef,
     });
 
     expect(options.scales?.x?.range?.(null as never, 0, 1)).toEqual([-0.5, 1.5]);

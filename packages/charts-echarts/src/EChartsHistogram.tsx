@@ -8,6 +8,7 @@ import {
   axisLabelStyle,
   gridOptions,
   hiddenTooltip,
+  isCompactTile,
   splitLineStyle,
   seriesPalette,
   toneColor,
@@ -52,10 +53,11 @@ export function EChartsHistogram({
 }: EChartsHistogramProps): ReactElement {
   const palette = seriesPalette(theme);
   const color = toneColor(tone, theme) ?? palette[0]!;
+  const compact = isCompactTile(width, height);
 
   const option: EChartsOption = withPresentationAnimation(
     {
-    grid: gridOptions(theme),
+    grid: gridOptions(theme, compact),
     tooltip: hiddenTooltip(),
     xAxis: {
       type: "category",

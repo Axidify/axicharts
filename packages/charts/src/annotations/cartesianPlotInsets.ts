@@ -25,9 +25,9 @@ export function resolveCartesianPlotInsets({
   const top = showLegend ? 28 : 8;
   return {
     top,
-    right: 14,
+    right: dualAxis ? 48 : 14,
     bottom: 8,
-    left: dualAxis ? 48 : 14,
+    left: 14,
   };
 }
 

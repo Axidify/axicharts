@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { isValidElement, type ReactElement } from "react";
 import { render, waitFor } from "@testing-library/react";
 import { registerBuiltinChartTypes, getChartType } from "@axicharts/charts/registry";
-import { registerTankChart } from "@axicharts/charts-tank";
 import {
   SAMPLE_DRILL_VALUES,
   SAMPLE_US_HIERARCHY,
@@ -16,7 +15,6 @@ import { ejectPanel } from "./eject";
 describe("compilePanel registered types", () => {
   it("compiles community plugin panels via registerChartType", () => {
     registerBuiltinChartTypes();
-    registerTankChart();
 
     const panel = compilePanel(
       {

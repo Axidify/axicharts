@@ -424,7 +424,7 @@ export function UPlotLine(props: UPlotLineProps): ReactElement {
         width,
         height,
         background: CANVAS_BG,
-        overflow: "hidden",
+        overflow: "visible",
       }}
     />
   );

@@ -14,7 +14,7 @@ describe("categoricalScale", () => {
 
   it("uses wider bars for few categories", () => {
     expect(ordinalBarSize(2, 1)).toEqual([0.72, 100]);
-    expect(ordinalBarSize(12, 2)).toEqual([0.45, 100]);
+    expect(ordinalBarSize(12, 2)).toEqual([0.48, 100]);
   });
 
   it("adds side padding for compact dashboards", () => {

@@ -8,6 +8,7 @@ import {
   axisLabelStyle,
   gridOptions,
   hiddenTooltip,
+  isCompactTile,
   reactAxisPointer,
   splitLineStyle,
 } from "./themeBridge";
@@ -67,10 +68,11 @@ export function EChartsWaterfall({
   const bridge = buildWaterfallBridge(items, theme);
   const { placeholders, values, colors, labels, connectors, displayValues, isTotals } =
     bridge;
+  const compact = isCompactTile(width, height);
 
   const option: EChartsOption = withPresentationAnimation(
     {
-    grid: gridOptions(theme),
+    grid: gridOptions(theme, compact),
     tooltip: hiddenTooltip(),
     axisPointer: reactAxisPointer(),
     xAxis: {

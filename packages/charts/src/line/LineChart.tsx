@@ -361,7 +361,7 @@ export function LineChart({
         width: size.width,
         height: size.height,
         position: "relative",
-        overflow: "hidden",
+        overflow: "visible",
       }}
     >
       <CartesianChartShell
@@ -413,7 +413,7 @@ export function LineChart({
             position: "absolute",
             width: 1,
             height: 1,
-            overflow: "hidden",
+            overflow: "visible",
             clip: "rect(0 0 0 0)",
           }}
         >
@@ -426,7 +426,7 @@ export function LineChart({
             position: "absolute",
             width: 1,
             height: 1,
-            overflow: "hidden",
+            overflow: "visible",
             clip: "rect(0 0 0 0)",
           }}
         >

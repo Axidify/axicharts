@@ -10,6 +10,23 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.20] - 2026-07-20
+
+### Added
+
+- **render-sandbox** — Stacked bar totals, pie @ 360px, tank + andon plugin scenarios
+- **Storybook** — `Audit/Render` stories for compact dashboard visual CI
+- **docs** — `render-audit.md` tracker for dashboard embed quality (R-001–R-204)
+
+### Fixed
+
+- **charts-canvas** — Stacked bar stack totals when `showValues` is enabled; wider ordinal bars for 9–12 categories; `overflow: visible` on uPlot chart roots
+- **charts** — Legend height parity in compact mode; dual-axis overlay right inset; Stat responsive scaling at 72px; DataTable ellipsis; `ComboPlot` `compact` prop regression
+- **charts-echarts** — Compact tile grid margins via `isCompactTile` (360px axiboard tiles)
+- **charts-spec** — `resolvePanelHeight` plot minimums; `digital` / `status-lamp` compile paths; auto-register `tank` / `andon` in `registerPluginChartTypes`
+
+See [RELEASE-v0.4.20.md](./RELEASE-v0.4.20.md).
+
 ## [0.4.19] - 2026-07-19
 
 ### Added

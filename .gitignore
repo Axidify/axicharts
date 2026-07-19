@@ -13,5 +13,6 @@ test-results
 coverage
 apps/docs/public
 audit-*.png
+!benchmarks/e2e/visual-snapshots/audit-*.png
 .audit-*.png
 grid-cells-audit.png

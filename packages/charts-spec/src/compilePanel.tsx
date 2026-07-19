@@ -13,6 +13,8 @@ import {
   ComboChart,
   CartesianChart,
   Gauge,
+  Digital,
+  StatusLamp,
   HeatmapChart,
   HistogramChart,
   CalendarHeatmapChart,
@@ -91,6 +93,7 @@ import {
   themeWithPanelStyle,
 } from "./panelStyle";
 import { registerPluginChartTypes } from "./registerPluginChartTypes";
+import { resolvePanelHeight } from "./resolvePanelHeight";
 import { assertPanelCategoryEnabled } from "./panelCategories";
 import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
 import { resolveCalendarHeatmapData } from "./calendarEncoding";
@@ -162,7 +165,10 @@ function wrapChart(
     readPanelStyle(spec.props),
   );
   const mode = options.mode ?? spec.mode;
-  const height = options.height ?? spec.height ?? 240;
+  const height = resolvePanelHeight(
+    spec.type,
+    options.height ?? spec.height,
+  );
   const width = options.width ?? spec.width ?? "100%";
   const dark = theme.name === "live" || theme.name === "industrial";
 
@@ -927,6 +933,42 @@ export function compilePanel(
           tone:
             (props.tone as StatTone | undefined) ??
             resolveTagStatTone(tagTones, label),
+        }),
+      );
+    }
+
+    case "digital": {
+      const value =
+        props.value ??
+        rows[0]?.[resolved.encoding?.value?.field ?? "value"] ??
+        "";
+      const label = String(props.label ?? resolved.title ?? "");
+      return wrap(
+        createElement(Digital, {
+          value: value as string | number,
+          label: label || undefined,
+          unit: props.unit as string | undefined,
+          tone: props.tone as StatTone | undefined,
+          surface: props.surface as "light" | "dark" | undefined,
+        }),
+      );
+    }
+
+    case "status-lamp":
+    case "statusLamp": {
+      const rawStatus =
+        props.status ?? rows[0]?.status ?? rows[0]?.[resolved.encoding?.color?.field ?? ""] ?? "idle";
+      const status = String(rawStatus) as
+        | "running"
+        | "stopped"
+        | "fault"
+        | "idle"
+        | "warning";
+      const label = String(props.label ?? resolved.title ?? "");
+      return wrap(
+        createElement(StatusLamp, {
+          status,
+          label: label || undefined,
         }),
       );
     }

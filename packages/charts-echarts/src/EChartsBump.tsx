@@ -8,6 +8,7 @@ import {
   axisLabelStyle,
   gridOptions,
   hiddenTooltip,
+  isCompactTile,
   seriesPalette,
   splitLineStyle,
   toneColor,
@@ -61,12 +62,13 @@ export function EChartsBump({
   const labelStyle = axisLabelStyle(theme);
   const resolvedMaxRank = resolveMaxRank(data, maxRank);
   const labelRoom = showLabels ? Math.min(96, Math.max(56, width * 0.18)) : 16;
+  const grid = gridOptions(theme, isCompactTile(width, height));
 
   const option: EChartsOption = withPresentationAnimation(
     {
       tooltip: hiddenTooltip(),
       grid: {
-        ...gridOptions(theme),
+        ...grid,
         right: labelRoom,
       },
       xAxis: {

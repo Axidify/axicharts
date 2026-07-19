@@ -48,12 +48,16 @@ export function Stat({
     value,
     layout?.mode === "presentation",
   );
+  const plotHeight = layout?.size.height ?? 0;
+  const compactKpi = plotHeight > 0 && plotHeight < 96;
   const resolvedTone =
     resolveTagStatTone(layout?.tagTones, label, tone) ?? tone ?? "neutral";
   const colors = TONE_COLORS[surface];
   const labelColor = surface === "light" ? "#64748b" : "#94a3b8";
   const staleColor = surface === "light" ? "#94a3b8" : "#64748b";
   const hero = layout?.mode === "presentation";
+  const valueFontSize = hero ? 28 : compactKpi ? Math.min(18, Math.max(14, plotHeight * 0.38)) : 20;
+  const labelFontSize = compactKpi ? 10 : 12;
   const descriptor = useMemo(
     () =>
       buildSingleValueA11yDescriptor({
@@ -74,7 +78,7 @@ export function Stat({
       <div>
         <div
           style={{
-            fontSize: hero ? 28 : 20,
+            fontSize: valueFontSize,
             fontWeight: 600,
             lineHeight: 1.2,
             color: stale ? staleColor : colors[resolvedTone],
@@ -88,8 +92,8 @@ export function Stat({
         </div>
         <div
           style={{
-            marginTop: 4,
-            fontSize: 12,
+            marginTop: compactKpi ? 2 : 4,
+            fontSize: labelFontSize,
             color: labelColor,
           }}
         >

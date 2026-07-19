@@ -12,6 +12,7 @@ import {
   axisLabelStyle,
   gridOptions,
   hiddenTooltip,
+  isCompactTile,
   splitLineStyle,
   seriesPalette,
   toneColor,
@@ -189,12 +190,14 @@ export function EChartsViolin({
         ? [{ name: "Distribution", items }]
         : [];
   const categories = violinCategories(groups.length > 0 ? groups : items);
+  const compact = isCompactTile(width, height);
+  const grid = gridOptions(theme, compact);
 
   const option: EChartsOption = withPresentationAnimation(
     {
       grid: {
-        ...gridOptions(theme),
-        top: groups.length > 1 ? 28 : gridOptions(theme).top,
+        ...grid,
+        top: groups.length > 1 ? 28 : grid.top,
       },
       legend:
         groups.length > 1

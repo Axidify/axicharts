@@ -6,7 +6,7 @@ import type { ChartTheme } from "@axicharts/charts-theme";
 import { resolveChartChrome } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { echartsColor } from "./echartsColor";
-import { gridOptions, hiddenTooltip, seriesPalette } from "./themeBridge";
+import { gridOptions, hiddenTooltip, isCompactTile, seriesPalette } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { resolvePieSliceColor } from "./pieSliceColor";
@@ -45,6 +45,7 @@ export function EChartsPie({
   const labelColor = echartsColor(chrome.axis);
   const palette = seriesPalette(theme);
   const gap = pieGapOptions(innerRadius);
+  const compact = isCompactTile(width, height);
 
   const data = slices.map((slice, index) => ({
     name: slice.name,
@@ -56,7 +57,7 @@ export function EChartsPie({
 
   const option: EChartsOption = withPresentationAnimation(
     {
-      grid: gridOptions(theme),
+      grid: gridOptions(theme, compact),
       tooltip: hiddenTooltip(),
       series: [
         {

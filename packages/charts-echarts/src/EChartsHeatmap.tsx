@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
-import { axisLabelStyle, gridOptions, hiddenTooltip, seriesPalette, splitLineStyle } from "./themeBridge";
+import { axisLabelStyle, gridOptions, hiddenTooltip, isCompactTile, seriesPalette, splitLineStyle } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { HeatmapMatrix } from "./types";
@@ -137,11 +137,13 @@ export function EChartsHeatmap({
     brushRange,
     matrix.xCategories.length,
   );
+  const compact = isCompactTile(width, height);
+  const grid = gridOptions(theme, compact);
 
   const option: EChartsOption = withPresentationAnimation(
     {
     grid: {
-      ...gridOptions(theme),
+      ...grid,
       bottom: 40,
     },
     tooltip: hiddenTooltip(),

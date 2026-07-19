@@ -48,6 +48,33 @@ const VISUAL_STORIES = [
     name: "mockup-g-api-latency",
     waitFor: ".axicharts-uplot",
   },
+  {
+    id: "audit-render--iot-dashboard-grid",
+    name: "audit-iot-dashboard-grid",
+    waitFor: ".axicharts-uplot",
+    settleMs: 2000,
+    maxDiffPixelRatio: 0.04,
+  },
+  {
+    id: "audit-render--compact-pie-tile",
+    name: "audit-compact-pie-tile",
+    waitFor: "canvas",
+    settleMs: 2000,
+  },
+  {
+    id: "audit-render--stacked-bar-totals",
+    name: "audit-stacked-bar-totals",
+    waitFor: ".axicharts-uplot",
+    settleMs: 2000,
+    maxDiffPixelRatio: 0.04,
+  },
+  {
+    id: "audit-render--industrial-primitives",
+    name: "audit-industrial-primitives",
+    waitFor: "text=Spindle",
+    settleMs: 1500,
+    maxDiffPixelRatio: 0.05,
+  },
 ] as const;
 
 /** Fixed viewport clip — avoids 1–3px height drift between macOS baselines and Linux CI. */

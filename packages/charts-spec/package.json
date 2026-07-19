@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-spec",
-  "version": "0.4.19",
+  "version": "0.4.20",
   "description": "Layer 2 panel spec compiler and vertical templates for AxiCharts.",
   "license": "MIT",
   "repository": {
@@ -62,8 +62,8 @@
     "./schema/data-profile.schema.json": "./schema/data-profile.schema.json"
   },
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/planning.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --clean",
-    "dev": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/planning.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --watch",
+    "build": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/planning.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --external @axicharts/charts-tank --external @axicharts/charts-andon --clean",
+    "dev": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/planning.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --external @axicharts/charts-tank --external @axicharts/charts-andon --watch",
     "test": "vitest run",
     "export:schemas": "node scripts/export-schemas.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
@@ -74,6 +74,8 @@
     "@axicharts/charts-geo": "workspace:*",
     "@axicharts/charts-map": "workspace:*",
     "@axicharts/charts-sankey": "workspace:*",
+    "@axicharts/charts-tank": "workspace:*",
+    "@axicharts/charts-andon": "workspace:*",
     "@axicharts/charts-theme": "workspace:*",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
@@ -85,12 +87,13 @@
     "@axicharts/charts-geo": "workspace:*",
     "@axicharts/charts-map": "workspace:*",
     "@axicharts/charts-sankey": "workspace:*",
+    "@axicharts/charts-tank": "workspace:*",
+    "@axicharts/charts-andon": "workspace:*",
     "@axicharts/charts-theme": "workspace:*",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1"
   },
   "devDependencies": {
-    "@axicharts/charts-tank": "workspace:*",
     "@testing-library/react": "^16.2.0",
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",

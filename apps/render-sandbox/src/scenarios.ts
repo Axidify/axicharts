@@ -287,6 +287,295 @@ export const RENDER_SCENARIOS: RenderScenario[] = [
       },
     ],
   },
+  {
+    id: "dual-axis-combo",
+    group: "Mixed marks",
+    title: "Dual-axis combo",
+    description:
+      "Bar + line on separate y scales — overlay insets should align with right-axis padding.",
+    tags: ["combo", "dual-axis", "regression"],
+    checks: [
+      "Right y-axis labels not clipped",
+      "Bar and line both visible in 360px tile",
+      "No overlay misalignment on graphics/markers",
+    ],
+    defaultLayout: { columns: 1, chartHeight: 280, containerWidth: 360 },
+    panels: [
+      {
+        title: "Volume vs trend",
+        panel: {
+          type: "combo",
+          title: "Volume vs trend",
+          theme: "clean",
+          mode: "static",
+          encoding: {
+            x: { field: "week", type: "nominal" },
+            y: [
+              { field: "total", label: "Weekly total", kind: "bar" },
+              { field: "avg", label: "Daily avg", kind: "line" },
+            ],
+          },
+          props: { dualAxis: true, showValues: true },
+        },
+        rows: [
+          { week: "W1", total: 1200, avg: 17 },
+          { week: "W2", total: 900, avg: 13 },
+          { week: "W3", total: 1500, avg: 21 },
+          { week: "W4", total: 1100, avg: 16 },
+        ],
+      },
+    ],
+  },
+  {
+    id: "bar-show-values",
+    group: "Categorical bars",
+    title: "Bar value labels",
+    description: "showValues draws above bars — needs top padding so labels are not clipped.",
+    tags: ["bar", "showValues", "regression"],
+    checks: [
+      "Numeric labels visible above each bar",
+      "Labels not clipped by chart overflow",
+    ],
+    defaultLayout: { columns: 1, chartHeight: 280, containerWidth: 360 },
+    panels: [
+      {
+        title: "Devices by status",
+        panel: {
+          ...barPanel("Devices by status", "Status", "count"),
+          props: { showValues: true },
+        },
+        rows: IOT_ROWS,
+      },
+    ],
+  },
+  {
+    id: "compact-bar-sparkline",
+    group: "Compact layouts",
+    title: "Compact bar (60px)",
+    description: "Sparkline-height bar chart — axes hidden, plot uses full height.",
+    tags: ["bar", "compact", "sparkline"],
+    checks: [
+      "No x/y axis chrome consuming height",
+      "Bars fill the short plot area",
+    ],
+    defaultLayout: { columns: 1, chartHeight: 60, containerWidth: 200 },
+    panels: [
+      {
+        title: "Status sparkline",
+        panel: barPanel("Status sparkline", "Status", "count"),
+        rows: IOT_ROWS,
+      },
+    ],
+  },
+  {
+    id: "kpi-stat-strip",
+    group: "Compact layouts",
+    title: "KPI stat strip (72px)",
+    description: "Matches PanelsDashboard KPI height — value and label should fit without overflow.",
+    tags: ["stat", "kpi", "dashboard"],
+    checks: [
+      "Value and label both visible",
+      "Font scales down for 72px height",
+      "Long values like 31.7 do not clip",
+    ],
+    defaultLayout: { columns: 4, chartHeight: 72, containerWidth: 760 },
+    panels: [
+      {
+        title: "Devices",
+        panel: {
+          type: "stat",
+          title: "Devices",
+          theme: "clean",
+          mode: "static",
+          props: { value: "4", label: "Devices" },
+        },
+        rows: [],
+      },
+      {
+        title: "Warnings",
+        panel: {
+          type: "stat",
+          title: "Warnings",
+          theme: "clean",
+          mode: "static",
+          props: { value: "1", label: "Warnings", tone: "warning" },
+        },
+        rows: [],
+      },
+      {
+        title: "Avg temp",
+        panel: {
+          type: "stat",
+          title: "Avg temp",
+          theme: "clean",
+          mode: "static",
+          props: { value: "27.0", label: "Avg °C" },
+        },
+        rows: [],
+      },
+      {
+        title: "Peak temp",
+        panel: {
+          type: "stat",
+          title: "Peak temp",
+          theme: "clean",
+          mode: "static",
+          props: { value: "31.7", label: "Peak °C", tone: "warning" },
+        },
+        rows: [],
+      },
+    ],
+  },
+  {
+    id: "stacked-bar-totals",
+    group: "Categorical bars",
+    title: "Stacked bar totals",
+    description: "Stacked bars with showValues — totals should render above each stack.",
+    tags: ["bar", "stacked", "showValues", "regression"],
+    checks: [
+      "Total label above each stacked bar",
+      "Segment labels hidden; only stack total shown",
+      "Labels not clipped by overflow",
+    ],
+    defaultLayout: { columns: 1, chartHeight: 280, containerWidth: 360 },
+    panels: [
+      {
+        title: "Weekly throughput",
+        panel: {
+          type: "cartesian",
+          title: "Weekly throughput",
+          theme: "clean",
+          mode: "static",
+          encoding: {
+            x: { field: "week", type: "nominal" },
+            y: [
+              { field: "online", label: "Online", kind: "bar" },
+              { field: "warning", label: "Warning", kind: "bar" },
+            ],
+          },
+          marks: [
+            { type: "bar", field: "online", label: "Online", tone: "success" },
+            { type: "bar", field: "warning", label: "Warning", tone: "warning" },
+          ],
+          props: { stacked: true, showValues: true },
+        },
+        rows: [
+          { week: "W1", online: 80, warning: 20 },
+          { week: "W2", online: 60, warning: 30 },
+          { week: "W3", online: 90, warning: 10 },
+        ],
+      },
+    ],
+  },
+  {
+    id: "pie-compact-tile",
+    group: "ECharts compact",
+    title: "Pie at 360px",
+    description: "ECharts pie in axiboard tile width with compact grid margins.",
+    tags: ["pie", "echarts", "compact"],
+    checks: [
+      "Slice labels not clipped at tile edge",
+      "Chart centered in 360px tile",
+    ],
+    defaultLayout: { columns: 1, chartHeight: 280, containerWidth: 360 },
+    panels: [
+      {
+        title: "Status mix",
+        panel: {
+          type: "pie",
+          title: "Status mix",
+          theme: "clean",
+          mode: "static",
+          encoding: {
+            name: { field: "Status", type: "nominal" },
+            value: { field: "count", type: "quantitative" },
+          },
+        },
+        rows: IOT_ROWS,
+      },
+    ],
+  },
+  {
+    id: "plugin-industrial",
+    group: "Plugin charts",
+    title: "Tank + andon",
+    description: "Industrial plugin panels auto-registered via compilePanel.",
+    tags: ["tank", "andon", "plugin"],
+    checks: [
+      "Tank level and label visible",
+      "Andon station grid fits compact tile",
+    ],
+    defaultLayout: { columns: 2, chartHeight: 200, containerWidth: 760 },
+    panels: [
+      {
+        title: "Tank level",
+        panel: {
+          type: "tank",
+          title: "Tank level",
+          theme: "industrial",
+          props: { level: 68, label: "Tank 2", warningAt: 75 },
+        },
+        rows: [],
+      },
+      {
+        title: "Line status",
+        panel: {
+          type: "andon",
+          title: "Line status",
+          theme: "industrial",
+          props: {
+            columns: 2,
+            stations: [
+              { id: "st-01", label: "Feeder", status: "ok" },
+              { id: "st-02", label: "Filler", status: "warning", detail: "Low hopper" },
+              { id: "st-03", label: "Capper", status: "ok" },
+              { id: "st-04", label: "Inspector", status: "fault", detail: "Reject high" },
+            ],
+          },
+        },
+        rows: [],
+      },
+    ],
+  },
+  {
+    id: "table-compact",
+    group: "Compact layouts",
+    title: "Table panel (320px)",
+    description: "Device readings table at dashboard table height.",
+    tags: ["table", "dashboard"],
+    checks: [
+      "Column headers readable",
+      "Long device IDs not hard-clipped without scroll",
+      "Horizontal scroll when needed",
+    ],
+    defaultLayout: { columns: 1, chartHeight: 320, containerWidth: 760 },
+    panels: [
+      {
+        title: "Device readings",
+        panel: {
+          type: "table",
+          title: "Device readings",
+          theme: "clean",
+          mode: "static",
+          props: {
+            compact: true,
+            columns: [
+              { key: "Device", label: "Device ID" },
+              { key: "Temperature (°C)", label: "Temp °C", align: "right" },
+              { key: "Battery (%)", label: "Battery", align: "right" },
+              { key: "Status", label: "Status" },
+            ],
+          },
+        },
+        rows: IOT_DEVICES.map((row) => ({
+          Device: row.Device,
+          "Temperature (°C)": row["Temperature (°C)"],
+          "Battery (%)": row["Battery (%)"],
+          Status: row.Device === "DEV003" ? "Warning" : "Online",
+        })),
+      },
+    ],
+  },
 ];
 
 export const SCENARIO_GROUPS = [...new Set(RENDER_SCENARIOS.map((scenario) => scenario.group))];

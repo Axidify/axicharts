@@ -8,6 +8,7 @@ import {
   axisLabelStyle,
   gridOptions,
   hiddenTooltip,
+  isCompactTile,
   reactAxisPointer,
   splitLineStyle,
   upDownColors,
@@ -94,8 +95,9 @@ export function EChartsCandlestick({
   const ohlc = data.map((point) => [point.open, point.close, point.low, point.high]);
   const zoomWindow = resolveZoomWindow(brush, brushStart, brushEnd, followerBrushRange);
   const showZoom = brush || Boolean(followerBrushRange);
+  const grid = gridOptions(theme, isCompactTile(width, height));
   const mainGrid = {
-    ...gridOptions(theme),
+    ...grid,
     ...(showZoom && !volume ? { bottom: 40 } : {}),
   };
   const sessionBands = buildSessionMarkAreas(categories, sessionShading ?? false, theme);
@@ -117,7 +119,7 @@ export function EChartsCandlestick({
               height: showZoom ? "52%" : "58%",
               bottom: showZoom ? "38%" : "32%",
             },
-            { ...gridOptions(theme), top: showZoom ? "68%" : "72%", height: "16%" },
+            { ...grid, top: showZoom ? "68%" : "72%", height: "16%" },
           ]
         : [mainGrid],
       tooltip: hiddenTooltip(),

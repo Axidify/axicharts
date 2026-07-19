@@ -1,5 +1,11 @@
 /** Ordinal / categorical uPlot scale helpers for compact dashboard bar charts. */
 
+export const COMPACT_PLOT_HEIGHT = 72;
+
+export function isCompactPlotHeight(height: number): boolean {
+  return height < COMPACT_PLOT_HEIGHT;
+}
+
 export function categoryXScale(categoryCount: number): {
   time: false;
   range: () => [number, number];
@@ -24,7 +30,10 @@ export function ordinalBarSize(
   if (categoryCount <= 8) {
     return barSeriesCount === 1 ? [0.62, 100] : [0.5, 100];
   }
-  return barSeriesCount === 1 ? [0.55, 100] : [0.45, 100];
+  if (categoryCount <= 12) {
+    return barSeriesCount === 1 ? [0.58, 100] : [0.48, 100];
+  }
+  return barSeriesCount === 1 ? [0.55, 100] : [0.48, 100];
 }
 
 export function ordinalBarGapPx(categoryCount: number, themeBarGap: number): number {
@@ -52,7 +61,7 @@ export function categoryChartPadding(
   }
   const slotWidth = plotWidth / categoryCount;
   const side = Math.min(28, Math.max(14, Math.round(slotWidth * 0.2)));
-  return [topPad, Math.max(right, side), 8, side];
+  return [topPad, Math.max(right, side), 10, side];
 }
 
 export function categorySlotWidth(plotWidth: number, categoryCount: number): number | undefined {

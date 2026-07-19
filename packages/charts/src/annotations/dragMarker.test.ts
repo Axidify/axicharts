@@ -22,12 +22,12 @@ describe("resolveCartesianPlotInsets", () => {
     });
   });
 
-  it("uses dual-axis left inset when requested", () => {
+  it("uses dual-axis right inset when requested", () => {
     expect(resolveCartesianPlotInsets({ height: 240, dualAxis: true })).toEqual({
       top: 8,
-      right: 14,
+      right: 48,
       bottom: 8,
-      left: 48,
+      left: 14,
     });
   });
 });

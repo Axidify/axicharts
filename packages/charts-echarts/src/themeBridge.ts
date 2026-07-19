@@ -5,13 +5,19 @@ import { echartsColor } from "./echartsColor";
 export { toneColor, seriesPalette } from "./palette";
 export type { SeriesTone } from "./types";
 
-export function gridOptions(theme: ChartTheme) {
+/** Dashboard tile (~360px wide or short height) — tighter ECharts grid margins. */
+export function isCompactTile(width?: number, height?: number): boolean {
+  if (width === undefined || height === undefined) return false;
+  return height < 200 || width <= 360;
+}
+
+export function gridOptions(theme: ChartTheme, compact = false) {
   return {
     show: theme.grid.show,
-    left: 8,
-    right: 8,
-    top: 16,
-    bottom: 24,
+    left: compact ? 4 : 8,
+    right: compact ? 4 : 8,
+    top: compact ? 8 : 16,
+    bottom: compact ? 18 : 24,
     containLabel: true,
     borderColor: "transparent",
     backgroundColor: "transparent",

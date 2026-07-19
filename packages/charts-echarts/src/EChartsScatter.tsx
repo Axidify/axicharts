@@ -82,7 +82,7 @@ export function EChartsScatter({
     xLabel,
     yLabel,
   });
-  const baseGrid = gridOptions(theme);
+  const baseGrid = gridOptions(theme, layout.compact);
   const grid = {
     ...baseGrid,
     top: layout.gridTop,

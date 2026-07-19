@@ -98,6 +98,7 @@ type BarPlotProps = {
   selectedCategoryIndex?: number;
   onCategoryClick?: (event: ChartPointerEvent) => void;
   onSeriesClick?: (event: ChartPointerEvent) => void;
+  compact?: boolean;
 };
 
 function BarPlot({
@@ -124,11 +125,12 @@ function BarPlot({
   selectedCategoryIndex,
   onCategoryClick,
   onSeriesClick,
+  compact = false,
 }: BarPlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
   const chrome = getInteractionChrome(mode);
-  const showLegend = chrome.showLegend && series.length > 1;
+  const showLegend = chrome.showLegend && series.length > 1 && !compact;
   const legendHeight = getLegendHeight(showLegend, legendVariant);
   const overviewHeight = brush ? RANGE_OVERVIEW_HEIGHT : 0;
   const plotHeight = Math.floor(size.height) - legendHeight - overviewHeight;
@@ -196,7 +198,7 @@ function BarPlot({
         categories={categories}
         categoryMeta={categoryMeta}
         series={series}
-        compact={false}
+        compact={compact}
         showLegend={showLegend}
         selectedCategoryIndex={selectedCategoryIndex}
         onCategoryClick={onCategoryClick}
@@ -312,7 +314,8 @@ export function BarChart({
     return null;
   }
 
-  const axes = showAxes ?? theme.axis.show;
+  const compact = size.height < 72;
+  const axes = showAxes ?? (theme.axis.show && !compact);
   const plotCategories = prepared.categories;
   const plotSeries = prepared.series;
 
@@ -326,13 +329,14 @@ export function BarChart({
         width: size.width,
         height: size.height,
         position: "relative",
-        overflow: "hidden",
+        overflow: "visible",
       }}
     >
       <CartesianChartShell
         categories={plotCategories}
         series={plotSeries}
         valueSuffix={valueSuffix}
+        compact={compact}
         plotMotionStyle={plotMotionStyle}
         plotKey={motion.plotKey}
         skipPresentationPlotEnter={motion.skipPresentationPlotEnter}
@@ -361,16 +365,17 @@ export function BarChart({
             selectedCategoryIndex={selectedCategoryIndex}
             onCategoryClick={onCategoryClick}
             onSeriesClick={onSeriesClick}
+            compact={compact}
           />
         }
       />
-      {valueSuffix && theme.caption.show ? (
+      {valueSuffix && theme.caption.show && !compact ? (
         <span
           style={{
             position: "absolute",
             width: 1,
             height: 1,
-            overflow: "hidden",
+            overflow: "visible",
             clip: "rect(0 0 0 0)",
           }}
         >
