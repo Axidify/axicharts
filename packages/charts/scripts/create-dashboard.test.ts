@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, realpath, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -24,6 +24,14 @@ describe("create-dashboard scaffold", () => {
   it("parses target dir and default cartesian category", () => {
     expect(parseCreateDashboardArgs(["my-app"])).toEqual({
       targetDir: "my-app",
+      category: "cartesian",
+      preset: null,
+    });
+  });
+
+  it("resolves . to cwd", () => {
+    expect(parseCreateDashboardArgs(["."])).toEqual({
+      targetDir: process.cwd(),
       category: "cartesian",
       preset: null,
     });
@@ -142,5 +150,21 @@ describe("create-dashboard scaffold", () => {
     const files = buildDashboardFiles("demo", "cartesian");
     expect(files["src/global.css"]).toContain("width: min(960px, 100%)");
     expect(files["README.md"]).toContain("category: **cartesian**");
+  });
+
+  it("scaffolds into cwd when target is .", async () => {
+    const dir = await makeTempDir();
+    const originalCwd = process.cwd();
+    process.chdir(dir);
+    try {
+      const result = await scaffoldDashboard(".", "cartesian");
+      expect(await realpath(result.targetDir)).toBe(await realpath(dir));
+      expect(result.files).toContain("package.json");
+      await expect(readFile(path.join(dir, "package.json"), "utf8")).resolves.toContain(
+        "@axicharts/charts",
+      );
+    } finally {
+      process.chdir(originalCwd);
+    }
   });
 });

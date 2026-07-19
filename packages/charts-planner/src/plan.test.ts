@@ -197,6 +197,27 @@ describe("planFromIntent", () => {
 
     expect(plan.template).toBe("saas-growth");
   });
+
+  it("infers encoding.x.field from profile fields (C147b)", () => {
+    const plan = planFromIntent(
+      {
+        metrics: [
+          { name: "cpu", unit: "%" },
+          { name: "memory", unit: "%" },
+        ],
+        fields: ["week", "cpu", "memory"],
+      },
+      "Static CSV snapshot batch report",
+    );
+
+    expect(plan.feed).toBe("static");
+    expect(plan.panels.length).toBeGreaterThan(0);
+    for (const panel of plan.panels) {
+      if (panel.type === "cartesian" || panel.type === "blocks") {
+        expect(panel.encoding?.x?.field).toBe("week");
+      }
+    }
+  });
 });
 
 describe("planFromProfile", () => {

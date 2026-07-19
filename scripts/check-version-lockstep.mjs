@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /**
- * CI gate: @axicharts/charts, charts-core, and charts-theme must share the same version.
+ * CI gate:
+ * - @axicharts/charts, charts-core, and charts-theme share the same version
+ * - @axicharts/charts-planner peers @axicharts/charts-spec at the platform minor
  */
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -14,9 +16,18 @@ const LOCKSTEP = [
   "packages/charts-theme/package.json",
 ];
 
+function readPkg(rel) {
+  return JSON.parse(readFileSync(path.join(root, rel), "utf8"));
+}
+
 function readVersion(rel) {
-  const pkg = JSON.parse(readFileSync(path.join(root, rel), "utf8"));
-  return pkg.version;
+  return readPkg(rel).version;
+}
+
+function parseMinor(version) {
+  const match = /^(\d+)\.(\d+)/.exec(version);
+  if (!match) return null;
+  return `${match[1]}.${match[2]}`;
 }
 
 const versions = LOCKSTEP.map((rel) => ({ rel, version: readVersion(rel) }));
@@ -30,4 +41,34 @@ if (unique.length !== 1) {
   process.exit(1);
 }
 
-console.log(`Version lockstep OK: ${unique[0]} (${LOCKSTEP.length} packages)`);
+const platformVersion = unique[0];
+const platformMinor = parseMinor(platformVersion);
+const specPkg = readPkg("packages/charts-spec/package.json");
+const plannerPkg = readPkg("packages/charts-planner/package.json");
+const specMinor = parseMinor(specPkg.version);
+
+if (platformMinor !== specMinor) {
+  console.error(
+    `Version lockstep check failed — charts-spec (${specPkg.version}) must match platform minor (${platformVersion})`,
+  );
+  process.exit(1);
+}
+
+const plannerPeer = plannerPkg.peerDependencies?.["@axicharts/charts-spec"];
+if (!plannerPeer) {
+  console.error(
+    "Version lockstep check failed — @axicharts/charts-planner must declare peerDependency on @axicharts/charts-spec",
+  );
+  process.exit(1);
+}
+
+if (!plannerPeer.includes(platformMinor)) {
+  console.error(
+    `Version lockstep check failed — charts-planner peer (${plannerPeer}) must include platform minor ${platformMinor} (platform ${platformVersion})`,
+  );
+  process.exit(1);
+}
+
+console.log(
+  `Version lockstep OK: platform ${platformVersion}; spec ${specPkg.version}; planner peer ${plannerPeer}`,
+);

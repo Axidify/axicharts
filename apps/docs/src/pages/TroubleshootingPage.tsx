@@ -96,6 +96,13 @@ const LatencyPanel = dynamic(
           <code>pnpm check:versions</code> in the monorepo; scaffolds pin matching <code>latest</code> on
           both charts packages.
         </p>
+        <p style={{ margin: "12px 0 0", fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
+          <strong>Planner + spec:</strong> install <code>@axicharts/charts-spec</code> at the app level
+          alongside <code>@axicharts/charts-planner</code> — planner peers spec at the platform minor
+          (e.g. planner <code>0.2.1</code> + spec/charts <code>0.4.3+</code>). Two spec versions in{" "}
+          <code>node_modules</code> usually means an outdated planner dependency; upgrade planner or align
+          spec explicitly.
+        </p>
       </section>
 
       <section style={{ ...docCardStyle(), padding: 20, marginBottom: 16, boxShadow: "none" }}>

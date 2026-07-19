@@ -8,6 +8,18 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-07-19
+
+### Fixed
+
+- `create-dashboard` CLI — bin calls `runCreateDashboardCli` explicitly (fixes npx silent no-op); `.` resolves to cwd; success prints file list
+- Planner/spec version split — `@axicharts/charts-planner@0.2.1` peers `@axicharts/charts-spec@^0.4.3` (no nested spec `0.3.52`)
+
+### Changed
+
+- `pnpm check:versions` — planner peer must include platform minor; charts-spec version must match platform
+- Troubleshooting docs — planner + spec version matrix
+
 ## [0.4.3] - 2026-07-19
 
 ### Fixed

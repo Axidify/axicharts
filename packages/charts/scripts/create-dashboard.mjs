@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const CATEGORIES = [
@@ -323,8 +323,11 @@ export function parseCreateDashboardArgs(argv = process.argv.slice(2)) {
     positional.push(arg);
   }
 
+  const rawTarget = positional[0] ?? "axicharts-dashboard";
+  const targetDir = rawTarget === "." ? process.cwd() : rawTarget;
+
   return {
-    targetDir: positional[0] ?? "axicharts-dashboard",
+    targetDir,
     category: preset === "full" ? "full" : preset === "studio" ? "studio" : category,
     preset,
   };
@@ -412,9 +415,10 @@ ${preset === "full"
 
 export async function scaffoldDashboard(targetDir, category = "cartesian", preset = null) {
   const files = buildDashboardFiles(targetDir, category, preset);
-  const resolvedDir = path.resolve(targetDir);
+  const absoluteDir = path.resolve(targetDir);
 
-  await mkdir(resolvedDir, { recursive: true });
+  await mkdir(absoluteDir, { recursive: true });
+  const resolvedDir = await realpath(absoluteDir);
   await mkdir(path.join(resolvedDir, "src"), { recursive: true });
 
   for (const [file, content] of Object.entries(files)) {
@@ -423,13 +427,19 @@ export async function scaffoldDashboard(targetDir, category = "cartesian", prese
     await writeFile(filePath, content);
   }
 
-  return { targetDir, category, preset };
+  return { targetDir: resolvedDir, category, preset, files: Object.keys(files) };
 }
 
-export function formatNextSteps(targetDir, category, preset = null) {
+export function formatNextSteps(targetDir, category, preset = null, files = []) {
+  const fileLines =
+    files.length > 0
+      ? ["", "Files:", ...files.map((file) => `  ${path.join(targetDir, file)}`)]
+      : [];
+
   if (preset === "full") {
     return [
       `Created ${targetDir} (preset: full)`,
+      ...fileLines,
       "Next:",
       `  cd ${targetDir}`,
       "  pnpm install",
@@ -446,6 +456,7 @@ export function formatNextSteps(targetDir, category, preset = null) {
   if (preset === "studio") {
     return [
       `Created ${targetDir} (preset: studio)`,
+      ...fileLines,
       "Next:",
       `  cd ${targetDir}`,
       "  pnpm install",
@@ -459,6 +470,7 @@ export function formatNextSteps(targetDir, category, preset = null) {
 
   return [
     `Created ${targetDir} (${category})`,
+    ...fileLines,
     "Next:",
     `  cd ${targetDir}`,
     "  pnpm install",
@@ -476,18 +488,20 @@ export function formatNextSteps(targetDir, category, preset = null) {
   ].join("\n");
 }
 
+export async function runCreateDashboardCli(argv = process.argv.slice(2)) {
+  const { targetDir, category, preset } = parseCreateDashboardArgs(argv);
+  const result = await scaffoldDashboard(targetDir, category, preset);
+  console.log(formatNextSteps(result.targetDir, category, preset, result.files));
+}
+
 const isMain =
   process.argv[1] &&
   (process.argv[1].endsWith("create-dashboard.mjs") ||
     process.argv[1].endsWith("bin/create-dashboard.mjs"));
 
 if (isMain) {
-  try {
-    const { targetDir, category, preset } = parseCreateDashboardArgs();
-    await scaffoldDashboard(targetDir, category, preset);
-    console.log(formatNextSteps(targetDir, category, preset));
-  } catch (error) {
+  runCreateDashboardCli().catch((error) => {
     console.error(error instanceof Error ? error.message : error);
     process.exitCode = 1;
-  }
+  });
 }

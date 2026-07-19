@@ -641,11 +641,10 @@ importers:
         version: 3.2.7(@types/node@22.20.1)(happy-dom@20.10.6)(jiti@2.7.0)(jsdom@26.1.0(canvas@3.2.3))
 
   packages/charts-planner:
-    dependencies:
+    devDependencies:
       '@axicharts/charts-spec':
         specifier: workspace:*
         version: link:../charts-spec
-    devDependencies:
       '@types/node':
         specifier: ^22.13.10
         version: 22.20.1
