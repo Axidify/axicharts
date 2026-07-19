@@ -39,6 +39,10 @@ export {
   type ChartPointerEvent,
   type ChartSeriesInput,
 } from "../interaction/chartPointerEvent";
+export {
+  isFlatZeroSeries,
+  type CartesianPointerChartProps,
+} from "../interaction/cartesianPointerChartProps";
 export { CategoryClickOverlay } from "../interaction/CategoryClickOverlay";
 export {
   ChartSyncGroup,

@@ -46,17 +46,17 @@ import {
   useLiveCrossfade,
 } from "../motion";
 import { CategoryClickOverlay } from "../interaction/CategoryClickOverlay";
+import { FlatZeroSeriesCaption } from "../interaction/FlatZeroSeriesCaption";
 import {
-  normalizeChartCategories,
-  type ChartCategoryInput,
-  type ChartPointerEvent,
-  type ChartSeriesInput,
-} from "../interaction/chartPointerEvent";
+  isFlatZeroSeries,
+  useCartesianCategoryMeta,
+  type CartesianPointerChartProps,
+} from "../interaction/cartesianPointerChartProps";
+import type { ChartPointerEvent, ChartSeriesInput } from "../interaction/chartPointerEvent";
 
 const LINE_SERIES_KINDS = ["line", "area"] as const;
 
-export type LineChartProps = {
-  categories?: ChartCategoryInput[];
+export type LineChartProps = CartesianPointerChartProps & {
   series?: ChartSeriesInput[];
   data?: Record<string, unknown>[];
   children?: ReactNode;
@@ -111,6 +111,7 @@ type LinePlotProps = {
   onCategoryClick?: (event: ChartPointerEvent) => void;
   onSeriesClick?: (event: ChartPointerEvent) => void;
   dualAxisResolved?: boolean;
+  showFlatZeroCaption?: boolean;
 };
 
 function LinePlot({
@@ -142,6 +143,7 @@ function LinePlot({
   onCategoryClick,
   onSeriesClick,
   dualAxisResolved = false,
+  showFlatZeroCaption = false,
 }: LinePlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
@@ -232,6 +234,7 @@ function LinePlot({
         onCategoryClick={onCategoryClick}
         onSeriesClick={onSeriesClick}
       />
+      {showFlatZeroCaption && isFlatZeroSeries(series) ? <FlatZeroSeriesCaption /> : null}
       {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
         <UPlotRangeOverview
           width={Math.floor(size.width)}
@@ -285,10 +288,7 @@ export function LineChart({
     brush,
     brushEnd,
   });
-  const normalizedCategories = useMemo(
-    () => normalizeChartCategories(categoriesProp),
-    [categoriesProp],
-  );
+  const normalizedCategories = useCartesianCategoryMeta(categoriesProp);
   const { categories, series: resolvedSeries, valueSuffix, curve } = useResolvedCartesianProps(
     {
       categories: normalizedCategories.labels,
@@ -406,6 +406,7 @@ export function LineChart({
             onCategoryClick={onCategoryClick}
             onSeriesClick={onSeriesClick}
             dualAxisResolved={dualAxisResolved}
+            showFlatZeroCaption
           />
         }
       />

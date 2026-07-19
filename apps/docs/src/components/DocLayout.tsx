@@ -7,6 +7,8 @@ const topLinks = [
   { to: "/start", label: "Start here" },
   { to: "/guides/choosing-your-path", label: "Choosing your path" },
   { to: "/guides/imports", label: "Import cheat sheet" },
+  { to: "/guides/theme", label: "Theme playground" },
+  { to: "/guides/branding", label: "Badge" },
   { to: "/benchmarks", label: "Benchmarks" },
   { to: "/guides/agent-cartesian", label: "Agent cartesian" },
   { to: "/guides/troubleshooting", label: "Troubleshooting" },

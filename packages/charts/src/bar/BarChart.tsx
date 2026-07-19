@@ -30,6 +30,10 @@ import { useResolvedCartesianProps } from "../composable/resolveCartesianProps";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
 import { applyChartConfigToSeries } from "../config/applyChartConfig";
 import { useCartesianAnnotations } from "../annotations/useCartesianAnnotations";
+import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
+import { seriesValueBounds } from "../annotations/seriesValueBounds";
+import { GraphicOverlay } from "../graphic/GraphicOverlay";
+import { useChartGraphics } from "../graphic/useChartGraphics";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
 import type { ChartAnimate, LiveAnimate } from "../motion/types";
 import {
@@ -38,16 +42,19 @@ import {
   useCartesianAnimate,
   useLiveCrossfade,
 } from "../motion";
-import { DraggableMarkerOverlay, type MarkerDragEndEvent } from "../annotations/DraggableMarkerOverlay";
-import { seriesValueBounds } from "../annotations/seriesValueBounds";
-import { GraphicOverlay } from "../graphic/GraphicOverlay";
-import { useChartGraphics } from "../graphic/useChartGraphics";
+import { CategoryClickOverlay } from "../interaction/CategoryClickOverlay";
+import { FlatZeroSeriesCaption } from "../interaction/FlatZeroSeriesCaption";
+import {
+  isFlatZeroSeries,
+  useCartesianCategoryMeta,
+  type CartesianPointerChartProps,
+} from "../interaction/cartesianPointerChartProps";
+import type { ChartPointerEvent, ChartSeriesInput } from "../interaction/chartPointerEvent";
 
 const BAR_SERIES_KINDS = ["bar"] as const;
 
-export type BarChartProps = {
-  categories?: string[];
-  series?: PlotSeries[];
+export type BarChartProps = CartesianPointerChartProps & {
+  series?: ChartSeriesInput[];
   data?: Record<string, unknown>[];
   children?: ReactNode;
   showAxes?: boolean;
@@ -69,7 +76,7 @@ export type BarChartProps = {
 
 type BarPlotProps = {
   categories: string[];
-  series: PlotSeries[];
+  series: ChartSeriesInput[];
   fullCategoryCount: number;
   showAxes?: boolean;
   showValues?: boolean;
@@ -87,6 +94,10 @@ type BarPlotProps = {
   overviewSeries?: PlotSeries[];
   engine: "canvas" | "svg";
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
+  categoryMeta?: unknown[];
+  selectedCategoryIndex?: number;
+  onCategoryClick?: (event: ChartPointerEvent) => void;
+  onSeriesClick?: (event: ChartPointerEvent) => void;
 };
 
 function BarPlot({
@@ -109,6 +120,10 @@ function BarPlot({
   overviewSeries,
   engine,
   onMarkerDragEnd,
+  categoryMeta = [],
+  selectedCategoryIndex,
+  onCategoryClick,
+  onSeriesClick,
 }: BarPlotProps): ReactElement {
   const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
@@ -175,6 +190,19 @@ function BarPlot({
         referenceLines={referenceLines}
         onDragEnd={onMarkerDragEnd}
       />
+      <CategoryClickOverlay
+        width={Math.floor(size.width)}
+        height={plotHeight}
+        categories={categories}
+        categoryMeta={categoryMeta}
+        series={series}
+        compact={false}
+        showLegend={showLegend}
+        selectedCategoryIndex={selectedCategoryIndex}
+        onCategoryClick={onCategoryClick}
+        onSeriesClick={onSeriesClick}
+      />
+      {isFlatZeroSeries(series) ? <FlatZeroSeriesCaption /> : null}
       {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
         <UPlotRangeOverview
           width={Math.floor(size.width)}
@@ -209,6 +237,9 @@ export function BarChart({
   onMarkerDragEnd,
   animate,
   liveAnimate: liveAnimateProp,
+  selectedCategoryIndex,
+  onCategoryClick,
+  onSeriesClick,
 }: BarChartProps): ReactElement | null {
   const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate } =
     useChartLayout();
@@ -223,9 +254,10 @@ export function BarChart({
     brush,
     brushEnd,
   });
+  const normalizedCategories = useCartesianCategoryMeta(categoriesProp);
   const { categories, series: resolvedSeries, valueSuffix } = useResolvedCartesianProps(
     {
-      categories: categoriesProp,
+      categories: normalizedCategories.labels,
       series: seriesProp,
       data,
       children,
@@ -325,6 +357,10 @@ export function BarChart({
             overviewSeries={brush ? series : undefined}
             engine={engine}
             onMarkerDragEnd={onMarkerDragEnd}
+            categoryMeta={normalizedCategories.meta}
+            selectedCategoryIndex={selectedCategoryIndex}
+            onCategoryClick={onCategoryClick}
+            onSeriesClick={onSeriesClick}
           />
         }
       />

@@ -88,12 +88,21 @@ const LatencyPanel = dynamic(
         </p>
       </section>
 
-      <section style={{ ...docCardStyle(), padding: 20, boxShadow: "none" }}>
+      <section style={{ ...docCardStyle(), padding: 20, marginBottom: 16, boxShadow: "none" }}>
         <h2 style={{ margin: "0 0 10px", fontSize: 16 }}>Version mismatch across packages</h2>
         <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
           Keep <code>@axicharts/charts</code>, <code>@axicharts/charts-theme</code>, and{" "}
-          <code>@axicharts/charts-core</code> on the <strong>same minor version</strong>. Mixed 0.3.x minors
-          can cause subtle theme or scale bugs.
+          <code>@axicharts/charts-core</code> on the <strong>same minor version</strong>. CI runs{" "}
+          <code>pnpm check:versions</code> in the monorepo; scaffolds pin matching <code>latest</code> on
+          both charts packages.
+        </p>
+      </section>
+
+      <section style={{ ...docCardStyle(), padding: 20, boxShadow: "none" }}>
+        <h2 style={{ margin: "0 0 10px", fontSize: 16 }}>Experimental imports</h2>
+        <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
+          Paths under <code>@axicharts/charts/experimental/*</code> are unstable — no semver guarantees.
+          Avoid in production unless you pin and test explicitly.
         </p>
       </section>
     </div>

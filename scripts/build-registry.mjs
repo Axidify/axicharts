@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -148,5 +148,9 @@ const registry = {
 
 writeFileSync(join(outputDir, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
 writeFileSync(join(registryRoot, "registry.json"), `${JSON.stringify(registry, null, 2)}\n`);
+
+const docsPublic = join(root, "apps/docs/public");
+mkdirSync(docsPublic, { recursive: true });
+copyFileSync(join(root, "apps/docs/badge.svg"), join(docsPublic, "badge.svg"));
 
 console.log(`Built ${builtItems.length} registry items → apps/docs/public/registry/`);

@@ -121,6 +121,9 @@ describe("create-dashboard scaffold", () => {
     expect(app).toContain("QuickLineChart");
     expect(tokens).toContain("--chart-1");
     expect(pkg.dependencies.echarts).toBeUndefined();
+    expect(pkg.dependencies["@axicharts/charts"]).toBe(
+      pkg.dependencies["@axicharts/charts-theme"],
+    );
   });
 
   it("scaffolds distribution PieChart sample", async () => {
