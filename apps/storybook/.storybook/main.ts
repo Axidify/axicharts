@@ -81,7 +81,15 @@ const config: StorybookConfig = {
             root,
             "packages/charts-echarts/src",
           ),
+          "@axicharts/charts-spec/planning": path.resolve(
+            root,
+            "packages/charts-spec/src/entry/planning.ts",
+          ),
           "@axicharts/charts-spec": path.resolve(root, "packages/charts-spec/src"),
+          "@axicharts/charts-planner/tabular": path.resolve(
+            root,
+            "packages/charts-planner/src/entry/tabular.ts",
+          ),
           "@axicharts/charts-runtime": path.resolve(
             root,
             "packages/charts-runtime/src",
