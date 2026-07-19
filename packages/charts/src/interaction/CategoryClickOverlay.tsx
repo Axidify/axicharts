@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties, KeyboardEvent, PointerEvent, ReactElement } from "react";
+import type { CSSProperties, ReactElement } from "react";
 import { useCallback } from "react";
 import type { PlotSeries } from "@axicharts/charts-canvas";
 import {
@@ -49,7 +49,7 @@ export function CategoryClickOverlay({
   const inner = plotInnerSize(width, height, insets);
 
   const emit = useCallback(
-    (categoryIndex: number, seriesIndex: number | null, nativeEvent: PointerEvent | KeyboardEvent) => {
+    (categoryIndex: number, seriesIndex: number | null, nativeEvent: globalThis.Event) => {
       const payload = buildChartPointerEvent({
         categoryIndex,
         labels: categories,

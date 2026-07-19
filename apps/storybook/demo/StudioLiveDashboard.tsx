@@ -540,7 +540,7 @@ export function StudioLiveDashboard(): ReactElement {
             <Stat
               value={`${latencyNow.toFixed(0)} ms`}
               label="Live p95"
-              tone={sloBreached ? "warning" : "default"}
+              tone={sloBreached ? "warning" : "neutral"}
               surface="light"
               stale={sloBreached}
             />

@@ -27,14 +27,17 @@ const base = import.meta.env.BASE_URL;
 function Section({
   title,
   subtitle,
+  id,
   children,
 }: {
   title: string;
   subtitle?: string;
+  id?: string;
   children: ReactNode;
 }): ReactElement {
   return (
     <section
+      id={id}
       style={{
         marginTop: 28,
         border: "1px solid #e2e8f0",

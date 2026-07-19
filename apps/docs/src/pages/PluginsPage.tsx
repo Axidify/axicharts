@@ -8,6 +8,8 @@ import { SankeyChart, SAMPLE_SANKEY_FLOW } from "@axicharts/charts-sankey";
 import "@axicharts/charts-sankey/register";
 import { GanttChart, SAMPLE_GANTT_PROGRAM } from "@axicharts/charts-gantt";
 import "@axicharts/charts-gantt/register";
+import { TankChart } from "@axicharts/charts-tank";
+import "@axicharts/charts-tank/register";
 import { cleanTheme, industrialTheme } from "@axicharts/charts-theme";
 
 const GANTT_CODE = `import "@axicharts/charts-gantt/register";

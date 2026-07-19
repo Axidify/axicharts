@@ -3,5 +3,5 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["src", "vite.config.ts", "../storybook/demo"]
+  "include": ["src", "vite.config.ts", "../storybook/demo", "badge.svg"]
 }

@@ -1368,7 +1368,6 @@ function LiveOpsCompareColumn({
       profilerId={profilerId}
       onProfilerRender={onProfilerRender}
       panels={panels}
-      struggling={struggling}
       renderPanel={renderPanel}
       calibrationProgress={columnProgress}
     />
@@ -1608,7 +1607,6 @@ function CompareColumn({
   profilerId: string;
   onProfilerRender: React.ProfilerOnRenderCallback;
   panels: LivePanelState[];
-  struggling?: boolean;
   renderPanel: (panel: LivePanelState) => ReactElement;
   calibrationProgress?: LiveBenchState["calibrationProgress"];
 }): ReactElement {

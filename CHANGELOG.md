@@ -8,14 +8,29 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-19
+
+Adoption track C141–C146 — see [RELEASE-v0.4.0.md](./RELEASE-v0.4.0.md) for full notes.
+
 ### Added
 
-- JSON Schema export: `cartesian-panel.schema.json` (marks `oneOf` per type) and `data-profile.schema.json` via `pnpm export:schemas`
+- **C144** — `ChartPointerEvent`, `onCategoryClick` / `onSeriesClick` on `LineChart` and `BarChart`; `categories` with `meta`; keyboard parity
+- **C143** — Docs theme playground with token glossary and `createTheme` export snippet
+- **C145** — Agent cartesian guide (`/guides/agent-cartesian`)
+- **C146** — `pnpm check:versions` lockstep CI; Built with AxiCharts badge page; flat-zero series caption
+- **C141–C142** — Docs front door (start here, benchmarks, troubleshooting, import cheat sheet)
+
+### Changed
+
+- Core chart packages **0.3.52 → 0.4.0**
+- `@axicharts/charts-echarts` size budget **20 KB → 20.1 KB** (measured +85 B)
 
 ### Fixed
 
-- Dashboarder app TypeScript errors (`typecheck` clean)
-- Storybook HMR: idempotent builtin dashboard template registration; guard community gallery demo re-register
+- `CategoryClickOverlay` DTS build (`nativeEvent` typed as DOM `Event`)
+- Docs `typecheck` clean (PluginsPage `TankChart` import, demo duplicate props, `StatTone`)
+- JSON Schema export: `cartesian-panel.schema.json` and `data-profile.schema.json` via `pnpm export:schemas`
+- Storybook HMR: idempotent builtin dashboard template registration
 
 ## [0.3.52] - 2026-07-19
 

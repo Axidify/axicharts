@@ -30,7 +30,17 @@ import { SHARE_IMPORT_TRACK_RELEASE_NOTES } from "../demos/runtimeSchemaDemo";
 
 const base = import.meta.env.BASE_URL;
 
-const chipStyle = {
+const chipStyle: {
+  fontSize: number;
+  padding: string;
+  borderRadius: number;
+  border: string;
+  background: string;
+  color: string;
+  textDecoration: string;
+  cursor: string;
+  fontWeight?: number;
+} = {
   fontSize: 12,
   padding: "6px 12px",
   borderRadius: 6,
@@ -39,9 +49,9 @@ const chipStyle = {
   color: "#1e293b",
   textDecoration: "none",
   cursor: "pointer",
-} as const;
+};
 
-function activeChipStyle(active: boolean): typeof chipStyle {
+function activeChipStyle(active: boolean) {
   return {
     ...chipStyle,
     background: active ? "#dbeafe" : "#f8fafc",

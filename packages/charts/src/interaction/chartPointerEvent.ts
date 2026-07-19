@@ -48,7 +48,7 @@ export type ChartPointerEvent = {
   value: number | null;
   /** Category meta, or merged `{ ...categoryMeta, ...seriesMeta }` when series hit */
   meta?: unknown;
-  nativeEvent: PointerEvent | KeyboardEvent;
+  nativeEvent: globalThis.Event;
 };
 
 export function buildChartPointerEvent({
@@ -64,7 +64,7 @@ export function buildChartPointerEvent({
   categoryMeta: unknown[];
   series: ChartSeriesInput[];
   seriesIndex: number | null;
-  nativeEvent: PointerEvent | KeyboardEvent;
+  nativeEvent: globalThis.Event;
 }): ChartPointerEvent {
   const category = labels[categoryIndex] ?? "";
   const baseMeta = categoryMeta[categoryIndex];
