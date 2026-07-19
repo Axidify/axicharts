@@ -20,7 +20,7 @@ Use the **@axicharts/charts-mcp** server when building cartesian charts in Curso
 | `list_cartesian_marks` | Discovery — closed v1 catalog only |
 | `compile_cartesian_panel` | Smoke test compile path |
 
-Schema: `@axicharts/charts-mcp/schema/cartesian-panel.schema.json`
+Schema: `@axicharts/charts-spec/schema/cartesian-panel.schema.json` · data profile: `@axicharts/charts-spec/schema/data-profile.schema.json`
 
 ## Workflow
 

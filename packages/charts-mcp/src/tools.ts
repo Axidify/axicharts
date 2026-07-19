@@ -5,6 +5,8 @@ import {
   normalizeToCartesian,
   reviseCartesianPanel,
   validateCartesianSpec,
+  CARTESIAN_PANEL_SCHEMA_URL,
+  DATA_PROFILE_SCHEMA_URL,
   type ChartMode,
   type DataProfile,
   type PanelSpec,
@@ -18,8 +20,7 @@ function asRowArray(rows?: SpecData): Record<string, unknown>[] | undefined {
   return Array.isArray(rows) ? rows : [rows];
 }
 
-export const CARTESIAN_PANEL_SCHEMA_URL =
-  "@axicharts/charts-mcp/schema/cartesian-panel.schema.json";
+export { CARTESIAN_PANEL_SCHEMA_URL, DATA_PROFILE_SCHEMA_URL };
 
 export type ToolTextResult = {
   content: Array<{ type: "text"; text: string }>;
@@ -108,12 +109,13 @@ export function handleDescribeDataProfile(args: {
   dataProfile?: DataProfile;
   rows?: SpecData;
 }): ToolTextResult {
-  return jsonResult(
-    describeDataProfile({
+  return jsonResult({
+    schema: DATA_PROFILE_SCHEMA_URL,
+    ...describeDataProfile({
       dataProfile: args.dataProfile,
       rows: asRowArray(args.rows),
     }),
-  );
+  });
 }
 
 export function handleCompileCartesianPanel(args: {

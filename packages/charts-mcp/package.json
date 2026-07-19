@@ -13,7 +13,6 @@
   },
   "files": [
     "dist",
-    "schema",
     "examples",
     "agent-skills",
     "README.md"
@@ -29,8 +28,7 @@
     },
     "./openapi": {
       "import": "./dist/openapi.js"
-    },
-    "./schema/cartesian-panel.schema.json": "./schema/cartesian-panel.schema.json"
+    }
   },
   "scripts": {
     "build": "tsup src/index.ts src/cli.ts src/openapi.ts --format esm --external @axicharts/charts-spec --external @modelcontextprotocol/sdk --external zod --clean",

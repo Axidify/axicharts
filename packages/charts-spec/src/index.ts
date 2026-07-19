@@ -168,3 +168,13 @@ export {
   type TooltipVariant,
 } from "./panelChrome";
 export { asRows, pluckField, readArray, readNumber } from "./data";
+export {
+  validateCartesianPanelSchemaRaw,
+  validateDataProfileSchemaRaw,
+  CARTESIAN_PANEL_SCHEMA_URL,
+  DATA_PROFILE_SCHEMA_URL,
+  HOSTED_CARTESIAN_PANEL_SCHEMA_URL,
+  HOSTED_DATA_PROFILE_SCHEMA_URL,
+  type SchemaValidationIssue,
+  type SchemaValidationResult,
+} from "./schemaValidation";

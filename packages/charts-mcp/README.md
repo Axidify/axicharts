@@ -13,7 +13,7 @@ MCP server for **RFC-002 cartesian** panel authoring. Wraps `@axicharts/charts-s
 | `describe_data_profile` | Field names + inferred roles |
 | `compile_cartesian_panel` | Validate + compile smoke test |
 
-All cartesian tools reference schema: `@axicharts/charts-mcp/schema/cartesian-panel.schema.json`
+All cartesian tools reference schema: `@axicharts/charts-spec/schema/cartesian-panel.schema.json`. `describe_data_profile` uses `@axicharts/charts-spec/schema/data-profile.schema.json`.
 
 ## Cursor / Claude Desktop
 

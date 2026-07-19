@@ -13,6 +13,7 @@ export {
   handleReviseCartesianPanel,
   handleValidateCartesianSpec,
   CARTESIAN_PANEL_SCHEMA_URL,
+  DATA_PROFILE_SCHEMA_URL,
   TOOL_HANDLERS,
   type ToolName,
   type ToolTextResult,

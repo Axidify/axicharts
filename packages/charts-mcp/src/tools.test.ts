@@ -6,6 +6,7 @@ import { OPENAPI_TOOL_BUNDLE } from "./openapi";
 import {
   callTool,
   CARTESIAN_PANEL_SCHEMA_URL,
+  DATA_PROFILE_SCHEMA_URL,
   handleCreateCartesianPanel,
   handleValidateCartesianSpec,
 } from "./tools";
@@ -78,8 +79,12 @@ describe("charts-mcp tools", () => {
     );
   });
 
-  it("openapi bundle references published schema URL", () => {
+  it("openapi bundle references published schema URLs", () => {
+    const byName = Object.fromEntries(OPENAPI_TOOL_BUNDLE.map((tool) => [tool.name, tool]));
+    expect(byName.create_cartesian_panel?.schemaUrl).toBe(CARTESIAN_PANEL_SCHEMA_URL);
+    expect(byName.describe_data_profile?.schemaUrl).toBe(DATA_PROFILE_SCHEMA_URL);
     for (const tool of OPENAPI_TOOL_BUNDLE) {
+      if (tool.name === "describe_data_profile") continue;
       expect(tool.schemaUrl).toBe(CARTESIAN_PANEL_SCHEMA_URL);
     }
     expect(OPENAPI_TOOL_BUNDLE.map((tool) => tool.name)).toEqual([
@@ -95,14 +100,18 @@ describe("charts-mcp tools", () => {
   it("schema file requires cartesian type and marks[]", () => {
     const schemaPath = join(
       dirname(fileURLToPath(import.meta.url)),
-      "../schema/cartesian-panel.schema.json",
+      "../../charts-spec/schema/cartesian-panel.schema.json",
     );
     const schema = JSON.parse(readFileSync(schemaPath, "utf8")) as {
-      properties: { type: { const: string }; marks: { type: string } };
+      properties: {
+        type: { const: string };
+        marks: { type: string; items: { oneOf: unknown[] } };
+      };
       required: string[];
     };
     expect(schema.properties.type.const).toBe("cartesian");
     expect(schema.required).toContain("marks");
     expect(schema.properties.marks.type).toBe("array");
+    expect(schema.properties.marks.items.oneOf.length).toBe(5);
   });
 });

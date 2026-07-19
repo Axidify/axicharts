@@ -1,4 +1,4 @@
-import { CARTESIAN_PANEL_SCHEMA_URL } from "./tools";
+import { CARTESIAN_PANEL_SCHEMA_URL, DATA_PROFILE_SCHEMA_URL } from "./tools";
 
 export type OpenApiToolDefinition = {
   name: string;
@@ -63,11 +63,14 @@ export const OPENAPI_TOOL_BUNDLE: OpenApiToolDefinition[] = [
   {
     name: "describe_data_profile",
     description: "Infer field names and roles from data profile or sample rows.",
-    schemaUrl: CARTESIAN_PANEL_SCHEMA_URL,
+    schemaUrl: DATA_PROFILE_SCHEMA_URL,
     inputSchema: {
       type: "object",
       properties: {
-        dataProfile: { type: "object" },
+        dataProfile: {
+          type: "object",
+          description: `Data profile input — see ${DATA_PROFILE_SCHEMA_URL}`,
+        },
         rows: { type: "array", items: { type: "object" } },
       },
     },
