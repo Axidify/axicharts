@@ -3,7 +3,8 @@ import { stat } from "node:fs/promises";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import path from "node:path";
 import { handleApiRequest } from "./http/apiRouter";
-import { type AxiboardFileStore, getFileStore } from "./persistence/fileStore";
+import type { AxiboardWorkspaceStore } from "./persistence/store";
+import { getWorkspaceStore } from "./persistence/resolveStore";
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -23,9 +24,10 @@ export type AxiboardServerOptions = {
   host?: string;
   /** Directory with Vite `dist/` output (index.html + assets). */
   staticDir: string;
-  /** Workspace + R&D persistence (defaults to AXIBOARD_DATA_DIR or ./data). */
+  /** Workspace persistence (file store or Postgres when AXIBOARD_DATABASE_URL is set). */
   dataDir?: string;
-  fileStore?: AxiboardFileStore;
+  databaseUrl?: string;
+  workspaceStore?: AxiboardWorkspaceStore;
 };
 
 function contentType(filePath: string): string {
@@ -123,12 +125,14 @@ export function createAxiboardServer(options: AxiboardServerOptions): AxiboardSe
   const port = options.port ?? Number(process.env.PORT ?? 3000);
   const host = options.host ?? process.env.HOST ?? "0.0.0.0";
   const staticDir = path.resolve(options.staticDir);
-  const fileStore = options.fileStore ?? getFileStore(options.dataDir);
+  const workspaceStore =
+    options.workspaceStore ??
+    getWorkspaceStore({ dataDir: options.dataDir, databaseUrl: options.databaseUrl });
 
   const server = createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
 
-    if (await handleApiRequest(req, res, url.pathname, fileStore)) {
+    if (await handleApiRequest(req, res, url.pathname, workspaceStore)) {
       return;
     }
 

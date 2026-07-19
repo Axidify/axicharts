@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { WorkspaceStore } from "@axicharts/charts-runtime/workspace";
-import type { AxiboardFileStore } from "../persistence/fileStore";
+import type { AxiboardWorkspaceStore } from "../persistence/store";
 import { isWorkspaceStore } from "../persistence/validate";
 
 async function readJsonBody<T>(req: IncomingMessage): Promise<T> {
@@ -23,7 +23,7 @@ export async function handleWorkspaceRequest(
   req: IncomingMessage,
   res: ServerResponse,
   pathname: string,
-  store: AxiboardFileStore,
+  store: AxiboardWorkspaceStore,
 ): Promise<boolean> {
   if (pathname !== "/api/workspaces") return false;
 

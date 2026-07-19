@@ -3,6 +3,7 @@ import path from "node:path";
 import type { WorkspaceStore } from "@axicharts/charts-runtime/workspace";
 import { createEmptyPersistence, type AxiboardPersistence } from "./types";
 import { isAxiboardPersistence } from "./validate";
+import type { AxiboardWorkspaceStore } from "./store";
 
 const STATE_FILE = "state.json";
 
@@ -12,7 +13,7 @@ export function resolveDataDir(): string {
   return path.resolve(process.cwd(), "data");
 }
 
-export class AxiboardFileStore {
+export class AxiboardFileStore implements AxiboardWorkspaceStore {
   private state: AxiboardPersistence = createEmptyPersistence();
   private loaded = false;
 

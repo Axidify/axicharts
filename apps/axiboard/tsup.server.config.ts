@@ -13,5 +13,6 @@ export default defineConfig({
     "react-dom",
     "echarts",
     "uplot",
+    "pg",
   ],
 });

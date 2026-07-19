@@ -25,7 +25,9 @@ pnpm --filter @axicharts/axiboard start
 | `PORT` | `3000` | HTTP listen port |
 | `HOST` | `0.0.0.0` | Bind address |
 | `AXIBOARD_STATIC_DIR` | `dist/` next to server bundle | Vite build output |
-| `AXIBOARD_DATA_DIR` | `./data` (cwd) | Workspace JSON persistence |
+| `AXIBOARD_DATA_DIR` | `./data` (cwd) | Workspace JSON file persistence (default) |
+| `AXIBOARD_DATABASE_URL` | — | Optional Postgres URL; overrides file store when set |
+| `DATABASE_URL` | — | Fallback Postgres URL (e.g. Railway/Heroku) |
 | `OPENAI_API_KEY` | — | Optional server default LLM key |
 | `OPENAI_MODEL` | — | Optional model override |
 | `OPENAI_BASE_URL` | — | Optional OpenAI-compatible base URL |
@@ -52,8 +54,14 @@ docker build -f apps/axiboard/Dockerfile -t axiboard:local .
 docker run -p 3000:3000 -e OPENAI_API_KEY=sk-... axiboard:local
 ```
 
-Or with compose:
+Or with compose (file persistence):
 
 ```bash
 docker compose -f apps/axiboard/docker-compose.yml up --build
+```
+
+Postgres persistence (compose profile):
+
+```bash
+docker compose -f apps/axiboard/docker-compose.yml --profile postgres up --build
 ```

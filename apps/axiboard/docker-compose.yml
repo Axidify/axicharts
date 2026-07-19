@@ -12,5 +12,38 @@ services:
     volumes:
       - axiboard-data:/app/apps/axiboard/data
 
+  axiboard-postgres:
+    profiles: ["postgres"]
+    build:
+      context: ../..
+      dockerfile: apps/axiboard/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      HOST: "0.0.0.0"
+      AXIBOARD_DATABASE_URL: postgres://axiboard:axiboard@postgres:5432/axiboard
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    profiles: ["postgres"]
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: axiboard
+      POSTGRES_PASSWORD: axiboard
+      POSTGRES_DB: axiboard
+    ports:
+      - "5432:5432"
+    volumes:
+      - axiboard-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U axiboard -d axiboard"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
 volumes:
   axiboard-data:
+  axiboard-pg:

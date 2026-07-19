@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import type { AxiboardFileStore } from "../persistence/fileStore";
+import type { AxiboardWorkspaceStore } from "../persistence/store";
 import { handleOrchestratorRequest } from "./handlers";
 import { handleWorkspaceRequest } from "./workspaceHandlers";
 
@@ -7,14 +7,14 @@ export async function handleApiRequest(
   req: IncomingMessage,
   res: ServerResponse,
   pathname: string,
-  fileStore: AxiboardFileStore,
+  workspaceStore: AxiboardWorkspaceStore,
 ): Promise<boolean> {
   if (pathname.startsWith("/api/orchestrator")) {
     return handleOrchestratorRequest(req, res, pathname);
   }
 
   if (pathname === "/api/workspaces") {
-    return handleWorkspaceRequest(req, res, pathname, fileStore);
+    return handleWorkspaceRequest(req, res, pathname, workspaceStore);
   }
 
   return false;
