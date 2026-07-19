@@ -203,6 +203,13 @@ export {
   useChartInteraction,
 } from "../interaction/ChartInteractionContext";
 export {
+  buildChartPointerEvent,
+  normalizeChartCategories,
+  type ChartCategoryInput,
+  type ChartPointerEvent,
+  type ChartSeriesInput,
+} from "../interaction/chartPointerEvent";
+export {
   ChartSyncGroup,
   useChartSync,
   useOptionalChartSync,
