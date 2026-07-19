@@ -1,4 +1,4 @@
-import { parseTabular } from "@axicharts/charts-spec";
+import { parseTabular } from "@axicharts/charts-spec/planning";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { runOrchestratorChat } from "../orchestrator/chat";
 import { runTabularPlan } from "../orchestrator/plan";

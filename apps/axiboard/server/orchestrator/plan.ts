@@ -1,4 +1,4 @@
-import { planDashboardFromRows, type PlannerDashboardPlan } from "@axicharts/charts-planner";
+import { planDashboardFromRows, type PlannerDashboardPlan } from "@axicharts/charts-planner/tabular";
 import type { Persona } from "@axicharts/charts-spec";
 import type { AgentChartBlock, OrchestratorPlanResult } from "../types";
 

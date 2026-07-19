@@ -1,8 +1,8 @@
-import type { DataProfile, TemplateId } from "@axicharts/charts-spec";
+import type { DataProfile, TemplateId } from "@axicharts/charts-spec/planning";
 import {
   planPanelsFromProfile,
   suggestTemplate,
-} from "@axicharts/charts-spec";
+} from "@axicharts/charts-spec/planning";
 import { enrichProfileFromIntent } from "./intent";
 import type { DashboardPlan, MosaicPresetId, PlannerFeed, PlannerLayout } from "./types";
 import { isTemplateId } from "./validate";

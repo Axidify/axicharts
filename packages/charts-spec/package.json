@@ -54,12 +54,16 @@
       "types": "./dist/entry/full.d.ts",
       "import": "./dist/entry/full.js"
     },
+    "./planning": {
+      "types": "./dist/entry/planning.d.ts",
+      "import": "./dist/entry/planning.js"
+    },
     "./schema/cartesian-panel.schema.json": "./schema/cartesian-panel.schema.json",
     "./schema/data-profile.schema.json": "./schema/data-profile.schema.json"
   },
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --clean",
-    "dev": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --watch",
+    "build": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/planning.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --clean",
+    "dev": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/planning.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --watch",
     "test": "vitest run",
     "export:schemas": "node scripts/export-schemas.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"

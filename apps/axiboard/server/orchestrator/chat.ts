@@ -1,5 +1,4 @@
-import { inferPersonaFromIntent } from "@axicharts/charts-spec";
-import type { Persona } from "@axicharts/charts-spec";
+import { inferPersonaFromIntent, type Persona } from "@axicharts/charts-spec/planning";
 import type { ByokConfig, OrchestratorChatRequest, OrchestratorChatResult } from "../types";
 import { parseChatWithLlm } from "./byok";
 import { runTabularPlan } from "./plan";

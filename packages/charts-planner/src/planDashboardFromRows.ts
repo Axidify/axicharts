@@ -5,7 +5,7 @@ import {
   type PlanDashboardFromRowsOptions,
   type TabularDashboardPlan,
   type TabularPlanDecision,
-} from "@axicharts/charts-spec";
+} from "@axicharts/charts-spec/planning";
 
 export type PlannerDashboardPlan = TabularDashboardPlan & {
   dashboardPlan: DashboardPlan;

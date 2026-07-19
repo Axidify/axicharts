@@ -29,11 +29,15 @@
     "./server": {
       "types": "./dist/server-entry.d.ts",
       "import": "./dist/server-entry.js"
+    },
+    "./tabular": {
+      "types": "./dist/entry/tabular.d.ts",
+      "import": "./dist/entry/tabular.js"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts src/server-entry.ts --format esm --dts --external @axicharts/charts-spec --clean",
-    "dev": "tsup src/index.ts src/cli.ts src/server-entry.ts --format esm --dts --external @axicharts/charts-spec --watch",
+    "build": "tsup src/index.ts src/cli.ts src/server-entry.ts src/entry/tabular.ts --format esm --dts --external @axicharts/charts-spec --clean",
+    "dev": "tsup src/index.ts src/cli.ts src/server-entry.ts src/entry/tabular.ts --format esm --dts --external @axicharts/charts-spec --watch",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

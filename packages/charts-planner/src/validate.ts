@@ -1,5 +1,5 @@
-import type { PanelSpec, TemplateId } from "@axicharts/charts-spec";
-import { SPEC_VERSION, isRegisteredTemplate } from "@axicharts/charts-spec";
+import type { PanelSpec, TemplateId } from "@axicharts/charts-spec/planning";
+import { SPEC_VERSION, isRegisteredTemplate } from "@axicharts/charts-spec/planning";
 import type { DashboardPlan } from "./types";
 
 const MOSAIC_PRESET_IDS = new Set<string>([
