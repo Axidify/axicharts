@@ -31,17 +31,12 @@ export function inferChartGeometry(input: GeometryInput): ChartGeometry {
     xRole === "time" ||
     /over\s*time|trend|time\s*series|monotone/.test(intent)
   ) {
-    rules.push("geometry:time-line");
-    return { panelType: "cartesian", markType: "line", rules };
-  }
-
-  if (
-    xRole === "time" &&
-    input.timeSpan &&
-    input.timeSpan.from !== input.timeSpan.to &&
-    (input.grain === "transaction" || input.grain === "daily")
-  ) {
-    rules.push("geometry:time-span-line");
+    const timeSpanLine =
+      xRole === "time" &&
+      input.timeSpan &&
+      input.timeSpan.from !== input.timeSpan.to &&
+      (input.grain === "transaction" || input.grain === "daily");
+    rules.push(timeSpanLine ? "geometry:time-span-line" : "geometry:time-line");
     return { panelType: "cartesian", markType: "line", rules };
   }
 

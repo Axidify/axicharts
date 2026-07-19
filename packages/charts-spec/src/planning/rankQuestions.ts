@@ -68,11 +68,15 @@ function scoreQuestion(
         field.role === "dimension" &&
         new RegExp(question.dimensionKey!, "i").test(field.name),
     )?.name;
-    const cardinality =
-      (dimensionField && profile.cardinalities[dimensionField]) ??
-      Object.entries(profile.cardinalities).find(([name]) =>
+    let cardinality: number | undefined;
+    if (dimensionField) {
+      cardinality = profile.cardinalities[dimensionField];
+    }
+    if (cardinality == null) {
+      cardinality = Object.entries(profile.cardinalities).find(([name]) =>
         new RegExp(question.dimensionKey!, "i").test(name),
       )?.[1];
+    }
     if (cardinality != null && cardinality > HIGH_CARDINALITY_BAR) {
       score -= HIGH_CARDINALITY_PENALTY;
       reasons.push(`cardinality:${cardinality}`);

@@ -37,6 +37,6 @@ describe("C165 inferChartGeometry — L1 profile hints", () => {
     });
 
     expect(geometry.markType).toBe("line");
-    expect(geometry.rules).toContain("geometry:time-line");
+    expect(geometry.rules).toContain("geometry:time-span-line");
   });
 });

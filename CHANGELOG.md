@@ -8,19 +8,37 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
-### Added
+_Nothing yet._
 
-- **C161** — Golden contract tests: MCP `plan_dashboard` ≡ orchestrator `runTabularPlan` on ledger, sales, attendance fixtures (`apps/axiboard/server/golden/`)
-
-_Nothing else yet._
-
-## Axiboard app (monorepo, not npm) — 2026-07-19
+## [0.4.14] - 2026-07-19
 
 ### Added
 
-- **C160** — `apps/axiboard/server` orchestrator (plan, chat, BYOK session)
-- **C160** — Vite dev API `/api/orchestrator/*`; R&D Ledger / Sales / Attendance use server chat
-- **C160** — `OrchestratorChat`, `ByokSettings`, `useOrchestratorPlan`
+- **C165** — `profileTabular` — `grain`, `cardinalities`, `timeSpan` on `DataProfile`; wired into `planDashboardFromRows`, `rankQuestions`, and `inferChartGeometry`
+- **C165** — MCP `describe_data_profile` returns L1 profile fields
+- **C164** — `classifyTabularDomain` decision step with confidence in planner log
+- **C162** — `@axicharts/charts-spec/planning` and `@axicharts/charts-planner/tabular` exports (server-safe, no uPlot CSS)
+- **C161** — Golden contract tests (`apps/axiboard/server/golden/`) — MCP `plan_dashboard` ≡ orchestrator plan
+
+### Axiboard app (monorepo, not npm)
+
+- **C162** — Production server + Docker (`pnpm start`, `dist-server/`)
+- **C163** — Workspace + R&D session persistence API
+- **C164** — Unified tabular upload UX (`TabularRndView`)
+
+See [RELEASE-v0.4.14.md](./RELEASE-v0.4.14.md).
+
+## [0.1.2] - 2026-07-19
+
+### Added
+
+- **C165** — `describe_data_profile` returns `grain`, `timeSpan`, `cardinalities` when rows provided
+
+## [0.2.2] - 2026-07-19
+
+### Added
+
+- **C162** — `./tabular` export — `planDashboardFromRows` without main index / uPlot CSS chain
 
 ## [0.1.1] - 2026-07-19
 

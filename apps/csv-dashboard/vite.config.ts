@@ -9,7 +9,15 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      "@axicharts/charts-planner/tabular": path.resolve(
+        root,
+        "packages/charts-planner/src/entry/tabular.ts",
+      ),
       "@axicharts/charts-planner": path.resolve(root, "packages/charts-planner/src"),
+      "@axicharts/charts-spec/planning": path.resolve(
+        root,
+        "packages/charts-spec/src/entry/planning.ts",
+      ),
       "@axicharts/charts-spec/cartesian": path.resolve(
         root,
         "packages/charts-spec/src/entry/cartesian.ts",

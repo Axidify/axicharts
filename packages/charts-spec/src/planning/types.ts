@@ -1,4 +1,4 @@
-import type { FieldProfile } from "../types";
+import type { DataProfile, FieldProfile } from "../types";
 import type { DomainSemantics } from "../classifyTabularDomain";
 import type { VerticalId } from "../rulePacks/types";
 
