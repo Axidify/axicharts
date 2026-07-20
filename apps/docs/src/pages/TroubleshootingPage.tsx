@@ -32,6 +32,36 @@ export function TroubleshootingPage(): ReactElement {
       </section>
 
       <section style={{ ...docCardStyle(), padding: 20, marginBottom: 16, boxShadow: "none" }}>
+        <h2 style={{ margin: "0 0 10px", fontSize: 16 }}>Dashboard card grids — plot height &amp; legend</h2>
+        <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
+          <code>minHeight</code> on <code>ChartContainer</code> is the <strong>plot area</strong> budget.
+          Multi-series legends render below the plot and the container grows automatically — single- and
+          multi-series cards in the same CSS grid row keep aligned canvases. Use{" "}
+          <code>legendVariant=&quot;compact&quot;</code> in tight tiles; set{" "}
+          <code>emptyMessage</code> for all-zero trends (empty state is automatic).
+        </p>
+        <pre
+          style={{
+            marginTop: 12,
+            padding: 12,
+            background: "#f1f5f9",
+            borderRadius: 8,
+            fontSize: 12,
+            overflow: "auto",
+          }}
+        >
+          {`<div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+  <ChartContainer theme={cleanTheme} minHeight={176} legendVariant="compact">
+    <LineChart … single series … />
+  </ChartContainer>
+  <ChartContainer theme={cleanTheme} minHeight={176} legendVariant="compact">
+    <LineChart … two series — legend below plot … />
+  </ChartContainer>
+</div>`}
+        </pre>
+      </section>
+
+      <section style={{ ...docCardStyle(), padding: 20, marginBottom: 16, boxShadow: "none" }}>
         <h2 style={{ margin: "0 0 10px", fontSize: 16 }}>Vite — peer dependency not found (uplot / echarts)</h2>
         <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
           Install peers at the app level. Line-only dashboards need <code>uplot</code> only — see{" "}

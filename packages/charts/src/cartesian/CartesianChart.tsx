@@ -17,8 +17,10 @@ import type { LineCurve } from "@axicharts/charts-theme";
 import type { RendererPreference } from "@axicharts/charts-core";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { CartesianChartShell } from "../chrome/CartesianChartShell";
-import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
+import { cartesianPlotHeight } from "../cartesian/cartesianPlotLayout";
+import { CartesianEmptyPlot } from "../cartesian/CartesianEmptyPlot";
+import { isFlatZeroSeries } from "../interaction/cartesianPointerChartProps";
 import { usePlotSync } from "../sync/usePlotSync";
 import { usePlotSampling } from "../plot/usePlotSampling";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
@@ -101,12 +103,10 @@ function CartesianPlot({
   onMarkerDragEnd,
   compact = false,
 }: CartesianPlotProps): ReactElement {
-  const { size, theme, mode, legendVariant } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const plotSync = usePlotSync();
   const chrome = getInteractionChrome(mode);
-  const showLegend = chrome.showLegend && series.length > 1 && !compact;
-  const legendHeight = getLegendHeight(showLegend, legendVariant);
-  const plotHeight = Math.floor(size.height) - legendHeight;
+  const plotHeight = cartesianPlotHeight(size);
   const valueBounds = useMemo(() => seriesValueBounds(series), [series]);
   const overlayDualAxis = useMemo(
     () => shouldUseDualAxis(series, dualAxis),
@@ -203,7 +203,7 @@ export function CartesianChart({
   animate,
   liveAnimate: liveAnimateProp,
 }: CartesianChartProps): ReactElement | null {
-  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate } =
+  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate, dataState, emptyMessage } =
     useChartLayout();
   const annotationProps = useCartesianAnnotations({
     annotations,
@@ -226,9 +226,11 @@ export function CartesianChart({
   const curve = curveProp ?? composed?.curve;
 
   const series = useMemo(() => {
-    const configured = applyChartConfigToSeries(resolvedSeries, config);
+    const configured = applyChartConfigToSeries(resolvedSeries, config, {
+      categories,
+    });
     return applyTagTonesToSeries(configured, tagTones ?? {}) as ComboSeries[];
-  }, [resolvedSeries, config, tagTones]);
+  }, [resolvedSeries, config, tagTones, categories]);
 
   const resolvedFill = useMemo(() => {
     if (series.some((item) => item.fill)) return false;
@@ -276,6 +278,18 @@ export function CartesianChart({
     series.length === 0
   ) {
     return null;
+  }
+
+  const dark = theme.name === "live" || theme.name === "industrial";
+  if (dataState === "ready" && isFlatZeroSeries(series)) {
+    return (
+      <CartesianEmptyPlot
+        width={size.width}
+        height={size.height}
+        message={emptyMessage}
+        dark={dark}
+      />
+    );
   }
 
   const compact = size.height < 72;

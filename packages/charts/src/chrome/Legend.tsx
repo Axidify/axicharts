@@ -19,11 +19,18 @@ export function getLegendHeight(
   return show ? legendHeightForVariant(variant) : 0;
 }
 
+export type LegendLayout = "overlay" | "flow";
+
 export type LegendProps = {
   series: PlotSeries[];
+  /** `overlay` = top of plot (legacy). `flow` = below plot slot (dashboard default). */
+  layout?: LegendLayout;
 };
 
-export function Legend({ series }: LegendProps): ReactElement | null {
+export function Legend({
+  series,
+  layout = "overlay",
+}: LegendProps): ReactElement | null {
   const { config, theme, legendVariant = DEFAULT_LEGEND_VARIANT } = useChartLayout();
   const dark = isDarkChartTheme(theme.name);
   const legendHeight = legendHeightForVariant(legendVariant);
@@ -32,22 +39,24 @@ export function Legend({ series }: LegendProps): ReactElement | null {
 
   const itemStyle = legendItemStyle(legendVariant, dark);
 
+  const flow = layout === "flow";
+
   return (
     <div
       className="axicharts-legend"
       aria-label="Chart legend"
       style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
+        position: flow ? "relative" : "absolute",
+        top: flow ? undefined : 0,
+        left: flow ? undefined : 0,
+        right: flow ? undefined : 0,
         height: legendHeight,
         display: "flex",
         alignItems: "center",
         gap: legendVariant === "compact" ? 6 : 8,
         padding: legendVariant === "inline" ? "0 4px" : "0 6px",
         pointerEvents: "none",
-        zIndex: 2,
+        zIndex: flow ? undefined : 2,
       }}
     >
       {series.map((item, index) => {

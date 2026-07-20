@@ -17,8 +17,10 @@ import type { LineCurve } from "@axicharts/charts-theme";
 import type { RendererPreference } from "@axicharts/charts-core";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { CartesianChartShell } from "../chrome/CartesianChartShell";
-import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
+import { cartesianPlotHeight } from "../cartesian/cartesianPlotLayout";
+import { CartesianEmptyPlot } from "../cartesian/CartesianEmptyPlot";
+import { isFlatZeroSeries } from "../interaction/cartesianPointerChartProps";
 import { usePlotSync } from "../sync/usePlotSync";
 import { usePlotSampling } from "../plot/usePlotSampling";
 import { applyTagTonesToSeries } from "../alarm/tagTones";
@@ -83,12 +85,10 @@ function ComboPlot({
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
   compact?: boolean;
 }): ReactElement {
-  const { size, theme, mode, legendVariant } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const plotSync = usePlotSync();
   const chrome = getInteractionChrome(mode);
-  const showLegend = chrome.showLegend && series.length > 1 && !compact;
-  const legendHeight = getLegendHeight(showLegend, legendVariant);
-  const plotHeight = Math.floor(size.height) - legendHeight;
+  const plotHeight = cartesianPlotHeight(size);
   const valueBounds = useMemo(() => seriesValueBounds(series), [series]);
   const overlayDualAxis = useMemo(
     () => shouldUseDualAxis(series, dualAxis),
@@ -169,7 +169,7 @@ export function ComboChart({
   animate,
   liveAnimate: liveAnimateProp,
 }: ComboChartProps): ReactElement | null {
-  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate } =
+  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate, dataState, emptyMessage } =
     useChartLayout();
   const annotationProps = useCartesianAnnotations({
     annotations,
@@ -178,9 +178,11 @@ export function ComboChart({
   });
   const chartGraphics = useChartGraphics({ graphics });
   const series = useMemo(() => {
-    const configured = applyChartConfigToSeries(seriesProp, config);
+    const configured = applyChartConfigToSeries(seriesProp, config, {
+      categories,
+    });
     return applyTagTonesToSeries(configured, tagTones ?? {}) as ComboSeries[];
-  }, [seriesProp, config, tagTones]);
+  }, [seriesProp, config, tagTones, categories]);
   const maxPoints = usePlotSampling({
     pointCount: categories.length,
     renderer,
@@ -222,6 +224,18 @@ export function ComboChart({
     series.length === 0
   ) {
     return null;
+  }
+
+  const dark = theme.name === "live" || theme.name === "industrial";
+  if (dataState === "ready" && isFlatZeroSeries(series)) {
+    return (
+      <CartesianEmptyPlot
+        width={size.width}
+        height={size.height}
+        message={emptyMessage}
+        dark={dark}
+      />
+    );
   }
 
   const compact = size.height < 72;

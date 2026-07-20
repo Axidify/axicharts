@@ -10,6 +10,20 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.21] - 2026-07-20
+
+### Added
+
+- **docs** — Dashboard card grid guidance (`minHeight` = plot budget, legend below plot, `emptyMessage`)
+
+### Fixed
+
+- **charts** — Multi-series legend renders below the plot; `minHeight` is the plot area budget so grid cards stay aligned
+- **charts** — All-zero cartesian series show built-in empty state (respects `emptyMessage` on `ChartContainer`)
+- **charts** — `ChartContainer` `config` keys matching category labels apply per-bar fills for single-series bar charts
+
+See [RELEASE-v0.4.21.md](./RELEASE-v0.4.21.md).
+
 ## [0.4.20] - 2026-07-20
 
 ### Added

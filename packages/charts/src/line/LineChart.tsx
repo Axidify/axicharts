@@ -20,8 +20,9 @@ import { useChartLayout } from "../container/ChartLayoutContext";
 import {
   CartesianChartShell,
 } from "../chrome/CartesianChartShell";
-import { getLegendHeight } from "../chrome/Legend";
 import { getInteractionChrome } from "../interaction/mode";
+import { cartesianPlotHeight } from "../cartesian/cartesianPlotLayout";
+import { CartesianEmptyPlot } from "../cartesian/CartesianEmptyPlot";
 import { usePlotSync } from "../sync/usePlotSync";
 import { sliceCartesianByBrushRange } from "../sync/brushRange";
 import { useCartesianBrush } from "../sync/useCartesianBrush";
@@ -46,7 +47,6 @@ import {
   useLiveCrossfade,
 } from "../motion";
 import { CategoryClickOverlay } from "../interaction/CategoryClickOverlay";
-import { FlatZeroSeriesCaption } from "../interaction/FlatZeroSeriesCaption";
 import {
   isFlatZeroSeries,
   useCartesianCategoryMeta,
@@ -108,7 +108,6 @@ type LinePlotProps = {
   onCategoryClick?: (event: ChartPointerEvent) => void;
   onSeriesClick?: (event: ChartPointerEvent) => void;
   dualAxisResolved?: boolean;
-  showFlatZeroCaption?: boolean;
 };
 
 function LinePlot({
@@ -140,16 +139,12 @@ function LinePlot({
   onCategoryClick,
   onSeriesClick,
   dualAxisResolved = false,
-  showFlatZeroCaption = false,
 }: LinePlotProps): ReactElement {
-  const { size, theme, mode, legendVariant } = useChartLayout();
+  const { size, theme, mode } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
   const chrome = getInteractionChrome(mode);
-  const showLegend =
-    chrome.showLegend && series.length > 1 && !compact;
-  const legendHeight = getLegendHeight(showLegend, legendVariant);
   const overviewHeight = brush ? RANGE_OVERVIEW_HEIGHT : 0;
-  const plotHeight = Math.floor(size.height) - legendHeight - overviewHeight;
+  const plotHeight = cartesianPlotHeight(size, overviewHeight);
   const valueBounds = useMemo(() => seriesValueBounds(series), [series]);
   const overlayDualAxis = useMemo(
     () => (stacked ? false : shouldUseDualAxis(series, dualAxis)),
@@ -157,7 +152,7 @@ function LinePlot({
   );
 
   return (
-    <div style={{ width: Math.floor(size.width), height: Math.floor(size.height) - legendHeight, position: "relative" }}>
+    <div style={{ width: Math.floor(size.width), height: plotHeight + overviewHeight, position: "relative" }}>
       {engine === "svg" ? (
         <SvgCartesianLine
           width={Math.floor(size.width)}
@@ -226,12 +221,10 @@ function LinePlot({
         series={series}
         compact={compact}
         dualAxis={dualAxisResolved}
-        showLegend={showLegend}
         selectedCategoryIndex={selectedCategoryIndex}
         onCategoryClick={onCategoryClick}
         onSeriesClick={onSeriesClick}
       />
-      {showFlatZeroCaption && isFlatZeroSeries(series) ? <FlatZeroSeriesCaption /> : null}
       {brush && brushRange && onBrushRangeChange && overviewCategories && overviewSeries ? (
         <UPlotRangeOverview
           width={Math.floor(size.width)}
@@ -272,7 +265,7 @@ export function LineChart({
   onCategoryClick,
   onSeriesClick,
 }: LineChartProps): ReactElement | null {
-  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate } =
+  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate, dataState, emptyMessage } =
     useChartLayout();
   const annotationProps = useCartesianAnnotations({
     annotations,
@@ -299,9 +292,11 @@ export function LineChart({
     [...LINE_SERIES_KINDS],
   );
   const series = useMemo(() => {
-    const configured = applyChartConfigToSeries(resolvedSeries, config);
+    const configured = applyChartConfigToSeries(resolvedSeries, config, {
+      categories,
+    });
     return applyTagTonesToSeries(configured, tagTones ?? {});
-  }, [resolvedSeries, config, tagTones]);
+  }, [resolvedSeries, config, tagTones, categories]);
   const brushed = useMemo(
     () => sliceCartesianByBrushRange(categories, series, effectiveRange),
     [categories, series, effectiveRange],
@@ -342,6 +337,18 @@ export function LineChart({
 
   if (!ready || size.width < 1 || size.height < 1 || categories.length === 0 || series.length === 0) {
     return null;
+  }
+
+  const dark = theme.name === "live" || theme.name === "industrial";
+  if (dataState === "ready" && isFlatZeroSeries(series)) {
+    return (
+      <CartesianEmptyPlot
+        width={size.width}
+        height={size.height}
+        message={emptyMessage}
+        dark={dark}
+      />
+    );
   }
 
   const compact = size.height < 72;
@@ -403,7 +410,6 @@ export function LineChart({
             onCategoryClick={onCategoryClick}
             onSeriesClick={onSeriesClick}
             dualAxisResolved={dualAxisResolved}
-            showFlatZeroCaption
           />
         }
       />

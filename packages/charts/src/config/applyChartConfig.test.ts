@@ -27,6 +27,22 @@ describe("applyChartConfigToSeries", () => {
       tone: "warning",
     });
   });
+
+  it("applies per-category fills for a single-series bar chart", () => {
+    const configured = applyChartConfigToSeries(
+      [{ name: "Tasks", data: [4, 18, 4] }],
+      {
+        "P1 – Critical": { color: "#f43f5e" },
+        "P2 – High": { color: "#f59e0b" },
+        "P3 – Medium": { color: "#3b82f6" },
+      },
+      {
+        categories: ["P1 – Critical", "P2 – High", "P3 – Medium"],
+      },
+    );
+
+    expect(configured[0]?.fills).toEqual(["#f43f5e", "#f59e0b", "#3b82f6"]);
+  });
 });
 
 describe("applyChartConfigToPieSlices", () => {

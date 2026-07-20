@@ -3,6 +3,11 @@ import type { PieSlice } from "@axicharts/charts-echarts";
 import type { FunnelStage } from "@axicharts/charts-echarts";
 import type { ChartConfig } from "../container/ChartLayoutContext";
 
+export type ApplyChartConfigOptions = {
+  /** Category axis labels — enables per-bar fills from config keys when a single series is used. */
+  categories?: string[];
+};
+
 export function configLookupKey(item: {
   key?: string;
   name: string;
@@ -10,13 +15,39 @@ export function configLookupKey(item: {
   return item.key ?? item.name;
 }
 
+function applyCategoryFillsFromConfig(
+  series: PlotSeries[],
+  config: ChartConfig,
+  categories: string[],
+): PlotSeries[] {
+  if (series.length !== 1 || categories.length === 0) return series;
+
+  const [first, ...rest] = series;
+  if (!first || (first.fills && first.fills.length > 0)) return series;
+
+  const fills = categories.map((category) => config[category]?.color);
+  if (!fills.some((color) => color != null)) return series;
+
+  return [
+    {
+      ...first,
+      fills: categories.map(
+        (category, index) =>
+          config[category]?.color ?? fills[index] ?? first.color ?? "",
+      ),
+    },
+    ...rest,
+  ];
+}
+
 export function applyChartConfigToSeries(
   series: PlotSeries[],
   config: ChartConfig | undefined,
+  options: ApplyChartConfigOptions = {},
 ): PlotSeries[] {
   if (!config) return series;
 
-  return series.map((item) => {
+  const mapped = series.map((item) => {
     const entry = config[configLookupKey(item)];
     if (!entry) return item;
 
@@ -27,6 +58,12 @@ export function applyChartConfigToSeries(
       tone: item.tone ?? entry.tone,
     };
   });
+
+  if (options.categories?.length) {
+    return applyCategoryFillsFromConfig(mapped, config, options.categories);
+  }
+
+  return mapped;
 }
 
 export function applyChartConfigToPieSlices(

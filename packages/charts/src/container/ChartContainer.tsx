@@ -27,6 +27,7 @@ import {
   presentationEnterStyle,
 } from "../presentation/motion";
 import { resolveChartAnimate } from "../motion/resolve";
+import { useChromeInsets } from "./useChromeInsets";
 import "../chrome/chartChrome.css";
 
 export type { ChartDataState };
@@ -96,6 +97,7 @@ export function ChartContainer({
 }: ChartContainerProps): ReactElement {
   const [ref, measured] = useResizeObserver(debounceMs);
   const [resolvedTheme, setResolvedTheme] = useState(theme);
+  const { total: chromeInset, register: setChromeInset } = useChromeInsets();
 
   useLayoutEffect(() => {
     if (!ref.current) {
@@ -176,6 +178,8 @@ export function ChartContainer({
         tagTones,
         legendVariant,
         tooltipVariant,
+        emptyMessage,
+        setChromeInset,
       }}
     >
       <div
@@ -184,9 +188,12 @@ export function ChartContainer({
         style={{
           width,
           height: height ?? undefined,
-          minHeight: height === undefined ? minHeight : undefined,
-          maxHeight,
+          minHeight:
+            height === undefined ? minHeight + chromeInset : undefined,
+          maxHeight: maxHeight != null ? maxHeight + chromeInset : undefined,
+          paddingBottom: chromeInset > 0 ? chromeInset : undefined,
           position: "relative",
+          boxSizing: "border-box",
           ...style,
         }}
       >

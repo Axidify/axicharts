@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactElement, ReactNode } from "react";
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import type { PlotSeries } from "@axicharts/charts-canvas";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import {
@@ -45,8 +45,9 @@ function CartesianChromeInner({
   plotKey,
   skipPresentationPlotEnter = false,
 }: CartesianChromeProps): ReactElement {
-  const { mode, legendVariant } = useChartLayout();
+  const { mode, legendVariant, setChromeInset } = useChartLayout();
   const chrome = getInteractionChrome(mode);
+  const insetId = useId();
   const showLegend =
     chrome.showLegend && series.length > 1 && !compact;
   const legendHeight = getLegendHeight(showLegend, legendVariant);
@@ -57,19 +58,19 @@ function CartesianChromeInner({
     }
   }, [mode]);
 
+  useEffect(() => {
+    setChromeInset?.(insetId, showLegend ? legendHeight : 0);
+    return () => setChromeInset?.(insetId, 0);
+  }, [insetId, legendHeight, setChromeInset, showLegend]);
+
   return (
-    <>
-      {showLegend ? (
-        <div style={presentationEnterStyle(mode === "presentation")}>
-          <Legend series={series} />
-        </div>
-      ) : null}
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <div
         key={plotKey}
         className={plotClassName}
         style={{
           position: "absolute",
-          top: legendHeight,
+          top: 0,
           left: 0,
           right: 0,
           bottom: 0,
@@ -91,7 +92,21 @@ function CartesianChromeInner({
           />
         ) : null}
       </div>
-    </>
+      {showLegend ? (
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            right: 0,
+            height: legendHeight,
+            ...presentationEnterStyle(mode === "presentation"),
+          }}
+        >
+          <Legend series={series} layout="flow" />
+        </div>
+      ) : null}
+    </div>
   );
 }
 

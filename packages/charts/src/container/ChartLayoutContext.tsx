@@ -5,6 +5,7 @@ import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartDataState } from "../state/types";
 import type { LegendVariant, TooltipVariant } from "../chrome/chromeVariants";
 import type { LiveAnimate } from "../motion/types";
+import type { ChromeInsetRegistrar } from "./useChromeInsets";
 
 export type ChartConfig = Record<
   string,
@@ -33,6 +34,9 @@ export type ChartLayoutContextValue = {
   tagTones?: Record<string, SeriesTone>;
   legendVariant?: LegendVariant;
   tooltipVariant?: TooltipVariant;
+  emptyMessage?: string;
+  /** Reserve space below the plot slot (e.g. flow legend). */
+  setChromeInset?: ChromeInsetRegistrar;
 };
 
 export const ChartLayoutContext = createContext<ChartLayoutContextValue | null>(
