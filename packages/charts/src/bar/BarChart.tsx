@@ -19,7 +19,7 @@ import {
   CartesianChartShell,
 } from "../chrome/CartesianChartShell";
 import { getInteractionChrome } from "../interaction/mode";
-import { cartesianPlotHeight } from "../cartesian/cartesianPlotLayout";
+import { resolveCartesianPlotSize } from "../cartesian/cartesianPlotLayout";
 import { CartesianEmptyPlot } from "../cartesian/CartesianEmptyPlot";
 import { usePlotSync } from "../sync/usePlotSync";
 import { sliceCartesianByBrushRange } from "../sync/brushRange";
@@ -64,6 +64,7 @@ export type BarChartProps<TMeta = unknown> = CartesianPointerChartProps<TMeta> &
   stacked?: boolean;
   renderer?: RendererPreference;
   refreshHz?: number;
+  orientation?: "vertical" | "horizontal";
   thresholdBands?: ThresholdBand[];
   annotations?: ChartAnnotation[];
   graphics?: ChartGraphicElement[];
@@ -99,6 +100,7 @@ type BarPlotProps = {
   onCategoryClick?: (event: ChartPointerEvent) => void;
   onSeriesClick?: (event: ChartPointerEvent) => void;
   compact?: boolean;
+  orientation?: "vertical" | "horizontal";
 };
 
 function BarPlot({
@@ -126,12 +128,18 @@ function BarPlot({
   onCategoryClick,
   onSeriesClick,
   compact = false,
+  orientation = "vertical",
 }: BarPlotProps): ReactElement {
-  const { size, theme, mode } = useChartLayout();
+  const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
   const chrome = getInteractionChrome(mode);
   const overviewHeight = brush ? RANGE_OVERVIEW_HEIGHT : 0;
-  const plotHeight = cartesianPlotHeight(size, overviewHeight);
+  const { height: plotHeight } = resolveCartesianPlotSize(size, {
+    overviewHeight,
+    seriesCount: series.length,
+    mode,
+    legendVariant,
+  });
   const valueBounds = useMemo(() => seriesValueBounds(series), [series]);
 
   return (
@@ -160,6 +168,7 @@ function BarPlot({
           stacked={stacked}
           thresholdBands={thresholdBands}
           annotations={annotations}
+          orientation={orientation}
           showCursor={chrome.showCrosshair}
           useNativeLegend={false}
           onCursor={plotSync.onCursor}
@@ -197,6 +206,7 @@ function BarPlot({
         categoryMeta={categoryMeta}
         series={series}
         compact={compact}
+        orientation={orientation}
         selectedCategoryIndex={selectedCategoryIndex}
         onCategoryClick={onCategoryClick}
         onSeriesClick={onSeriesClick}
@@ -225,6 +235,7 @@ export function BarChart({
   valueSuffix: valueSuffixProp,
   referenceLines,
   stacked = false,
+  orientation = "vertical",
   renderer = "auto",
   refreshHz,
   thresholdBands,
@@ -239,7 +250,7 @@ export function BarChart({
   onCategoryClick,
   onSeriesClick,
 }: BarChartProps): ReactElement | null {
-  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate, dataState, emptyMessage } =
+  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate, dataState, emptyMessage, legendVariant } =
     useChartLayout();
   const annotationProps = useCartesianAnnotations({
     annotations,
@@ -278,7 +289,7 @@ export function BarChart({
     pointCount: brushed.categories.length,
     renderer,
     refreshHz,
-    forceCanvas: brush,
+    forceCanvas: brush || orientation === "horizontal" || stacked,
   });
   const prepared = useMemo(
     () => preparePlotData(brushed.categories, brushed.series, maxPoints),
@@ -337,7 +348,7 @@ export function BarChart({
       engine={engine}
       style={{
         width: size.width,
-        height: size.height,
+        height: "100%",
         position: "relative",
         overflow: "visible",
       }}
@@ -376,6 +387,7 @@ export function BarChart({
             onCategoryClick={onCategoryClick}
             onSeriesClick={onSeriesClick}
             compact={compact}
+            orientation={orientation}
           />
         }
       />

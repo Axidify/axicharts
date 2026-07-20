@@ -53,6 +53,7 @@ export function Legend({
         height: legendHeight,
         display: "flex",
         alignItems: "center",
+        justifyContent: flow ? "center" : undefined,
         gap: legendVariant === "compact" ? 6 : 8,
         padding: legendVariant === "inline" ? "0 4px" : "0 6px",
         pointerEvents: "none",

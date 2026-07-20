@@ -75,6 +75,20 @@ const VISUAL_STORIES = [
     settleMs: 1500,
     maxDiffPixelRatio: 0.05,
   },
+  {
+    id: "audit-design--recharts-parity-tile-360",
+    name: "design-recharts-parity-360",
+    waitFor: ".axicharts-uplot",
+    settleMs: 2500,
+    maxDiffPixelRatio: 0.05,
+  },
+  {
+    id: "audit-design--horizontal-bar-tile-360",
+    name: "design-horizontal-bar-360",
+    waitFor: ".axicharts-uplot",
+    settleMs: 2000,
+    maxDiffPixelRatio: 0.04,
+  },
 ] as const;
 
 /** Fixed viewport clip — avoids 1–3px height drift between macOS baselines and Linux CI. */

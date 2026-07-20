@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolvePanelHeight } from "./resolvePanelHeight";
+import { panelChartHeight, resolvePanelHeight } from "./resolvePanelHeight";
 
 describe("resolvePanelHeight", () => {
   it("keeps sparkline and KPI heights below the plot minimum", () => {
@@ -17,5 +17,16 @@ describe("resolvePanelHeight", () => {
   it("uses fallback when height is omitted", () => {
     expect(resolvePanelHeight("line")).toBe(240);
     expect(resolvePanelHeight("pie", undefined, 280)).toBe(280);
+  });
+});
+
+describe("panelChartHeight", () => {
+  it("subtracts title chrome for titled panels at dashboard height", () => {
+    expect(panelChartHeight("bar", 280, true)).toBe(257);
+    expect(panelChartHeight("bar", 280, false)).toBe(280);
+  });
+
+  it("does not subtract title chrome for sparkline heights", () => {
+    expect(panelChartHeight("bar", 60, true)).toBe(60);
   });
 });

@@ -1,3 +1,5 @@
+import { categoryAxisSizeForLabels } from "@axicharts/charts-canvas";
+
 export type CartesianPlotInsets = {
   top: number;
   right: number;
@@ -11,15 +13,28 @@ export function resolveCartesianPlotInsets({
   dualAxis = false,
   showLegend = false,
   compact,
+  orientation = "vertical",
+  categories = [],
 }: {
   height: number;
   dualAxis?: boolean;
   showLegend?: boolean;
   compact?: boolean;
+  orientation?: "vertical" | "horizontal";
+  categories?: string[];
 }): CartesianPlotInsets {
   const isCompact = compact ?? height < 72;
   if (isCompact) {
     return { top: 4, right: 6, bottom: 4, left: 6 };
+  }
+
+  if (orientation === "horizontal") {
+    return {
+      top: 8,
+      right: 14,
+      bottom: 32,
+      left: categoryAxisSizeForLabels(categories),
+    };
   }
 
   const top = showLegend ? 28 : 8;

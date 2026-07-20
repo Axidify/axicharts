@@ -58,7 +58,7 @@ import type { FieldEncoding, PanelSpec, SpecData, ThemeName, ChartMode } from ".
 import { asRows, pluckField } from "./data";
 import { applySpecCompilers } from "./specCompiler";
 import { resolveTheme } from "./themes";
-import { fillsFromColorField } from "./colorEncoding";
+import { applyColorEncodingToBarSeries, fillsFromColorField } from "./colorEncoding";
 import { sizesFromSizeField } from "./sizeEncoding";
 import { comboSeriesFromEncoding } from "./comboEncoding";
 import {
@@ -93,7 +93,7 @@ import {
   themeWithPanelStyle,
 } from "./panelStyle";
 import { registerPluginChartTypes } from "./registerPluginChartTypes";
-import { resolvePanelHeight } from "./resolvePanelHeight";
+import { panelChartHeight } from "./resolvePanelHeight";
 import { assertPanelCategoryEnabled } from "./panelCategories";
 import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
 import { resolveCalendarHeatmapData } from "./calendarEncoding";
@@ -109,6 +109,10 @@ import { ridgelineFromRows } from "./ridgelineEncoding";
 import { wordCloudFromRows } from "./wordCloudEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
 import { panelPropsWithGraphics } from "./panelGraphics";
+import {
+  isHorizontalBarPanel,
+  panelOrientationProps,
+} from "./panelOrientation";
 
 function panelChartProps<T extends Record<string, unknown>>(
   spec: PanelSpec,
@@ -164,10 +168,11 @@ function wrapChart(
     resolveTheme(options.theme ?? spec.theme),
     readPanelStyle(spec.props),
   );
-  const mode = options.mode ?? spec.mode;
-  const height = resolvePanelHeight(
+  const mode = options.mode ?? spec.mode ?? "static";
+  const height = panelChartHeight(
     spec.type,
     options.height ?? spec.height,
+    Boolean(spec.title),
   );
   const width = options.width ?? spec.width ?? "100%";
   const dark = theme.name === "live" || theme.name === "industrial";
@@ -320,12 +325,20 @@ export function compilePanel(
         resolved.encoding?.color &&
         baseSeries[0]
       ) {
-        const fills = fillsFromColorField(
-          rows,
-          resolved.encoding.color.field,
-          baseSeries[0].color,
-        );
-        seriesWithColor = [{ ...baseSeries[0], fills }, ...baseSeries.slice(1)];
+        if (resolved.type === "bar") {
+          seriesWithColor = applyColorEncodingToBarSeries(
+            rows,
+            resolved.encoding.color.field,
+            baseSeries,
+          );
+        } else {
+          const fills = fillsFromColorField(
+            rows,
+            resolved.encoding.color.field,
+            baseSeries[0].color,
+          );
+          seriesWithColor = [{ ...baseSeries[0], fills }, ...baseSeries.slice(1)];
+        }
       }
 
       let seriesWithSize = seriesWithColor;
@@ -358,6 +371,7 @@ export function compilePanel(
         stacked: resolved.stacked,
         valueSuffix: resolved.valueSuffix,
         animate: readPanelAnimation(resolved),
+        ...panelOrientationProps(resolved),
         ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
       });
 
@@ -433,10 +447,18 @@ export function compilePanel(
       const curve =
         marksCurve(marks) ?? readPanelStyle(cartesian.props)?.line?.curve;
 
+      const seriesWithColor = cartesian.encoding?.color
+        ? applyColorEncodingToBarSeries(
+            rows,
+            cartesian.encoding.color.field,
+            fromMarks.series,
+          )
+        : fromMarks.series;
+
       const chartProps = panelChartProps(cartesian, {
         ...props,
         categories,
-        series: applyTagTonesToSeries(fromMarks.series, tagTones) as ComboSeries[],
+        series: applyTagTonesToSeries(seriesWithColor, tagTones) as ComboSeries[],
         fill: cartesian.fill ?? fromMarks.fill,
         valueSuffix: cartesian.valueSuffix,
         ...(fromMarks.showValues || cartesian.showValues
@@ -460,8 +482,13 @@ export function compilePanel(
         ],
         ...(curve ? { curve } : {}),
         animate: readPanelAnimation(cartesian),
+        ...panelOrientationProps(cartesian),
         ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
       });
+
+      if (isHorizontalBarPanel(cartesian)) {
+        return wrap(createElement(BarChart, chartProps));
+      }
 
       return wrap(createElement(CartesianChart, chartProps));
     }

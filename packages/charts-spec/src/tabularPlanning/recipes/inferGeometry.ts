@@ -66,11 +66,11 @@ export function inferChartGeometry(input: GeometryInput): ChartGeometry {
   }
 
   if (xCardinality != null && xCardinality > HIGH_CARDINALITY_BAR) {
-    rules.push("geometry:high-cardinality-bar");
+    rules.push("geometry:high-cardinality-horizontal-bar");
     return {
       panelType: "cartesian",
       markType: "bar",
-      orientation: "vertical",
+      orientation: "horizontal",
       rules,
     };
   }

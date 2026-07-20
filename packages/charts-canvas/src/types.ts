@@ -84,12 +84,15 @@ export type UPlotLineProps = {
   chartId?: string;
 };
 
+export type BarOrientation = "vertical" | "horizontal";
+
 export type UPlotBarProps = {
   width: number;
   height: number;
   categories: string[];
   series: PlotSeries[];
   theme: ChartTheme;
+  orientation?: BarOrientation;
   showAxes?: boolean;
   showValues?: boolean;
   valueSuffix?: string;

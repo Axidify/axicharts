@@ -18,7 +18,7 @@ import type { RendererPreference } from "@axicharts/charts-core";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { CartesianChartShell } from "../chrome/CartesianChartShell";
 import { getInteractionChrome } from "../interaction/mode";
-import { cartesianPlotHeight } from "../cartesian/cartesianPlotLayout";
+import { resolveCartesianPlotSize } from "../cartesian/cartesianPlotLayout";
 import { CartesianEmptyPlot } from "../cartesian/CartesianEmptyPlot";
 import { isFlatZeroSeries } from "../interaction/cartesianPointerChartProps";
 import { usePlotSync } from "../sync/usePlotSync";
@@ -85,10 +85,14 @@ function ComboPlot({
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
   compact?: boolean;
 }): ReactElement {
-  const { size, theme, mode } = useChartLayout();
+  const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync();
   const chrome = getInteractionChrome(mode);
-  const plotHeight = cartesianPlotHeight(size);
+  const { height: plotHeight } = resolveCartesianPlotSize(size, {
+    seriesCount: series.length,
+    mode,
+    legendVariant,
+  });
   const valueBounds = useMemo(() => seriesValueBounds(series), [series]);
   const overlayDualAxis = useMemo(
     () => shouldUseDualAxis(series, dualAxis),

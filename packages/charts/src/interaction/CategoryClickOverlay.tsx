@@ -22,6 +22,7 @@ export type CategoryClickOverlayProps = {
   compact?: boolean;
   dualAxis?: boolean;
   showLegend?: boolean;
+  orientation?: "vertical" | "horizontal";
   selectedCategoryIndex?: number;
   onCategoryClick?: (event: ChartPointerEvent) => void;
   onSeriesClick?: (event: ChartPointerEvent) => void;
@@ -36,6 +37,7 @@ export function CategoryClickOverlay({
   compact = false,
   dualAxis = false,
   showLegend = false,
+  orientation = "vertical",
   selectedCategoryIndex,
   onCategoryClick,
   onSeriesClick,
@@ -45,6 +47,8 @@ export function CategoryClickOverlay({
     dualAxis,
     showLegend,
     compact,
+    orientation,
+    categories,
   });
   const inner = plotInnerSize(width, height, insets);
 
@@ -71,7 +75,10 @@ export function CategoryClickOverlay({
     return null;
   }
 
-  const columnWidth = inner.width / Math.max(categories.length, 1);
+  const horizontal = orientation === "horizontal";
+  const bandCount = Math.max(categories.length, 1);
+  const columnWidth = inner.width / bandCount;
+  const rowHeight = inner.height / bandCount;
 
   const containerStyle: CSSProperties = {
     position: "absolute",
@@ -80,6 +87,7 @@ export function CategoryClickOverlay({
     width: inner.width,
     height: inner.height,
     display: "flex",
+    flexDirection: horizontal ? "column" : "row",
     pointerEvents: "none",
     zIndex: 4,
   };
@@ -94,7 +102,14 @@ export function CategoryClickOverlay({
           pointerEvents: "auto",
           cursor: "pointer",
           background: selected ? "rgba(59, 130, 246, 0.12)" : "transparent",
-          borderRight: index < categories.length - 1 ? "1px solid transparent" : undefined,
+          borderRight:
+            !horizontal && index < categories.length - 1
+              ? "1px solid transparent"
+              : undefined,
+          borderBottom:
+            horizontal && index < categories.length - 1
+              ? "1px solid transparent"
+              : undefined,
         };
         return (
           <button
@@ -121,16 +136,29 @@ export function CategoryClickOverlay({
       })}
       {selectedCategoryIndex != null && selectedCategoryIndex >= 0 ? (
         <div
-          style={{
-            position: "absolute",
-            left: columnWidth * selectedCategoryIndex,
-            top: 0,
-            width: columnWidth,
-            height: "100%",
-            borderLeft: "2px solid rgba(59, 130, 246, 0.55)",
-            borderRight: "2px solid rgba(59, 130, 246, 0.55)",
-            pointerEvents: "none",
-          }}
+          style={
+            horizontal
+              ? {
+                  position: "absolute",
+                  left: 0,
+                  top: rowHeight * selectedCategoryIndex,
+                  width: "100%",
+                  height: rowHeight,
+                  borderTop: "2px solid rgba(59, 130, 246, 0.55)",
+                  borderBottom: "2px solid rgba(59, 130, 246, 0.55)",
+                  pointerEvents: "none",
+                }
+              : {
+                  position: "absolute",
+                  left: columnWidth * selectedCategoryIndex,
+                  top: 0,
+                  width: columnWidth,
+                  height: "100%",
+                  borderLeft: "2px solid rgba(59, 130, 246, 0.55)",
+                  borderRight: "2px solid rgba(59, 130, 246, 0.55)",
+                  pointerEvents: "none",
+                }
+          }
         />
       ) : null}
     </div>

@@ -10,6 +10,26 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.23] - 2026-07-20
+
+### Added
+
+- **docs** — `/compare/design` Recharts vs AxiCharts parity wall @ 360×280 with per-chart feedback
+- **docs** — `chart-design-language.md` and `chart-design-audit.md` (parity matrix, D-xxx backlog)
+- **storybook** — `Compare/Design parity`, horizontal bar, and design audit stories
+- **charts-spec** — `panelOrientation` helper; stacked-bar and donut compilePanel regression tests
+- **benchmarks** — Visual CI snapshots for design parity and horizontal bar tiles
+
+### Fixed
+
+- **charts-echarts** — Donut/pie @ dashboard tiles: bottom legend with `Name 48%`, no hover scale jitter, flush segment edges (no rounded “putty” caps)
+- **charts** — Stacked bars render on canvas (true stacking); flow legend below plot; centered legend alignment
+- **charts-canvas** — Horizontal bar renderer (rounded caps, value grid, semantic `encoding.color`, stack totals)
+- **charts-spec** — `resolvePanelHeight` reserves 23px for `spec.title`; nominal color encoding on compile path
+- **charts** — Cartesian plot layout subtracts legend height so labels don’t overlap series names
+
+See [RELEASE-v0.4.23.md](./RELEASE-v0.4.23.md).
+
 ## [0.4.22] - 2026-07-20
 
 ### Added

@@ -11,6 +11,7 @@ import {
 import { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 import { compilePanel } from "./compilePanel";
 import { ejectPanel } from "./eject";
+import stackedBarSpec from "../examples/velocity-stacked-bar.panel.json";
 
 describe("compilePanel registered types", () => {
   it("compiles community plugin panels via registerChartType", () => {
@@ -264,6 +265,62 @@ describe("compilePanel panel style", () => {
     const { container } = render(panel);
     expect(container.innerHTML.length).toBeGreaterThan(0);
     expect(container.innerHTML).not.toContain('"style"');
+  });
+
+  it("compiles horizontal cartesian bar panels through BarChart", () => {
+    const panel = compilePanel(
+      {
+        type: "cartesian",
+        orientation: "horizontal",
+        height: 360,
+        encoding: {
+          x: { field: "department" },
+        },
+        marks: [{ type: "bar", field: "spend", label: "Spend" }],
+      },
+      [
+        { department: "Engineering", spend: 120 },
+        { department: "Sales", spend: 90 },
+        { department: "Marketing", spend: 65 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+  });
+
+  it("applies encoding.color fills on horizontal cartesian bar panels", () => {
+    const panel = compilePanel(
+      {
+        type: "cartesian",
+        orientation: "horizontal",
+        height: 280,
+        encoding: {
+          x: { field: "priority", type: "nominal" },
+          color: { field: "priority", type: "nominal" },
+        },
+        marks: [{ type: "bar", field: "count", label: "Tickets" }],
+      },
+      [
+        { priority: "P1 – Critical", count: 12 },
+        { priority: "P4 – Low", count: 19 },
+      ],
+    );
+
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+  });
+
+  it("renders flow legend for stacked bar dashboard panels", async () => {
+    const panel = compilePanel(stackedBarSpec, [], { height: 280 });
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.querySelector(".axicharts-legend")).toBeTruthy();
+      expect(container.querySelector('[data-engine="svg"]')).toBeNull();
+      expect(container.querySelector(".axicharts-uplot")).toBeTruthy();
+    });
+    expect(container.textContent).toContain("Done");
+    expect(container.textContent).toContain("Carry-over");
   });
 });
 

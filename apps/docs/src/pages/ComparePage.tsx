@@ -1,10 +1,12 @@
 import type { ReactElement } from "react";
 import { LiveOpsCompareDemo } from "../../../storybook/demo/LiveOpsCompareDemo";
+import { CompareNav } from "../components/CompareNav";
 import { docBodyStyle, docCardStyle, docColors } from "../styles/docTokens";
 
 export function ComparePage(): ReactElement {
   return (
     <div>
+      <CompareNav />
       <div style={{ ...docCardStyle(), padding: 24, marginBottom: 24 }}>
         <h1 style={{ marginTop: 0 }}>AxiCharts vs Recharts vs ECharts — live ops wall</h1>
         <p style={docBodyStyle()}>

@@ -1,7 +1,6 @@
 "use client";
 
-import type { CSSProperties, ReactElement, ReactNode } from "react";
-import { useEffect, useId } from "react";
+import { useEffect, type CSSProperties, type ReactElement, type ReactNode } from "react";
 import type { PlotSeries } from "@axicharts/charts-canvas";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import {
@@ -11,7 +10,7 @@ import {
   Tooltip,
 } from "../chrome";
 import { ChartInteractionProvider } from "../interaction/ChartInteractionContext";
-import { getInteractionChrome } from "../interaction/mode";
+import { getInteractionChrome, shouldShowCartesianLegend } from "../interaction/mode";
 import {
   ensurePresentationStyles,
   presentationEnterStyle,
@@ -45,11 +44,13 @@ function CartesianChromeInner({
   plotKey,
   skipPresentationPlotEnter = false,
 }: CartesianChromeProps): ReactElement {
-  const { mode, legendVariant, setChromeInset } = useChartLayout();
+  const { mode, legendVariant } = useChartLayout();
   const chrome = getInteractionChrome(mode);
-  const insetId = useId();
-  const showLegend =
-    chrome.showLegend && series.length > 1 && !compact;
+  const showLegend = shouldShowCartesianLegend({
+    mode,
+    seriesCount: series.length,
+    compact,
+  });
   const legendHeight = getLegendHeight(showLegend, legendVariant);
 
   useEffect(() => {
@@ -58,48 +59,58 @@ function CartesianChromeInner({
     }
   }, [mode]);
 
-  useEffect(() => {
-    setChromeInset?.(insetId, showLegend ? legendHeight : 0);
-    return () => setChromeInset?.(insetId, 0);
-  }, [insetId, legendHeight, setChromeInset, showLegend]);
-
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100%",
+        minHeight: 0,
+      }}
+    >
       <div
-        key={plotKey}
-        className={plotClassName}
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          ...presentationEnterStyle(
-            mode === "presentation" && !skipPresentationPlotEnter,
-          ),
-          ...plotMotionStyle,
+          flex: 1,
+          minHeight: 0,
+          position: "relative",
         }}
       >
-        {plot}
-        {chrome.showCrosshair ? <SyncHighlight categories={categories} /> : null}
-        {chrome.showCrosshair ? <Crosshair /> : null}
-        {chrome.showTooltip ? (
-          <Tooltip
-            categories={categories}
-            series={series}
-            valueSuffix={valueSuffix}
-            getRows={getRows}
-          />
-        ) : null}
+        <div
+          key={plotKey}
+          className={plotClassName}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            ...presentationEnterStyle(
+              mode === "presentation" && !skipPresentationPlotEnter,
+            ),
+            ...plotMotionStyle,
+          }}
+        >
+          {plot}
+          {chrome.showCrosshair ? <SyncHighlight categories={categories} /> : null}
+          {chrome.showCrosshair ? <Crosshair /> : null}
+          {chrome.showTooltip ? (
+            <Tooltip
+              categories={categories}
+              series={series}
+              valueSuffix={valueSuffix}
+              getRows={getRows}
+            />
+          ) : null}
+        </div>
       </div>
       {showLegend ? (
         <div
           style={{
-            position: "absolute",
-            top: "100%",
-            left: 0,
-            right: 0,
+            flexShrink: 0,
             height: legendHeight,
+            display: "flex",
+            justifyContent: "center",
             ...presentationEnterStyle(mode === "presentation"),
           }}
         >

@@ -12,7 +12,7 @@ const topLinks = [
   { to: "/benchmarks", label: "Benchmarks" },
   { to: "/guides/agent-cartesian", label: "Agent cartesian" },
   { to: "/guides/troubleshooting", label: "Troubleshooting" },
-  { to: "/compare", label: "vs Recharts" },
+  { to: "/compare/design", label: "vs Recharts" },
   { to: "/shadcn", label: "shadcn gallery" },
   { to: "/spec/blocks", label: "Blocks Playground" },
 ] as const;

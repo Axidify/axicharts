@@ -11,7 +11,7 @@ import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { resolvePieSliceColor } from "./pieSliceColor";
 import { pieGapOptions } from "./pieGapOptions";
-import { pieOuterRadius } from "./pieLayout";
+import { pieCenter, pieEmphasisOptions, pieLabelMode, pieOuterRadius } from "./pieLayout";
 import type { PieSlice } from "./types";
 
 export type EChartsPieProps = {
@@ -46,6 +46,8 @@ export function EChartsPie({
   const palette = seriesPalette(theme);
   const gap = pieGapOptions(innerRadius);
   const compact = isCompactTile(width, height);
+  const labelMode = pieLabelMode(width, height, showLabels);
+  const useExternalLabels = labelMode === "external";
 
   const data = slices.map((slice, index) => ({
     name: slice.name,
@@ -59,27 +61,43 @@ export function EChartsPie({
     {
       grid: gridOptions(theme, compact),
       tooltip: hiddenTooltip(),
+      legend:
+        labelMode === "legend"
+          ? {
+              show: true,
+              type: "plain",
+              orient: "horizontal",
+              bottom: 2,
+              left: "center",
+              itemWidth: 7,
+              itemHeight: 7,
+              itemGap: 10,
+              icon: "circle",
+              textStyle: {
+                color: labelColor,
+                fontSize: 11,
+                fontWeight: 500,
+              },
+              formatter: (name: string) => {
+                const slice = slices.find((item) => item.name === name);
+                if (!slice || total <= 0) return name;
+                return `${name}  ${Math.round((slice.value / total) * 100)}%`;
+              },
+            }
+          : { show: false },
       series: [
         {
           type: "pie",
-          radius: pieOuterRadius(theme, innerRadius),
-          center: ["50%", "50%"],
+          radius: pieOuterRadius(theme, innerRadius, labelMode),
+          center: pieCenter(labelMode),
           padAngle: gap.padAngle,
           avoidLabelOverlap: true,
           minShowLabelAngle: 8,
           data,
           itemStyle: gap.itemStyle,
-          emphasis: {
-            scale: !presentation,
-            scaleSize: 6,
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: "rgba(15, 23, 42, 0.12)",
-            },
-          },
+          emphasis: pieEmphasisOptions(presentation),
           label: {
-            show: showLabels,
+            show: useExternalLabels,
             formatter: "{name|{b}}\n{pct|{d}%}",
             rich: {
               name: {
@@ -98,7 +116,7 @@ export function EChartsPie({
             },
           },
           labelLine: {
-            show: showLabels,
+            show: useExternalLabels,
             length: presentation ? 14 : 12,
             length2: presentation ? 12 : 10,
             smooth: 0.25,

@@ -75,3 +75,26 @@ export function fillsFromColorField(
     resolveEncodingFill(row[field], index, fallback),
   );
 }
+
+type ColorEncodableSeries = {
+  kind?: string;
+  color?: string;
+  fills?: string[];
+};
+
+/** Apply `encoding.color` fills to the primary bar series (cartesian + bar compile paths). */
+export function applyColorEncodingToBarSeries<T extends ColorEncodableSeries>(
+  rows: Record<string, unknown>[],
+  colorField: string | undefined,
+  series: T[],
+): T[] {
+  if (!colorField || series.length === 0) return series;
+  const barIndex = series.findIndex((item) => item.kind === "bar");
+  const targetIndex = barIndex >= 0 ? barIndex : 0;
+  const target = series[targetIndex];
+  if (!target || (target.kind && target.kind !== "bar")) return series;
+  const fills = fillsFromColorField(rows, colorField, target.color);
+  return series.map((item, index) =>
+    index === targetIndex ? { ...item, fills } : item,
+  );
+}

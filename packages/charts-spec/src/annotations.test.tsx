@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { isValidElement } from "react";
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import { compilePanel } from "./compilePanel";
 import { ejectPanel } from "./eject";
 
@@ -11,7 +11,7 @@ const ROWS = [
 ];
 
 describe("compilePanel annotations", () => {
-  it("passes annotations to cartesian charts", () => {
+  it("passes annotations to cartesian charts", async () => {
     const panel = compilePanel(
       {
         type: "line",
@@ -30,11 +30,17 @@ describe("compilePanel annotations", () => {
     );
 
     expect(isValidElement(panel)).toBe(true);
-    const { container } = render(panel);
-    expect(container.querySelector(".axicharts-uplot")).toBeTruthy();
+    const { container } = render(
+      <div style={{ width: 480, height: 240 }}>{panel}</div>,
+    );
+    await waitFor(() => {
+      expect(
+        container.querySelector(".axicharts-uplot, [data-engine='svg']"),
+      ).toBeTruthy();
+    });
   });
 
-  it("reads annotations from props.annotations", () => {
+  it("reads annotations from props.annotations", async () => {
     const panel = compilePanel(
       {
         type: "line",
@@ -52,8 +58,14 @@ describe("compilePanel annotations", () => {
     );
 
     expect(isValidElement(panel)).toBe(true);
-    const { container } = render(panel);
-    expect(container.querySelector(".axicharts-uplot")).toBeTruthy();
+    const { container } = render(
+      <div style={{ width: 480, height: 240 }}>{panel}</div>,
+    );
+    await waitFor(() => {
+      expect(
+        container.querySelector(".axicharts-uplot, [data-engine='svg']"),
+      ).toBeTruthy();
+    });
   });
 });
 

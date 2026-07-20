@@ -255,6 +255,7 @@ export function buildComboOptions(
                     left,
                     top,
                     barWidth,
+                    barHeight,
                     value,
                   );
                 }

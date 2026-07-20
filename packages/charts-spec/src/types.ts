@@ -182,6 +182,8 @@ export type PanelSpec = {
   valueSuffix?: string;
   fill?: boolean;
   stacked?: boolean;
+  /** Bar chart orientation — horizontal for long category labels. */
+  orientation?: "horizontal" | "vertical";
   /** Bar value labels on cartesian/combo panels. */
   showValues?: boolean;
   innerRadius?: number;

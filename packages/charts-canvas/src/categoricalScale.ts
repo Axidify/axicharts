@@ -48,6 +48,33 @@ export function categoryAxisSize(): number {
   return 22;
 }
 
+/** Left axis width for horizontal bar category labels (px). */
+export function categoryAxisSizeForLabels(
+  categories: string[],
+  compact = false,
+): number {
+  if (compact || categories.length === 0) return 0;
+  const maxLen = Math.max(...categories.map((label) => label.length), 0);
+  return Math.min(148, Math.max(52, Math.ceil(maxLen * 5.8) + 12));
+}
+
+/** Nice ceiling for horizontal bar value axes — bars must not overshoot the last tick. */
+export function horizontalValueAxisMax(dataMax: number): number {
+  if (dataMax <= 0) return 10;
+  const padded = dataMax * 1.12;
+  const step =
+    padded <= 15
+      ? 5
+      : padded <= 40
+        ? 10
+        : padded <= 100
+          ? 15
+          : padded <= 200
+            ? 20
+            : 50;
+  return Math.ceil(padded / step) * step;
+}
+
 /** Side padding so edge tick labels are not clipped. */
 export function categoryChartPadding(
   plotWidth: number,
@@ -62,6 +89,20 @@ export function categoryChartPadding(
   const slotWidth = plotWidth / categoryCount;
   const side = Math.min(28, Math.max(14, Math.round(slotWidth * 0.2)));
   return [topPad, Math.max(right, side), 10, side];
+}
+
+/** Padding for horizontal bar charts — category axis on the left. */
+export function horizontalBarChartPadding(
+  categoryCount: number,
+  leftAxisSize: number,
+  topPad = 8,
+  showValueLabels = false,
+): [number, number, number, number] {
+  const right = showValueLabels ? 36 : 14;
+  const bottom = categoryCount > 0 ? 32 : 10;
+  const top = topPad;
+  const left = Math.max(14, leftAxisSize);
+  return [top, right, bottom, left];
 }
 
 export function categorySlotWidth(plotWidth: number, categoryCount: number): number | undefined {

@@ -97,4 +97,19 @@ describe("ejectCartesian", () => {
     );
     expect(body).toContain('type="linear"');
   });
+
+  it("emits orientation for horizontal bar panels", () => {
+    const { body } = ejectCartesianBody(
+      {
+        type: "bar",
+        orientation: "horizontal",
+        encoding: {
+          x: { field: "department" },
+          y: { field: "spend" },
+        },
+      },
+      "rows",
+    );
+    expect(body).toContain('orientation="horizontal"');
+  });
 });

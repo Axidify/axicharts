@@ -21,7 +21,7 @@ import {
   CartesianChartShell,
 } from "../chrome/CartesianChartShell";
 import { getInteractionChrome } from "../interaction/mode";
-import { cartesianPlotHeight } from "../cartesian/cartesianPlotLayout";
+import { cartesianPlotHeight, resolveCartesianPlotSize } from "../cartesian/cartesianPlotLayout";
 import { CartesianEmptyPlot } from "../cartesian/CartesianEmptyPlot";
 import { usePlotSync } from "../sync/usePlotSync";
 import { sliceCartesianByBrushRange } from "../sync/brushRange";
@@ -140,11 +140,16 @@ function LinePlot({
   onSeriesClick,
   dualAxisResolved = false,
 }: LinePlotProps): ReactElement {
-  const { size, theme, mode } = useChartLayout();
+  const { size, theme, mode, legendVariant } = useChartLayout();
   const plotSync = usePlotSync(fullCategoryCount);
   const chrome = getInteractionChrome(mode);
   const overviewHeight = brush ? RANGE_OVERVIEW_HEIGHT : 0;
-  const plotHeight = cartesianPlotHeight(size, overviewHeight);
+  const { height: plotHeight } = resolveCartesianPlotSize(size, {
+    overviewHeight,
+    seriesCount: series.length,
+    mode,
+    legendVariant,
+  });
   const valueBounds = useMemo(() => seriesValueBounds(series), [series]);
   const overlayDualAxis = useMemo(
     () => (stacked ? false : shouldUseDualAxis(series, dualAxis)),
@@ -366,7 +371,7 @@ export function LineChart({
       engine={engine}
       style={{
         width: size.width,
-        height: size.height,
+        height: "100%",
         position: "relative",
         overflow: "visible",
       }}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getInteractionChrome } from "./mode";
+import { getInteractionChrome, shouldShowCartesianLegend } from "./mode";
 
 describe("getInteractionChrome", () => {
   it("disables all chrome in static mode", () => {
@@ -32,5 +32,25 @@ describe("getInteractionChrome", () => {
       showLegend: true,
       showCrosshair: true,
     });
+  });
+});
+
+describe("shouldShowCartesianLegend", () => {
+  it("shows legends for multi-series static dashboard panels", () => {
+    expect(
+      shouldShowCartesianLegend({ mode: "static", seriesCount: 2, compact: false }),
+    ).toBe(true);
+    expect(
+      shouldShowCartesianLegend({ mode: "static", seriesCount: 1, compact: false }),
+    ).toBe(false);
+  });
+
+  it("hides legends in live mode and compact sparkline heights", () => {
+    expect(
+      shouldShowCartesianLegend({ mode: "live", seriesCount: 2, compact: false }),
+    ).toBe(false);
+    expect(
+      shouldShowCartesianLegend({ mode: "static", seriesCount: 2, compact: true }),
+    ).toBe(false);
   });
 });

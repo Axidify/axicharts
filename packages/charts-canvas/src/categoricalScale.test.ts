@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  categoryAxisSizeForLabels,
   categoryChartPadding,
   categoryXScale,
+  horizontalBarChartPadding,
+  horizontalValueAxisMax,
   ordinalBarSize,
 } from "./categoricalScale";
 
@@ -21,5 +24,29 @@ describe("categoricalScale", () => {
     const padding = categoryChartPadding(320, 4);
     expect(padding[1]).toBeGreaterThanOrEqual(14);
     expect(padding[3]).toBeGreaterThanOrEqual(14);
+  });
+
+  it("sizes the left axis from the longest category label", () => {
+    expect(categoryAxisSizeForLabels(["A", "Short"])).toBeGreaterThanOrEqual(52);
+    expect(categoryAxisSizeForLabels(["P1 – Critical", "P4 – Low"])).toBeLessThanOrEqual(
+      100,
+    );
+    expect(
+      categoryAxisSizeForLabels(["P1 – Critical outage in production gateway"]),
+    ).toBeLessThanOrEqual(148);
+  });
+
+  it("ceilings horizontal value axes past the data max", () => {
+    expect(horizontalValueAxisMax(45)).toBe(60);
+    expect(horizontalValueAxisMax(12)).toBe(15);
+    expect(horizontalValueAxisMax(180)).toBe(250);
+  });
+
+  it("reserves left gutter space for horizontal bar charts", () => {
+    const [top, right, bottom, left] = horizontalBarChartPadding(8, 96, 12, true);
+    expect(top).toBe(12);
+    expect(right).toBe(36);
+    expect(bottom).toBe(32);
+    expect(left).toBe(96);
   });
 });

@@ -13,6 +13,7 @@ import { SpecPage } from "./pages/SpecPage";
 import { BlocksPlaygroundPage } from "./pages/BlocksPlaygroundPage";
 import { StartPage } from "./pages/StartPage";
 import { VerticalsPage } from "./pages/VerticalsPage";
+import { CompareDesignPage } from "./pages/CompareDesignPage";
 import { ComparePage } from "./pages/ComparePage";
 import { ShadcnPage } from "./pages/ShadcnPage";
 import { ShadcnRegistryPage } from "./pages/ShadcnRegistryPage";
@@ -44,6 +45,7 @@ export function App(): ReactElement {
           <Route path="guides/versions" element={<VersionMatrixPage />} />
           <Route path="guides/troubleshooting" element={<TroubleshootingPage />} />
           <Route path="verticals" element={<VerticalsPage />} />
+          <Route path="compare/design" element={<CompareDesignPage />} />
           <Route path="compare" element={<ComparePage />} />
           <Route path="shadcn" element={<ShadcnPage />} />
           <Route path="shadcn/registry" element={<ShadcnRegistryPage />} />

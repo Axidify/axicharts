@@ -3,6 +3,7 @@ import { createCartesianPanel } from "../../createCartesianPanel";
 import { createTablePanel } from "../../createTablePanel";
 import { validateCartesianSpec } from "../../cartesianValidation";
 import { isNominalColorDimension } from "../../nominalColorMap";
+import { horizontalBarPanelHeight } from "../../panelOrientation";
 import { inferChartGeometry } from "./inferGeometry";
 import type {
   ChartGeometry,
@@ -171,19 +172,30 @@ function compileCartesianPanel(
   });
 
   const panel = enrichNominalBarPanel(result.panel, recipe, geometry);
+  const xField = recipe.xField ?? panel.encoding?.x?.field;
+  const categoryCount = xField
+    ? new Set(rows.map((row) => String(row[xField]))).size
+    : rows.length;
+  const panelWithGeometry: PanelSpec = {
+    ...panel,
+    ...(geometry.orientation ? { orientation: geometry.orientation } : {}),
+    ...(geometry.orientation === "horizontal" && categoryCount > 0
+      ? { height: horizontalBarPanelHeight(categoryCount) }
+      : {}),
+  };
 
   const matchedRules = [
     ...result.matchedRules,
     ...geometry.rules,
     `mark:${geometry.markType ?? "bar"}`,
   ];
-  if (panel.encoding?.color?.type === "nominal") {
+  if (panelWithGeometry.encoding?.color?.type === "nominal") {
     matchedRules.push("encoding:nominal-color");
   }
   if (!validation.ok) matchedRules.push("validation:needs-review");
 
   return {
-    panel: { ...panel, title: recipe.title },
+    panel: { ...panelWithGeometry, title: recipe.title },
     rows,
     geometry,
     matchedRules,
@@ -238,6 +250,9 @@ export function compileRecipe(
     yField: recipe.yField,
     yFields: recipe.yFields,
     dimensionKey: recipe.stageOrder ? "stage" : undefined,
+    grain: options.dataProfile?.grain,
+    timeSpan: options.dataProfile?.timeSpan,
+    cardinalities: options.dataProfile?.cardinalities,
   });
 
   return compileCartesianPanel(recipe, chartRows, geometry, options);

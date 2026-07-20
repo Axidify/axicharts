@@ -117,6 +117,23 @@ function CompositionPriorityCompare(): ReactElement {
       </div>
       <div style={{ gridColumn: "1 / -1" }}>
         <div style={{ ...LABEL, color: "#2563eb" }}>
+          AxiCharts · horizontal bar (spec path)
+        </div>
+        <div style={CARD}>
+          <div style={{ padding: 16 }}>
+            <Chart
+              panel={{
+                ...PRIORITY_PANEL,
+                orientation: "horizontal",
+                height: 260,
+              }}
+              data={PRIORITY_ROWS}
+            />
+          </div>
+        </div>
+      </div>
+      <div style={{ gridColumn: "1 / -1" }}>
+        <div style={{ ...LABEL, color: "#2563eb" }}>
           AxiCharts · imperative BarChart + chartConfig
         </div>
         <div style={CARD}>
@@ -140,8 +157,8 @@ function CompositionPriorityCompare(): ReactElement {
           </div>
         </div>
         <p style={{ marginTop: 8, fontSize: 11, color: "#64748b" }}>
-          Horizontal bars ship in v0.5.0 — this story tracks semantic priority
-          colors on the vertical bar + spec compile path (C147/C165).
+          Horizontal bars via <code>orientation="horizontal"</code> on panel spec
+          or <code>BarChart</code> — see Charts/Horizontal bar.
         </p>
       </div>
     </div>

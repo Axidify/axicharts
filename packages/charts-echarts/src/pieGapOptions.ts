@@ -1,4 +1,4 @@
-export function pieGapOptions(innerRadius: number): {
+export function pieGapOptions(_innerRadius: number): {
   padAngle: number;
   itemStyle: {
     borderWidth: number;
@@ -9,7 +9,7 @@ export function pieGapOptions(innerRadius: number): {
     padAngle: 0,
     itemStyle: {
       borderWidth: 0,
-      borderRadius: innerRadius > 0 ? [4, 4] : 0,
+      borderRadius: 0,
     },
   };
 }

@@ -1,5 +1,6 @@
 import { ejectGraphicsProp } from "./panelGraphics";
 import { readPanelStyle } from "./panelStyle";
+import { readPanelOrientation } from "./panelOrientation";
 import { readPanelAnimation, animationToSpecField } from "./panelAnimation";
 import { readPanelLiveAnimate } from "./panelLiveAnimate";
 import {
@@ -88,6 +89,7 @@ function chartLevelFlags(spec: PanelSpec): string[] {
   return [
     spec.fill && spec.type !== "bar" ? "fill" : "",
     spec.stacked ? "stacked" : "",
+    readPanelOrientation(spec) === "horizontal" ? `orientation="horizontal"` : "",
     spec.valueSuffix ? `valueSuffix="${spec.valueSuffix}"` : "",
     spec.props?.showValues === true ? "showValues" : "",
     chartLevelCurveFlag(spec),

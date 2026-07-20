@@ -198,6 +198,43 @@ export const RENDER_SCENARIOS: RenderScenario[] = [
     ],
   },
   {
+    id: "horizontal-priority",
+    group: "Categorical bars",
+    title: "Horizontal priority breakdown",
+    description:
+      "Long category labels in a narrow axiboard tile — planner/renderer horizontal bar path (D-101).",
+    tags: ["bar", "horizontal", "labels", "design-audit"],
+    checks: [
+      "P1–P4 labels fully visible on the left axis",
+      "Bars extend right with sensible left gutter",
+      "No vertical label crowding or clipping at 360px",
+    ],
+    defaultLayout: { columns: 1, chartHeight: 280, containerWidth: 360 },
+    panels: [
+      {
+        title: "Tickets by priority",
+        panel: {
+          type: "cartesian",
+          title: "Tickets by priority",
+          theme: "clean",
+          mode: "static",
+          orientation: "horizontal",
+          encoding: {
+            x: { field: "priority", type: "nominal", label: "Priority" },
+            color: { field: "priority", type: "nominal" },
+          },
+          marks: [{ type: "bar", field: "count", label: "Tickets" }],
+        },
+        rows: [
+          { priority: "P1 – Critical", count: 12 },
+          { priority: "P2 – High", count: 28 },
+          { priority: "P3 – Medium", count: 45 },
+          { priority: "P4 – Low", count: 19 },
+        ],
+      },
+    ],
+  },
+  {
     id: "single-category",
     group: "Categorical bars",
     title: "Single category",

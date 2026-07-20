@@ -31,6 +31,7 @@ export {
   type BrushRangePercent,
 } from "./brushRangePercent";
 export type {
+  BarOrientation,
   ComboSeries,
   ComboSeriesKind,
   DualAxisMode,
@@ -47,4 +48,8 @@ export { SERIES_COLORS, SERIES_PALETTE, resolveChromeColors, chromeGridStroke, i
 export { resolveSeriesColor, resolveSeriesTone } from "./seriesColor";
 export { shouldUseDualAxis } from "./dualAxis";
 export { expandYRange } from "./plotAnnotations";
+export {
+  categoryAxisSizeForLabels,
+  horizontalBarChartPadding,
+} from "./categoricalScale";
 export { lineSeriesPaths, resolveLineCurve, type LineCurve } from "./linePaths";

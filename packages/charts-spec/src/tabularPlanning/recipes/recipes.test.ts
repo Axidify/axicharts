@@ -108,6 +108,34 @@ describe("C158 panel recipes + chart geometry", () => {
     expect(validation.ok).toBe(true);
   });
 
+  it("compiles high-cardinality bar recipes as horizontal cartesian panels", () => {
+    const rows = Array.from({ length: 14 }, (_, index) => ({
+      Category: `Category ${index + 1}`,
+      Amount: (index + 1) * 10,
+    }));
+    const fieldProfiles = inferFieldRoles(rows);
+    const recipe = {
+      questionId: "generic.spend.category",
+      title: "Spend by category",
+      intent: "spend by category bar chart",
+      panelType: "cartesian" as const,
+      markType: "bar" as const,
+      xField: "Category",
+      yField: "Amount",
+    };
+
+    const { profile } = enrichProfileWithDomain({
+      ...fieldProfilesToDataProfile(fieldProfiles),
+      fieldProfiles,
+      cardinalities: { Category: 14 },
+    });
+
+    const compiled = compileRecipe(recipe, rows, { dataProfile: profile });
+    expect(compiled.panel.orientation).toBe("horizontal");
+    expect(compiled.panel.height).toBeGreaterThanOrEqual(14 * 28 + 48);
+    expect(compiled.matchedRules).toContain("geometry:high-cardinality-horizontal-bar");
+  });
+
   it("compiles generic KPI stat without cartesian UNKNOWN_FIELD", () => {
     const recipe = {
       questionId: "generic.kpi.rows",

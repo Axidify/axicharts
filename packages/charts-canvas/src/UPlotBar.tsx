@@ -9,7 +9,7 @@ import {
   chromeGridStroke,
   resolveChromeColors,
 } from "./colors";
-import type { UPlotBarProps } from "./types";
+import type { UPlotBarProps, BarOrientation } from "./types";
 import { applySyncedCursor } from "./plotCursor";
 import {
   createAnnotationDrawHook,
@@ -21,8 +21,11 @@ import { resolveSeriesColor } from "./seriesColor";
 import { axisCategoryValues } from "./axisCategoryLabel";
 import {
   categoryAxisSize,
+  categoryAxisSizeForLabels,
   categoryChartPadding,
   categoryXScale,
+  horizontalBarChartPadding,
+  horizontalValueAxisMax,
   ordinalBarGapPx,
   ordinalBarSize,
 } from "./categoricalScale";
@@ -58,12 +61,30 @@ function drawRoundedBar(
   height: number,
   radius: number,
   fill: string,
+  orientation: BarOrientation = "vertical",
 ): void {
   if (height <= 0 || width <= 0) return;
 
+  const r = Math.min(radius, width / 2, height / 2);
+  ctx.fillStyle = fill;
+
+  if (orientation === "horizontal") {
+    const right = left + width;
+    const bottom = top + height;
+    ctx.beginPath();
+    ctx.moveTo(left, top);
+    ctx.lineTo(right - r, top);
+    ctx.quadraticCurveTo(right, top, right, top + r);
+    ctx.lineTo(right, bottom - r);
+    ctx.quadraticCurveTo(right, bottom, right - r, bottom);
+    ctx.lineTo(left, bottom);
+    ctx.closePath();
+    ctx.fill();
+    return;
+  }
+
   const bottom = top + height;
   const right = left + width;
-  const r = Math.min(radius, width / 2, height);
 
   ctx.beginPath();
   ctx.moveTo(left, bottom);
@@ -73,7 +94,6 @@ function drawRoundedBar(
   ctx.quadraticCurveTo(right, top, right, top + r);
   ctx.lineTo(right, bottom);
   ctx.closePath();
-  ctx.fillStyle = fill;
   ctx.fill();
 }
 
@@ -83,7 +103,7 @@ function formatValue(value: number, suffix = ""): string {
   return `${rounded}${suffix}`;
 }
 
-function buildOptions({
+export function buildBarOptions({
   width,
   height,
   categories,
@@ -103,6 +123,7 @@ function buildOptions({
   stacked = false,
   showCursor = false,
   useNativeLegend = true,
+  orientation = "vertical",
 }: UPlotBarProps & {
   barLayoutsRef: React.MutableRefObject<BarLayout[]>;
   stackTotalsRef: React.MutableRefObject<Map<number, StackBarTotal>>;
@@ -128,6 +149,7 @@ function buildOptions({
   const gridStroke = chromeGridStroke(theme, compact);
   const gapPx = ordinalBarGapPx(categories.length, theme.bar.gap);
   const stackSeries = shouldStackSeries(stacked, series.length);
+  const barSeriesCount = stackSeries ? 1 : series.length;
   const showStackTotals = showValues && stackSeries;
   const showBarValues = showValues && !stackSeries;
   const customFills = hasCustomFills(series) && !stackSeries;
@@ -136,6 +158,244 @@ function buildOptions({
   const showLegend = useNativeLegend && series.length > 1;
   const topPad =
     (showBarValues || showStackTotals) && !compact ? 18 : compact ? 4 : 8;
+  const horizontal = orientation === "horizontal";
+  const leftAxisSize = categoryAxisSizeForLabels(categories, compact);
+  const paintHorizontalRounded = horizontal && !stackSeries;
+  const valueRange = (
+    _u: uPlot,
+    dataMin: number,
+    dataMax: number,
+  ): [number, number] => {
+    const [expandedMin, expandedMax] = expandYRange(
+      dataMin,
+      dataMax,
+      horizontal ? [] : thresholdBandsResolved,
+      horizontal ? [] : referenceLinesResolved,
+      horizontal ? [] : extraY,
+    );
+    const peak = Math.max(expandedMax, dataMax);
+    const top = horizontal
+      ? horizontalValueAxisMax(peak)
+      : stackSeries && categories.length <= 8
+        ? peak * 1.06
+        : peak * 1.12;
+    const bottom =
+      !horizontal && thresholdBandsResolved.length > 0
+        ? Math.min(0, expandedMin)
+        : 0;
+    return [bottom, top];
+  };
+
+  const barSeriesPaths = series.map((item, index) => {
+    const color = item.color ?? resolveSeriesColor(item.tone, index, theme);
+    const paintCustom =
+      (customMarks && Boolean(item.fills?.length || item.sizes?.length)) ||
+      paintHorizontalRounded;
+    return {
+      label: item.name,
+      stroke: paintCustom ? "transparent" : color,
+      fill: paintCustom ? "transparent" : color,
+      width: 0,
+      stack: stackSeries ? STACK_GROUP : undefined,
+      paths: uPlot.paths.bars!({
+        gap: gapPx,
+        size: ordinalBarSize(categories.length, barSeriesCount),
+        each: (u, seriesIdx, idx, left, top, barWidth, barHeight) => {
+          const seriesIndex = seriesIdx - 1;
+          const value =
+            (u.data[seriesIdx] as number[] | undefined)?.[idx] ?? 0;
+          const fill =
+            item.fills?.[idx] ??
+            item.color ??
+            resolveSeriesColor(item.tone, seriesIndex, theme);
+          const sizeMul = item.sizes?.[idx] ?? 1;
+          const barW = barWidth * sizeMul;
+          const barH = barHeight * sizeMul;
+          const adjustedLeft = horizontal
+            ? left
+            : left + (barWidth - barW) / 2;
+          const adjustedTop = horizontal
+            ? top + (barHeight - barH) / 2
+            : top;
+          const adjustedWidth = barW;
+          const adjustedHeight = horizontal ? barH : barHeight;
+
+          if (seriesIdx === 1 && idx === 0) {
+            barLayoutsRef.current = [];
+            stackTotalsRef.current.clear();
+          }
+
+          if (showStackTotals) {
+            recordStackBarTotal(
+              stackTotalsRef.current,
+              idx,
+              adjustedLeft,
+              adjustedTop,
+              adjustedWidth,
+              adjustedHeight,
+              value,
+              orientation,
+            );
+          }
+
+          if (paintCustom || showBarValues) {
+            barLayoutsRef.current.push({
+              left: adjustedLeft,
+              top: adjustedTop,
+              width: adjustedWidth,
+              height: adjustedHeight,
+              value,
+              fill,
+            });
+          }
+        },
+      }),
+      points: { show: false },
+    };
+  });
+
+  const drawBarHook = createAnnotationDrawHook({
+    bands: horizontal ? [] : thresholdBandsResolved,
+    referenceLines: horizontal ? [] : referenceLinesResolved,
+    verticalLines: horizontal ? [] : verticalLines,
+    labels: horizontal ? [] : plotLabels,
+    markers: horizontal ? [] : plotMarkers,
+    categories,
+    onDraw: (u) => {
+      const ctx = u.ctx;
+      const layouts = barLayoutsRef.current;
+
+      if (customMarks || paintHorizontalRounded) {
+        const radius = theme.bar.radius;
+        for (const layout of layouts) {
+          drawRoundedBar(
+            ctx,
+            layout.left,
+            layout.top,
+            layout.width,
+            layout.height,
+            radius,
+            layout.fill,
+            orientation,
+          );
+        }
+      }
+
+      if (!showBarValues && !showStackTotals) return;
+
+      if (showBarValues) {
+        ctx.save();
+        ctx.fillStyle = chrome.axis;
+        ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
+
+        if (horizontal) {
+          ctx.textAlign = "left";
+          ctx.textBaseline = "middle";
+          for (const layout of layouts) {
+            const label = formatValue(layout.value, valueSuffix);
+            const x = layout.left + layout.width + 4;
+            const y = layout.top + layout.height / 2;
+            ctx.fillText(label, x, y);
+          }
+        } else {
+          ctx.textAlign = "center";
+          ctx.textBaseline = "bottom";
+          for (const layout of layouts) {
+            const label = formatValue(layout.value, valueSuffix);
+            const x = layout.left + layout.width / 2;
+            const y = layout.top - 4;
+            ctx.fillText(label, x, y);
+          }
+        }
+
+        ctx.restore();
+      }
+
+      if (showStackTotals) {
+        drawStackBarTotals(
+          ctx,
+          stackTotalsRef.current,
+          valueSuffix,
+          chrome.axis,
+          formatValue,
+          orientation,
+        );
+      }
+    },
+  }) as (u: uPlot) => void;
+
+  if (horizontal) {
+    return {
+      width,
+      height,
+      class: "axicharts-uplot",
+      padding: compact
+        ? [topPad, 6, 4, 6]
+        : horizontalBarChartPadding(
+            categories.length,
+            leftAxisSize,
+            topPad,
+            showBarValues || showStackTotals,
+          ),
+      cursor: {
+        show: showCursor,
+        x: false,
+        y: true,
+        points: { show: false },
+      },
+      legend: { show: showLegend },
+      scales: {
+        x: {
+          time: false,
+          range: categoryXScale(categories.length).range,
+          ori: 1,
+          dir: -1,
+        },
+        y: {
+          ori: 0,
+          dir: 1,
+          range: valueRange,
+        },
+      },
+      axes: showAxes
+        ? ([
+            {
+              scale: "x",
+              side: 3,
+              ori: 1,
+              dir: -1,
+              stroke: chrome.axis,
+              grid: { show: false },
+              ticks: { show: true, stroke: chrome.axis, size: 4 },
+              values: axisCategoryValues(categories),
+              size: leftAxisSize,
+              font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+              gap: 4,
+            },
+            {
+              scale: "y",
+              side: 2,
+              ori: 0,
+              dir: 1,
+              stroke: chrome.axis,
+              grid: theme.grid.horizontal
+                ? { stroke: gridStroke, width: theme.grid.strokeWidth }
+                : { show: false },
+              ticks: { show: true, stroke: chrome.axis, size: 4 },
+              size: compact ? 0 : 32,
+              font: theme.values.monospace
+                ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
+                : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+              gap: 4,
+            },
+          ] as unknown as uPlot.Axis[])
+        : [],
+      series: [{}, ...barSeriesPaths],
+      hooks: {
+        draw: [drawBarHook],
+      },
+    };
+  }
 
   return {
     width,
@@ -154,21 +414,7 @@ function buildOptions({
     scales: {
       x: compact ? { time: false } : categoryXScale(categories.length),
       y: {
-        range: (_u, dataMin, dataMax) => {
-          const [expandedMin, expandedMax] = expandYRange(
-            dataMin,
-            dataMax,
-            thresholdBandsResolved,
-            referenceLinesResolved,
-            extraY,
-          );
-          const top = Math.max(expandedMax, dataMax) * 1.12;
-          const bottom =
-            thresholdBandsResolved.length > 0
-              ? Math.min(0, expandedMin)
-              : 0;
-          return [bottom, top];
-        },
+        range: valueRange,
       },
     },
     axes: showAxes
@@ -198,125 +444,9 @@ function buildOptions({
           },
         ]
       : [],
-    series: [
-      {},
-      ...series.map((item, index) => {
-        const color = item.color ?? resolveSeriesColor(item.tone, index, theme);
-        const paintCustom =
-          customMarks &&
-          Boolean(item.fills?.length || item.sizes?.length);
-        return {
-          label: item.name,
-          stroke: paintCustom ? "transparent" : color,
-          fill: paintCustom ? "transparent" : color,
-          width: 0,
-          stack: stackSeries ? STACK_GROUP : undefined,
-          paths: uPlot.paths.bars!({
-            gap: gapPx,
-            size: ordinalBarSize(categories.length, series.length),
-            each: (u, seriesIdx, idx, left, top, barWidth, barHeight) => {
-              const seriesIndex = seriesIdx - 1;
-              const value =
-                (u.data[seriesIdx] as number[] | undefined)?.[idx] ?? 0;
-              const fill =
-                item.fills?.[idx] ??
-                item.color ??
-                resolveSeriesColor(item.tone, seriesIndex, theme);
-              const sizeMul = item.sizes?.[idx] ?? 1;
-              const width = barWidth * sizeMul;
-              const adjustedLeft = left + (barWidth - width) / 2;
-
-              if (seriesIdx === 1 && idx === 0) {
-                barLayoutsRef.current = [];
-                stackTotalsRef.current.clear();
-              }
-
-              if (showStackTotals) {
-                recordStackBarTotal(
-                  stackTotalsRef.current,
-                  idx,
-                  adjustedLeft,
-                  top,
-                  width,
-                  value,
-                );
-              }
-
-              if (paintCustom || showBarValues) {
-                barLayoutsRef.current.push({
-                  left: adjustedLeft,
-                  top,
-                  width,
-                  height: barHeight,
-                  value,
-                  fill,
-                });
-              }
-            },
-          }),
-          points: { show: false },
-        };
-      }),
-    ],
+    series: [{}, ...barSeriesPaths],
     hooks: {
-      draw: [
-        createAnnotationDrawHook({
-          bands: thresholdBandsResolved,
-          referenceLines: referenceLinesResolved,
-          verticalLines,
-          labels: plotLabels,
-          markers: plotMarkers,
-          categories,
-          onDraw: (u) => {
-            const ctx = u.ctx;
-            const layouts = barLayoutsRef.current;
-
-            if (customMarks) {
-              const radius = theme.bar.radius;
-              for (const layout of layouts) {
-                drawRoundedBar(
-                  ctx,
-                  layout.left,
-                  layout.top,
-                  layout.width,
-                  layout.height,
-                  radius,
-                  layout.fill,
-                );
-              }
-            }
-
-            if (!showBarValues && !showStackTotals) return;
-
-            if (showBarValues) {
-              ctx.save();
-              ctx.fillStyle = chrome.axis;
-              ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
-              ctx.textAlign = "center";
-              ctx.textBaseline = "bottom";
-
-              for (const layout of layouts) {
-                const label = formatValue(layout.value, valueSuffix);
-                const x = layout.left + layout.width / 2;
-                const y = layout.top - 4;
-                ctx.fillText(label, x, y);
-              }
-
-              ctx.restore();
-            }
-
-            if (showStackTotals) {
-              drawStackBarTotals(
-                ctx,
-                stackTotalsRef.current,
-                valueSuffix,
-                chrome.axis,
-                formatValue,
-              );
-            }
-          },
-        }) as (u: uPlot) => void,
-      ],
+      draw: [drawBarHook],
     },
   };
 }
@@ -354,7 +484,7 @@ export function UPlotBar(props: UPlotBarProps): ReactElement {
   onSyncIndexRef.current = onSyncIndex;
 
   const options = useMemo(() => {
-    const base = buildOptions({ ...props, barLayoutsRef, stackTotalsRef });
+    const base = buildBarOptions({ ...props, barLayoutsRef, stackTotalsRef });
     if (!showCursor && !onSyncIndexRef.current) {
       return base;
     }
@@ -399,6 +529,7 @@ export function UPlotBar(props: UPlotBarProps): ReactElement {
     props.verticalLines,
     props.plotLabels,
     props.plotMarkers,
+    props.orientation,
     showAxes,
     stacked,
     showCursor,

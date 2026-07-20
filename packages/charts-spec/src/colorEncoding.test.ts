@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { fillsFromColorField, resolveEncodingFill } from "./colorEncoding";
+import {
+  applyColorEncodingToBarSeries,
+  fillsFromColorField,
+  resolveEncodingFill,
+} from "./colorEncoding";
 
 describe("colorEncoding", () => {
   it("maps semantic strings to palette colors", () => {
@@ -37,5 +41,18 @@ describe("colorEncoding", () => {
       "#64748b",
     ]);
     expect(resolveEncodingFill("P3 – Medium", 0)).toBe("#3b82f6");
+  });
+
+  it("applies encoding.color fills to the primary bar series", () => {
+    const rows = [
+      { priority: "P1 – Critical", count: 12 },
+      { priority: "P4 – Low", count: 19 },
+    ];
+    const series = applyColorEncodingToBarSeries(rows, "priority", [
+      { name: "Tickets", kind: "bar", data: [12, 19] },
+      { name: "Trend", kind: "line", data: [1, 2] },
+    ]);
+    expect(series[0]?.fills).toEqual(["#f43f5e", "#64748b"]);
+    expect(series[1]?.fills).toBeUndefined();
   });
 });
