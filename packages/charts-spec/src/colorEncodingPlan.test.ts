@@ -67,4 +67,15 @@ describe("colorEncodingPlan", () => {
       }),
     ).toBeUndefined();
   });
+
+  it("infers nominal color encoding for priority breakdown bars", () => {
+    const encoding = inferColorEncodingForPanel({
+      type: "cartesian",
+      metric: { name: "resolution" },
+      intent: "avg resolution by priority bar chart",
+      xField: "Priority",
+    });
+
+    expect(encoding).toEqual({ field: "Priority", type: "nominal" });
+  });
 });

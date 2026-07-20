@@ -24,4 +24,18 @@ describe("colorEncoding", () => {
       "#dc2626",
     ]);
   });
+
+  it("maps priority labels to nominal semantic colors", () => {
+    const rows = [
+      { Priority: "Critical", value: 1 },
+      { Priority: "High", value: 2 },
+      { Priority: "Low", value: 3 },
+    ];
+    expect(fillsFromColorField(rows, "Priority")).toEqual([
+      "#f43f5e",
+      "#f59e0b",
+      "#64748b",
+    ]);
+    expect(resolveEncodingFill("P3 – Medium", 0)).toBe("#3b82f6");
+  });
 });

@@ -60,6 +60,8 @@ export type ChartContainerProps = {
   animate?: ChartAnimate;
   /** Live-mode wholesale replace crossfade — default `"none"`. */
   liveAnimate?: LiveAnimate;
+  /** When false, skip reading host `--chart-*` CSS vars (use theme tokens as-is). Default true. */
+  inheritThemeTokens?: boolean;
   onResize?: (size: { width: number; height: number }) => void;
 };
 
@@ -93,6 +95,7 @@ export function ChartContainer({
   tooltipVariant,
   animate,
   liveAnimate = "none",
+  inheritThemeTokens = true,
   onResize,
 }: ChartContainerProps): ReactElement {
   const [ref, measured] = useResizeObserver(debounceMs);
@@ -100,12 +103,12 @@ export function ChartContainer({
   const { total: chromeInset, register: setChromeInset } = useChromeInsets();
 
   useLayoutEffect(() => {
-    if (!ref.current) {
+    if (!inheritThemeTokens || !ref.current) {
       setResolvedTheme(theme);
       return;
     }
     setResolvedTheme(resolveThemeTokens(theme, ref.current));
-  }, [theme, measured.width, measured.height]);
+  }, [theme, measured.width, measured.height, inheritThemeTokens]);
   const isStale = useIsStale(
     lastUpdatedAt,
     staleAfterMs,

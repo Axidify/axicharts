@@ -16,7 +16,19 @@ describe("chart colors", () => {
   });
 
   it("uses light grid strokes on clean theme", () => {
-    expect(chromeGridStroke(cleanTheme)).toBe("rgba(226, 232, 240, 0.85)");
+    expect(chromeGridStroke(cleanTheme)).toBe("rgba(226, 232, 240, 0.42)");
+  });
+
+  it("ignores malformed host grid tokens that canvas would render as yellow", () => {
+    const theme = {
+      ...cleanTheme,
+      tokens: {
+        palette: ["#2563eb"],
+        grid: "hsl(226 232 240 / .95)",
+        axis: "#64748b",
+      },
+    };
+    expect(chromeGridStroke(theme)).toBe("rgba(226, 232, 240, 0.42)");
   });
 
   it("detects dark chart themes", () => {

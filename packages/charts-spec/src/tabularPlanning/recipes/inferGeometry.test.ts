@@ -8,7 +8,7 @@ const fieldProfiles: FieldProfile[] = [
 ];
 
 describe("C165 inferChartGeometry — L1 profile hints", () => {
-  it("prefers horizontal bar for high-cardinality dimensions", () => {
+  it("uses vertical bar for high-cardinality dimensions until horizontal renderer ships", () => {
     const geometry = inferChartGeometry({
       kind: "chart",
       intent: "spend by category",
@@ -18,8 +18,8 @@ describe("C165 inferChartGeometry — L1 profile hints", () => {
       cardinalities: { Category: 24 },
     });
 
-    expect(geometry.orientation).toBe("horizontal");
-    expect(geometry.rules).toContain("geometry:high-cardinality-horizontal-bar");
+    expect(geometry.orientation).toBe("vertical");
+    expect(geometry.rules).toContain("geometry:high-cardinality-bar");
   });
 
   it("prefers line chart when time span spans multiple days", () => {

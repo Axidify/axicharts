@@ -10,6 +10,23 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.22] - 2026-07-20
+
+### Added
+
+- **charts-theme** — Chrome contrast utilities (`resolveCanvasRgb`, `looksLikeRgbInHsl`, `sanitizeChromeToken`)
+- **charts-spec** — `nominalColorMap` for priority/status/stage label → semantic bar fills
+- **storybook** — `Compare/Composition priority` repro (AxiCharts spec path vs Recharts)
+
+### Fixed
+
+- **charts-theme** — Malformed host `hsl()` chrome tokens no longer paint yellow grids or pink axes; explicit `theme.tokens` grid/axis override document `--chart-*` vars
+- **charts-canvas** — `chromeGridStroke()` sanitizes host grid colors and applies theme opacity
+- **charts** — `ChartContainer` `inheritThemeTokens` prop; softer `cleanTheme` grid opacity
+- **charts-spec** — Planner/compile path emits `encoding.color` for priority/status dimensions; gates horizontal bar geometry until uPlot horizontal renderer ships
+
+See [RELEASE-v0.4.22.md](./RELEASE-v0.4.22.md).
+
 ## [0.4.21] - 2026-07-20
 
 ### Added

@@ -15,6 +15,16 @@ export {
   resolveChartPalette,
   resolveToneColors,
   resolveChartChrome,
+  sanitizeChromeToken,
   type ChartColorTokens,
   type SeriesTone as ChartSeriesTone,
 } from "./cssTokens";
+export {
+  contrastRatio,
+  isAcceptableChromeColor,
+  isNeutralChromeRgb,
+  looksLikeRgbInHsl,
+  parseRgbString,
+  resolveCanvasRgb,
+  resolveComputedRgb,
+} from "./contrast";

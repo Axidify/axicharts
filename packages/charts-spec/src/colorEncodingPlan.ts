@@ -4,6 +4,7 @@ import {
   intentWantsVerticalColor,
   resolveVerticalId,
 } from "./rulePacks";
+import { isNominalColorDimension } from "./nominalColorMap";
 
 const COLOR_FIELD_PRIORITY = [
   "aboveTarget",
@@ -78,8 +79,21 @@ export function inferColorEncodingForPanel(args: {
   metric: MetricProfile;
   intent?: string;
   profileFields?: string[];
+  xField?: string;
 }): ColorEncoding | undefined {
   if (!isCartesianPanelType(args.type)) return undefined;
+
+  if (args.xField && isNominalColorDimension(args.xField)) {
+    const hasBar =
+      args.type === "bar" ||
+      (args.type === "cartesian" &&
+        /bar|breakdown|composition|distribution|priority|status|severity/i.test(
+          args.intent ?? "",
+        ));
+    if (hasBar) {
+      return { field: args.xField, type: "nominal" };
+    }
+  }
 
   const explicitField = args.metric.tags?.colorField;
   if (explicitField) {

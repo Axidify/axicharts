@@ -1,5 +1,5 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
-import { resolveChartChrome } from "@axicharts/charts-theme";
+import { resolveChartChrome, sanitizeChromeToken } from "@axicharts/charts-theme";
 import type { SeriesTone } from "./types";
 
 /** shadcn-inspired series palette — modern, saturated but not harsh */
@@ -57,14 +57,30 @@ export function chromeGridStroke(
   theme: Pick<ChartTheme, "name" | "grid" | "tokens">,
   compact = false,
 ): string {
-  if (theme.tokens?.grid) {
-    return theme.tokens.grid;
-  }
-
-  const { gridRgb } = resolveChromeColors(theme);
   const opacity = compact
     ? Math.min(theme.grid.opacity + 0.12, 0.72)
     : theme.grid.opacity;
+
+  if (theme.tokens?.grid) {
+    const safe = sanitizeChromeToken(theme.tokens.grid, "grid", theme.name);
+    if (safe) {
+      const channels = parseRgbChannels(safe);
+      if (channels) {
+        return `rgba(${channels.r}, ${channels.g}, ${channels.b}, ${opacity})`;
+      }
+      return safe;
+    }
+  }
+
+  const { gridRgb } = resolveChromeColors(theme);
+  if (!theme.tokens) {
+    return `rgba(${gridRgb}, ${opacity})`;
+  }
+
+  const channels = parseRgbChannels(gridRgb);
+  if (channels) {
+    return `rgba(${channels.r}, ${channels.g}, ${channels.b}, ${opacity})`;
+  }
   return `rgba(${gridRgb}, ${opacity})`;
 }
 

@@ -45,6 +45,11 @@ describe("composeIncidentDashboard", () => {
         expect.objectContaining({ Priority: "High", "Avg resolution (hrs)": 2.4 }),
       ]),
     );
+    expect(compiled.panel.encoding?.color).toEqual({
+      field: "Priority",
+      type: "nominal",
+    });
+    expect(compiled.matchedRules).toContain("encoding:nominal-color");
   });
 
   it("uses agent compose in planDashboardFromRows generic path", () => {

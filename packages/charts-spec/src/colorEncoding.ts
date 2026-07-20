@@ -1,10 +1,11 @@
+import { resolveNominalFill } from "./nominalColorMap";
+
 type SemanticTone =
   | "default"
   | "info"
   | "success"
   | "warning"
   | "critical";
-
 const SERIES_COLORS: Record<SemanticTone, string> = {
   default: "#2563eb",
   info: "#0891b2",
@@ -42,6 +43,11 @@ export function resolveEncodingFill(
 ): string {
   if (typeof raw === "string") {
     const trimmed = raw.trim();
+    if (SEMANTIC_TONES.has(trimmed)) {
+      return SERIES_COLORS[trimmed as SemanticTone];
+    }
+    const nominal = resolveNominalFill(trimmed);
+    if (nominal) return nominal;
     if (
       trimmed.startsWith("#") ||
       trimmed.startsWith("hsl") ||
@@ -49,9 +55,6 @@ export function resolveEncodingFill(
       trimmed.startsWith("var(")
     ) {
       return trimmed;
-    }
-    if (SEMANTIC_TONES.has(trimmed)) {
-      return SERIES_COLORS[trimmed as SemanticTone];
     }
   }
   if (typeof raw === "boolean") {

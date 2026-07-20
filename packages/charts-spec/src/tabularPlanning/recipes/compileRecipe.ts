@@ -2,6 +2,7 @@ import { aggregateRows } from "../../aggregateRows";
 import { createCartesianPanel } from "../../createCartesianPanel";
 import { createTablePanel } from "../../createTablePanel";
 import { validateCartesianSpec } from "../../cartesianValidation";
+import { isNominalColorDimension } from "../../nominalColorMap";
 import { inferChartGeometry } from "./inferGeometry";
 import type {
   ChartGeometry,
@@ -9,6 +10,7 @@ import type {
   CompiledRecipeResult,
   PanelRecipe,
 } from "./types";
+import type { PanelSpec } from "../../types";
 
 function sortByStageOrder(
   rows: Record<string, unknown>[],
@@ -118,6 +120,33 @@ function compileWaterfallPanel(recipe: PanelRecipe, rows: Record<string, unknown
   };
 }
 
+function enrichNominalBarPanel(
+  panel: PanelSpec,
+  recipe: PanelRecipe,
+  geometry: ChartGeometry,
+): PanelSpec {
+  const xField = recipe.xField ?? panel.encoding?.x?.field;
+  if (!xField || !isNominalColorDimension(xField)) {
+    return panel;
+  }
+
+  const isBar =
+    geometry.markType === "bar" ||
+    panel.marks?.some((mark) => mark.type === "bar");
+  if (!isBar) {
+    return panel;
+  }
+
+  return {
+    ...panel,
+    encoding: {
+      ...panel.encoding,
+      x: panel.encoding?.x ?? { field: xField },
+      color: { field: xField, type: "nominal" },
+    },
+  };
+}
+
 function compileCartesianPanel(
   recipe: PanelRecipe,
   rows: Record<string, unknown>[],
@@ -141,15 +170,20 @@ function compileCartesianPanel(
     rows,
   });
 
+  const panel = enrichNominalBarPanel(result.panel, recipe, geometry);
+
   const matchedRules = [
     ...result.matchedRules,
     ...geometry.rules,
     `mark:${geometry.markType ?? "bar"}`,
   ];
+  if (panel.encoding?.color?.type === "nominal") {
+    matchedRules.push("encoding:nominal-color");
+  }
   if (!validation.ok) matchedRules.push("validation:needs-review");
 
   return {
-    panel: { ...result.panel, title: recipe.title },
+    panel: { ...panel, title: recipe.title },
     rows,
     geometry,
     matchedRules,

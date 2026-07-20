@@ -169,6 +169,7 @@ export function planPanelFromMetric(
     metric,
     intent: options.intent,
     profileFields: options.profileFields,
+    xField,
   });
   if (colorEncoding && panel.encoding) {
     panel.encoding = { ...panel.encoding, color: colorEncoding };

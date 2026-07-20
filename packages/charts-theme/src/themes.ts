@@ -56,7 +56,7 @@ const baseGrid = {
 
 export const cleanTheme: ChartTheme = {
   name: "clean",
-  grid: { ...baseGrid },
+  grid: { ...baseGrid, opacity: 0.42 },
   axis: { show: true },
   line: { strokeWidth: 2.25, curve: "monotone" },
   area: { show: true, fillOpacity: 0.24 },

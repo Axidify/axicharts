@@ -1,4 +1,9 @@
 import type { ChartTheme } from "./themes";
+import {
+  isAcceptableChromeColor,
+  resolveCanvasRgb,
+  resolveComputedRgb,
+} from "./contrast";
 
 export type ChartColorTokens = {
   palette: string[];
@@ -33,6 +38,16 @@ const FALLBACK_TONE_COLORS: Record<SeriesTone, string> = {
   critical: "#dc2626",
 };
 
+const FALLBACK_CHROME_LIGHT = {
+  grid: "rgba(226, 232, 240, 0.95)",
+  axis: "#64748b",
+};
+
+const FALLBACK_CHROME_DARK = {
+  grid: "rgba(51, 65, 85, 0.62)",
+  axis: "#94a3b8",
+};
+
 function formatCssColor(raw: string): string {
   const value = raw.trim();
   if (!value) return "";
@@ -48,6 +63,92 @@ function formatCssColor(raw: string): string {
 
 function readVar(style: CSSStyleDeclaration, name: string): string {
   return formatCssColor(style.getPropertyValue(name));
+}
+
+function isDarkThemeName(themeName: string): boolean {
+  return themeName === "live" || themeName === "industrial";
+}
+
+function plotBackgroundRgb(themeName: string): { r: number; g: number; b: number } {
+  return isDarkThemeName(themeName)
+    ? { r: 15, g: 23, b: 42 }
+    : { r: 255, g: 255, b: 255 };
+}
+
+function canonicalChromeColor(
+  color: string,
+  element?: Element | null,
+): string | null {
+  const rgb =
+    resolveCanvasRgb(color) ??
+    resolveComputedRgb(color, element ?? undefined);
+  if (!rgb) return null;
+  return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+}
+
+function sanitizeChromeColor(
+  color: string,
+  role: "grid" | "axis",
+  background: { r: number; g: number; b: number },
+  fallback: string,
+  element?: Element | null,
+): string {
+  if (isAcceptableChromeColor(color, role, background, element)) {
+    return canonicalChromeColor(color, element) ?? color;
+  }
+  return fallback;
+}
+
+/** Public guard for canvas adapters when tokens are set manually. */
+export function sanitizeChromeToken(
+  color: string,
+  role: "grid" | "axis",
+  themeName: string,
+  element?: Element | null,
+): string | null {
+  const fallback =
+    role === "grid"
+      ? (isDarkThemeName(themeName)
+          ? FALLBACK_CHROME_DARK.grid
+          : FALLBACK_CHROME_LIGHT.grid)
+      : isDarkThemeName(themeName)
+        ? FALLBACK_CHROME_DARK.axis
+        : FALLBACK_CHROME_LIGHT.axis;
+
+  const background = plotBackgroundRgb(themeName);
+  if (!isAcceptableChromeColor(color, role, background, element)) {
+    return null;
+  }
+  return canonicalChromeColor(color, element) ?? color;
+}
+
+function sanitizeChartTokens(
+  tokens: ChartColorTokens,
+  themeName: string,
+  element?: Element | null,
+): ChartColorTokens {
+  const fallback = isDarkThemeName(themeName)
+    ? FALLBACK_CHROME_DARK
+    : FALLBACK_CHROME_LIGHT;
+  const background = plotBackgroundRgb(themeName);
+
+  return {
+    ...tokens,
+    axis: sanitizeChromeColor(
+      tokens.axis,
+      "axis",
+      background,
+      fallback.axis,
+      element,
+    ),
+    grid: sanitizeChromeColor(
+      tokens.grid,
+      "grid",
+      background,
+      fallback.grid,
+      element,
+    ),
+  };
 }
 
 export function readCssChartTokens(
@@ -76,8 +177,8 @@ export function readCssChartTokens(
 
   return {
     palette,
-    grid: grid || "rgba(226, 232, 240, 0.95)",
-    axis: axis || "#64748b",
+    grid: grid || FALLBACK_CHROME_LIGHT.grid,
+    axis: axis || FALLBACK_CHROME_LIGHT.axis,
     areaFill: readVar(style, "--chart-area-fill") || undefined,
     alarmWarning: readVar(style, "--chart-alarm-warning") || undefined,
     alarmCritical: readVar(style, "--chart-alarm-critical") || undefined,
@@ -88,14 +189,25 @@ export function resolveThemeTokens(
   theme: ChartTheme,
   element?: Element | null,
 ): ChartTheme {
-  const tokens = readCssChartTokens(element);
-  if (!tokens) {
+  const cssTokens = readCssChartTokens(element);
+  if (!cssTokens) {
     return theme;
   }
 
+  const explicit = theme.tokens;
+  const merged: ChartColorTokens = {
+    ...cssTokens,
+    ...(explicit?.grid ? { grid: explicit.grid } : {}),
+    ...(explicit?.axis ? { axis: explicit.axis } : {}),
+    ...(explicit?.areaFill ? { areaFill: explicit.areaFill } : {}),
+    ...(explicit?.alarmWarning ? { alarmWarning: explicit.alarmWarning } : {}),
+    ...(explicit?.alarmCritical ? { alarmCritical: explicit.alarmCritical } : {}),
+    ...(explicit?.palette?.length ? { palette: explicit.palette } : {}),
+  };
+
   return {
     ...theme,
-    tokens,
+    tokens: sanitizeChartTokens(merged, theme.name, element),
   };
 }
 
@@ -124,16 +236,19 @@ export function resolveToneColors(
 export function resolveChartChrome(
   theme: Pick<ChartTheme, "name" | "tokens">,
 ): { grid: string; axis: string } {
+  const dark = isDarkThemeName(theme.name);
+  const fallback = dark ? FALLBACK_CHROME_DARK : FALLBACK_CHROME_LIGHT;
+
   if (theme.tokens) {
     return {
-      grid: theme.tokens.grid,
-      axis: theme.tokens.axis,
+      grid:
+        sanitizeChromeToken(theme.tokens.grid, "grid", theme.name) ??
+        fallback.grid,
+      axis:
+        sanitizeChromeToken(theme.tokens.axis, "axis", theme.name) ??
+        fallback.axis,
     };
   }
 
-  const dark = theme.name === "live" || theme.name === "industrial";
-  return {
-    grid: dark ? "rgba(51, 65, 85, 0.62)" : "rgba(226, 232, 240, 0.95)",
-    axis: dark ? "#94a3b8" : "#64748b",
-  };
+  return fallback;
 }

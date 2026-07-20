@@ -66,11 +66,25 @@ export function inferChartGeometry(input: GeometryInput): ChartGeometry {
   }
 
   if (xCardinality != null && xCardinality > HIGH_CARDINALITY_BAR) {
-    rules.push("geometry:high-cardinality-horizontal-bar");
+    rules.push("geometry:high-cardinality-bar");
     return {
       panelType: "cartesian",
       markType: "bar",
-      orientation: "horizontal",
+      orientation: "vertical",
+      rules,
+    };
+  }
+
+  if (
+    input.xField &&
+    /priority|severity|status|composition|breakdown/i.test(input.xField) &&
+    (xCardinality == null || xCardinality <= 12)
+  ) {
+    rules.push("geometry:nominal-composition-bar");
+    return {
+      panelType: "cartesian",
+      markType: "bar",
+      orientation: "vertical",
       rules,
     };
   }
