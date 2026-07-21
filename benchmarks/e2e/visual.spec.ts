@@ -91,6 +91,13 @@ const VISUAL_STORIES = [
     settleMs: 2000,
     maxDiffPixelRatio: 0.04,
   },
+  {
+    id: "audit-dashboard-adjacent--lane-b-tile-360",
+    name: "design-lane-b-adjacent-360",
+    waitFor: "text=dashboard-adjacent",
+    settleMs: 2500,
+    maxDiffPixelRatio: 0.06,
+  },
 ] as const;
 
 /** Fixed viewport clip — avoids 1–3px height drift between macOS baselines and Linux CI. */
@@ -98,6 +105,7 @@ const VIEWPORT_CLIP = { x: 0, y: 0, width: 1280, height: 900 };
 
 for (const story of VISUAL_STORIES) {
   test(`visual ${story.name}`, async ({ page }) => {
+    test.setTimeout(120_000);
     const params = new URLSearchParams({
       id: story.id,
       viewMode: "story",

@@ -4,6 +4,7 @@ import {
   categoryChartPadding,
   categoryXScale,
   horizontalBarChartPadding,
+  horizontalValueAxisIncrs,
   horizontalValueAxisMax,
   ordinalBarSize,
 } from "./categoricalScale";
@@ -43,11 +44,16 @@ describe("categoricalScale", () => {
     expect(horizontalValueAxisMax(180)).toBe(250);
   });
 
-  it("reserves left gutter space for horizontal bar charts", () => {
+  it("reserves left gutter in axis size, not plot padding (D-101)", () => {
     const [top, right, bottom, left] = horizontalBarChartPadding(8, 96, 12, true);
     expect(top).toBe(12);
     expect(right).toBe(36);
     expect(bottom).toBe(32);
-    expect(left).toBe(96);
+    expect(left).toBe(10);
+  });
+
+  it("uses denser value-axis ticks for dashboard horizontal bars", () => {
+    expect(horizontalValueAxisIncrs(60)).toEqual([15]);
+    expect(horizontalValueAxisIncrs(15)).toEqual([5]);
   });
 });

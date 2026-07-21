@@ -25,6 +25,8 @@ import {
   categoryChartPadding,
   categoryXScale,
   horizontalBarChartPadding,
+  horizontalCategoryAxisGap,
+  horizontalValueAxisIncrs,
   horizontalValueAxisMax,
   ordinalBarGapPx,
   ordinalBarSize,
@@ -196,6 +198,19 @@ export function buildBarOptions({
     (showBarValues || showStackTotals) && !compact ? 18 : compact ? 4 : 8;
   const horizontal = orientation === "horizontal";
   const leftAxisSize = categoryAxisSizeForLabels(categories, compact);
+  const horizontalDataMax = horizontal
+    ? stackSeries
+      ? Math.max(
+          0,
+          ...categories.map((_, idx) =>
+            series.reduce((sum, item) => sum + (item.data[idx] ?? 0), 0),
+          ),
+        )
+      : Math.max(0, ...series.flatMap((item) => item.data))
+    : 0;
+  const horizontalAxisMax = horizontal
+    ? horizontalValueAxisMax(horizontalDataMax)
+    : 0;
   const valueRange = (
     _u: uPlot,
     dataMin: number,
@@ -414,7 +429,7 @@ export function buildBarOptions({
               values: axisCategoryValues(categories),
               size: leftAxisSize,
               font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
-              gap: 4,
+              gap: horizontalCategoryAxisGap(),
             },
             {
               scale: "y",
@@ -426,6 +441,7 @@ export function buildBarOptions({
                 ? { stroke: gridStroke, width: theme.grid.strokeWidth }
                 : { show: false },
               ticks: { show: true, stroke: chrome.axis, size: 4 },
+              incrs: horizontalValueAxisIncrs(horizontalAxisMax),
               size: compact ? 0 : 32,
               font: theme.values.monospace
                 ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"

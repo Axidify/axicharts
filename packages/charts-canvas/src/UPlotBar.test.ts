@@ -122,7 +122,11 @@ describe("UPlotBar horizontal", () => {
     });
 
     const categoryAxis = options.axes?.[0];
-    expect(categoryAxis?.size).toBeLessThanOrEqual(96);
-    expect(categoryAxis?.gap).toBe(4);
+    expect(categoryAxis?.size).toBeLessThanOrEqual(92);
+    expect(categoryAxis?.gap).toBe(3);
+    expect(options.padding?.[3]).toBe(10);
+
+    const valueAxis = options.axes?.[1];
+    expect(valueAxis?.incrs).toEqual([15]);
   });
 });

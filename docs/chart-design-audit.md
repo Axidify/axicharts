@@ -69,7 +69,7 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 | **Line** | `Compare/Design parity` · `Shadcn parity` | `Charts/Line chart` · `/compare/design` | **Parity** | Single-series revenue ✅ + multi-series burndown ✅ (area fill between series, smart y-range, centered flow legend) — **D-103** closed |
 | **Area** | `Compare/Design parity` · `Shadcn parity` (area SLO) | `Charts/Area chart` · `/compare/design` | **Parity** | AxiCharts wins @ 360×280 ✅ — `encoding.color` semantic SLO segments, smart y-range, horizontal grid; Recharts wall chart is flat monotone gradient, no grid — area slice of **D-103** closed |
 | **Bar (vertical)** | `Compare/Design parity` · `Shadcn parity` | `Charts/Bar chart` · `/compare/design` | **Parity** | encoding.color fills via BarChart/uPlot ✅; radius/gap @ 360 ✅ — **D-102** closed |
-| **Bar (horizontal)** | `Audit/Design` · `Compare/Composition priority` | `Charts/Horizontal bar` · render-sandbox `horizontal-priority` | **Close** | `encoding.color`, grid, radius, value-axis headroom ✅; left gutter polish — **D-101** |
+| **Bar (horizontal)** | `Audit/Design` · `Compare/Composition priority` | `Charts/Horizontal bar` · render-sandbox `horizontal-priority` | **Parity** | @ 360×280 ✅ — axis `size` gutter (no double padding); 15-step value ticks; tight label gap — **D-101** closed |
 | **Stacked bar** | `Compare/Design parity` · `Shadcn parity` | `Charts/Stacked` | **Parity** | Stack totals ✅; top-cap radius ✅; 4-series palette ramp on wall ✅ — **D-102** closed |
 | **Combo (bar+line)** | `Compare/Design parity` · `Shadcn parity` | `Charts/Combo chart` · `/compare/design` | **Parity** | AxiCharts wins @ 360×280 ✅ — dual y-axes, spline line, bar value labels, centered flow legend; bare Recharts wall chart is bar-only on one scale (line invisible) — **D-104** closed |
 | **Sparkline** | `Compare/Recharts compare` (inline) | `Charts/Grid cells` | **Parity** | 72px strip; liveTheme grid |
@@ -127,7 +127,7 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 
 | ID | Chart | Gap vs Recharts | Status |
 |----|-------|-----------------|--------|
-| D-101 | Horizontal bar | `layout="vertical"` reference in Composition priority; Axi horizontal renderer + planner path | **Close** — color, grid, radius, axis headroom wired |
+| D-101 | Horizontal bar | `layout="vertical"` reference in Composition priority; Axi horizontal renderer + planner path | **Closed** — axis-size gutter, 15-step ticks @ compact, encoding.color + grid + radius |
 | D-102 | Bar / stacked bar | Semantic `encoding.color` without manual `Cell`; bar radius/gap at 360px | **Closed** — bar-only cartesian → BarChart/uPlot; always-round radius; compact gap; 4-series ramp row |
 | D-103 | Line / area | Compact multi-series legend; area fill on line charts | **Closed** — area SLO + burndown multi-line @ 360×280 ✅ |
 | D-104 | Combo | Bar+line visual balance; dual-axis label gutters | **Closed** — dual-axis combo, value labels, flow legend @ 360×280 |
@@ -151,7 +151,7 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | D-110 | Scatter | Add `/compare/design` @ 360×280; verify point labels + multi-series legend; bubble size legend optional | **Closed** — compact bottom legend + bubble size legend min/max |
 | D-202 | Histogram | Compact bin labels / axis density @ 360 wide; add compare row | **Closed** — `-25°` rotate when bins ≥6 @ compact |
 | D-210 | Radar | Multi-series bottom/flow legend; compare wall @ 360×280; labels policy at compact width | **Closed** — spoke order + hidden radial ticks @ compact |
-| D-301 | Expand visual CI: one snapshot per P0 cartesian type @ 360px | **In progress** — `Audit/Design` parity wall + horizontal tile |
+| D-301 | Expand visual CI: one snapshot per P0 cartesian type @ 360px | **In progress** — `Audit/Design` parity wall + horizontal tile + Lane B adjacent wall |
 | D-302 | `Compare/*` wall: add scatter, radar, histogram rows (was: horizontal/combo) | **Close** — scatter / radar / histogram on `/compare/design` @ 360×280 |
 | D-303 | Document Recharts snippet per type in this file (link to story) | **Open** |
 | D-310 | Studio lane audit (Bklit/Recharts styled) — separate from clean parity | **Open** |
@@ -168,7 +168,7 @@ Code + Storybook review against wall chrome rules. No browser side-by-side yet f
 | Bar / stacked | encoding.color + radius/gap + 4-series ramp (~4.5) | **D-102** Closed → Parity |
 | Stat / table | Lane B harness @ 72/120/320px (~4) | **D-106 / D-107** Close |
 
-**Wall eight baseline (confirmed):** Parity = line, area, combo, multi-line, donut, **vertical bar**, **stacked bar**. Close = horizontal bar.
+**Wall eight baseline (confirmed):** Parity = line, area, combo, multi-line, donut, **vertical bar**, **stacked bar**, **horizontal bar**.
 
 ---
 
@@ -202,7 +202,7 @@ Add to `/compare/design` and polish @ 360×280 until **Close → Parity**:
 3. **Histogram** — **D-202**
 4. Finish open wall polish: bar/stacked (**D-102** ✅), stat (**D-106** ✅), table (**D-107** ✅)
 
-**Wall already at Parity / Close:** line, area, combo, multi-line, donut, **vertical bar**, **stacked bar** (Parity); horizontal bar (Close).
+**Wall already at Parity / Close:** line, area, combo, multi-line, donut, **vertical bar**, **stacked bar**, **horizontal bar** (Parity).
 
 #### Phase 2 — Dashboard-adjacent (Lane B)
 Apply compact tile rules with non-Recharts references:
@@ -251,6 +251,7 @@ Do **not** file D-xxx for these unless a dashboard user expects Recharts behavio
 
 | Date | Change |
 |------|--------|
+| 2026-07-21 | **D-101** horizontal bar @ 360×280 — fixed double left padding; axis-size gutter + 15-step value ticks → **Parity**; wall eight complete |
 | 2026-07-21 | **Design consistency program** documented (Lanes A–C, Phases 1–4). Audit pass: Phase 1 targets (scatter / radar / histogram) + open D-ids; wall eight confirmed Parity/Close |
 | 2026-07-21 | **D-106 / D-107** Lane B: `Stat` unit+delta chip + ChartContainer @ height; `DataTable` zebra/sticky/tabular-nums; `/compare/design` dashboard-adjacent harness |
 | 2026-07-20 | Initial doc; Recharts as design north star; D-101–D-310 backlog; matrix seeded from render-audit + compare stories |

@@ -56,7 +56,7 @@ export function categoryAxisSizeForLabels(
 ): number {
   if (compact || categories.length === 0) return 0;
   const maxLen = Math.max(...categories.map((label) => label.length), 0);
-  return Math.min(148, Math.max(52, Math.ceil(maxLen * 5.8) + 12));
+  return Math.min(136, Math.max(52, Math.ceil(maxLen * 5.5) + 10));
 }
 
 /** Nice ceiling for horizontal bar value axes — bars must not overshoot the last tick. */
@@ -74,6 +74,20 @@ export function horizontalValueAxisMax(dataMax: number): number {
             ? 20
             : 50;
   return Math.ceil(padded / step) * step;
+}
+
+/** uPlot `incrs` for horizontal bar value axes — denser ticks @ dashboard tile sizes. */
+export function horizontalValueAxisIncrs(axisMax: number): number[] {
+  if (axisMax <= 20) return [5];
+  if (axisMax <= 60) return [15];
+  if (axisMax <= 120) return [20];
+  if (axisMax <= 250) return [50];
+  return [100];
+}
+
+/** Gap between category labels and bars on horizontal charts (px). */
+export function horizontalCategoryAxisGap(): number {
+  return 3;
 }
 
 /** Side padding so edge tick labels are not clipped. */
@@ -95,14 +109,15 @@ export function categoryChartPadding(
 /** Padding for horizontal bar charts — category axis on the left. */
 export function horizontalBarChartPadding(
   categoryCount: number,
-  leftAxisSize: number,
+  _leftAxisSize: number,
   topPad = 8,
   showValueLabels = false,
 ): [number, number, number, number] {
-  const right = showValueLabels ? 36 : 14;
+  const right = showValueLabels ? 36 : 12;
   const bottom = categoryCount > 0 ? 32 : 10;
   const top = topPad;
-  const left = Math.max(14, leftAxisSize);
+  // Label gutter lives in axis `size` — keep plot padding minimal (D-101).
+  const left = 10;
   return [top, right, bottom, left];
 }
 
