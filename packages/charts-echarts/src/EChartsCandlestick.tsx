@@ -22,6 +22,7 @@ import {
   sessionMarkAreaToECharts,
   type SessionShading,
 } from "./candlestickSession";
+import { resolveCandlestickNicheLayout } from "./nicheCompactLayout";
 
 export type EChartBrushRange = {
   start: number;
@@ -96,6 +97,11 @@ export function EChartsCandlestick({
   const zoomWindow = resolveZoomWindow(brush, brushStart, brushEnd, followerBrushRange);
   const showZoom = brush || Boolean(followerBrushRange);
   const grid = gridOptions(theme, isCompactTile(width, height));
+  const nicheLayout = resolveCandlestickNicheLayout(width, height);
+  const axisStyle = {
+    ...axisLabelStyle(theme),
+    fontSize: nicheLayout.axisFontSize,
+  };
   const mainGrid = {
     ...grid,
     ...(showZoom && !volume ? { bottom: 40 } : {}),
@@ -157,7 +163,10 @@ export function EChartsCandlestick({
             {
               type: "category",
               data: categories,
-              axisLabel: axisLabelStyle(theme),
+              axisLabel: {
+                ...axisStyle,
+                show: !nicheLayout.hideCategoryLabels,
+              },
               splitLine: splitLineStyle(theme),
             },
           ],
@@ -165,7 +174,7 @@ export function EChartsCandlestick({
         ? [
             {
               scale: true,
-              axisLabel: axisLabelStyle(theme),
+              axisLabel: axisStyle,
               splitLine: splitLineStyle(theme),
               gridIndex: 0,
             },
@@ -179,7 +188,10 @@ export function EChartsCandlestick({
         : [
             {
               scale: true,
-              axisLabel: axisLabelStyle(theme),
+              axisLabel: {
+                ...axisStyle,
+                show: !nicheLayout.catalog,
+              },
               splitLine: splitLineStyle(theme),
             },
           ],

@@ -10,6 +10,7 @@ import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { flattenTreemapValues, mapTreemapData } from "./treemapData";
 import type { TreemapNode } from "./treemapTypes";
 import { buildTreemapDrillOptions, type TreemapDrillChange } from "./treemapDrill";
+import { resolveTreemapLayout } from "./nicheCompactLayout";
 
 export type EChartsTreemapProps = {
   width: number;
@@ -47,6 +48,7 @@ export function EChartsTreemap({
   const leafValues = flattenTreemapValues(nodes);
   const total = leafValues.reduce((sum, value) => sum + value, 0);
   const drillOptions = buildTreemapDrillOptions({ drilldown });
+  const layout = resolveTreemapLayout(width, height, showLabels);
 
   const option: EChartsOption = withPresentationAnimation(
     {
@@ -59,15 +61,15 @@ export function EChartsTreemap({
         roam: false,
         ...drillOptions,
         label: {
-          show: showLabels,
-          fontSize: 11,
+          show: layout.showLabels,
+          fontSize: layout.labelFontSize,
           color: "#0f172a",
         },
         upperLabel: {
-          show: showLabels,
-          height: 22,
+          show: layout.showLabels,
+          height: layout.upperLabelHeight,
           color: "#0f172a",
-          fontSize: 11,
+          fontSize: layout.labelFontSize,
         },
         itemStyle: {
           borderColor: theme.name === "live" || theme.name === "industrial"

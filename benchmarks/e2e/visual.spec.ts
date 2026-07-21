@@ -119,6 +119,13 @@ const VISUAL_STORIES = [
     settleMs: 2500,
     maxDiffPixelRatio: 0.06,
   },
+  {
+    id: "audit-niche-industrial--lane-c-tile-wall",
+    name: "design-lane-c-niche-360",
+    waitFor: "text=Lane C",
+    settleMs: 3000,
+    maxDiffPixelRatio: 0.08,
+  },
 ] as const;
 
 /** Fixed viewport clip — avoids 1–3px height drift between macOS baselines and Linux CI. */

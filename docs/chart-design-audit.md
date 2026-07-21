@@ -84,15 +84,15 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 | **Donut** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · `/compare/design` | **Parity** | @ 360×280 ✅ — bottom legend with `Name 48%`, hole KPI centered, no clipped leader lines vs Recharts bare legend — **D-201** closed |
 | **Funnel** | — | `Charts/Funnel` · `/compare/design` Lane B | **Parity** | @ 360×280 ✅ — compact in-stage % labels, tighter insets — **D-220** closed |
 | **Histogram** | `Compare/Design parity` · `/compare/design` | `Charts/Distribution` · catalog | **Parity** | @ 360×280 ✅ — `-25°` bin labels when bins ≥6 @ compact — **D-202** closed |
-| **Boxplot** | — | `Charts/Distribution` | **N/A** | Nivo/ECharts reference — **Lane C** |
-| **Violin / Swarm / Ridgeline** | — | catalog @ 120px | **N/A** | Analytics niche; defer — **Lane C** |
+| **Boxplot** | — | `Charts/Distribution` · Lane C harness | **Close** | @ 280×140 — hide y-axis labels, 9px ticks — **D-401** |
+| **Violin / Swarm / Ridgeline** | — | catalog @ 140px · Lane C harness | **Close** | Analytics niche; violin @ 280×140 — **D-402** |
 
 ### Financial
 
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
 | **Waterfall** | — (IBCS) | `Charts/Finance` · `/compare/design` Lane B | **Parity** | @ 360×280 ✅ — rotated dense labels, compact currency, IBCS connectors — **D-221** closed |
-| **Candlestick** | — | `Charts/Trading desk` | **N/A** | TradingView/ECharts reference — **Lane C** |
+| **Candlestick** | — | `Charts/Trading desk` · Lane C harness | **Close** | @ 280×140 — hide category labels, compact grid — **D-404** |
 
 ### Matrix / analytics (ECharts)
 
@@ -100,7 +100,7 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 |------|--------------|---------|--------|--------------|
 | **Heatmap** | — | `Charts/Heatmap` · `/compare/design` Lane B | **Parity** | @ 360×280 ✅ — hide cell labels @ compact; dense x-axis rotate — **D-222** closed |
 | **Radar** | `Compare/Design parity` · `/compare/design` | `Charts/Radar` | **Parity** | @ 360×280 ✅ — bottom legend, `startAngle: 90` spoke order, radial ticks hidden @ compact — **D-210** closed |
-| **Treemap / Sunburst** | — | catalog | **N/A** | Defer — **Lane C** |
+| **Treemap / Sunburst** | — | catalog · Lane C harness | **Close** | Treemap labels hidden @ 280×140 — **D-403** |
 | **Word cloud** | — | visual CI snapshot | **N/A** | Defer — **Lane C** |
 
 ### KPI & panels
@@ -114,8 +114,8 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 
 | Type | Recharts ref | Axi ref | Status | Notes |
 |------|--------------|---------|--------|-------|
-| Gauge, Digital, Status lamp, Tank, Andon | — | `Industrial/*` · plugins | **N/A** | `industrialTheme`; ops/HMI lane |
-| Liquid fill | — | `Charts/Liquid fill` | **N/A** | ECharts wave gauge |
+| Gauge, Digital, Status lamp, Tank, Andon | — | `Industrial/*` · Lane C harness | **Close** | `industrialTheme` @ 180×120 — **D-405–D-408** |
+| Liquid fill | — | `Charts/Liquid fill` · Lane C harness | **Close** | Compact label + radius @ 120px — **D-406** |
 
 Use **industrial** and **studio** themes as separate audit lanes (not Recharts parity).
 
@@ -155,6 +155,19 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | D-302 | `Compare/*` wall: add scatter, radar, histogram rows (was: horizontal/combo) | **Closed** — scatter / radar / histogram on `/compare/design` @ 360×280 |
 | D-303 | Document Recharts snippet per type in this file (link to story) | **Open** |
 | D-310 | Studio lane audit (Bklit/Recharts styled) — separate from clean parity | **Open** |
+
+### P3 — Niche / industrial (Lane C)
+
+| ID | Chart | Gap | Status |
+|----|-------|-----|--------|
+| D-401 | Boxplot | Catalog card @ 280×140 — axis density | **Close** — hide y labels, 9px ticks |
+| D-402 | Violin | Catalog card @ 280×140 | **Close** — axes off @ catalog; distribution layout |
+| D-403 | Treemap | Catalog card @ 280×140 | **Close** — hide cell labels @ compact |
+| D-404 | Candlestick | Catalog strip @ 280×140 | **Close** — hide category labels |
+| D-405 | Gauge | Industrial tile @ 180×120 | **Close** — compact arc + value sizing |
+| D-406 | Liquid fill | Industrial tile @ 180×120 | **Close** — 14px label, 80% radius |
+| D-407 | Digital | Industrial tile @ 180×120 | **Close** — harness row |
+| D-408 | Status lamp | Industrial tile @ 180×120 | **Close** — harness row |
 
 ### Phase 1 audit snapshot (2026-07-21)
 
@@ -210,7 +223,11 @@ Apply compact tile rules with non-Recharts references:
 - KPI/table polish (**D-106** ✅ / **D-107** ✅) — harness on `/compare/design`
 
 #### Phase 3 — Niche / industrial (Lane C)
-Keep separate aesthetic; audit for internal consistency only (margins, type scale, theme tokens) — no Recharts side-by-side required.
+Audit for internal consistency (margins, type scale, theme tokens) — no Recharts side-by-side:
+- Analytics niche @ **280×140**: boxplot (**D-401** ✅), violin (**D-402** ✅), treemap (**D-403** ✅), candlestick (**D-404** ✅)
+- Industrial HMI @ **180×120**: gauge (**D-405** ✅), liquid fill (**D-406** ✅), digital (**D-407** ✅), status lamp (**D-408** ✅)
+- Harness: `/compare/design` Lane C wall + `Audit/Niche industrial` visual CI
+- Remaining: swarm/ridgeline, sunburst, word cloud, plugins (map/sankey/gantt)
 
 #### Phase 4 — CI & docs (ongoing)
 - **D-301**–**D-303**: snapshot matrix matches P0 + Phase 1 table
@@ -251,6 +268,7 @@ Do **not** file D-xxx for these unless a dashboard user expects Recharts behavio
 
 | Date | Change |
 |------|--------|
+| 2026-07-21 | **Phase 3 Lane C** — `nicheCompactLayout` + harness **D-401–D-408** @ 280×140 / 180×120; visual CI `design-lane-c-niche-360` |
 | 2026-07-21 | **D-106 / D-107 / D-220–D-223** Lane B → **Parity**; stat compact padding, table status tones; **D-301** visual CI scatter/radar/histogram tiles |
 | 2026-07-21 | **D-101** horizontal bar @ 360×280 — fixed double left padding; axis-size gutter + 15-step value ticks → **Parity**; wall eight complete |
 | 2026-07-21 | **Design consistency program** documented (Lanes A–C, Phases 1–4). Audit pass: Phase 1 targets (scatter / radar / histogram) + open D-ids; wall eight confirmed Parity/Close |

@@ -88,11 +88,12 @@ export function Gauge({
     resolveTone(value, undefined, warningAt, criticalAt);
   const width = layout?.ready ? layout.size.width : 160;
   const height = layout?.ready ? layout.size.height : 120;
+  const industrial = height <= 130;
 
   const cx = width / 2;
-  const cy = height * 0.86;
-  const r = Math.min(width, height * 1.1) * 0.33;
-  const strokeWidth = Math.max(7, Math.min(11, r * 0.13));
+  const cy = height * (industrial ? 0.88 : 0.86);
+  const r = Math.min(width, height * 1.1) * (industrial ? 0.3 : 0.33);
+  const strokeWidth = Math.max(industrial ? 6 : 7, Math.min(11, r * 0.13));
   const start = Math.PI;
   const end = 0;
   const span = max - min || 1;
@@ -103,7 +104,9 @@ export function Gauge({
   const track = surface === "light" ? "#e2e8f0" : "#334155";
   const labelColor = surface === "light" ? "#64748b" : "#94a3b8";
   const tickColor = surface === "light" ? "#94a3b8" : "#64748b";
-  const valueFontSize = Math.min(Math.max(13, width * 0.095), r * 0.34);
+  const valueFontSize = industrial
+    ? Math.min(Math.max(12, width * 0.08), r * 0.32)
+    : Math.min(Math.max(13, width * 0.095), r * 0.34);
   const valueY = cy - r * 0.24;
   const labelY = valueY + valueFontSize * 0.72;
   const display =

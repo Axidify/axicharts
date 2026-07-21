@@ -14,6 +14,7 @@ import {
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart } from "./useEChart";
 import { useLiquidFillExtension } from "./useLiquidFillExtension";
+import { resolveLiquidFillLayout } from "./nicheCompactLayout";
 
 export type LiquidFillShape =
   | "circle"
@@ -83,6 +84,7 @@ function EChartsLiquidFillPlot({
     "#3b82f6";
   const displayPct = Math.round(normalized * 100);
   const labelColor = axisLabelStyle(theme).color;
+  const layout = resolveLiquidFillLayout(width, height);
 
   const option: EChartsOption = withPresentationAnimation(
     {
@@ -91,15 +93,15 @@ function EChartsLiquidFillPlot({
         {
           type: "liquidFill",
           data: fillData,
-          radius: "88%",
+          radius: layout.radius,
           shape,
           color: [fillColor],
           outline: {
             show: true,
-            borderDistance: 4,
+            borderDistance: layout.compact ? 2 : 4,
             itemStyle: {
               borderColor: fillColor,
-              borderWidth: 2,
+              borderWidth: layout.borderWidth,
             },
           },
           backgroundStyle: {
@@ -107,8 +109,9 @@ function EChartsLiquidFillPlot({
           },
           label: {
             show: true,
-            fontSize: 28,
+            fontSize: layout.labelFontSize,
             fontWeight: 700,
+            lineHeight: layout.compact ? layout.labelFontSize + 2 : 32,
             color: labelColor,
             formatter: label ? `${displayPct}%\n${label}` : `${displayPct}%`,
           },

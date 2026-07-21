@@ -28,6 +28,7 @@ import {
   type ViolinItem,
   type ViolinSeries,
 } from "./violinTypes";
+import { resolveDistributionNicheLayout } from "./nicheCompactLayout";
 
 export type EChartsViolinProps = {
   width: number;
@@ -191,13 +192,18 @@ export function EChartsViolin({
         : [];
   const categories = violinCategories(groups.length > 0 ? groups : items);
   const compact = isCompactTile(width, height);
+  const layout = resolveDistributionNicheLayout(width, height, groups.length);
   const grid = gridOptions(theme, compact);
+  const axisStyle = {
+    ...axisLabelStyle(theme),
+    fontSize: layout.axisFontSize,
+  };
 
   const option: EChartsOption = withPresentationAnimation(
     {
       grid: {
         ...grid,
-        top: groups.length > 1 ? 28 : grid.top,
+        top: layout.gridTop ?? grid.top,
       },
       legend:
         groups.length > 1
@@ -212,13 +218,16 @@ export function EChartsViolin({
         type: "category",
         data: categories,
         show: showAxes,
-        axisLabel: axisLabelStyle(theme),
+        axisLabel: axisStyle,
         splitLine: { show: false },
       },
       yAxis: {
         type: "value",
         show: showAxes,
-        axisLabel: axisLabelStyle(theme),
+        axisLabel: {
+          ...axisStyle,
+          show: showAxes && !layout.hideYAxisLabels,
+        },
         splitLine: splitLineStyle(theme),
       },
       series: groups.map((group, groupIndex) => {
