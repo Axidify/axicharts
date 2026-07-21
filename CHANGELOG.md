@@ -10,6 +10,16 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.32] - 2026-07-21
+
+### Fixed
+
+- **charts-canvas** — horizontal bar gutter: axis `size` only (no duplicate `padding.left`); 15-step value ticks @ compact tiles (**D-101** → Parity)
+
+### Added
+
+- **storybook** — Lane B `Audit/Dashboard adjacent` visual CI snapshot (**D-301**)
+
 ## [0.4.31] - 2026-07-21
 
 ### Added
