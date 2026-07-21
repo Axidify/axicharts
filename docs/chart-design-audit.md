@@ -82,7 +82,7 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 |------|--------------|---------|--------|--------------|
 | **Pie** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · catalog | **Close** | Large panels: external labels + leader lines; compact tiles use bottom legend — **D-201** center metric ✅ |
 | **Donut** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · `/compare/design` | **Parity** | @ 360×280 ✅ — bottom legend with `Name 48%`, hole KPI centered, no clipped leader lines vs Recharts bare legend — **D-201** closed |
-| **Funnel** | — | `Charts/Funnel` | **N/A** | No Recharts funnel; use SaaS mockups — **Lane B** |
+| **Funnel** | — | `Charts/Funnel` · `/compare/design` Lane B | **Close** | @ 360×280 — compact in-stage % labels, tighter insets — **D-220** |
 | **Histogram** | `Compare/Design parity` · `/compare/design` | `Charts/Distribution` · catalog | **Parity** | @ 360×280 ✅ — `-25°` bin labels when bins ≥6 @ compact — **D-202** closed |
 | **Boxplot** | — | `Charts/Distribution` | **N/A** | Nivo/ECharts reference — **Lane C** |
 | **Violin / Swarm / Ridgeline** | — | catalog @ 120px | **N/A** | Analytics niche; defer — **Lane C** |
@@ -91,14 +91,14 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
-| **Waterfall** | — (IBCS) | `Charts/Finance` · ECharts interaction | **N/A** | IBCS connectors; not Recharts-shaped — **Lane B** |
+| **Waterfall** | — (IBCS) | `Charts/Finance` · `/compare/design` Lane B | **Close** | @ 360×280 — rotated dense labels, compact currency, IBCS connectors — **D-221** |
 | **Candlestick** | — | `Charts/Trading desk` | **N/A** | TradingView/ECharts reference — **Lane C** |
 
 ### Matrix / analytics (ECharts)
 
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
-| **Heatmap** | — | `Charts/Heatmap` | **N/A** | ECharts reference — **Lane B** |
+| **Heatmap** | — | `Charts/Heatmap` · `/compare/design` Lane B | **Close** | @ 360×280 — hide cell labels @ compact; dense x-axis rotate — **D-222** |
 | **Radar** | `Compare/Design parity` · `/compare/design` | `Charts/Radar` | **Parity** | @ 360×280 ✅ — bottom legend, `startAngle: 90` spoke order, radial ticks hidden @ compact — **D-210** closed |
 | **Treemap / Sunburst** | — | catalog | **N/A** | Defer — **Lane C** |
 | **Word cloud** | — | visual CI snapshot | **N/A** | Defer — **Lane C** |
@@ -139,6 +139,10 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | D-201 | Pie / donut | Donut center metric @ compact height | **Closed** — `centerMetric` hole KPI + CSS-centered overlay; compact bottom legend + % labels @ 360×280 ✅ |
 | D-106 | Stat | KPI strip typography (value, unit, delta) @ 72–120px | **Close** — `StatDeltaChip`, unit suffix, ChartContainer @ height; Lane B harness |
 | D-107 | Table | Row density, header stickiness, numeric alignment @ 320px | **Close** — zebra, sticky header, tabular-nums; Lane B harness |
+| D-220 | Funnel | Compact pipeline tile @ 360×280; in-stage % labels | **Close** — Lane B harness + compact insets |
+| D-221 | Waterfall | IBCS bridge @ 360×280; dense category labels | **Close** — rotated labels + compact bar/label sizing |
+| D-222 | Heatmap | Service load tile @ 360×280 | **Close** — no cell labels @ compact; visualMap + axis density |
+| D-223 | Calendar heatmap | 90-day activity @ 360×280 | **Close** — compact cells + short weekday labels |
 
 ### P2 — Coverage & CI
 
@@ -202,7 +206,8 @@ Add to `/compare/design` and polish @ 360×280 until **Close → Parity**:
 
 #### Phase 2 — Dashboard-adjacent (Lane B)
 Apply compact tile rules with non-Recharts references:
-- Funnel, waterfall, heatmap (+ calendar heatmap), remaining KPI/table polish
+- Funnel (**D-220** ✅), waterfall (**D-221** ✅), heatmap (**D-222** ✅), calendar heatmap (**D-223** ✅)
+- KPI/table polish (**D-106** ✅ / **D-107** ✅) — harness on `/compare/design`
 
 #### Phase 3 — Niche / industrial (Lane C)
 Keep separate aesthetic; audit for internal consistency only (margins, type scale, theme tokens) — no Recharts side-by-side required.

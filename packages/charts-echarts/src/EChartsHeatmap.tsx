@@ -5,10 +5,11 @@ import { useMemo } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
-import { axisLabelStyle, gridOptions, hiddenTooltip, isCompactTile, seriesPalette, splitLineStyle } from "./themeBridge";
+import { axisLabelStyle, gridOptions, hiddenTooltip, seriesPalette, splitLineStyle } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { HeatmapMatrix } from "./types";
+import { resolveHeatmapLayout } from "./heatmapLayout";
 
 export type HeatmapBrushRange = {
   start: number;
@@ -123,7 +124,17 @@ export function EChartsHeatmap({
   const flat = slicedMatrix.values.flat();
   const computedMin = min ?? (flat.length > 0 ? Math.min(...flat) : 0);
   const computedMax = max ?? (flat.length > 0 ? Math.max(...flat) : 1);
-  const labelVisible = showLabels ?? width > 360;
+  const layout = resolveHeatmapLayout(width, height, {
+    showLabels,
+    xCategoryCount: slicedMatrix.xCategories.length,
+  });
+  const axisFont = {
+    ...axisLabelStyle(theme),
+    fontSize: layout.axisFontSize,
+    ...(layout.rotateXLabels
+      ? { rotate: layout.rotateXLabels, interval: 0, hideOverlap: true }
+      : {}),
+  };
 
   const data: [number, number, number][] = [];
   slicedMatrix.values.forEach((row, yIndex) => {
@@ -137,28 +148,30 @@ export function EChartsHeatmap({
     brushRange,
     matrix.xCategories.length,
   );
-  const compact = isCompactTile(width, height);
-  const grid = gridOptions(theme, compact);
+  const grid = gridOptions(theme, layout.compact);
 
   const option: EChartsOption = withPresentationAnimation(
     {
     grid: {
       ...grid,
-      bottom: 40,
+      bottom: layout.gridBottom,
     },
     tooltip: hiddenTooltip(),
     xAxis: {
       type: "category",
       data: slicedMatrix.xCategories,
       show: showAxes,
-      axisLabel: axisLabelStyle(theme),
+      axisLabel: axisFont,
       splitLine: splitLineStyle(theme),
     },
     yAxis: {
       type: "category",
       data: slicedMatrix.yCategories,
       show: showAxes,
-      axisLabel: axisLabelStyle(theme),
+      axisLabel: {
+        ...axisLabelStyle(theme),
+        fontSize: layout.axisFontSize,
+      },
       splitLine: splitLineStyle(theme),
     },
     visualMap: {
@@ -168,17 +181,21 @@ export function EChartsHeatmap({
       orient: "horizontal",
       left: "center",
       bottom: 0,
+      itemHeight: layout.visualMapHeight,
       inRange: {
         color: heatmapColors(theme),
       },
-      textStyle: { fontSize: 10, color: axisLabelStyle(theme).color },
+      textStyle: {
+        fontSize: layout.compact ? 9 : 10,
+        color: axisLabelStyle(theme).color,
+      },
     },
     series: [
       {
         type: "heatmap",
         data,
         label: {
-          show: labelVisible,
+          show: layout.showCellLabels,
           fontSize: 10,
           color: "#0f172a",
           textBorderColor: "rgba(255,255,255,0.85)",

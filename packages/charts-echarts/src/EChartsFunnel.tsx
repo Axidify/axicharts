@@ -8,6 +8,7 @@ import { hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { FunnelStage } from "./funnelTypes";
+import { resolveFunnelLayout } from "./funnelLayout";
 
 export type EChartsFunnelProps = {
   width: number;
@@ -34,6 +35,7 @@ export function EChartsFunnel({
 }: EChartsFunnelProps): ReactElement {
   const total = stages.reduce((sum, stage) => sum + stage.value, 0);
   const palette = seriesPalette(theme);
+  const layout = resolveFunnelLayout(width, height);
   const data = stages.map((stage, index) => ({
     name: stage.name,
     value: stage.value,
@@ -51,22 +53,22 @@ export function EChartsFunnel({
     series: [
       {
         type: "funnel",
-        left: "8%",
-        top: 16,
-        bottom: 16,
-        width: "84%",
+        left: layout.inset.left,
+        top: layout.inset.top,
+        bottom: layout.inset.bottom,
+        width: layout.inset.width,
         min: 0,
         max: Math.max(...stages.map((stage) => stage.value), 1),
-        minSize: "12%",
+        minSize: layout.minSize,
         maxSize: "100%",
         sort,
-        gap: 4,
+        gap: layout.gap,
         label: {
           show: true,
           position: "inside",
-          fontSize: 11,
+          fontSize: layout.labelFontSize,
           color: "#f8fafc",
-          formatter: "{b}",
+          formatter: layout.compact ? "{b}\n{d}%" : "{b}",
         },
         itemStyle: {
           borderColor:

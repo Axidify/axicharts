@@ -8,7 +8,6 @@ import {
   axisLabelStyle,
   gridOptions,
   hiddenTooltip,
-  isCompactTile,
   reactAxisPointer,
   splitLineStyle,
 } from "./themeBridge";
@@ -16,6 +15,7 @@ import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartCursorEvent } from "./useEChart";
 import type { WaterfallItem } from "./types";
 import { buildWaterfallBridge } from "./waterfallBridge";
+import { resolveWaterfallLayout } from "./waterfallLayout";
 
 export type EChartsWaterfallProps = {
   width: number;
@@ -68,22 +68,35 @@ export function EChartsWaterfall({
   const bridge = buildWaterfallBridge(items, theme);
   const { placeholders, values, colors, labels, connectors, displayValues, isTotals } =
     bridge;
-  const compact = isCompactTile(width, height);
+  const layout = resolveWaterfallLayout(width, height, labels.length);
+  const axisFont = {
+    ...axisLabelStyle(theme),
+    fontSize: layout.axisFontSize,
+    ...(layout.rotateLabels
+      ? { rotate: layout.rotateLabels, interval: 0, hideOverlap: true }
+      : {}),
+  };
 
   const option: EChartsOption = withPresentationAnimation(
     {
-    grid: gridOptions(theme, compact),
+    grid: {
+      ...gridOptions(theme, layout.compact),
+      ...(layout.gridBottom > 0 ? { bottom: layout.gridBottom } : {}),
+    },
     tooltip: hiddenTooltip(),
     axisPointer: reactAxisPointer(),
     xAxis: {
       type: "category",
       data: labels,
-      axisLabel: axisLabelStyle(theme),
+      axisLabel: axisFont,
       splitLine: splitLineStyle(theme),
     },
     yAxis: {
       type: "value",
-      axisLabel: axisLabelStyle(theme),
+      axisLabel: {
+        ...axisLabelStyle(theme),
+        fontSize: layout.axisFontSize,
+      },
       splitLine: splitLineStyle(theme),
     },
     series: [
@@ -99,7 +112,7 @@ export function EChartsWaterfall({
       {
         type: "bar",
         stack: "waterfall",
-        barMaxWidth: 56,
+        barMaxWidth: layout.barMaxWidth,
         label: {
           show: showLabels,
           position: "top",
@@ -112,7 +125,7 @@ export function EChartsWaterfall({
               valueFormat,
             );
           },
-          fontSize: 11,
+          fontSize: layout.labelFontSize,
           fontWeight: 600,
         },
         markLine: {

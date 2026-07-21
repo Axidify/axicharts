@@ -9,6 +9,7 @@ import { axisLabelStyle, hiddenTooltip, seriesPalette } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { CalendarHeatmapData } from "./types";
+import { resolveCalendarHeatmapLayout } from "./calendarLayout";
 
 export type EChartsCalendarHeatmapProps = {
   width: number;
@@ -95,19 +96,17 @@ export function EChartsCalendarHeatmap({
   const values = data.points.map((point) => point.value);
   const computedMin = min ?? (values.length > 0 ? Math.min(...values) : 0);
   const computedMax = max ?? (values.length > 0 ? Math.max(...values) : 1);
-  const labelVisible = showLabels ?? false;
-  const resolvedCellSize: number | [number | "auto", number | "auto"] =
-    cellSize ??
-    Math.max(8, Math.min(14, Math.floor(width / 60)));
+  const layout = resolveCalendarHeatmapLayout(width, height, { showLabels });
+  const resolvedCellSize = cellSize ?? layout.cellSize;
 
   const option: EChartsOption = withPresentationAnimation(
     {
       tooltip: hiddenTooltip(),
       calendar: {
-        top: 48,
-        left: 40,
-        right: 20,
-        bottom: 40,
+        top: layout.inset.top,
+        left: layout.inset.left,
+        right: layout.inset.right,
+        bottom: layout.inset.bottom,
         range,
         cellSize: Array.isArray(resolvedCellSize)
           ? resolvedCellSize
@@ -117,14 +116,20 @@ export function EChartsCalendarHeatmap({
           borderColor: "#fff",
         },
         yearLabel: {
-          show: true,
+          show: !layout.compact,
           ...axisLabelStyle(theme),
         },
-        monthLabel: axisLabelStyle(theme),
+        monthLabel: {
+          ...axisLabelStyle(theme),
+          fontSize: layout.compact ? 9 : 11,
+        },
         dayLabel: {
           firstDay: 1,
-          nameMap: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+          nameMap: layout.compact
+            ? ["S", "M", "T", "W", "T", "F", "S"]
+            : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
           ...axisLabelStyle(theme),
+          fontSize: layout.compact ? 8 : 11,
         },
       },
       visualMap: {
@@ -137,7 +142,10 @@ export function EChartsCalendarHeatmap({
         inRange: {
           color: heatmapColors(theme),
         },
-        textStyle: { fontSize: 10, color: axisLabelStyle(theme).color },
+        textStyle: {
+          fontSize: layout.compact ? 9 : 10,
+          color: axisLabelStyle(theme).color,
+        },
       },
       series: [
         {
@@ -145,7 +153,7 @@ export function EChartsCalendarHeatmap({
           coordinateSystem: "calendar",
           data: seriesData,
           label: {
-            show: labelVisible,
+            show: layout.showCellLabels,
             fontSize: 9,
             color: "#0f172a",
             textBorderColor: "rgba(255,255,255,0.85)",
