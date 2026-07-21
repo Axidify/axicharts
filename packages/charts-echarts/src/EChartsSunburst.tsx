@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
+import { resolveSunburstLayout } from "./nicheCompactLayout";
 import { hiddenTooltip } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
@@ -41,6 +42,8 @@ export function EChartsSunburst({
   const data = mapTreemapData(nodes, theme);
   const leafValues = flattenTreemapValues(nodes);
   const total = leafValues.reduce((sum, value) => sum + value, 0);
+  const layout = resolveSunburstLayout(width, height, showLabels);
+  const [innerRadius, outerRadius] = layout.radius;
 
   const option: EChartsOption = withPresentationAnimation(
     {
@@ -48,15 +51,15 @@ export function EChartsSunburst({
     series: [
       {
         type: "sunburst",
-        radius: ["12%", "92%"],
+        radius: layout.radius,
         sort: undefined,
         emphasis: {
           focus: "ancestor",
         },
         label: {
-          show: showLabels,
+          show: layout.showLabels,
           rotate: "radial",
-          fontSize: 11,
+          fontSize: layout.labelFontSize,
           color: "#0f172a",
         },
         itemStyle: {
@@ -69,13 +72,13 @@ export function EChartsSunburst({
         levels: [
           {},
           {
-            r0: "12%",
+            r0: innerRadius,
             r: "42%",
             label: { rotate: "tangential" },
           },
           {
             r0: "42%",
-            r: "92%",
+            r: outerRadius,
             label: { rotate: "radial" },
           },
         ],

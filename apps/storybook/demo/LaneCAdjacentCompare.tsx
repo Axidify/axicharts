@@ -6,7 +6,10 @@ import {
   Digital,
   Gauge,
   LiquidFillChart,
+  RidgelineChart,
   StatusLamp,
+  SunburstChart,
+  SwarmChart,
   TreemapChart,
   ViolinChart,
 } from "@axicharts/charts";
@@ -43,6 +46,27 @@ const CANDLE_DATA = [
   { open: 100, high: 108, low: 98, close: 105 },
   { open: 105, high: 110, low: 102, close: 103 },
   { open: 103, high: 106, low: 99, close: 101 },
+];
+
+const SWARM_ITEMS = [
+  { category: "API", values: [12, 18, 22, 28, 35, 42, 55, 72] },
+  { category: "DB", values: [8, 14, 20, 26, 34, 48, 60, 78] },
+];
+
+const RIDGELINE_ITEMS = [
+  { category: "API", samples: [12, 18, 22, 28, 35, 42, 55, 72] },
+  { category: "DB", samples: [8, 14, 20, 26, 34, 48, 60, 78] },
+];
+
+const SUNBURST_NODES = [
+  {
+    name: "Equities",
+    children: [
+      { name: "US", value: 38 },
+      { name: "Intl", value: 18 },
+    ],
+  },
+  { name: "Bonds", children: [{ name: "Treasury", value: 16 }] },
 ];
 
 type LaneCCase = {
@@ -205,6 +229,45 @@ function buildLaneCCases(): LaneCCase[] {
           height={INDUSTRIAL_TILE_H}
         >
           <StatusLamp status="running" label="Line 3" />
+        </ChartContainer>
+      ),
+    },
+    {
+      id: "swarm-catalog-140",
+      title: "Swarm — latency jitter",
+      designId: "D-409",
+      lane: "analytics",
+      width: NICHE_CATALOG_W,
+      height: NICHE_CATALOG_H,
+      chart: (
+        <ChartContainer theme={cleanTheme} width={NICHE_CATALOG_W} height={NICHE_CATALOG_H}>
+          <SwarmChart items={SWARM_ITEMS} showAxes={false} />
+        </ChartContainer>
+      ),
+    },
+    {
+      id: "ridgeline-catalog-140",
+      title: "Ridgeline — latency density",
+      designId: "D-410",
+      lane: "analytics",
+      width: NICHE_CATALOG_W,
+      height: NICHE_CATALOG_H,
+      chart: (
+        <ChartContainer theme={cleanTheme} width={NICHE_CATALOG_W} height={NICHE_CATALOG_H}>
+          <RidgelineChart items={RIDGELINE_ITEMS} showAxes={false} />
+        </ChartContainer>
+      ),
+    },
+    {
+      id: "sunburst-catalog-140",
+      title: "Sunburst — portfolio mix",
+      designId: "D-411",
+      lane: "analytics",
+      width: NICHE_CATALOG_W,
+      height: NICHE_CATALOG_H,
+      chart: (
+        <ChartContainer theme={cleanTheme} width={NICHE_CATALOG_W} height={NICHE_CATALOG_H}>
+          <SunburstChart nodes={SUNBURST_NODES} />
         </ChartContainer>
       ),
     },

@@ -6,6 +6,7 @@ import {
   resolveCandlestickNicheLayout,
   resolveDistributionNicheLayout,
   resolveLiquidFillLayout,
+  resolveSunburstLayout,
   resolveTreemapLayout,
 } from "./nicheCompactLayout";
 
@@ -33,5 +34,11 @@ describe("Lane C compact layouts", () => {
     const layout = resolveCandlestickNicheLayout(NICHE_CATALOG_W, NICHE_CATALOG_H);
     expect(layout.hideCategoryLabels).toBe(true);
     expect(layout.axisFontSize).toBe(9);
+  });
+
+  it("hides sunburst labels @ catalog size", () => {
+    const layout = resolveSunburstLayout(NICHE_CATALOG_W, NICHE_CATALOG_H, true);
+    expect(layout.showLabels).toBe(false);
+    expect(layout.radius).toEqual(["18%", "88%"]);
   });
 });

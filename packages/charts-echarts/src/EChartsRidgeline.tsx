@@ -8,6 +8,7 @@ import type {
 } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
+import { resolveDistributionNicheLayout } from "./nicheCompactLayout";
 import {
   axisLabelStyle,
   gridOptions,
@@ -163,13 +164,18 @@ export function EChartsRidgeline({
         : [];
   const categories = ridgelineCategories(groups.length > 0 ? groups : items);
   const compact = isCompactTile(width, height);
+  const layout = resolveDistributionNicheLayout(width, height, groups.length);
   const grid = gridOptions(theme, compact);
+  const axisStyle = {
+    ...axisLabelStyle(theme),
+    fontSize: layout.axisFontSize,
+  };
 
   const option: EChartsOption = withPresentationAnimation(
     {
       grid: {
         ...grid,
-        top: groups.length > 1 ? 28 : grid.top,
+        top: layout.gridTop ?? (groups.length > 1 ? 28 : grid.top),
       },
       legend:
         groups.length > 1
@@ -183,7 +189,7 @@ export function EChartsRidgeline({
       xAxis: {
         type: "value",
         show: showAxes,
-        axisLabel: axisLabelStyle(theme),
+        axisLabel: axisStyle,
         splitLine: splitLineStyle(theme),
       },
       yAxis: {
@@ -191,7 +197,10 @@ export function EChartsRidgeline({
         data: categories,
         inverse: true,
         show: showAxes,
-        axisLabel: axisLabelStyle(theme),
+        axisLabel: {
+          ...axisStyle,
+          show: showAxes && !layout.hideCategoryAxisLabels,
+        },
         splitLine: { show: false },
       },
       series: groups.map((group, groupIndex) => {

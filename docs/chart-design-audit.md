@@ -74,18 +74,18 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 | **Combo (bar+line)** | `Compare/Design parity` · `Shadcn parity` | `Charts/Combo chart` · `/compare/design` | **Parity** | AxiCharts wins @ 360×280 ✅ — dual y-axes, spline line, bar value labels, centered flow legend; bare Recharts wall chart is bar-only on one scale (line invisible) — **D-104** closed |
 | **Sparkline** | `Compare/Recharts compare` (inline) | `Charts/Grid cells` | **Parity** | 72px strip; liveTheme grid |
 | **Scatter** | `Compare/Design parity` · `/compare/design` | `Charts/Scatter` | **Parity** | @ 360×280 ✅ — compact bottom legend; bubble size legend min/max labels — **D-110** closed |
-| **Cartesian blocks** | Composed `Bar`/`Line` children | `Charts/Cartesian chart` · `Blocks` | **Close** | Agent path; less design QA than presets — **D-105** |
+| **Cartesian blocks** | Composed `Bar`/`Line` children | `Charts/Cartesian chart` · `Blocks` · `/compare/design` | **Parity** | Agent `marks[]` path @ 360×280 vs Recharts `ComposedChart` — **D-105** closed |
 
 ### Distribution (ECharts) — Recharts overlap
 
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
-| **Pie** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · catalog | **Close** | Large panels: external labels + leader lines; compact tiles use bottom legend — **D-201** center metric ✅ |
+| **Pie** | `Compare/Design parity` · `Charts/Pie` | `Charts/Pie` · `/compare/design` | **Parity** | Full disk @ 360×280 — bottom legend, `62%` radius @ compact — **D-201** closed |
 | **Donut** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · `/compare/design` | **Parity** | @ 360×280 ✅ — bottom legend with `Name 48%`, hole KPI centered, no clipped leader lines vs Recharts bare legend — **D-201** closed |
 | **Funnel** | — | `Charts/Funnel` · `/compare/design` Lane B | **Parity** | @ 360×280 ✅ — compact in-stage % labels, tighter insets — **D-220** closed |
 | **Histogram** | `Compare/Design parity` · `/compare/design` | `Charts/Distribution` · catalog | **Parity** | @ 360×280 ✅ — `-25°` bin labels when bins ≥6 @ compact — **D-202** closed |
 | **Boxplot** | — | `Charts/Distribution` · Lane C harness | **Close** | @ 280×140 — hide y-axis labels, 9px ticks — **D-401** |
-| **Violin / Swarm / Ridgeline** | — | catalog @ 140px · Lane C harness | **Close** | Analytics niche; violin @ 280×140 — **D-402** |
+| **Violin / Swarm / Ridgeline** | — | catalog @ 140px · Lane C harness | **Close** | Swarm **D-409**, ridgeline **D-410** @ 280×140 |
 
 ### Financial
 
@@ -100,8 +100,8 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 |------|--------------|---------|--------|--------------|
 | **Heatmap** | — | `Charts/Heatmap` · `/compare/design` Lane B | **Parity** | @ 360×280 ✅ — hide cell labels @ compact; dense x-axis rotate — **D-222** closed |
 | **Radar** | `Compare/Design parity` · `/compare/design` | `Charts/Radar` | **Parity** | @ 360×280 ✅ — bottom legend, `startAngle: 90` spoke order, radial ticks hidden @ compact — **D-210** closed |
-| **Treemap / Sunburst** | — | catalog · Lane C harness | **Close** | Treemap labels hidden @ 280×140 — **D-403** |
-| **Word cloud** | — | visual CI snapshot | **N/A** | Defer — **Lane C** |
+| **Treemap / Sunburst** | — | catalog · Lane C harness | **Close** | Treemap **D-403**; sunburst labels hidden @ 280×140 — **D-411** |
+| **Word cloud** | — | `Charts/WordCloud` · visual CI | **N/A** | Defer — existing CI sufficient |
 
 ### KPI & panels
 
@@ -131,12 +131,13 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | D-102 | Bar / stacked bar | Semantic `encoding.color` without manual `Cell`; bar radius/gap at 360px | **Closed** — bar-only cartesian → BarChart/uPlot; always-round radius; compact gap; 4-series ramp row |
 | D-103 | Line / area | Compact multi-series legend; area fill on line charts | **Closed** — area SLO + burndown multi-line @ 360×280 ✅ |
 | D-104 | Combo | Bar+line visual balance; dual-axis label gutters | **Closed** — dual-axis combo, value labels, flow legend @ 360×280 |
+| D-105 | Cartesian blocks | Agent `marks[]` path chrome @ 360×280 | **Closed** — bar+line+rule vs Recharts `ComposedChart`; visual CI `BlocksTile360` |
 
 ### P1 — Distribution & KPI
 
 | ID | Chart | Gap | Status |
 |----|-------|-----|--------|
-| D-201 | Pie / donut | Donut center metric @ compact height | **Closed** — `centerMetric` hole KPI + CSS-centered overlay; compact bottom legend + % labels @ 360×280 ✅ |
+| D-201 | Pie / donut | Donut center metric @ compact height; full pie @ 360×280 | **Closed** — `centerMetric` hole KPI; full pie bottom legend + `62%` radius @ compact |
 | D-106 | Stat | KPI strip typography (value, unit, delta) @ 72–120px | **Closed** — compact padding + delta chip; Lane B harness |
 | D-107 | Table | Row density, header stickiness, numeric alignment @ 320px | **Closed** — zebra, sticky header, status tone inference |
 | D-220 | Funnel | Compact pipeline tile @ 360×280; in-stage % labels | **Closed** — Lane B harness + compact insets |
@@ -153,8 +154,8 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | D-210 | Radar | Multi-series bottom/flow legend; compare wall @ 360×280; labels policy at compact width | **Closed** — spoke order + hidden radial ticks @ compact |
 | D-301 | Expand visual CI: one snapshot per P0 cartesian type @ 360px | **Closed** — parity wall + horizontal + scatter/radar/histogram tiles + Lane B wall |
 | D-302 | `Compare/*` wall: add scatter, radar, histogram rows (was: horizontal/combo) | **Closed** — scatter / radar / histogram on `/compare/design` @ 360×280 |
-| D-303 | Document Recharts snippet per type in this file (link to story) | **Open** |
-| D-310 | Studio lane audit (Bklit/Recharts styled) — separate from clean parity | **Open** |
+| D-303 | Document Recharts snippet per type in this file (link to story) | **Closed** — story index + snippet refs below |
+| D-310 | Studio lane audit (Bklit/Recharts styled) — separate from clean parity | **Close** — `Audit/Studio` 3-way wall @ 360×280 |
 
 ### P3 — Niche / industrial (Lane C)
 
@@ -168,6 +169,10 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | D-406 | Liquid fill | Industrial tile @ 180×120 | **Close** — 14px label, 80% radius |
 | D-407 | Digital | Industrial tile @ 180×120 | **Close** — harness row |
 | D-408 | Status lamp | Industrial tile @ 180×120 | **Close** — harness row |
+| D-409 | Swarm | Catalog card @ 280×140 | **Close** — axes off; distribution compact layout |
+| D-410 | Ridgeline | Catalog card @ 280×140 | **Close** — axes off; distribution compact layout |
+| D-411 | Sunburst | Catalog card @ 280×140 | **Close** — hide labels @ compact |
+| D-412 | Plugins (map/sankey/gantt) | Catalog @ 280×140 | **Close** — Lane C plugins wall; N/A for Recharts |
 
 ### Phase 1 audit snapshot (2026-07-21)
 
@@ -227,15 +232,49 @@ Audit for internal consistency (margins, type scale, theme tokens) — no Rechar
 - Analytics niche @ **280×140**: boxplot (**D-401** ✅), violin (**D-402** ✅), treemap (**D-403** ✅), candlestick (**D-404** ✅)
 - Industrial HMI @ **180×120**: gauge (**D-405** ✅), liquid fill (**D-406** ✅), digital (**D-407** ✅), status lamp (**D-408** ✅)
 - Harness: `/compare/design` Lane C wall + `Audit/Niche industrial` visual CI
-- Remaining: swarm/ridgeline, sunburst, word cloud, plugins (map/sankey/gantt)
+- Remaining: word cloud (N/A — defer)
 
 #### Phase 4 — CI & docs (ongoing)
-- **D-301**–**D-303**: snapshot matrix matches P0 + Phase 1 table
+- **D-301**–**D-303** ✅ snapshot matrix + Recharts story index
 - Per-type **last audited** date in matrix rows / history below
+
+#### Studio lane (D-310)
+Editorial `studioTheme` — gradient areas, soft grid, bar highlight. **Not** scored on Recharts 1–5 rubric.
+- Harness: `Audit/Studio → StudioTileWall` @ 360×280 (Recharts bare / `cleanTheme` / `studioTheme`)
+- Reference mood: Bklit-style editorial dashboards (`.cache/bklit-*.png` in dev snapshots)
 
 ---
 
-## Storybook compare index
+## Recharts reference index (D-303)
+
+Storybook base: `pnpm storybook` → iframe `?id=<story-id>&viewMode=story`
+
+| Type | Recharts snippet | Axi story / case | Storybook ID |
+|------|------------------|------------------|--------------|
+| Line | `Compare/Design parity` case `line-revenue` | same | `compare-design-parity--gallery` |
+| Bar | case `bar-color` | `Audit/Design → RechartsParityTile360` | `audit-design--recharts-parity-tile-360` |
+| Horizontal bar | `Compare/Composition priority` | case `horizontal-priority` | `audit-design--horizontal-bar-tile-360` |
+| Stacked bar | case `stacked-velocity` / `stacked-breakdown-4` | Shadcn wall | `charts-shadcnparity--recharts-parity-wall` |
+| Combo | case `combo-bar-line` | same | `compare-design-parity--gallery` |
+| Area | case `area-slo` | same | `compare-design-parity--gallery` |
+| Multi-line | case `multi-line-burndown` | same | `compare-design-parity--gallery` |
+| Pie | case `pie-status` — `innerRadius={0}` | `Charts/Pie` | `audit-design--pie-tile-360` |
+| Donut | case `donut-browser` — `innerRadius={58}` | `Charts/Donut` | `compare-design-parity--gallery` |
+| Scatter | case `scatter-risk-return` | `Audit/Design → ScatterTile360` | `audit-design--scatter-tile-360` |
+| Radar | case `radar-scorecard` | `Audit/Design → RadarTile360` | `audit-design--radar-tile-360` |
+| Histogram | case `histogram-latency` | `Audit/Design → HistogramTile360` | `audit-design--histogram-tile-360` |
+| Cartesian blocks | case `cartesian-blocks` — `ComposedChart` | `Spec/Blocks Playground` | `audit-design--blocks-tile-360` |
+| Funnel / waterfall / heatmap | Lane B CSS mocks | `Audit/Dashboard adjacent` | `audit-dashboard-adjacent--lane-b-tile-360` |
+| Niche / industrial | — | `Audit/Niche industrial` | `audit-niche-industrial--lane-c-tile-wall` |
+| Studio | bare Recharts (no shadcn) | `Audit/Studio` | `audit-studio--studio-tile-wall` |
+
+**Shadcn parity wall:** `Charts/ShadcnParity → RechartsParityWall` (`charts-shadcnparity--recharts-parity-wall`)
+
+**Recharts snippet source:** `apps/storybook/demo/RechartsParityCompare.tsx` — each `recharts:` column is the canonical reference JSX @ `TILE_W`×`TILE_H` (360×280).
+
+---
+
+## Storybook compare index (legacy)
 
 | Story | Recharts vs Axi |
 |-------|-----------------|
@@ -243,7 +282,9 @@ Audit for internal consistency (margins, type scale, theme tokens) — no Rechar
 | `Compare/Design parity` · `/compare/design` | Full wall (8 types) + Phase 1 additions as they land |
 | `Compare/Recharts compare` | Bare vs styled line; sparklines |
 | `Compare/Composition priority` | Priority bars; horizontal Recharts reference |
-| `Shadcn parity` | Bar, line, area, pie, donut, stacked, combo, multi-line |
+| `Charts/ShadcnParity` | Bar, line, area, pie, donut, stacked, combo, multi-line |
+| `Charts/Pie` | Full pie @ 360×280 — status distribution |
+| `Audit/Studio` | Studio lane 3-way wall (D-310) |
 | `Charts/Bar cell` · `Charts/Line cell` | Composable `Cell` per-category fills |
 | `Charts/Horizontal bar` | Imperative horizontal bar API |
 
@@ -268,6 +309,7 @@ Do **not** file D-xxx for these unless a dashboard user expects Recharts behavio
 
 | Date | Change |
 |------|--------|
+| 2026-07-21 | **Optional backlog** — pie **D-201** parity row; blocks **D-105**; studio **D-310**; **D-303** story index; Lane C **D-409–D-412** (swarm/ridgeline/sunburst/plugins) |
 | 2026-07-21 | **Phase 3 Lane C** — `nicheCompactLayout` + harness **D-401–D-408** @ 280×140 / 180×120; visual CI `design-lane-c-niche-360` |
 | 2026-07-21 | **D-106 / D-107 / D-220–D-223** Lane B → **Parity**; stat compact padding, table status tones; **D-301** visual CI scatter/radar/histogram tiles |
 | 2026-07-21 | **D-101** horizontal bar @ 360×280 — fixed double left padding; axis-size gutter + 15-step value ticks → **Parity**; wall eight complete |

@@ -125,6 +125,14 @@ export const HistogramTile360: Story = {
   render: () => <ParityAxiTile caseId="histogram-latency" />,
 };
 
+export const PieTile360: Story = {
+  render: () => <ParityAxiTile caseId="pie-status" />,
+};
+
+export const BlocksTile360: Story = {
+  render: () => <ParityAxiTile caseId="cartesian-blocks" />,
+};
+
 /** Imperative API smoke at tile size. */
 export const ImperativeCartesianTile360: Story = {
   render: () => (

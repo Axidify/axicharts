@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { LaneCAdjacentCompare } from "../demo/LaneCAdjacentCompare";
+import { LaneCPluginsCompare } from "../demo/LaneCPluginsCompare";
 
 const meta = {
   title: "Audit/Niche industrial",
@@ -19,5 +20,10 @@ type Story = StoryObj<typeof meta>;
 
 /** Lane C wall — visual CI baseline for D-401–D-408. */
 export const LaneCTileWall: Story = {
-  render: () => <LaneCAdjacentCompare />,
+  render: () => (
+    <>
+      <LaneCAdjacentCompare />
+      <LaneCPluginsCompare />
+    </>
+  ),
 };

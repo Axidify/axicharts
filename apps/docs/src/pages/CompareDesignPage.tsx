@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { RechartsParityCompare } from "../../../storybook/demo/RechartsParityCompare";
 import { DashboardAdjacentCompare } from "../../../storybook/demo/DashboardAdjacentCompare";
 import { LaneCAdjacentCompare } from "../../../storybook/demo/LaneCAdjacentCompare";
+import { LaneCPluginsCompare } from "../../../storybook/demo/LaneCPluginsCompare";
 import { CompareNav } from "../components/CompareNav";
 import { docBodyStyle, docCardStyle, docColors } from "../styles/docTokens";
 
@@ -47,6 +48,7 @@ export function CompareDesignPage(): ReactElement {
 
       <div style={{ ...docCardStyle(), padding: 20 }}>
         <LaneCAdjacentCompare />
+        <LaneCPluginsCompare />
       </div>
     </div>
   );

@@ -17,6 +17,7 @@ describe("pieLayout", () => {
 
   it("shrinks donut radius and lifts center when using a bottom legend", () => {
     expect(pieOuterRadius(cleanTheme, 42, "legend")).toEqual(["42%", "68%"]);
+    expect(pieOuterRadius(cleanTheme, 0, "legend")).toBe("62%");
     expect(pieCenter("legend")).toEqual(["50%", "46%"]);
   });
 

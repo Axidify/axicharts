@@ -35,6 +35,7 @@ export function resolveDistributionNicheLayout(
     axisFontSize: nicheAxisFontSize(compact, catalog),
     gridTop: seriesCount > 1 ? (catalog ? 20 : 28) : undefined,
     hideYAxisLabels: catalog && height <= 140,
+    hideCategoryAxisLabels: catalog && height <= 140,
   };
 }
 
@@ -62,6 +63,20 @@ export function resolveLiquidFillLayout(width: number, height: number) {
     radius: industrial ? "80%" : catalog ? "84%" : "88%",
     labelFontSize: industrial ? 14 : catalog ? 18 : 28,
     borderWidth: industrial ? 1 : 2,
+  };
+}
+
+export function resolveSunburstLayout(
+  width: number,
+  height: number,
+  showLabels: boolean,
+) {
+  const catalog = isNicheCatalogTile(width, height);
+  return {
+    catalog,
+    showLabels: showLabels && !catalog,
+    labelFontSize: catalog ? 9 : 11,
+    radius: catalog ? (["18%", "88%"] as [string, string]) : (["12%", "92%"] as [string, string]),
   };
 }
 

@@ -25,7 +25,9 @@ export function pieOuterRadius(
 ): string | [string, string] {
   const outer =
     labelMode === "legend"
-      ? "68%"
+      ? innerRadius > 0
+        ? "68%"
+        : "62%"
       : theme.name === "presentation"
         ? "72%"
         : "70%";

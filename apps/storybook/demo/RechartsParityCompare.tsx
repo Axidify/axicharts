@@ -13,6 +13,7 @@ import {
   Bar as RechartsBar,
   BarChart as RechartsBarChart,
   Cell as RechartsCell,
+  ComposedChart,
   Legend,
   Line,
   LineChart as RechartsLineChart,
@@ -23,6 +24,7 @@ import {
   PolarRadiusAxis,
   Radar,
   RadarChart as RechartsRadarChart,
+  ReferenceLine,
   Scatter,
   ScatterChart as RechartsScatterChart,
   XAxis as RechartsXAxis,
@@ -118,6 +120,58 @@ const BURNDOWN_ROWS = [
 ];
 
 export const DONUT_COLORS = ["#2563eb", "#16a34a", "#d97706", "#64748b"];
+
+export const STATUS_PIE_ROWS = [
+  { status: "Open", count: 12 },
+  { status: "In progress", count: 8 },
+  { status: "Done", count: 24 },
+];
+
+const STATUS_PIE_COLORS = ["#d97706", "#2563eb", "#16a34a"];
+
+const STATUS_PIE_CHART_CONFIG = Object.fromEntries(
+  STATUS_PIE_ROWS.map((row, index) => [
+    row.status,
+    { color: STATUS_PIE_COLORS[index % STATUS_PIE_COLORS.length] },
+  ]),
+);
+
+export const PIE_PARITY_SPEC = {
+  specVersion: 1,
+  type: "pie",
+  theme: "clean",
+  encoding: {
+    name: { field: "status", type: "nominal" },
+    value: { field: "count", type: "quantitative" },
+  },
+  props: {
+    showLabels: true,
+    chartConfig: STATUS_PIE_CHART_CONFIG,
+  },
+} satisfies PanelSpec;
+
+const REVENUE_TARGET_ROWS = [
+  { week: "W1", revenue: 42, target: 48 },
+  { week: "W2", revenue: 51, target: 48 },
+  { week: "W3", revenue: 46, target: 48 },
+  { week: "W4", revenue: 55, target: 48 },
+  { week: "W5", revenue: 49, target: 48 },
+];
+
+const BLOCKS_PARITY_SPEC = {
+  specVersion: 1,
+  type: "cartesian",
+  theme: "clean",
+  mode: "static",
+  encoding: {
+    x: { field: "week", label: "Week" },
+  },
+  marks: [
+    { mark: "bar", field: "revenue", label: "Revenue", tone: "default" },
+    { mark: "line", field: "target", label: "Target", tone: "info", curve: "monotone" },
+    { mark: "rule", value: 50, label: "Quota", tone: "warning" },
+  ],
+} satisfies PanelSpec;
 
 const SCATTER_HOLDINGS = [
   { name: "AAPL", risk: 0.22, return: 0.18 },
@@ -243,6 +297,18 @@ export const PARITY_CASES: ParityCaseMeta[] = [
     title: "Donut — browser share",
     category: "distribution",
     designId: "D-201",
+  },
+  {
+    id: "pie-status",
+    title: "Pie — ticket status",
+    category: "distribution",
+    designId: "D-201",
+  },
+  {
+    id: "cartesian-blocks",
+    title: "Cartesian blocks — revenue vs target",
+    category: "cartesian",
+    designId: "D-105",
   },
   {
     id: "scatter-risk-return",
@@ -522,6 +588,58 @@ function buildComparisonCases(): ComparisonCase[] {
       ...PARITY_CASES[8]!,
       axi: (
         <div style={{ width: TILE_W, height: TILE_H }}>
+          {compilePanel(PIE_PARITY_SPEC, STATUS_PIE_ROWS, { height: TILE_H })}
+        </div>
+      ),
+      recharts: (
+        <RechartsPieChart width={TILE_W} height={TILE_H}>
+          <Pie
+            data={STATUS_PIE_ROWS}
+            dataKey="count"
+            nameKey="status"
+            cx="50%"
+            cy="46%"
+            innerRadius={0}
+            outerRadius={88}
+            isAnimationActive={false}
+          >
+            {STATUS_PIE_ROWS.map((row, index) => (
+              <RechartsCell key={row.status} fill={STATUS_PIE_COLORS[index % STATUS_PIE_COLORS.length]} />
+            ))}
+          </Pie>
+          <Legend wrapperStyle={{ fontSize: 11 }} />
+        </RechartsPieChart>
+      ),
+    },
+    {
+      ...PARITY_CASES[9]!,
+      axi: (
+        <div style={{ width: TILE_W, height: TILE_H }}>
+          {compilePanel(BLOCKS_PARITY_SPEC, REVENUE_TARGET_ROWS, { height: TILE_H })}
+        </div>
+      ),
+      recharts: (
+        <ComposedChart width={TILE_W} height={TILE_H} data={REVENUE_TARGET_ROWS}>
+          <RechartsXAxis dataKey="week" tick={{ fontSize: 11 }} />
+          <RechartsYAxis tick={{ fontSize: 11 }} width={36} />
+          <Legend wrapperStyle={{ fontSize: 11 }} />
+          <RechartsBar dataKey="revenue" fill="#2563eb" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+          <Line
+            type="monotone"
+            dataKey="target"
+            stroke="#0891b2"
+            strokeWidth={2}
+            dot={false}
+            isAnimationActive={false}
+          />
+          <ReferenceLine y={50} stroke="#d97706" strokeDasharray="4 4" />
+        </ComposedChart>
+      ),
+    },
+    {
+      ...PARITY_CASES[10]!,
+      axi: (
+        <div style={{ width: TILE_W, height: TILE_H }}>
           <ChartContainer theme={cleanTheme} height={TILE_H} width={TILE_W}>
             <ScatterChart
               series={[
@@ -585,7 +703,7 @@ function buildComparisonCases(): ComparisonCase[] {
       ),
     },
     {
-      ...PARITY_CASES[9]!,
+      ...PARITY_CASES[11]!,
       axi: (
         <div style={{ width: TILE_W, height: TILE_H }}>
           <ChartContainer theme={cleanTheme} height={TILE_H} width={TILE_W}>
@@ -624,7 +742,7 @@ function buildComparisonCases(): ComparisonCase[] {
       ),
     },
     {
-      ...PARITY_CASES[10]!,
+      ...PARITY_CASES[12]!,
       axi: (
         <div style={{ width: TILE_W, height: TILE_H }}>
           <ChartContainer theme={cleanTheme} height={TILE_H} width={TILE_W}>
@@ -645,7 +763,7 @@ function buildComparisonCases(): ComparisonCase[] {
       ),
     },
     {
-      ...PARITY_CASES[11]!,
+      ...PARITY_CASES[13]!,
       axi: (
         <div style={{ width: TILE_W, height: TILE_H }}>
           {compilePanel(stackedBar4Spec as PanelSpec, [], { height: TILE_H })}
