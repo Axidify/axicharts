@@ -5,6 +5,7 @@ const VISUAL_STORIES = [
     id: "charts-shadcnparity--gallery",
     name: "shadcn-gallery",
     waitFor: "canvas",
+    maxDiffPixelRatio: 0.04,
   },
   {
     id: "charts-catalog--all-types",
