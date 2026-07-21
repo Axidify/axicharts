@@ -1,4 +1,5 @@
 import type { ChartBlockMarkSpec, ChartBlockSeriesMark, ChartMode, DataProfile, PanelSpec, ThemeName } from "./types";
+import { suggestField } from "./fieldSuggest";
 import { normalizeToCartesian } from "./normalizeToCartesian";
 
 export type CartesianMarkCatalogEntry = {
@@ -30,7 +31,58 @@ const BAR_INTENT_RE = /\b(bars?|bar chart|histogram|magnitude)\b/i;
 const LINE_INTENT_RE = /\b(lines?|line chart|trend|latency|p95|over time|target line)\b/i;
 const AREA_INTENT_RE = /\b(areas?|area chart|volume|cumulative|mrr)\b/i;
 
-export type PlannerReviewReason = "no_data_mark" | "vague_intent" | null;
+export type PlannerReviewReason =
+  | "no_data_mark"
+  | "vague_intent"
+  | "unresolved_field"
+  | null;
+
+const INTENT_STOP_WORDS = new Set([
+  "bar",
+  "bars",
+  "line",
+  "lines",
+  "area",
+  "chart",
+  "charts",
+  "of",
+  "by",
+  "with",
+  "and",
+  "the",
+  "a",
+  "an",
+  "at",
+  "to",
+  "for",
+  "over",
+  "time",
+  "show",
+  "me",
+  "weekly",
+  "daily",
+  "monthly",
+  "trend",
+  "smooth",
+  "stacked",
+  "stack",
+  "dual",
+  "axis",
+  "label",
+  "labels",
+  "value",
+  "values",
+  "target",
+  "quota",
+  "slo",
+  "threshold",
+  "limit",
+  "healthy",
+  "band",
+  "under",
+  "below",
+  "between",
+]);
 
 function pickXField(fields: string[]): string {
   return fields.find((field) => X_FIELD_RE.test(field)) ?? fields[0] ?? "x";
@@ -40,9 +92,69 @@ function pickNumericFields(fields: string[], xField: string): string[] {
   return fields.filter((field) => field !== xField);
 }
 
+/** Strip threshold/rule phrases so "target line at 100" does not count as a series field. */
+function stripOverlayPhrases(intent: string): string {
+  return intent
+    .replace(
+      /(?:slo|quota|threshold|limit|target(?:\s+line)?)\s*(?:at|of)\s*\d+(?:\.\d+)?\s*(?:ms)?/gi,
+      " ",
+    )
+    .replace(
+      /healthy(?:\s*band)?\s*(?:\d+(?:\.\d+)?\s*(?:ms)?\s*[-–]\s*\d+(?:\.\d+)?\s*(?:ms)?|(?:under|below|<)\s*\d+(?:\.\d+)?\s*(?:ms)?|between\s*\d+(?:\.\d+)?\s*(?:and|to)\s*\d+(?:\.\d+)?\s*(?:ms)?)/gi,
+      " ",
+    );
+}
+
+/**
+ * Prefer fields the intent actually names (exact / underscore variants / fuzzy)
+ * before falling back to revenue/target vocabulary heuristics.
+ */
+function fieldsMentionedInIntent(intent: string, candidates: string[]): string[] {
+  if (candidates.length === 0) return [];
+  const scrubbed = stripOverlayPhrases(intent).toLowerCase();
+  const mentioned: string[] = [];
+  const sorted = [...candidates].sort((a, b) => b.length - a.length);
+
+  for (const field of sorted) {
+    const lower = field.toLowerCase();
+    const variants = [lower, lower.replace(/_/g, " "), lower.replace(/_/g, "")];
+    if (variants.some((variant) => variant.length >= 2 && scrubbed.includes(variant))) {
+      mentioned.push(field);
+    }
+  }
+
+  const tokens = scrubbed.match(/[a-z][a-z0-9_]{2,}/g) ?? [];
+  for (const token of tokens) {
+    if (INTENT_STOP_WORDS.has(token)) continue;
+    if (X_FIELD_RE.test(token)) continue;
+    const suggestion = suggestField(token, candidates);
+    if (suggestion && !mentioned.includes(suggestion)) {
+      mentioned.push(suggestion);
+    }
+  }
+
+  return mentioned;
+}
+
+/** "of X" / "for X" naming a field that is not in the catalog → unresolved. */
+function unresolvedIntentField(
+  intent: string,
+  fields: string[],
+): string | null {
+  const match = intent.match(
+    /\b(?:of|for)\s+([a-z][a-z0-9_]*)\b(?:\s+by\b|\s*$|,)/i,
+  );
+  const named = match?.[1];
+  if (!named) return null;
+  if (INTENT_STOP_WORDS.has(named.toLowerCase())) return null;
+  if (X_FIELD_RE.test(named)) return null;
+  if (suggestField(named, fields)) return null;
+  return named;
+}
+
 function parseRuleValue(intent: string): number | null {
   const sloMatch = intent.match(
-    /(?:slo|quota|threshold|limit)\s*(?:at|of)?\s*(\d+(?:\.\d+)?)\s*(?:ms)?/i,
+    /(?:slo|quota|threshold|limit|target(?:\s+line)?)\s*(?:at|of)\s*(\d+(?:\.\d+)?)\s*(?:ms)?/i,
   );
   return sloMatch?.[1] ? Number(sloMatch[1]) : null;
 }
@@ -116,10 +228,13 @@ export function createCartesianPanel(
   const marks: ChartBlockMarkSpec[] = [];
   const matchedRules: string[] = [];
 
+  const intentYFields = fieldsMentionedInIntent(intent, numericFields);
   const revenueField =
+    intentYFields[0] ??
     numericFields.find((field) => /revenue|sales|throughput|volume/i.test(field)) ??
     numericFields[0];
   const targetField =
+    intentYFields.find((field) => field !== revenueField) ??
     numericFields.find((field) => /target|plan|forecast|margin/i.test(field)) ??
     numericFields.find((field) => field !== revenueField);
 
@@ -165,14 +280,20 @@ export function createCartesianPanel(
     });
   }
 
-  if (LINE_INTENT_RE.test(intent) && (targetField ?? revenueField) && !explicitYFields?.length) {
-    matchedRules.push("line");
-    marks.push({
-      type: "line",
-      field: targetField ?? revenueField!,
-      label: targetField ?? revenueField,
-      curve: intent.includes("smooth") ? "monotone" : undefined,
-    });
+  if (LINE_INTENT_RE.test(intent) && !explicitYFields?.length) {
+    const hasBar = marks.some((mark) => mark.type === "bar");
+    const lineField = hasBar
+      ? (targetField ?? revenueField)
+      : (revenueField ?? targetField);
+    if (lineField) {
+      matchedRules.push("line");
+      marks.push({
+        type: "line",
+        field: lineField,
+        label: lineField,
+        curve: intent.includes("smooth") ? "monotone" : undefined,
+      });
+    }
   }
 
   if (AREA_INTENT_RE.test(intent) && revenueField && !explicitYFields?.length) {
@@ -227,11 +348,14 @@ export function createCartesianPanel(
     marks.some((mark) => mark.type === "bar" || mark.type === "line" || mark.type === "area") ||
     matchedRules.some((rule) => rule === "bar" || rule === "line" || rule === "area");
   const vague = isVagueIntent(intent);
-  const reviewReason: PlannerReviewReason = !hasDataMark
-    ? vague
-      ? "vague_intent"
-      : "no_data_mark"
-    : null;
+  const missingField = unresolvedIntentField(intent, fields);
+  const reviewReason: PlannerReviewReason = missingField
+    ? "unresolved_field"
+    : !hasDataMark
+      ? vague
+        ? "vague_intent"
+        : "no_data_mark"
+      : null;
   const needsReview = reviewReason != null;
 
   const panel: PanelSpec = {
@@ -297,10 +421,13 @@ export function reviseCartesianPanel(
   const marks = [...(panel.marks ?? [])];
   const matchedRules: string[] = [];
 
+  const intentYFields = fieldsMentionedInIntent(intent, numericFields);
   const revenueField =
+    intentYFields[0] ??
     numericFields.find((field) => /revenue|sales|throughput|volume/i.test(field)) ??
     numericFields[0];
   const targetField =
+    intentYFields.find((field) => field !== revenueField) ??
     numericFields.find((field) => /target|plan|forecast|margin/i.test(field)) ??
     numericFields.find((field) => field !== revenueField);
 
@@ -317,14 +444,19 @@ export function reviseCartesianPanel(
     });
   }
 
-  if (LINE_INTENT_RE.test(intent) && (targetField ?? revenueField) && !hasLine) {
-    matchedRules.push("line");
-    marks.push({
-      type: "line",
-      field: targetField ?? revenueField!,
-      label: targetField ?? revenueField,
-      curve: intent.includes("smooth") ? "monotone" : undefined,
-    });
+  if (LINE_INTENT_RE.test(intent) && !hasLine) {
+    const lineField = hasBar
+      ? (targetField ?? revenueField)
+      : (revenueField ?? targetField);
+    if (lineField) {
+      matchedRules.push("line");
+      marks.push({
+        type: "line",
+        field: lineField,
+        label: lineField,
+        curve: intent.includes("smooth") ? "monotone" : undefined,
+      });
+    }
   }
 
   if (AREA_INTENT_RE.test(intent) && revenueField && !marks.some((mark) => mark.type === "area")) {

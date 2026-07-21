@@ -10,6 +10,14 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.28] - 2026-07-21
+
+### Fixed
+
+- **charts-spec** — `createCartesianPanel` binds intent-named fields before revenue/target vocabulary; unresolved `of <field>` → `needsReview: "unresolved_field"`
+- **charts-spec** — `"target line at N"` is a rule overlay, not the plotted series
+- **charts-echarts** — Donut hole KPI centered via CSS overlay at pie center (D-201 alignment)
+
 ## [0.4.27] - 2026-07-21
 
 ### Added

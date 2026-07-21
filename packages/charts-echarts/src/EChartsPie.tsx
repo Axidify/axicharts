@@ -12,8 +12,8 @@ import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { resolvePieSliceColor } from "./pieSliceColor";
 import { pieGapOptions } from "./pieGapOptions";
 import {
-  pieCenterMetricGraphics,
   resolvePieCenterMetric,
+  type PieCenterMetric,
   type PieCenterMetricInput,
 } from "./pieCenterMetric";
 import { pieCenter, pieEmphasisOptions, pieLabelMode, pieOuterRadius } from "./pieLayout";
@@ -32,6 +32,64 @@ export type EChartsPieProps = {
   graphics?: ChartGraphicElement[];
   onItemHover?: (event: EChartItemHoverEvent) => void;
 };
+
+function PieCenterMetricOverlay({
+  metric,
+  theme,
+  labelMode,
+  compact,
+}: {
+  metric: PieCenterMetric;
+  theme: ChartTheme;
+  labelMode: ReturnType<typeof pieLabelMode>;
+  compact: boolean;
+}): ReactElement {
+  const chrome = resolveChartChrome(theme);
+  const dark = theme.name === "live" || theme.name === "industrial";
+  const [, cy] = pieCenter(labelMode);
+  const valueSize = compact ? 18 : 22;
+  const labelSize = compact ? 10 : 11;
+
+  return (
+    <div
+      className="axicharts-pie-center-metric"
+      aria-hidden
+      style={{
+        position: "absolute",
+        left: "50%",
+        top: cy,
+        transform: "translate(-50%, -50%)",
+        textAlign: "center",
+        pointerEvents: "none",
+        zIndex: 2,
+        lineHeight: 1.15,
+      }}
+    >
+      <div
+        style={{
+          color: dark ? "#f8fafc" : "#0f172a",
+          fontSize: valueSize,
+          fontWeight: 700,
+        }}
+      >
+        {metric.value}
+      </div>
+      {metric.label ? (
+        <div
+          style={{
+            color: echartsColor(chrome.axis),
+            fontSize: labelSize,
+            fontWeight: 500,
+            opacity: 0.88,
+            marginTop: compact ? 2 : 3,
+          }}
+        >
+          {metric.label}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 export function EChartsPie({
   width,
@@ -58,20 +116,6 @@ export function EChartsPie({
   const resolvedCenterMetric =
     innerRadius > 0 && centerMetric
       ? resolvePieCenterMetric(slices, centerMetric)
-      : undefined;
-  const centerGraphics =
-    resolvedCenterMetric != null
-      ? pieCenterMetricGraphics(
-          resolvedCenterMetric,
-          theme,
-          labelMode,
-          width,
-          height,
-        )
-      : [];
-  const mergedGraphics =
-    centerGraphics.length > 0 || graphics?.length
-      ? [...centerGraphics, ...(graphics ?? [])]
       : undefined;
 
   const data = slices.map((slice, index) => ({
@@ -121,25 +165,27 @@ export function EChartsPie({
           data,
           itemStyle: gap.itemStyle,
           emphasis: pieEmphasisOptions(presentation),
-          label: {
-            show: useExternalLabels,
-            formatter: "{name|{b}}\n{pct|{d}%}",
-            rich: {
-              name: {
-                color: labelColor,
-                fontSize: presentation ? 12 : 11,
-                fontWeight: presentation ? 600 : 500,
-                lineHeight: presentation ? 18 : 16,
-              },
-              pct: {
-                color: labelColor,
-                fontSize: presentation ? 11 : 10,
-                fontWeight: 600,
-                lineHeight: presentation ? 16 : 14,
-                opacity: 0.88,
-              },
-            },
-          },
+          label: useExternalLabels
+            ? {
+                show: true,
+                formatter: "{name|{b}}\n{pct|{d}%}",
+                rich: {
+                  name: {
+                    color: labelColor,
+                    fontSize: presentation ? 12 : 11,
+                    fontWeight: presentation ? 600 : 500,
+                    lineHeight: presentation ? 18 : 16,
+                  },
+                  pct: {
+                    color: labelColor,
+                    fontSize: presentation ? 11 : 10,
+                    fontWeight: 600,
+                    lineHeight: presentation ? 16 : 14,
+                    opacity: 0.88,
+                  },
+                },
+              }
+            : { show: false },
           labelLine: {
             show: useExternalLabels,
             length: presentation ? 14 : 12,
@@ -159,7 +205,7 @@ export function EChartsPie({
 
   const rootRef = useEChart({
     option,
-    graphics: mergedGraphics,
+    graphics,
     width,
     height,
     onItemHover,
@@ -189,10 +235,20 @@ export function EChartsPie({
   });
 
   return (
-    <div
-      ref={rootRef}
-      className="axicharts-echarts"
-      style={{ width, height, background: "transparent" }}
-    />
+    <div style={{ position: "relative", width, height }}>
+      <div
+        ref={rootRef}
+        className="axicharts-echarts"
+        style={{ width, height, background: "transparent" }}
+      />
+      {resolvedCenterMetric ? (
+        <PieCenterMetricOverlay
+          metric={resolvedCenterMetric}
+          theme={theme}
+          labelMode={labelMode}
+          compact={compact}
+        />
+      ) : null}
+    </div>
   );
 }

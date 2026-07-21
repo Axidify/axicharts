@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { cleanTheme } from "@axicharts/charts-theme";
 import {
-  pieCenterMetricGraphics,
+  pieCenterPixels,
   resolveLargestSliceMetric,
   resolvePieCenterMetric,
 } from "./pieCenterMetric";
@@ -35,31 +34,11 @@ describe("resolvePieCenterMetric", () => {
   });
 });
 
-describe("pieCenterMetricGraphics", () => {
-  it("anchors the metric group at the lifted pie center for legend mode", () => {
-    const graphics = pieCenterMetricGraphics(
-      { value: "48%", label: "Chrome" },
-      cleanTheme,
-      "legend",
-      360,
-      257,
-    );
-    expect(graphics[0]?.type).toBe("group");
-    expect(graphics[0]?.left).toBe("50%");
-    expect(graphics[0]?.top).toBe("46%");
-    expect(graphics[0]?.children?.[0]?.style?.text).toBe("48%");
-    expect(graphics[0]?.children?.[1]?.style?.text).toBe("Chrome");
-  });
-
-  it("uses smaller type on compact tiles", () => {
-    const graphics = pieCenterMetricGraphics(
-      { value: "48%", label: "Chrome" },
-      cleanTheme,
-      "legend",
-      360,
-      257,
-    );
-    expect(graphics[0]?.children?.[0]?.style?.fontSize).toBe(18);
-    expect(graphics[0]?.children?.[1]?.style?.fontSize).toBe(10);
+describe("pieCenterPixels", () => {
+  it("maps legend-mode center to lifted pixel coords", () => {
+    expect(pieCenterPixels("legend", 360, 257)).toEqual({
+      x: 180,
+      y: Math.round(257 * 0.46),
+    });
   });
 });

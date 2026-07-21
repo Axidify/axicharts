@@ -126,6 +126,43 @@ describe("createCartesianPanel", () => {
     expect(bars).toHaveLength(2);
     expect(bars.every((mark) => mark.stack === "default")).toBe(true);
   });
+
+  it("binds the field named in the intent before revenue vocabulary", () => {
+    const { panel, needsReview, reviewReason } = createCartesianPanel({
+      intent: "bar chart of units_sold by month",
+      fields: ["month", "region", "revenue", "units_sold"],
+    });
+    expect(needsReview).toBe(false);
+    expect(reviewReason).toBeNull();
+    expect(panel.marks?.some((mark) => mark.type === "bar" && mark.field === "units_sold")).toBe(
+      true,
+    );
+  });
+
+  it("flags unresolved field names instead of silently binding revenue", () => {
+    const { panel, needsReview, reviewReason } = createCartesianPanel({
+      intent: "bar chart of profit_margin_xyz by month",
+      fields: ["month", "region", "revenue", "target"],
+    });
+    expect(needsReview).toBe(true);
+    expect(reviewReason).toBe("unresolved_field");
+    // May still emit a provisional bar for recovery, but agent must see the review flag.
+    expect(panel.marks?.some((mark) => mark.type === "bar")).toBe(true);
+  });
+
+  it("parses target line at N as a rule overlay, not the plotted series", () => {
+    const { panel, needsReview, matchedRules } = createCartesianPanel({
+      intent: "line chart of revenue with target line at 100",
+      fields: ["month", "revenue", "target"],
+    });
+    expect(needsReview).toBe(false);
+    expect(matchedRules).toEqual(expect.arrayContaining(["line", "rule-slo"]));
+    expect(panel.marks?.filter((mark) => mark.type === "line")).toHaveLength(1);
+    expect(panel.marks?.some((mark) => mark.type === "line" && mark.field === "revenue")).toBe(
+      true,
+    );
+    expect(panel.marks?.some((mark) => mark.type === "rule" && mark.value === 100)).toBe(true);
+  });
 });
 
 describe("reviseCartesianPanel", () => {

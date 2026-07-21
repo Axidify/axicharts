@@ -80,8 +80,8 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
-| **Pie** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · catalog | **Close** | Large panels: external labels + leader lines; compact tiles use bottom legend — **D-201** (center metric open) |
-| **Donut** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · `/compare/design` | **Parity** | @ 360×280 ✅ — bottom legend with `Name 48%`, lifted center, no clipped leader lines vs Recharts bare legend — **D-201** compact labels closed |
+| **Pie** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · catalog | **Close** | Large panels: external labels + leader lines; compact tiles use bottom legend — **D-201** center metric ✅ |
+| **Donut** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · `/compare/design` | **Parity** | @ 360×280 ✅ — bottom legend with `Name 48%`, hole KPI centered, no clipped leader lines vs Recharts bare legend — **D-201** closed |
 | **Funnel** | — | `Charts/Funnel` | **N/A** | No Recharts funnel; use SaaS mockups |
 | **Histogram** | Recharts bar (bins) | `Charts/Distribution` | **Gap** | Bin labels compact — **D-202** |
 | **Boxplot** | — | `Charts/Distribution` | **N/A** | Nivo/ECharts reference |
@@ -136,7 +136,7 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 
 | ID | Chart | Gap | Status |
 |----|-------|-----|--------|
-| D-201 | Pie / donut | Donut center metric @ compact height | **Open** — compact bottom legend + % labels @ 360×280 ✅ |
+| D-201 | Pie / donut | Donut center metric @ compact height | **Closed** — `centerMetric` hole KPI + CSS-centered overlay; compact bottom legend + % labels @ 360×280 ✅ |
 | D-106 | Stat | KPI strip typography (value, unit, delta) @ 72–120px | **Open** |
 | D-107 | Table | Row density, header stickiness, numeric alignment @ 320px | **Open** |
 

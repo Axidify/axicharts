@@ -1,8 +1,3 @@
-import type { ChartTheme } from "@axicharts/charts-theme";
-import { resolveChartChrome } from "@axicharts/charts-theme";
-import type { ChartGraphicElement } from "@axicharts/charts-canvas";
-import { echartsColor } from "./echartsColor";
-import { isCompactTile } from "./themeBridge";
 import { pieCenter, type PieLabelMode } from "./pieLayout";
 import type { PieSlice } from "./types";
 
@@ -35,69 +30,17 @@ export function resolvePieCenterMetric(
   return input;
 }
 
-export function pieCenterMetricGraphics(
-  metric: PieCenterMetric,
-  theme: ChartTheme,
+/** Resolve pie center percent strings to pixel coords. */
+export function pieCenterPixels(
   labelMode: PieLabelMode,
   width: number,
   height: number,
-): ChartGraphicElement[] {
-  const compact = isCompactTile(width, height);
-  const chrome = resolveChartChrome(theme);
-  const dark = theme.name === "live" || theme.name === "industrial";
-  const [centerX, centerY] = pieCenter(labelMode);
-  const valueColor = dark ? "#f8fafc" : "#0f172a";
-  const labelColor = echartsColor(chrome.axis);
-  const valueSize = compact ? 18 : 22;
-  const labelSize = compact ? 10 : 11;
-  const labelGap = compact ? 2 : 3;
-  const hasLabel = Boolean(metric.label);
-  const blockHeight = hasLabel ? valueSize + labelGap + labelSize : valueSize;
-  const valueTop = -blockHeight / 2;
-
-  const children: ChartGraphicElement[] = [
-    {
-      type: "text",
-      left: "50%",
-      top: valueTop,
-      style: {
-        text: metric.value,
-        fill: valueColor,
-        fontSize: valueSize,
-        fontWeight: "700",
-        textAlign: "center",
-      },
-      z: 10,
-      id: "pie-center-value",
-    },
-  ];
-
-  if (metric.label) {
-    children.push({
-      type: "text",
-      left: "50%",
-      top: valueTop + valueSize + labelGap,
-      style: {
-        text: metric.label,
-        fill: labelColor,
-        fontSize: labelSize,
-        fontWeight: "500",
-        textAlign: "center",
-        opacity: 0.88,
-      },
-      z: 10,
-      id: "pie-center-label",
-    });
-  }
-
-  return [
-    {
-      type: "group",
-      left: centerX,
-      top: centerY,
-      children,
-      z: 10,
-      id: "pie-center-metric",
-    },
-  ];
+): { x: number; y: number } {
+  const [cx, cy] = pieCenter(labelMode);
+  const xPct = Number.parseFloat(String(cx).replace("%", "")) / 100;
+  const yPct = Number.parseFloat(String(cy).replace("%", "")) / 100;
+  return {
+    x: Math.round(width * (Number.isFinite(xPct) ? xPct : 0.5)),
+    y: Math.round(height * (Number.isFinite(yPct) ? yPct : 0.5)),
+  };
 }
