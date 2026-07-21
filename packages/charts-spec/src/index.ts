@@ -107,6 +107,10 @@ export {
   type SimulationResult,
 } from "./distributionSimulation";
 export {
+  runMatrixSimulations,
+  summarizeSimulations as summarizeMatrixSimulations,
+} from "./matrixSimulation";
+export {
   DISTRIBUTION_PLAYGROUND_PRESETS,
   findDistributionPreset,
   distributionPresetSpecJson,

@@ -10,6 +10,18 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.26] - 2026-07-21
+
+### Added
+
+- **charts-spec** — Matrix simulation suite (`runMatrixSimulations`, M01–M08) with `silent_bad === 0` CI gate
+- **charts-spec** — `compilePanel` tests for legacy cartesian routing (encoding validation vs props-only panels)
+
+### Fixed
+
+- **charts-spec** — `line` / `area` / `bar` / `combo` panels with row encoding route through `normalizeToCartesian` + cartesian validation before compile; props-only legacy panels unchanged
+- **charts-spec** — `validatePanel` fix-patch regression tests for distribution and matrix `UNKNOWN_FIELD`
+
 ## [0.4.25] - 2026-07-21
 
 ### Added

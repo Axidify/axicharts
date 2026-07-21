@@ -297,6 +297,20 @@ function compileRegisteredPanel(
   );
 }
 
+/** Legacy line/bar/area/combo panels with row encoding normalize to cartesian + marks[]. */
+function hasCartesianRowEncoding(spec: PanelSpec): boolean {
+  const y = spec.encoding?.y;
+  if (spec.type === "combo") {
+    const encodings = Array.isArray(y) ? y : y ? [y] : [];
+    return encodings.length > 0;
+  }
+  if (spec.type === "line" || spec.type === "bar" || spec.type === "area") {
+    const field = Array.isArray(y) ? y[0]?.field : y?.field;
+    return typeof field === "string" && field.length > 0;
+  }
+  return false;
+}
+
 export function compilePanel(
   spec: PanelSpec,
   data: SpecData,
@@ -321,7 +335,37 @@ export function compilePanel(
   switch (resolved.type) {
     case "line":
     case "area":
-    case "bar": {
+    case "bar":
+    case "combo": {
+      if (hasCartesianRowEncoding(resolved)) {
+        return compilePanel(normalizeToCartesian(resolved), data, options);
+      }
+
+      if (resolved.type === "combo") {
+        const categories = resolved.encoding?.x
+          ? (pluckField(rows, resolved.encoding.x) as string[])
+          : (props.categories as string[] | undefined) ?? [];
+        const fromEncoding = comboSeriesFromEncoding(rows, resolved.encoding?.y);
+        const baseSeries =
+          fromEncoding.length > 0
+            ? fromEncoding
+            : ((props.series as ComboSeries[] | undefined) ?? []);
+
+        const panelLiveAnimate = readPanelLiveAnimate(resolved);
+
+        const chartProps = panelChartProps(resolved, {
+          ...props,
+          categories,
+          series: applyTagTonesToSeries(baseSeries, tagTones) as ComboSeries[],
+          fill: resolved.fill,
+          valueSuffix: resolved.valueSuffix,
+          animate: readPanelAnimation(resolved),
+          ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
+        });
+
+        return wrap(createElement(ComboChart, chartProps));
+      }
+
       const categories = resolved.encoding?.x
         ? (pluckField(rows, resolved.encoding.x) as string[])
         : (props.categories as string[] | undefined) ?? [];
@@ -396,31 +440,6 @@ export function compilePanel(
             : LineChart;
 
       return wrap(createElement(Chart, chartProps));
-    }
-
-    case "combo": {
-      const categories = resolved.encoding?.x
-        ? (pluckField(rows, resolved.encoding.x) as string[])
-        : (props.categories as string[] | undefined) ?? [];
-      const fromEncoding = comboSeriesFromEncoding(rows, resolved.encoding?.y);
-      const baseSeries =
-        fromEncoding.length > 0
-          ? fromEncoding
-          : ((props.series as ComboSeries[] | undefined) ?? []);
-
-      const panelLiveAnimate = readPanelLiveAnimate(resolved);
-
-      const chartProps = panelChartProps(resolved, {
-        ...props,
-        categories,
-        series: applyTagTonesToSeries(baseSeries, tagTones) as ComboSeries[],
-        fill: resolved.fill,
-        valueSuffix: resolved.valueSuffix,
-        animate: readPanelAnimation(resolved),
-        ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
-      });
-
-      return wrap(createElement(ComboChart, chartProps));
     }
 
     case "cartesian":

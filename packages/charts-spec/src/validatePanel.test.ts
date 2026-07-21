@@ -165,3 +165,53 @@ describe("listMarks", () => {
     expect(result.closedSet).toEqual(["cell", "colorScale", "axis"]);
   });
 });
+
+describe("validatePanel fix patches", () => {
+  const browserRows = [
+    { browser: "Chrome", share: 48 },
+    { browser: "Safari", share: 32 },
+  ];
+
+  it("distribution UNKNOWN_FIELD includes fix", () => {
+    const result = validatePanel(
+      {
+        type: "distribution",
+        encoding: {
+          angle: { field: "shre" },
+          color: { field: "browser" },
+        },
+        marks: [{ type: "arc", field: "shre" }],
+      },
+      { rows: browserRows, strict: true },
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      const err = result.errors.find((issue) => issue.code === "UNKNOWN_FIELD");
+      expect(err?.fix).toEqual({ "encoding.angle.field": "share" });
+    }
+  });
+
+  it("matrix UNKNOWN_FIELD includes fix", () => {
+    const rows = [
+      { hour: "09:00", day: "Mon", latency: 42 },
+      { hour: "10:00", day: "Mon", latency: 55 },
+    ];
+    const result = validatePanel(
+      {
+        type: "matrix",
+        encoding: {
+          x: { field: "hour" },
+          y: { field: "day" },
+          value: { field: "latncy" },
+        },
+        marks: [{ type: "cell", field: "latncy" }],
+      },
+      { rows, strict: true },
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      const err = result.errors.find((issue) => issue.code === "UNKNOWN_FIELD");
+      expect(err?.fix).toEqual({ "marks[0].field": "latency" });
+    }
+  });
+});

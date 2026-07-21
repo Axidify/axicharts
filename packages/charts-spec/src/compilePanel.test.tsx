@@ -1161,3 +1161,39 @@ describe("compilePanel empty data (C147a)", () => {
     ).not.toThrow();
   });
 });
+
+describe("compilePanel legacy cartesian routing", () => {
+  it("routes line panels with encoding through cartesian validation", () => {
+    expect(() =>
+      compilePanel(
+        {
+          type: "line",
+          encoding: {
+            x: { field: "week" },
+            y: { field: "revnue" },
+          },
+          height: 180,
+        },
+        [
+          { week: "W1", revenue: 42 },
+          { week: "W2", revenue: 48 },
+        ],
+      ),
+    ).toThrow();
+  });
+
+  it("keeps props-only line panels on legacy compile path", () => {
+    const panel = compilePanel(
+      {
+        type: "line",
+        props: {
+          categories: ["a", "b"],
+          series: [{ name: "cpu", data: [1, 2] }],
+        },
+        height: 160,
+      },
+      {},
+    );
+    expect(isValidElement(panel)).toBe(true);
+  });
+});
