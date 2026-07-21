@@ -10,6 +10,22 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.33] - 2026-07-21
+
+### Added
+
+- **charts-echarts** — `nicheCompactLayout` for Lane C @ 280×140 analytics / 180×120 industrial (**D-401–D-408**)
+- **charts-echarts** — boxplot/violin hide Y labels @ catalog; treemap hides cell labels; candlestick hides categories; liquid compact radius/label
+- **charts** — gauge compact arc + value sizing @ industrial tiles (**D-405**)
+- **storybook** — Lane C `Audit/Niche industrial` harness + visual CI snapshot
+- **docs** — `/compare/design` Lane C wall
+
+### Changed
+
+- **charts** — `Stat` compact padding @ 72px strip (**D-106** → Parity)
+- **charts** — `DataTable` infers warning tone from status labels (**D-107** → Parity)
+- **docs** — Lane B **D-220–D-223** promoted to Parity; scatter/radar/histogram visual CI tiles (**D-301**)
+
 ## [0.4.32] - 2026-07-21
 
 ### Fixed
