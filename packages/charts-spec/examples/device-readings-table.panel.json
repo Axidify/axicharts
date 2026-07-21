@@ -1,0 +1,19 @@
+{
+  "specVersion": 1,
+  "type": "table",
+  "theme": "clean",
+  "height": 320,
+  "mode": "static",
+  "props": {
+    "compact": true,
+    "zebra": true,
+    "stickyHeader": true,
+    "surface": "light",
+    "columns": [
+      { "key": "device", "label": "Device ID", "monospace": true },
+      { "key": "temp", "label": "Temp °C", "align": "right", "monospace": true },
+      { "key": "battery", "label": "Battery", "align": "right", "monospace": true },
+      { "key": "status", "label": "Status" }
+    ]
+  }
+}

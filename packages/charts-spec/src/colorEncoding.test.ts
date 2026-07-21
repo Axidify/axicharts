@@ -25,7 +25,7 @@ describe("colorEncoding", () => {
     ];
     expect(fillsFromColorField(rows, "aboveTarget")).toEqual([
       "#16a34a",
-      "#dc2626",
+      "#d97706",
     ]);
   });
 

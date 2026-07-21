@@ -54,29 +54,44 @@ export function EChartsHistogram({
   const palette = seriesPalette(theme);
   const color = toneColor(tone, theme) ?? palette[0]!;
   const compact = isCompactTile(width, height);
+  const denseBins = categories.length > 6;
+  const grid = gridOptions(theme, compact);
+  const axisFont = {
+    ...axisLabelStyle(theme),
+    fontSize: compact ? 10 : 11,
+    ...(compact && denseBins
+      ? { rotate: 30, interval: 0, hideOverlap: true }
+      : {}),
+  };
 
   const option: EChartsOption = withPresentationAnimation(
     {
-    grid: gridOptions(theme, compact),
+    grid: {
+      ...grid,
+      bottom: compact && denseBins ? 36 : grid.bottom,
+    },
     tooltip: hiddenTooltip(),
     xAxis: {
       type: "category",
       data: categories,
       show: showAxes,
-      axisLabel: axisLabelStyle(theme),
+      axisLabel: axisFont,
       splitLine: { show: false },
     },
     yAxis: {
       type: "value",
       show: showAxes,
-      axisLabel: axisLabelStyle(theme),
+      axisLabel: {
+        ...axisLabelStyle(theme),
+        fontSize: compact ? 10 : 11,
+      },
       splitLine: splitLineStyle(theme),
     },
     series: [
       {
         type: "bar",
         data: values,
-        barMaxWidth: 48,
+        barMaxWidth: compact ? 36 : 48,
         itemStyle: {
           color,
           borderRadius: [theme.bar.radius, theme.bar.radius, 0, 0],

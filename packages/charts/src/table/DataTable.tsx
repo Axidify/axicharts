@@ -16,6 +16,9 @@ export type DataTableProps = {
   rows: TableRow[];
   surface?: StatSurface;
   compact?: boolean;
+  zebra?: boolean;
+  stickyHeader?: boolean;
+  maxHeight?: number;
   caption?: string;
   style?: CSSProperties;
 };
@@ -57,80 +60,108 @@ export function DataTable({
   rows,
   surface = "dark",
   compact = false,
+  zebra = true,
+  stickyHeader = false,
+  maxHeight,
   caption,
   style,
 }: DataTableProps): ReactElement {
   const borderColor = surface === "light" ? "#e2e8f0" : "#334155";
+  const headerBg = surface === "light" ? "#f8fafc" : "#1e293b";
   const headerColor = surface === "light" ? "#64748b" : "#94a3b8";
   const rowColor = surface === "light" ? "#0f172a" : "#e2e8f0";
+  const zebraBg = surface === "light" ? "#f8fafc" : "rgba(30, 41, 59, 0.45)";
   const colors = TONE_COLORS[surface];
-  const fontSize = compact ? 12 : 13;
-  const cellPadding = compact ? "6px 8px" : "8px 10px";
+  const fontSize = compact ? 11 : 13;
+  const cellPadding = compact ? "5px 8px" : "8px 10px";
 
-  return (
-    <div style={style}>
-      <div style={{ overflowX: "auto" }}>
-        <table
-          style={{
-            width: "100%",
-            tableLayout: "fixed",
-            borderCollapse: "collapse",
-            fontSize,
-          }}
-        >
-          <thead>
-            <tr>
-              {columns.map((column) => (
-                <th
+  const table = (
+    <table
+      style={{
+        width: "100%",
+        tableLayout: "fixed",
+        borderCollapse: "collapse",
+        fontSize,
+      }}
+    >
+      <thead>
+        <tr>
+          {columns.map((column) => (
+            <th
+              key={column.key}
+              scope="col"
+              style={{
+                position: stickyHeader ? "sticky" : undefined,
+                top: stickyHeader ? 0 : undefined,
+                zIndex: stickyHeader ? 1 : undefined,
+                textAlign: column.align ?? "left",
+                color: headerColor,
+                fontWeight: 600,
+                padding: cellPadding,
+                borderBottom: `1px solid ${borderColor}`,
+                background: headerBg,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {column.label}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, rowIndex) => (
+          <tr
+            key={rowIndex}
+            style={
+              zebra && rowIndex % 2 === 1
+                ? { background: zebraBg }
+                : undefined
+            }
+          >
+            {columns.map((column) => {
+              const tone = cellTone(row, column);
+              const value = row[column.key];
+              const numeric = column.align === "right" || column.monospace;
+              return (
+                <td
                   key={column.key}
-                  scope="col"
                   style={{
                     textAlign: column.align ?? "left",
-                    color: headerColor,
-                    fontWeight: 600,
+                    color: tone ? colors[tone] : rowColor,
                     padding: cellPadding,
                     borderBottom: `1px solid ${borderColor}`,
+                    fontFamily: column.monospace
+                      ? "ui-monospace, SFMono-Regular, Menlo, monospace"
+                      : undefined,
+                    fontVariantNumeric: numeric ? "tabular-nums" : undefined,
+                    maxWidth: 0,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {column.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {columns.map((column) => {
-                  const tone = cellTone(row, column);
-                  const value = row[column.key];
-                  return (
-                    <td
-                      key={column.key}
-                      style={{
-                        textAlign: column.align ?? "left",
-                        color: tone ? colors[tone] : rowColor,
-                        padding: cellPadding,
-                        borderBottom: `1px solid ${borderColor}`,
-                        fontFamily: column.monospace
-                          ? "ui-monospace, SFMono-Regular, Menlo, monospace"
-                          : undefined,
-                        maxWidth: 0,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {value == null ? "" : String(value)}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  {value == null ? "" : String(value)}
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
+  return (
+    <div style={style}>
+      <div
+        style={{
+          overflowX: "auto",
+          overflowY: stickyHeader && maxHeight ? "auto" : undefined,
+          maxHeight: stickyHeader && maxHeight ? maxHeight : undefined,
+        }}
+      >
+        {table}
       </div>
       {caption ? (
         <p

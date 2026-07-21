@@ -36,8 +36,11 @@ describe("chart colors", () => {
     expect(isDarkChartTheme("live")).toBe(true);
   });
 
-  it("applies alpha to hsl css token colors", () => {
-    expect(withAlpha("hsl(221 83% 53%)", 0.24)).toBe("rgba(37, 99, 235, 0.24)");
-    expect(withAlpha("#2563eb", 0.5)).toBe("rgba(37, 99, 235, 0.5)");
+  it("cycles a distinct palette for 4+ untuned series (stacked ramp)", () => {
+    const colors = [0, 1, 2, 3].map((index) =>
+      resolveSeriesColor(undefined, index),
+    );
+    expect(new Set(colors).size).toBe(4);
+    expect(colors).toEqual(["#2563eb", "#0891b2", "#16a34a", "#d97706"]);
   });
 });

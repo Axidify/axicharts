@@ -38,4 +38,30 @@ describe("DataTable", () => {
     const cell = container.querySelector("td");
     expect(cell?.style.color).toBe("rgb(22, 163, 74)");
   });
+
+  it("renders zebra rows and sticky header chrome", () => {
+    const { container } = render(
+      <DataTable
+        columns={[
+          { key: "device", label: "Device" },
+          { key: "temp", label: "Temp", align: "right", monospace: true },
+        ]}
+        rows={[
+          { device: "DEV001", temp: "24.1" },
+          { device: "DEV002", temp: "27.3" },
+        ]}
+        surface="light"
+        zebra
+        stickyHeader
+        maxHeight={200}
+        compact
+      />,
+    );
+
+    const header = container.querySelector("th");
+    expect(header?.style.position).toBe("sticky");
+    expect(header?.style.background).toBe("rgb(248, 250, 252)");
+    const rows = container.querySelectorAll("tbody tr");
+    expect(rows[1]?.style.background).toBe("rgb(248, 250, 252)");
+  });
 });

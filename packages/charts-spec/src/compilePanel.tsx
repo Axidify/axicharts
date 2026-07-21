@@ -119,7 +119,7 @@ import { panelPropsWithAnnotations } from "./panelAnnotations";
 import { panelPropsWithGraphics } from "./panelGraphics";
 import { readPanelCenterMetric } from "./panelCenterMetric";
 import {
-  isHorizontalBarPanel,
+  isBarOnlyPanel,
   panelOrientationProps,
 } from "./panelOrientation";
 
@@ -519,7 +519,9 @@ export function compilePanel(
         ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
       });
 
-      if (isHorizontalBarPanel(cartesian)) {
+      // Bar-only panels use UPlotBar so encoding.color fills + theme radius apply.
+      // Mixed cartesian (bar+line) stays on CartesianChart / UPlotCombo.
+      if (isBarOnlyPanel(cartesian)) {
         return wrap(createElement(BarChart, chartProps));
       }
 
@@ -1074,6 +1076,13 @@ export function compilePanel(
       const statElement = createElement(Stat, {
         value,
         label,
+        unit: props.unit as string | undefined,
+        delta: props.delta as string | undefined,
+        deltaDirection: props.deltaDirection as
+          | "up"
+          | "down"
+          | "neutral"
+          | undefined,
         tone:
           (props.tone as StatTone | undefined) ??
           resolveTagStatTone(tagTones, label),
@@ -1081,7 +1090,10 @@ export function compilePanel(
         monospace: props.monospace as boolean | undefined,
       });
       const panelMode = options.mode ?? spec.mode;
-      return panelMode === "presentation" ? wrap(statElement) : statElement;
+      if (panelMode === "presentation" || options.height != null) {
+        return wrap(statElement);
+      }
+      return statElement;
     }
 
     case "gauge": {
@@ -1171,13 +1183,23 @@ export function compilePanel(
         rows.length > 0
           ? (rows as Parameters<typeof DataTable>[0]["rows"])
           : ((props.rows as Parameters<typeof DataTable>[0]["rows"]) ?? []);
-      return createElement(DataTable, {
+      const tableElement = createElement(DataTable, {
         columns,
         rows: tableRows,
-        surface: props.surface as "light" | "dark" | undefined,
-        compact: props.compact as boolean | undefined,
-        caption: String(props.caption ?? resolved.title ?? ""),
+        surface: (props.surface as "light" | "dark" | undefined) ?? "light",
+        compact: props.compact as boolean | undefined ?? true,
+        zebra: (props.zebra as boolean | undefined) ?? true,
+        stickyHeader:
+          (props.stickyHeader as boolean | undefined) ?? options.height != null,
+        maxHeight:
+          (props.maxHeight as number | undefined) ??
+          (options.height != null ? Math.max(120, options.height - 24) : undefined),
+        caption: props.caption as string | undefined,
       });
+      if (options.height != null) {
+        return wrap(tableElement);
+      }
+      return tableElement;
     }
 
     case "alert": {

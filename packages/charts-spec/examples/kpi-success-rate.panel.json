@@ -1,0 +1,17 @@
+{
+  "specVersion": 1,
+  "type": "stat",
+  "title": "Success rate",
+  "theme": "clean",
+  "height": 72,
+  "mode": "static",
+  "props": {
+    "value": "99.2",
+    "unit": "%",
+    "label": "Success rate",
+    "delta": "+0.4%",
+    "deltaDirection": "up",
+    "tone": "success",
+    "surface": "light"
+  }
+}

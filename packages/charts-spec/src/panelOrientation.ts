@@ -17,13 +17,18 @@ function isBarOnlyMarks(marks: ChartBlockMarkSpec[]): boolean {
   return marks.length > 0 && marks.every((mark) => mark.type === "bar");
 }
 
-export function isHorizontalBarPanel(spec: PanelSpec): boolean {
-  if (readPanelOrientation(spec) !== "horizontal") return false;
+/** Bar-only panels (preset `bar` or cartesian/blocks with only bar marks). */
+export function isBarOnlyPanel(spec: PanelSpec): boolean {
   if (spec.type === "bar") return true;
   if (spec.type === "cartesian" || spec.type === "blocks") {
     return isBarOnlyMarks(spec.marks ?? []);
   }
   return false;
+}
+
+export function isHorizontalBarPanel(spec: PanelSpec): boolean {
+  if (readPanelOrientation(spec) !== "horizontal") return false;
+  return isBarOnlyPanel(spec);
 }
 
 export function panelOrientationProps(

@@ -710,6 +710,58 @@ describe("compilePanel presentation mode", () => {
     });
   });
 
+  it("compiles stat panels with unit and delta at compact KPI height", async () => {
+    const panel = compilePanel(
+      {
+        type: "stat",
+        theme: "clean",
+        props: {
+          value: "99.2",
+          unit: "%",
+          label: "Success rate",
+          delta: "+0.4%",
+          surface: "light",
+        },
+      },
+      [],
+      { height: 72 },
+    );
+
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.textContent).toContain("99.2");
+      expect(container.textContent).toContain("+0.4%");
+      expect(container.querySelector(".axicharts-stat-delta")).toBeTruthy();
+    });
+  });
+
+  it("compiles table panels with sticky header chrome at dashboard height", async () => {
+    const panel = compilePanel(
+      {
+        type: "table",
+        theme: "clean",
+        props: {
+          compact: true,
+          columns: [
+            { key: "device", label: "Device" },
+            { key: "temp", label: "Temp", align: "right", monospace: true },
+          ],
+        },
+      },
+      [
+        { device: "DEV001", temp: "24.8" },
+        { device: "DEV002", temp: "25.4" },
+      ],
+      { height: 320, width: 360 },
+    );
+
+    const { container } = render(panel);
+    await waitFor(() => {
+      expect(container.querySelector("th")?.style.position).toBe("sticky");
+      expect(container.textContent).toContain("DEV001");
+    });
+  });
+
   it("compiles gauge panels with presentation mode", async () => {
     const panel = compilePanel(
       {

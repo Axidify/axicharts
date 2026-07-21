@@ -1,4 +1,11 @@
 import { useMemo, type ReactElement } from "react";
+import {
+  ChartContainer,
+  HistogramChart,
+  RadarChart,
+  ScatterChart,
+} from "@axicharts/charts";
+import { cleanTheme } from "@axicharts/charts-theme";
 import { compilePanel, type PanelSpec } from "@axicharts/charts-spec";
 import {
   Area,
@@ -11,6 +18,13 @@ import {
   LineChart as RechartsLineChart,
   Pie,
   PieChart as RechartsPieChart,
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
+  Radar,
+  RadarChart as RechartsRadarChart,
+  Scatter,
+  ScatterChart as RechartsScatterChart,
   XAxis as RechartsXAxis,
   YAxis as RechartsYAxis,
 } from "recharts";
@@ -20,6 +34,7 @@ import donutSpec from "../../../packages/charts-spec/examples/browser-share-donu
 import multiLineSpec from "../../../packages/charts-spec/examples/burndown-multi-line.panel.json";
 import revenueLineSpec from "../../../packages/charts-spec/examples/revenue-line.panel.json";
 import stackedBarSpec from "../../../packages/charts-spec/examples/velocity-stacked-bar.panel.json";
+import stackedBar4Spec from "../../../packages/charts-spec/examples/velocity-stacked-bar-4.panel.json";
 import throughputSpec from "../../../packages/charts-spec/examples/throughput-bar-color.panel.json";
 
 export const TILE_W = 360;
@@ -64,6 +79,13 @@ const SPRINT_ROWS = [
   { sprint: "S4", done: 28, carry: 3 },
 ];
 
+const SPRINT_4_ROWS = [
+  { sprint: "S1", done: 18, review: 4, blocked: 2, carry: 3 },
+  { sprint: "S2", done: 20, review: 5, blocked: 1, carry: 4 },
+  { sprint: "S3", done: 19, review: 3, blocked: 3, carry: 2 },
+  { sprint: "S4", done: 22, review: 4, blocked: 1, carry: 3 },
+];
+
 const PRIORITY_ROWS = [
   { priority: "P1 – Critical", count: 12 },
   { priority: "P2 – High", count: 28 },
@@ -96,6 +118,50 @@ const BURNDOWN_ROWS = [
 ];
 
 export const DONUT_COLORS = ["#2563eb", "#16a34a", "#d97706", "#64748b"];
+
+const SCATTER_HOLDINGS = [
+  { name: "AAPL", risk: 0.22, return: 0.18 },
+  { name: "MSFT", risk: 0.19, return: 0.16 },
+  { name: "NVDA", risk: 0.41, return: 0.52 },
+  { name: "JPM", risk: 0.24, return: 0.11 },
+  { name: "XOM", risk: 0.28, return: 0.09 },
+  { name: "UNH", risk: 0.17, return: 0.13 },
+  { name: "TSLA", risk: 0.48, return: 0.31 },
+  { name: "PG", risk: 0.12, return: 0.07 },
+];
+
+const SCATTER_BENCHMARKS = [
+  { name: "S&P 500", risk: 0.16, return: 0.1 },
+  { name: "NASDAQ", risk: 0.21, return: 0.14 },
+  { name: "Small cap", risk: 0.27, return: 0.12 },
+];
+
+const RADAR_INDICATORS = [
+  { name: "Reliability", max: 100 },
+  { name: "Latency", max: 100 },
+  { name: "Throughput", max: 100 },
+  { name: "Cost", max: 100 },
+  { name: "Security", max: 100 },
+];
+
+const RADAR_SERIES = [
+  { name: "Current", tone: "info" as const, values: [82, 74, 88, 63, 91] },
+  { name: "Target", tone: "success" as const, values: [90, 85, 92, 75, 95] },
+];
+
+/** Flattened rows for Recharts Radar (one row per indicator). */
+const RADAR_RECHARTS_ROWS = RADAR_INDICATORS.map((indicator, index) => ({
+  metric: indicator.name,
+  Current: RADAR_SERIES[0]!.values[index]!,
+  Target: RADAR_SERIES[1]!.values[index]!,
+}));
+
+const HISTOGRAM_CATEGORIES = ["0–50", "50–100", "100–200", "200–400", "400–800", "800+"];
+const HISTOGRAM_VALUES = [42, 118, 256, 189, 73, 22];
+const HISTOGRAM_ROWS = HISTOGRAM_CATEGORIES.map((bin, index) => ({
+  bin,
+  count: HISTOGRAM_VALUES[index]!,
+}));
 
 const BROWSER_SHARE_CHART_CONFIG = Object.fromEntries(
   BROWSER_SHARE_ROWS.map((row, index) => [
@@ -177,6 +243,30 @@ export const PARITY_CASES: ParityCaseMeta[] = [
     title: "Donut — browser share",
     category: "distribution",
     designId: "D-201",
+  },
+  {
+    id: "scatter-risk-return",
+    title: "Scatter — risk vs return",
+    category: "cartesian",
+    designId: "D-110",
+  },
+  {
+    id: "radar-scorecard",
+    title: "Radar — ops scorecard",
+    category: "distribution",
+    designId: "D-210",
+  },
+  {
+    id: "histogram-latency",
+    title: "Histogram — response time bins",
+    category: "distribution",
+    designId: "D-202",
+  },
+  {
+    id: "stacked-breakdown-4",
+    title: "Stacked bar — 4-series color ramp",
+    category: "cartesian",
+    designId: "D-102",
   },
 ];
 
@@ -426,6 +516,151 @@ function buildComparisonCases(): ComparisonCase[] {
           </Pie>
           <Legend wrapperStyle={{ fontSize: 11 }} />
         </RechartsPieChart>
+      ),
+    },
+    {
+      ...PARITY_CASES[8]!,
+      axi: (
+        <div style={{ width: TILE_W, height: TILE_H }}>
+          <ChartContainer theme={cleanTheme} height={TILE_H} width={TILE_W}>
+            <ScatterChart
+              series={[
+                {
+                  name: "Holdings",
+                  tone: "info",
+                  points: SCATTER_HOLDINGS.map((item) => ({
+                    x: item.risk,
+                    y: item.return,
+                    label: item.name,
+                  })),
+                },
+                {
+                  name: "Benchmarks",
+                  tone: "default",
+                  points: SCATTER_BENCHMARKS.map((item) => ({
+                    x: item.risk,
+                    y: item.return,
+                    label: item.name,
+                  })),
+                },
+              ]}
+              xLabel="Risk"
+              yLabel="Return"
+              showPointLabels={false}
+            />
+          </ChartContainer>
+        </div>
+      ),
+      recharts: (
+        <RechartsScatterChart width={TILE_W} height={TILE_H} margin={{ top: 12, right: 12, bottom: 28, left: 8 }}>
+          <RechartsXAxis
+            type="number"
+            dataKey="risk"
+            name="Risk"
+            tick={{ fontSize: 11 }}
+            domain={[0, 0.55]}
+          />
+          <RechartsYAxis
+            type="number"
+            dataKey="return"
+            name="Return"
+            tick={{ fontSize: 11 }}
+            width={36}
+            domain={[0, 0.6]}
+          />
+          <Legend wrapperStyle={{ fontSize: 11 }} />
+          <Scatter
+            name="Holdings"
+            data={SCATTER_HOLDINGS}
+            fill="#2563eb"
+            isAnimationActive={false}
+          />
+          <Scatter
+            name="Benchmarks"
+            data={SCATTER_BENCHMARKS}
+            fill="#64748b"
+            isAnimationActive={false}
+          />
+        </RechartsScatterChart>
+      ),
+    },
+    {
+      ...PARITY_CASES[9]!,
+      axi: (
+        <div style={{ width: TILE_W, height: TILE_H }}>
+          <ChartContainer theme={cleanTheme} height={TILE_H} width={TILE_W}>
+            <RadarChart
+              indicators={RADAR_INDICATORS}
+              series={RADAR_SERIES}
+              showLabels={false}
+              areaFill
+            />
+          </ChartContainer>
+        </div>
+      ),
+      recharts: (
+        <RechartsRadarChart width={TILE_W} height={TILE_H} data={RADAR_RECHARTS_ROWS} cx="50%" cy="46%" outerRadius="54%">
+          <PolarGrid />
+          <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10 }} />
+          <PolarRadiusAxis tick={{ fontSize: 10 }} domain={[0, 100]} />
+          <Radar
+            name="Current"
+            dataKey="Current"
+            stroke="#2563eb"
+            fill="#2563eb"
+            fillOpacity={0.18}
+            isAnimationActive={false}
+          />
+          <Radar
+            name="Target"
+            dataKey="Target"
+            stroke="#16a34a"
+            fill="#16a34a"
+            fillOpacity={0.12}
+            isAnimationActive={false}
+          />
+          <Legend wrapperStyle={{ fontSize: 11 }} />
+        </RechartsRadarChart>
+      ),
+    },
+    {
+      ...PARITY_CASES[10]!,
+      axi: (
+        <div style={{ width: TILE_W, height: TILE_H }}>
+          <ChartContainer theme={cleanTheme} height={TILE_H} width={TILE_W}>
+            <HistogramChart
+              categories={HISTOGRAM_CATEGORIES}
+              values={HISTOGRAM_VALUES}
+              tone="info"
+            />
+          </ChartContainer>
+        </div>
+      ),
+      recharts: (
+        <RechartsBarChart width={TILE_W} height={TILE_H} data={HISTOGRAM_ROWS} margin={{ top: 8, right: 8, bottom: 8, left: 0 }}>
+          <RechartsXAxis dataKey="bin" tick={{ fontSize: 10 }} interval={0} angle={-25} textAnchor="end" height={48} />
+          <RechartsYAxis tick={{ fontSize: 11 }} width={36} />
+          <RechartsBar dataKey="count" fill="#2563eb" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+        </RechartsBarChart>
+      ),
+    },
+    {
+      ...PARITY_CASES[11]!,
+      axi: (
+        <div style={{ width: TILE_W, height: TILE_H }}>
+          {compilePanel(stackedBar4Spec as PanelSpec, [], { height: TILE_H })}
+        </div>
+      ),
+      recharts: (
+        <RechartsBarChart width={TILE_W} height={TILE_H} data={SPRINT_4_ROWS}>
+          <RechartsXAxis dataKey="sprint" tick={{ fontSize: 11 }} />
+          <RechartsYAxis tick={{ fontSize: 11 }} width={36} />
+          <Legend wrapperStyle={{ fontSize: 11 }} />
+          <RechartsBar stackId="velocity" dataKey="done" fill="#2563eb" radius={[0, 0, 0, 0]} />
+          <RechartsBar stackId="velocity" dataKey="review" fill="#0891b2" />
+          <RechartsBar stackId="velocity" dataKey="blocked" fill="#16a34a" />
+          <RechartsBar stackId="velocity" dataKey="carry" fill="#d97706" radius={[4, 4, 0, 0]} />
+        </RechartsBarChart>
       ),
     },
   ];

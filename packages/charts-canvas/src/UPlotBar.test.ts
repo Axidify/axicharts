@@ -55,6 +55,26 @@ describe("UPlotBar stacked", () => {
   });
 });
 
+describe("UPlotBar vertical radius", () => {
+  const stackTotalsRef = { current: new Map() };
+
+  it("uses custom rounded draw for vertical bars when theme radius is set", () => {
+    const barLayoutsRef = { current: [] as never[] };
+    const options = buildBarOptions({
+      width: 360,
+      height: 220,
+      categories: ["W1", "W2", "W3", "W4", "W5"],
+      series: [{ name: "Throughput", data: [120, 90, 150, 110, 180] }],
+      theme: cleanTheme,
+      barLayoutsRef,
+      stackTotalsRef,
+    });
+
+    expect(options.series?.[1]?.fill).toBe("transparent");
+    expect(options.series?.[1]?.stroke).toBe("transparent");
+  });
+});
+
 describe("UPlotBar horizontal", () => {
   const stackTotalsRef = { current: new Map() };
 

@@ -1,5 +1,11 @@
 export * from "./_container";
 export { Stat, type StatProps, type StatSurface, type StatTone } from "../stat/Stat";
+export { StatDeltaChip, type StatDeltaChipProps } from "../stat/StatDeltaChip";
+export {
+  inferStatDeltaDirection,
+  statDeltaChipStyle,
+  type StatDeltaDirection,
+} from "../stat/statDelta";
 export {
   ensurePresentationStyles,
   presentationEnterStyle,

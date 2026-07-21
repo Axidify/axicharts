@@ -43,6 +43,8 @@ type BarLayout = {
   height: number;
   value: number;
   fill: string;
+  categoryIndex: number;
+  seriesIndex: number;
 };
 
 function hasCustomFills(series: PlotSeries[]): boolean {
@@ -62,11 +64,17 @@ function drawRoundedBar(
   radius: number,
   fill: string,
   orientation: BarOrientation = "vertical",
+  roundCap = true,
 ): void {
   if (height <= 0 || width <= 0) return;
 
-  const r = Math.min(radius, width / 2, height / 2);
   ctx.fillStyle = fill;
+  if (!roundCap || radius <= 0) {
+    ctx.fillRect(left, top, width, height);
+    return;
+  }
+
+  const r = Math.min(radius, width / 2, height / 2);
 
   if (orientation === "horizontal") {
     const right = left + width;
@@ -95,6 +103,32 @@ function drawRoundedBar(
   ctx.lineTo(right, bottom);
   ctx.closePath();
   ctx.fill();
+}
+
+/** Top-of-stack (vertical) or trailing-edge (horizontal) segment per category. */
+function stackCapKeys(
+  layouts: BarLayout[],
+  orientation: BarOrientation,
+): Set<string> {
+  const best = new Map<number, BarLayout>();
+  for (const layout of layouts) {
+    if (layout.height <= 0 || layout.width <= 0) continue;
+    const prev = best.get(layout.categoryIndex);
+    if (!prev) {
+      best.set(layout.categoryIndex, layout);
+      continue;
+    }
+    const prefer =
+      orientation === "horizontal"
+        ? layout.left + layout.width >= prev.left + prev.width
+        : layout.top <= prev.top;
+    if (prefer) best.set(layout.categoryIndex, layout);
+  }
+  return new Set(
+    [...best.values()].map(
+      (layout) => `${layout.categoryIndex}:${layout.seriesIndex}`,
+    ),
+  );
 }
 
 function formatValue(value: number, suffix = ""): string {
@@ -155,12 +189,13 @@ export function buildBarOptions({
   const customFills = hasCustomFills(series) && !stackSeries;
   const customSizes = hasCustomSizes(series) && !stackSeries;
   const customMarks = customFills || customSizes;
+  const paintRounded = theme.bar.radius > 0;
+  const paintCustomBars = paintRounded || customMarks;
   const showLegend = useNativeLegend && series.length > 1;
   const topPad =
     (showBarValues || showStackTotals) && !compact ? 18 : compact ? 4 : 8;
   const horizontal = orientation === "horizontal";
   const leftAxisSize = categoryAxisSizeForLabels(categories, compact);
-  const paintHorizontalRounded = horizontal && !stackSeries;
   const valueRange = (
     _u: uPlot,
     dataMin: number,
@@ -189,8 +224,8 @@ export function buildBarOptions({
   const barSeriesPaths = series.map((item, index) => {
     const color = item.color ?? resolveSeriesColor(item.tone, index, theme);
     const paintCustom =
-      (customMarks && Boolean(item.fills?.length || item.sizes?.length)) ||
-      paintHorizontalRounded;
+      paintCustomBars ||
+      (customMarks && Boolean(item.fills?.length || item.sizes?.length));
     return {
       label: item.name,
       stroke: paintCustom ? "transparent" : color,
@@ -246,6 +281,8 @@ export function buildBarOptions({
               height: adjustedHeight,
               value,
               fill,
+              categoryIndex: idx,
+              seriesIndex,
             });
           }
         },
@@ -265,9 +302,15 @@ export function buildBarOptions({
       const ctx = u.ctx;
       const layouts = barLayoutsRef.current;
 
-      if (customMarks || paintHorizontalRounded) {
+      if (paintCustomBars) {
         const radius = theme.bar.radius;
+        const caps = stackSeries
+          ? stackCapKeys(layouts, orientation)
+          : null;
         for (const layout of layouts) {
+          const roundCap =
+            !stackSeries ||
+            caps!.has(`${layout.categoryIndex}:${layout.seriesIndex}`);
           drawRoundedBar(
             ctx,
             layout.left,
@@ -277,6 +320,7 @@ export function buildBarOptions({
             radius,
             layout.fill,
             orientation,
+            roundCap,
           );
         }
       }

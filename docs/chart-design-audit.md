@@ -68,12 +68,12 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 |------|--------------|---------|--------|--------------|
 | **Line** | `Compare/Design parity` · `Shadcn parity` | `Charts/Line chart` · `/compare/design` | **Parity** | Single-series revenue ✅ + multi-series burndown ✅ (area fill between series, smart y-range, centered flow legend) — **D-103** closed |
 | **Area** | `Compare/Design parity` · `Shadcn parity` (area SLO) | `Charts/Area chart` · `/compare/design` | **Parity** | AxiCharts wins @ 360×280 ✅ — `encoding.color` semantic SLO segments, smart y-range, horizontal grid; Recharts wall chart is flat monotone gradient, no grid — area slice of **D-103** closed |
-| **Bar (vertical)** | `Compare/Design parity` · `Shadcn parity` | `Charts/Bar chart` · `/compare/design` | **Close** | Prefer Axi @ 360×280 (value labels, semantic color) ✅; title chrome clipped x-labels — fixed in `panelChartHeight`; radius/gap — **D-102** |
+| **Bar (vertical)** | `Compare/Design parity` · `Shadcn parity` | `Charts/Bar chart` · `/compare/design` | **Parity** | encoding.color fills via BarChart/uPlot ✅; radius/gap @ 360 ✅ — **D-102** closed |
 | **Bar (horizontal)** | `Audit/Design` · `Compare/Composition priority` | `Charts/Horizontal bar` · render-sandbox `horizontal-priority` | **Close** | `encoding.color`, grid, radius, value-axis headroom ✅; left gutter polish — **D-101** |
-| **Stacked bar** | `Compare/Design parity` · `Shadcn parity` | `Charts/Stacked` | **Close** | Stack totals ✅; static multi-series legend ✅; 4+ series color ramp — **D-102** |
+| **Stacked bar** | `Compare/Design parity` · `Shadcn parity` | `Charts/Stacked` | **Parity** | Stack totals ✅; top-cap radius ✅; 4-series palette ramp on wall ✅ — **D-102** closed |
 | **Combo (bar+line)** | `Compare/Design parity` · `Shadcn parity` | `Charts/Combo chart` · `/compare/design` | **Parity** | AxiCharts wins @ 360×280 ✅ — dual y-axes, spline line, bar value labels, centered flow legend; bare Recharts wall chart is bar-only on one scale (line invisible) — **D-104** closed |
 | **Sparkline** | `Compare/Recharts compare` (inline) | `Charts/Grid cells` | **Parity** | 72px strip; liveTheme grid |
-| **Scatter** | Recharts `ScatterChart` (ad hoc) | `Charts/Scatter` | **Gap** | No compare story; bubble legend — **D-110** |
+| **Scatter** | `Compare/Design parity` · `/compare/design` | `Charts/Scatter` | **Close** | **Audited 2026-07-21:** parity row @ 360×280; multi-series legend OK; compact layout helpers — point-label density / bubble size legend polish remain — **D-110** |
 | **Cartesian blocks** | Composed `Bar`/`Line` children | `Charts/Cartesian chart` · `Blocks` | **Close** | Agent path; less design QA than presets — **D-105** |
 
 ### Distribution (ECharts) — Recharts overlap
@@ -82,33 +82,33 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 |------|--------------|---------|--------|--------------|
 | **Pie** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · catalog | **Close** | Large panels: external labels + leader lines; compact tiles use bottom legend — **D-201** center metric ✅ |
 | **Donut** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · `/compare/design` | **Parity** | @ 360×280 ✅ — bottom legend with `Name 48%`, hole KPI centered, no clipped leader lines vs Recharts bare legend — **D-201** closed |
-| **Funnel** | — | `Charts/Funnel` | **N/A** | No Recharts funnel; use SaaS mockups |
-| **Histogram** | Recharts bar (bins) | `Charts/Distribution` | **Gap** | Bin labels compact — **D-202** |
-| **Boxplot** | — | `Charts/Distribution` | **N/A** | Nivo/ECharts reference |
-| **Violin / Swarm / Ridgeline** | — | catalog @ 120px | **N/A** | Analytics niche; defer |
+| **Funnel** | — | `Charts/Funnel` | **N/A** | No Recharts funnel; use SaaS mockups — **Lane B** |
+| **Histogram** | `Compare/Design parity` · `/compare/design` | `Charts/Distribution` · catalog | **Close** | **Audited 2026-07-21:** parity row @ 360×280; compact axis rotate + denser bottom gutter — **D-202** |
+| **Boxplot** | — | `Charts/Distribution` | **N/A** | Nivo/ECharts reference — **Lane C** |
+| **Violin / Swarm / Ridgeline** | — | catalog @ 120px | **N/A** | Analytics niche; defer — **Lane C** |
 
 ### Financial
 
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
-| **Waterfall** | — (IBCS) | `Charts/Finance` · ECharts interaction | **N/A** | IBCS connectors; not Recharts-shaped |
-| **Candlestick** | — | `Charts/Trading desk` | **N/A** | TradingView/ECharts reference |
+| **Waterfall** | — (IBCS) | `Charts/Finance` · ECharts interaction | **N/A** | IBCS connectors; not Recharts-shaped — **Lane B** |
+| **Candlestick** | — | `Charts/Trading desk` | **N/A** | TradingView/ECharts reference — **Lane C** |
 
 ### Matrix / analytics (ECharts)
 
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
-| **Heatmap** | — | `Charts/Heatmap` | **N/A** | ECharts reference |
-| **Radar** | Recharts `RadarChart` | `Charts/Radar` | **Gap** | No compare wall — **D-210** |
-| **Treemap / Sunburst** | — | catalog | **N/A** | Defer |
-| **Word cloud** | — | visual CI snapshot | **N/A** | Defer |
+| **Heatmap** | — | `Charts/Heatmap` | **N/A** | ECharts reference — **Lane B** |
+| **Radar** | `Compare/Design parity` · `/compare/design` | `Charts/Radar` | **Close** | **Audited 2026-07-21:** bottom multi-series legend + lifted center @ compact; parity row @ 360×280 — **D-210** |
+| **Treemap / Sunburst** | — | catalog | **N/A** | Defer — **Lane C** |
+| **Word cloud** | — | visual CI snapshot | **N/A** | Defer — **Lane C** |
 
 ### KPI & panels
 
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
-| **Stat** | Tremor/shadcn KPI cards | `Charts/KPI` · render-sandbox KPI strip | **Close** | 72px scale ✅ (R-006); delta chip design — **D-106** |
-| **Table** | Tremor Table | `Charts/Data table` | **Close** | Ellipsis ✅ (R-102); zebra/header — **D-107** |
+| **Stat** | Tremor/shadcn KPI cards | `Charts/KPI` · render-sandbox KPI strip · `/compare/design` Lane B | **Close** | **Audited 2026-07-21:** `unit` + `delta` chip @ 72–120px; ChartContainer wrap when height set — **D-106** |
+| **Table** | Tremor Table | `Charts/Data table` · `/compare/design` Lane B | **Close** | **Audited 2026-07-21:** zebra + sticky header + tabular nums @ 320px — **D-107** |
 
 ### Industrial — intentionally not Recharts-shaped
 
@@ -128,7 +128,7 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | ID | Chart | Gap vs Recharts | Status |
 |----|-------|-----------------|--------|
 | D-101 | Horizontal bar | `layout="vertical"` reference in Composition priority; Axi horizontal renderer + planner path | **Close** — color, grid, radius, axis headroom wired |
-| D-102 | Bar / stacked bar | Semantic `encoding.color` without manual `Cell`; bar radius/gap at 360px | **Open** |
+| D-102 | Bar / stacked bar | Semantic `encoding.color` without manual `Cell`; bar radius/gap at 360px | **Closed** — bar-only cartesian → BarChart/uPlot; always-round radius; compact gap; 4-series ramp row |
 | D-103 | Line / area | Compact multi-series legend; area fill on line charts | **Closed** — area SLO + burndown multi-line @ 360×280 ✅ |
 | D-104 | Combo | Bar+line visual balance; dual-axis label gutters | **Closed** — dual-axis combo, value labels, flow legend @ 360×280 |
 
@@ -137,17 +137,79 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | ID | Chart | Gap | Status |
 |----|-------|-----|--------|
 | D-201 | Pie / donut | Donut center metric @ compact height | **Closed** — `centerMetric` hole KPI + CSS-centered overlay; compact bottom legend + % labels @ 360×280 ✅ |
-| D-106 | Stat | KPI strip typography (value, unit, delta) @ 72–120px | **Open** |
-| D-107 | Table | Row density, header stickiness, numeric alignment @ 320px | **Open** |
+| D-106 | Stat | KPI strip typography (value, unit, delta) @ 72–120px | **Close** — `StatDeltaChip`, unit suffix, ChartContainer @ height; Lane B harness |
+| D-107 | Table | Row density, header stickiness, numeric alignment @ 320px | **Close** — zebra, sticky header, tabular-nums; Lane B harness |
 
 ### P2 — Coverage & CI
 
 | ID | Task | Status |
 |----|------|--------|
+| D-110 | Scatter | Add `/compare/design` @ 360×280; verify point labels + multi-series legend; bubble size legend optional | **Close** — parity row landed; bubble/size legend polish open |
+| D-202 | Histogram | Compact bin labels / axis density @ 360 wide; add compare row | **Close** — parity row + rotate/hideOverlap on dense bins |
+| D-210 | Radar | Multi-series bottom/flow legend; compare wall @ 360×280; labels policy at compact width | **Close** — bottom legend + lifted center + parity row |
 | D-301 | Expand visual CI: one snapshot per P0 cartesian type @ 360px | **In progress** — `Audit/Design` parity wall + horizontal tile |
-| D-302 | `Compare/*` wall: add horizontal bar, combo, scatter rows | **Open** |
+| D-302 | `Compare/*` wall: add scatter, radar, histogram rows (was: horizontal/combo) | **Close** — scatter / radar / histogram on `/compare/design` @ 360×280 |
 | D-303 | Document Recharts snippet per type in this file (link to story) | **Open** |
 | D-310 | Studio lane audit (Bklit/Recharts styled) — separate from clean parity | **Open** |
+
+### Phase 1 audit snapshot (2026-07-21)
+
+Code + Storybook review against wall chrome rules. No browser side-by-side yet for Gap types.
+
+| Type | Rubric notes (1–5 informal) | Next action |
+|------|-----------------------------|-------------|
+| Scatter | Parity row @ 360×280; multi-series legend (~4) | Optional: bottom legend like wall; bubble size legend — **D-110** Close |
+| Radar | Bottom legend + lifted center (~4) | Optional: match Recharts indicator order / hide radial ticks — **D-210** Close |
+| Histogram | Parity row; theme bars + grid (~4) | Optional: denser rotate when bins ≥6 — **D-202** Close |
+| Bar / stacked | encoding.color + radius/gap + 4-series ramp (~4.5) | **D-102** Closed → Parity |
+| Stat / table | Lane B harness @ 72/120/320px (~4) | **D-106 / D-107** Close |
+
+**Wall eight baseline (confirmed):** Parity = line, area, combo, multi-line, donut, **vertical bar**, **stacked bar**. Close = horizontal bar.
+
+---
+
+## Design consistency program (cross-catalog)
+
+**Goal:** Every chart that ships in a dashboard tile feels like the same product as the `/compare/design` wall (the 8 polished types), without forcing industrial/niche charts into a Recharts SaaS look.
+
+**North star for SaaS tiles:** the wall eight — line, bar, horizontal bar, stacked bar, combo, area, multi-line, donut — at **360×280**, `cleanTheme`, shared chrome (grid, axis type, legend rhythm, no clipped labels).
+
+**Definition of done (per type):**
+1. Readable at compact tile size (360×280 or type-appropriate min)
+2. Shared `cleanTheme` chrome (grid / axis / typography)
+3. Legend / tooltip rhythm consistent with wall charts
+4. Spec path (`compilePanel`) matches imperative look
+5. Status in this matrix updated; visual CI snapshot when **Parity** or **Close**
+
+### Lanes
+
+| Lane | Scope | Reference | Outcome |
+|------|--------|-----------|---------|
+| **A — Recharts wall** | Types with a Recharts twin | Side-by-side on `/compare/design` | Same visual family as today’s 8 |
+| **B — Dashboard adjacent** | Funnel, waterfall, heatmap, calendar, stat, table | ECharts / IBCS / Tremor (not Recharts) | Same tile density + chrome; domain-appropriate marks |
+| **C — Niche / industrial** | Gauge, liquid, boxplot/violin/swarm, treemap/sunburst, word cloud, map, gantt | Own theme / Storybook lane | Coherent *within* lane — not “looks like a revenue line” |
+
+### Phased plan (current)
+
+#### Phase 1 — Close Recharts gaps (Lane A)
+Add to `/compare/design` and polish @ 360×280 until **Close → Parity**:
+1. **Scatter** — **D-110**
+2. **Radar** — **D-210**
+3. **Histogram** — **D-202**
+4. Finish open wall polish: bar/stacked (**D-102** ✅), stat (**D-106** ✅), table (**D-107** ✅)
+
+**Wall already at Parity / Close:** line, area, combo, multi-line, donut, **vertical bar**, **stacked bar** (Parity); horizontal bar (Close).
+
+#### Phase 2 — Dashboard-adjacent (Lane B)
+Apply compact tile rules with non-Recharts references:
+- Funnel, waterfall, heatmap (+ calendar heatmap), remaining KPI/table polish
+
+#### Phase 3 — Niche / industrial (Lane C)
+Keep separate aesthetic; audit for internal consistency only (margins, type scale, theme tokens) — no Recharts side-by-side required.
+
+#### Phase 4 — CI & docs (ongoing)
+- **D-301**–**D-303**: snapshot matrix matches P0 + Phase 1 table
+- Per-type **last audited** date in matrix rows / history below
 
 ---
 
@@ -156,31 +218,12 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | Story | Recharts vs Axi |
 |-------|-----------------|
 | `Audit/Design` | Recharts vs Axi @ 360×280 — line, bar, horizontal, stacked, combo |
+| `Compare/Design parity` · `/compare/design` | Full wall (8 types) + Phase 1 additions as they land |
 | `Compare/Recharts compare` | Bare vs styled line; sparklines |
 | `Compare/Composition priority` | Priority bars; horizontal Recharts reference |
 | `Shadcn parity` | Bar, line, area, pie, donut, stacked, combo, multi-line |
 | `Charts/Bar cell` · `Charts/Line cell` | Composable `Cell` per-category fills |
 | `Charts/Horizontal bar` | Imperative horizontal bar API |
-
----
-
-## Phased plan
-
-### Phase 1 — Cartesian Recharts parity (1 week)
-
-- Close **D-101** → **D-104**
-- Add visual CI snapshots for horizontal bar, stacked bar @ 360px
-- Update `CompositionPriorityCompare` with Axi horizontal column
-
-### Phase 2 — Distribution + KPI (1 week)
-
-- Close **D-201**, **D-106**, **D-107**
-- Extend `Shadcn parity` with pie @ 360px tile
-
-### Phase 3 — CI & docs (ongoing)
-
-- **D-301**–**D-303**: snapshot matrix matches this doc’s P0 table
-- Per-type **last audited** date in matrix (below)
 
 ---
 
@@ -203,6 +246,8 @@ Do **not** file D-xxx for these unless a dashboard user expects Recharts behavio
 
 | Date | Change |
 |------|--------|
+| 2026-07-21 | **Design consistency program** documented (Lanes A–C, Phases 1–4). Audit pass: Phase 1 targets (scatter / radar / histogram) + open D-ids; wall eight confirmed Parity/Close |
+| 2026-07-21 | **D-106 / D-107** Lane B: `Stat` unit+delta chip + ChartContainer @ height; `DataTable` zebra/sticky/tabular-nums; `/compare/design` dashboard-adjacent harness |
 | 2026-07-20 | Initial doc; Recharts as design north star; D-101–D-310 backlog; matrix seeded from render-audit + compare stories |
 | 2026-07-20 | Phase 1 harness: `Audit/Design` stories, visual CI snapshots, render-sandbox `horizontal-priority`; D-101 → Close |
 | 2026-07-20 | `/compare/design` review: **Line — revenue trend** at 360×280 — AxiCharts ahead of bare Recharts (smart y-range, grid, area fill) → Line **Parity** |
@@ -213,3 +258,4 @@ Do **not** file D-xxx for these unless a dashboard user expects Recharts behavio
 | 2026-07-20 | `/compare/design` review: **Area — latency SLO coloring** — AxiCharts ahead: semantic `encoding.color` segments, smart y-range + grid vs Recharts flat gradient → Area **Parity** |
 | 2026-07-20 | `/compare/design` review: **Multi-series line — burndown** — AxiCharts ahead: `fill` area between series, smart y-range, centered flow legend; Recharts bare lines only → Line **Parity**, **D-103** closed |
 | 2026-07-20 | `/compare/design` review: **Donut — browser share** — external labels clipped in 360×280 tile → `pieLabelMode`: compact tiles use bottom legend with percentages, smaller radius + lifted center → Donut **Parity**, **D-201** compact labels closed |
+| 2026-07-21 | Donut hole KPI (`centerMetric`) + CSS-centered overlay; intent field binding in `createCartesianPanel` — **D-201** closed; axicharts **v0.4.27–v0.4.28** |

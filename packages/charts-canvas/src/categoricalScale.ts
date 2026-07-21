@@ -24,8 +24,8 @@ export function ordinalBarSize(
   categoryCount: number,
   barSeriesCount: number,
 ): [number, number] {
-  if (categoryCount <= 4) {
-    return barSeriesCount === 1 ? [0.72, 100] : [0.58, 100];
+  if (categoryCount <= 5) {
+    return barSeriesCount === 1 ? [0.74, 100] : [0.6, 100];
   }
   if (categoryCount <= 8) {
     return barSeriesCount === 1 ? [0.62, 100] : [0.5, 100];
@@ -38,7 +38,8 @@ export function ordinalBarSize(
 
 export function ordinalBarGapPx(categoryCount: number, themeBarGap: number): number {
   const base = Math.max(3, Math.round(themeBarGap * 28));
-  if (categoryCount <= 4) return Math.min(base, 4);
+  // Compact tiles (≤5 cats @ ~360px): keep a visible gap without skinny bars.
+  if (categoryCount <= 5) return Math.min(base, 5);
   if (categoryCount <= 8) return Math.min(base, 6);
   return base;
 }

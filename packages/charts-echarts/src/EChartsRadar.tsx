@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
-import { axisLabelStyle, hiddenTooltip, seriesPalette, splitLineStyle, toneColor } from "./themeBridge";
+import { axisLabelStyle, hiddenTooltip, isCompactTile, seriesPalette, splitLineStyle, toneColor } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { RadarIndicator, RadarSeries } from "./radarTypes";
@@ -39,6 +39,9 @@ export function EChartsRadar({
   onItemHover,
 }: EChartsRadarProps): ReactElement {
   const palette = seriesPalette(theme);
+  const compact = isCompactTile(width, height);
+  const showLegend = series.length > 1;
+  const labelColor = axisLabelStyle(theme).color;
   const maxByIndicator = indicators.map((indicator, index) => {
     const fromSeries = series.reduce(
       (max, item) => Math.max(max, item.values[index] ?? 0),
@@ -50,17 +53,36 @@ export function EChartsRadar({
   const option: EChartsOption = withPresentationAnimation(
     {
     tooltip: hiddenTooltip(),
+    legend: showLegend
+      ? {
+          show: true,
+          type: "plain",
+          orient: "horizontal",
+          bottom: 2,
+          left: "center",
+          itemWidth: 10,
+          itemHeight: 8,
+          itemGap: 12,
+          icon: "roundRect",
+          textStyle: {
+            color: labelColor,
+            fontSize: compact ? 10 : 11,
+            fontWeight: 500,
+          },
+        }
+      : { show: false },
     radar: {
       indicator: indicators.map((indicator, index) => ({
         name: indicator.name,
         max: maxByIndicator[index],
       })),
-      center: ["50%", "52%"],
-      radius: width < 320 ? "58%" : "66%",
+      // Lift center when a bottom legend is present (same posture as compact donut).
+      center: showLegend ? ["50%", "46%"] : ["50%", "52%"],
+      radius: compact ? "54%" : width < 320 ? "58%" : "66%",
       axisName: {
         show: showAxes,
-        color: axisLabelStyle(theme).color,
-        fontSize: 11,
+        color: labelColor,
+        fontSize: compact ? 10 : 11,
       },
       splitLine: {
         lineStyle: {
@@ -91,7 +113,8 @@ export function EChartsRadar({
               palette[index % palette.length],
           },
           label: {
-            show: showLabels && width > 360,
+            // Compact tiles rely on legend + hover — value labels crowd the polar plot.
+            show: showLabels && !compact && width > 360,
             fontSize: 10,
             formatter: (params) =>
               params.value != null ? String(params.value) : "",

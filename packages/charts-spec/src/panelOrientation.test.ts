@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   horizontalBarPanelHeight,
+  isBarOnlyPanel,
   isHorizontalBarPanel,
   panelOrientationProps,
   readPanelOrientation,
@@ -26,8 +27,27 @@ describe("panelOrientation", () => {
       orientation: "horizontal",
       marks: [{ type: "bar", field: "amount" }],
     };
+    expect(isBarOnlyPanel(spec)).toBe(true);
     expect(isHorizontalBarPanel(spec)).toBe(true);
     expect(panelOrientationProps(spec)).toEqual({ orientation: "horizontal" });
+  });
+
+  it("treats vertical bar encoding panels as bar-only", () => {
+    expect(
+      isBarOnlyPanel({
+        type: "bar",
+        encoding: {
+          x: { field: "week" },
+          y: { field: "throughput" },
+        },
+      }),
+    ).toBe(true);
+    expect(
+      isBarOnlyPanel({
+        type: "cartesian",
+        marks: [{ type: "bar", field: "throughput" }],
+      }),
+    ).toBe(true);
   });
 
   it("ignores horizontal orientation on mixed cartesian marks", () => {
@@ -39,6 +59,7 @@ describe("panelOrientation", () => {
         { type: "line", field: "target" },
       ],
     };
+    expect(isBarOnlyPanel(spec)).toBe(false);
     expect(isHorizontalBarPanel(spec)).toBe(false);
     expect(panelOrientationProps(spec)).toEqual({});
   });

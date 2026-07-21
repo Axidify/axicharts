@@ -1,0 +1,18 @@
+{
+  "specVersion": 1,
+  "type": "bar",
+  "title": "Sprint breakdown",
+  "theme": "clean",
+  "height": 220,
+  "stacked": true,
+  "props": {
+    "categories": ["S1", "S2", "S3", "S4"],
+    "series": [
+      { "name": "Done", "data": [18, 20, 19, 22] },
+      { "name": "Review", "data": [4, 5, 3, 4] },
+      { "name": "Blocked", "data": [2, 1, 3, 1] },
+      { "name": "Carry-over", "data": [3, 4, 2, 3] }
+    ],
+    "legendVariant": "inline"
+  }
+}

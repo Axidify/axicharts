@@ -289,7 +289,8 @@ export function BarChart({
     pointCount: brushed.categories.length,
     renderer,
     refreshHz,
-    forceCanvas: brush || orientation === "horizontal" || stacked,
+    // Dashboard bars need uPlot for radius, encoding.color fills, and value labels.
+    forceCanvas: true,
   });
   const prepared = useMemo(
     () => preparePlotData(brushed.categories, brushed.series, maxPoints),

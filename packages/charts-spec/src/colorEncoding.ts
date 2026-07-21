@@ -58,7 +58,8 @@ export function resolveEncodingFill(
     }
   }
   if (typeof raw === "boolean") {
-    return raw ? SERIES_COLORS.success : SERIES_COLORS.critical;
+    // success / warning matches dashboard “above vs below target” (Recharts wall Cells).
+    return raw ? SERIES_COLORS.success : SERIES_COLORS.warning;
   }
   if (typeof raw === "number") {
     return raw >= 0 ? SERIES_COLORS.success : SERIES_COLORS.critical;
