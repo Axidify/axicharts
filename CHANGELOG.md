@@ -10,6 +10,14 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.31] - 2026-07-21
+
+### Added
+
+- **charts-echarts** — compact layout helpers for funnel, waterfall, heatmap, and calendar @ 360×280 dashboard tiles
+- **charts-echarts** — funnel percent labels; waterfall dense category rotation; heatmap hides cell labels @ compact; calendar short weekday letters
+- **docs** — `/compare/design` Lane B harness rows **D-220–D-223** with CSS reference mocks
+
 ## [0.4.30] - 2026-07-21
 
 ### Added
