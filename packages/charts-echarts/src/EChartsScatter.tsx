@@ -48,6 +48,15 @@ function formatCoord(value: number, suffix = ""): string {
   return `${rounded}${suffix}`;
 }
 
+function formatBubbleLegendValue(value: number): string {
+  if (!Number.isFinite(value)) return "";
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
+  if (abs >= 100) return value.toFixed(0);
+  return value.toFixed(1);
+}
+
 function seriesHasBubbleSizes(items: ScatterSeries[]): boolean {
   return items.some((item) =>
     item.points.some((point) => typeof point.size === "number"),
@@ -109,8 +118,13 @@ export function EChartsScatter({
     legend: showLegend
       ? {
           show: true,
-          top: 0,
+          ...(layout.legendBottom
+            ? { bottom: 2, left: "center" }
+            : { top: 0 }),
           textStyle: { color: axisNameStyle.color, fontSize: layout.compact ? 10 : 11 },
+          itemWidth: 10,
+          itemHeight: 8,
+          itemGap: 12,
         }
       : { show: false },
     tooltip: hiddenTooltip(),
@@ -127,15 +141,20 @@ export function EChartsScatter({
             },
             calculable: false,
             orient: "vertical",
-            right: 4,
-            top: "middle",
+            right: layout.legendBottom ? 6 : 4,
+            top: layout.legendBottom ? 12 : "middle",
             itemWidth: 10,
-            itemHeight: layout.compact ? 56 : 72,
+            itemHeight: layout.compact ? 52 : 72,
             textStyle: {
               color: axisNameStyle.color,
               fontSize: layout.compact ? 9 : 10,
             },
-            text: ["Large", "Small"],
+            text: [
+              formatBubbleLegendValue(bubbleExtent.max),
+              formatBubbleLegendValue(bubbleExtent.min),
+            ],
+            textGap: 4,
+            itemSymbol: "circle",
           }
         : undefined,
     xAxis: {

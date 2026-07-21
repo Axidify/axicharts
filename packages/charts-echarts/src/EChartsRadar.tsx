@@ -8,6 +8,7 @@ import { axisLabelStyle, hiddenTooltip, isCompactTile, seriesPalette, splitLineS
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { RadarIndicator, RadarSeries } from "./radarTypes";
+import { resolveRadarLayout, radarIndicatorOrder } from "./radarLayout";
 
 export type EChartsRadarProps = {
   width: number;
@@ -39,11 +40,16 @@ export function EChartsRadar({
   onItemHover,
 }: EChartsRadarProps): ReactElement {
   const palette = seriesPalette(theme);
-  const compact = isCompactTile(width, height);
-  const showLegend = series.length > 1;
+  const layout = resolveRadarLayout(width, height, series.length);
+  const { compact, showLegend } = layout;
   const labelColor = axisLabelStyle(theme).color;
-  const maxByIndicator = indicators.map((indicator, index) => {
-    const fromSeries = series.reduce(
+  const orderedIndicators = radarIndicatorOrder(indicators);
+  const orderedSeries = series.map((item) => ({
+    ...item,
+    values: radarIndicatorOrder(item.values),
+  }));
+  const maxByIndicator = orderedIndicators.map((indicator, index) => {
+    const fromSeries = orderedSeries.reduce(
       (max, item) => Math.max(max, item.values[index] ?? 0),
       0,
     );
@@ -72,17 +78,22 @@ export function EChartsRadar({
         }
       : { show: false },
     radar: {
-      indicator: indicators.map((indicator, index) => ({
+      indicator: orderedIndicators.map((indicator, index) => ({
         name: indicator.name,
         max: maxByIndicator[index],
       })),
-      // Lift center when a bottom legend is present (same posture as compact donut).
-      center: showLegend ? ["50%", "46%"] : ["50%", "52%"],
-      radius: compact ? "54%" : width < 320 ? "58%" : "66%",
+      startAngle: layout.startAngle,
+      center: layout.center,
+      radius: layout.radius,
       axisName: {
         show: showAxes,
         color: labelColor,
         fontSize: compact ? 10 : 11,
+      },
+      axisLabel: {
+        show: showAxes && !layout.hideRadialLabels,
+        color: labelColor,
+        fontSize: compact ? 9 : 10,
       },
       splitLine: {
         lineStyle: {
@@ -101,7 +112,7 @@ export function EChartsRadar({
     series: [
       {
         type: "radar",
-        data: series.map((item, index) => ({
+        data: orderedSeries.map((item, index) => ({
           name: item.name,
           value: item.values,
           areaStyle: areaFill ? { opacity: 0.18 } : undefined,
@@ -139,7 +150,7 @@ export function EChartsRadar({
       const values = Array.isArray(params.value) ? params.value : [];
       return {
         title: params.name,
-        rows: indicators.map((indicator, index) => ({
+        rows: orderedIndicators.map((indicator, index) => ({
           label: indicator.name,
           value: String(values[index] ?? 0),
           color: params.color,

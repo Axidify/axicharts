@@ -12,6 +12,20 @@ describe("scatterLabels", () => {
     expect(scatterLabelDensity(30)).toBe("crowded");
   });
 
+  it("places the legend at the bottom on compact dashboard tiles", () => {
+    const layout = resolveScatterAxisLayout(360, 280, {
+      pointCount: 10,
+      showLegend: true,
+      xLabel: "Risk",
+      yLabel: "Return",
+    });
+
+    expect(layout.compact).toBe(true);
+    expect(layout.legendBottom).toBe(true);
+    expect(layout.gridTop).toBe(12);
+    expect(layout.gridBottom).toBe(34);
+  });
+
   it("shrinks axis name gaps and fonts in compact panels", () => {
     const layout = resolveScatterAxisLayout(240, 140, {
       pointCount: 10,

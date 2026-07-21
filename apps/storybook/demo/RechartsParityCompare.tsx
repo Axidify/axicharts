@@ -602,7 +602,7 @@ function buildComparisonCases(): ComparisonCase[] {
         <RechartsRadarChart width={TILE_W} height={TILE_H} data={RADAR_RECHARTS_ROWS} cx="50%" cy="46%" outerRadius="54%">
           <PolarGrid />
           <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10 }} />
-          <PolarRadiusAxis tick={{ fontSize: 10 }} domain={[0, 100]} />
+          <PolarRadiusAxis tick={false} axisLine={false} domain={[0, 100]} />
           <Radar
             name="Current"
             dataKey="Current"

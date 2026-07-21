@@ -16,6 +16,7 @@ import {
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { SeriesTone } from "./types";
+import { resolveHistogramBinAxisStyle } from "./histogramBins";
 
 export type EChartsHistogramProps = {
   width: number;
@@ -54,13 +55,13 @@ export function EChartsHistogram({
   const palette = seriesPalette(theme);
   const color = toneColor(tone, theme) ?? palette[0]!;
   const compact = isCompactTile(width, height);
-  const denseBins = categories.length > 6;
+  const binAxis = resolveHistogramBinAxisStyle(categories.length, compact);
   const grid = gridOptions(theme, compact);
   const axisFont = {
     ...axisLabelStyle(theme),
     fontSize: compact ? 10 : 11,
-    ...(compact && denseBins
-      ? { rotate: 30, interval: 0, hideOverlap: true }
+    ...(binAxis.denseBins && compact
+      ? { rotate: binAxis.rotate, interval: 0, hideOverlap: true }
       : {}),
   };
 
@@ -68,7 +69,7 @@ export function EChartsHistogram({
     {
     grid: {
       ...grid,
-      bottom: compact && denseBins ? 36 : grid.bottom,
+      bottom: binAxis.bottomGutter > 0 ? binAxis.bottomGutter : grid.bottom,
     },
     tooltip: hiddenTooltip(),
     xAxis: {

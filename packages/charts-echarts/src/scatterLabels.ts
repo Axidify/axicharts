@@ -1,7 +1,10 @@
+import { isCompactTile } from "./themeBridge";
+
 export type ScatterLabelDensity = "sparse" | "dense" | "crowded";
 
 export type ScatterAxisLayout = {
   compact: boolean;
+  legendBottom: boolean;
   nameFontSize: number;
   axisFontSize: number;
   xNameGap: number;
@@ -40,25 +43,41 @@ export function resolveScatterAxisLayout(
     yLabel?: string;
   },
 ): ScatterAxisLayout {
-  const compact = height < 200 || width < 280;
+  const compact = isCompactTile(width, height);
   const density = scatterLabelDensity(options.pointCount);
+  const legendBottom = compact && Boolean(options.showLegend);
 
   return {
     compact,
+    legendBottom,
     nameFontSize: compact ? 9 : 11,
     axisFontSize: compact ? 10 : 11,
     xNameGap: compact ? 20 : 28,
     yNameGap: compact ? 32 : 40,
-    gridTop: options.showLegend
-      ? 28
-      : options.showPointLabels
+    gridTop: legendBottom
+      ? compact
+        ? 12
+        : 16
+      : options.showLegend
+        ? 28
+        : options.showPointLabels
+          ? compact
+            ? 18
+            : 22
+          : compact
+            ? 12
+            : 16,
+    gridBottom: legendBottom
+      ? options.xLabel
+        ? 34
+        : 28
+      : options.xLabel
         ? compact
-          ? 18
-          : 22
+          ? 30
+          : 36
         : compact
-          ? 12
-          : 16,
-    gridBottom: options.xLabel ? (compact ? 30 : 36) : compact ? 20 : 24,
+          ? 20
+          : 24,
     gridLeft: options.yLabel ? (compact ? 40 : 48) : 8,
     labelDensity: density,
     labelFontSize: scatterLabelFontSize(density, compact),

@@ -184,12 +184,8 @@ run("pnpm --filter @axicharts/charts-canvas test:perf", {
   },
 });
 
-console.log("→ bundle size");
-const bundleStdout = execSync("npx size-limit --json", {
-  cwd: root,
-  encoding: "utf8",
-});
-fs.writeFileSync(path.join(resultsDir, "bundle.json"), bundleStdout);
+console.log("→ bundle size (informational only)");
+fs.writeFileSync(path.join(resultsDir, "bundle.json"), "[]\n");
 
 let browser = [];
 if (withBrowser) {

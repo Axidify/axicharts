@@ -10,6 +10,18 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.30] - 2026-07-21
+
+### Added
+
+- **charts-echarts** — scatter compact bottom legend; bubble `visualMap` shows formatted min/max
+- **charts-echarts** — radar `startAngle: 90` + indicator order mirror for Recharts spoke parity; hide radial ticks @ compact
+- **charts-echarts** — histogram `-25°` bin labels when bins ≥6 on compact tiles
+
+### Changed
+
+- **CI** — removed `size-limit` / `.size-limit.json` bundle budget gate
+
 ## [0.4.29] - 2026-07-21
 
 ### Added

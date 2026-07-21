@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { docBodyStyle } from "../styles/docTokens";
 
-/** Measured entry-shim gzip from `pnpm size` (CI gate). Peers excluded. */
+/** Reference entry-shim gzip sizes (informational). Peers excluded. */
 const categoryRows = [
   { subpath: "@axicharts/charts/quick", gzip: "669 B", peers: "uplot", charts: "QuickLineChart" },
   { subpath: "@axicharts/charts/cartesian", gzip: "1.26 KB", peers: "uplot", charts: "Line, area, bar, combo, scatter + chrome" },
@@ -27,8 +27,7 @@ export function BenchmarksPage(): ReactElement {
     <div>
       <h1 style={{ marginTop: 0 }}>Bundle benchmarks</h1>
       <p style={docBodyStyle()}>
-        Entry-shim sizes are CI-gated via <code>pnpm size</code> (<code>.size-limit.json</code>). Numbers
-        below are <strong>gzip of the subpath entry file</strong> — your app total also includes{" "}
+        Reference <strong>gzip of the subpath entry file</strong> — your app total also includes{" "}
         <code>charts-canvas</code>, <code>charts-core</code>, <code>charts-theme</code>, and peers.
       </p>
 
@@ -132,7 +131,7 @@ npx @axicharts/charts create-dashboard my-ops --category cartesian`}
           benchmarks/BENCHMARKS.md
         </a>
         {" · "}
-        Re-run: <code>pnpm size</code> · <code>pnpm bench</code>
+        Re-run: <code>pnpm bench</code>
       </p>
     </div>
   );

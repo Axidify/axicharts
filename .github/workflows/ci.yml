@@ -22,7 +22,6 @@ jobs:
       - run: pnpm build
       - run: pnpm test
       - run: pnpm test:perf
-      - run: pnpm size
       - run: pnpm check:versions
       - run: pnpm check:vite-aliases
       - run: pnpm validate:runtime

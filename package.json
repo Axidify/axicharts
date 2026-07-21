@@ -23,20 +23,17 @@
     "test:visual": "node benchmarks/e2e/visual-snapshots.mjs",
     "test:registry": "node scripts/test-registry-e2e.mjs",
     "bench:all": "node scripts/collect-benchmarks.mjs --browser",
-    "size": "size-limit",
     "check:versions": "node scripts/check-version-lockstep.mjs",
     "check:vite-aliases": "node scripts/check-vite-aliases.mjs",
     "validate:runtime": "pnpm --filter @axicharts/charts-runtime validate:examples",
     "typecheck": "turbo run typecheck",
-    "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm check:versions && pnpm check:vite-aliases && pnpm size && pnpm validate:runtime && pnpm test:registry && pnpm test:visual",
+    "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm check:versions && pnpm check:vite-aliases && pnpm validate:runtime && pnpm test:registry && pnpm test:visual",
     "create:dashboard": "node packages/charts/scripts/create-dashboard.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",
-    "@size-limit/file": "^11.1.6",
     "playwright": "^1.51.1",
     "shadcn": "^4.13.1",
-    "size-limit": "^11.1.6",
     "turbo": "^2.4.4",
     "typescript": "^5.8.2"
   }

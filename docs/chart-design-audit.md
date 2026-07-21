@@ -73,7 +73,7 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 | **Stacked bar** | `Compare/Design parity` · `Shadcn parity` | `Charts/Stacked` | **Parity** | Stack totals ✅; top-cap radius ✅; 4-series palette ramp on wall ✅ — **D-102** closed |
 | **Combo (bar+line)** | `Compare/Design parity` · `Shadcn parity` | `Charts/Combo chart` · `/compare/design` | **Parity** | AxiCharts wins @ 360×280 ✅ — dual y-axes, spline line, bar value labels, centered flow legend; bare Recharts wall chart is bar-only on one scale (line invisible) — **D-104** closed |
 | **Sparkline** | `Compare/Recharts compare` (inline) | `Charts/Grid cells` | **Parity** | 72px strip; liveTheme grid |
-| **Scatter** | `Compare/Design parity` · `/compare/design` | `Charts/Scatter` | **Close** | **Audited 2026-07-21:** parity row @ 360×280; multi-series legend OK; compact layout helpers — point-label density / bubble size legend polish remain — **D-110** |
+| **Scatter** | `Compare/Design parity` · `/compare/design` | `Charts/Scatter` | **Parity** | @ 360×280 ✅ — compact bottom legend; bubble size legend min/max labels — **D-110** closed |
 | **Cartesian blocks** | Composed `Bar`/`Line` children | `Charts/Cartesian chart` · `Blocks` | **Close** | Agent path; less design QA than presets — **D-105** |
 
 ### Distribution (ECharts) — Recharts overlap
@@ -83,7 +83,7 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 | **Pie** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · catalog | **Close** | Large panels: external labels + leader lines; compact tiles use bottom legend — **D-201** center metric ✅ |
 | **Donut** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · `/compare/design` | **Parity** | @ 360×280 ✅ — bottom legend with `Name 48%`, hole KPI centered, no clipped leader lines vs Recharts bare legend — **D-201** closed |
 | **Funnel** | — | `Charts/Funnel` | **N/A** | No Recharts funnel; use SaaS mockups — **Lane B** |
-| **Histogram** | `Compare/Design parity` · `/compare/design` | `Charts/Distribution` · catalog | **Close** | **Audited 2026-07-21:** parity row @ 360×280; compact axis rotate + denser bottom gutter — **D-202** |
+| **Histogram** | `Compare/Design parity` · `/compare/design` | `Charts/Distribution` · catalog | **Parity** | @ 360×280 ✅ — `-25°` bin labels when bins ≥6 @ compact — **D-202** closed |
 | **Boxplot** | — | `Charts/Distribution` | **N/A** | Nivo/ECharts reference — **Lane C** |
 | **Violin / Swarm / Ridgeline** | — | catalog @ 120px | **N/A** | Analytics niche; defer — **Lane C** |
 
@@ -99,7 +99,7 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
 | **Heatmap** | — | `Charts/Heatmap` | **N/A** | ECharts reference — **Lane B** |
-| **Radar** | `Compare/Design parity` · `/compare/design` | `Charts/Radar` | **Close** | **Audited 2026-07-21:** bottom multi-series legend + lifted center @ compact; parity row @ 360×280 — **D-210** |
+| **Radar** | `Compare/Design parity` · `/compare/design` | `Charts/Radar` | **Parity** | @ 360×280 ✅ — bottom legend, `startAngle: 90` spoke order, radial ticks hidden @ compact — **D-210** closed |
 | **Treemap / Sunburst** | — | catalog | **N/A** | Defer — **Lane C** |
 | **Word cloud** | — | visual CI snapshot | **N/A** | Defer — **Lane C** |
 
@@ -144,9 +144,9 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 
 | ID | Task | Status |
 |----|------|--------|
-| D-110 | Scatter | Add `/compare/design` @ 360×280; verify point labels + multi-series legend; bubble size legend optional | **Close** — parity row landed; bubble/size legend polish open |
-| D-202 | Histogram | Compact bin labels / axis density @ 360 wide; add compare row | **Close** — parity row + rotate/hideOverlap on dense bins |
-| D-210 | Radar | Multi-series bottom/flow legend; compare wall @ 360×280; labels policy at compact width | **Close** — bottom legend + lifted center + parity row |
+| D-110 | Scatter | Add `/compare/design` @ 360×280; verify point labels + multi-series legend; bubble size legend optional | **Closed** — compact bottom legend + bubble size legend min/max |
+| D-202 | Histogram | Compact bin labels / axis density @ 360 wide; add compare row | **Closed** — `-25°` rotate when bins ≥6 @ compact |
+| D-210 | Radar | Multi-series bottom/flow legend; compare wall @ 360×280; labels policy at compact width | **Closed** — spoke order + hidden radial ticks @ compact |
 | D-301 | Expand visual CI: one snapshot per P0 cartesian type @ 360px | **In progress** — `Audit/Design` parity wall + horizontal tile |
 | D-302 | `Compare/*` wall: add scatter, radar, histogram rows (was: horizontal/combo) | **Close** — scatter / radar / histogram on `/compare/design` @ 360×280 |
 | D-303 | Document Recharts snippet per type in this file (link to story) | **Open** |
@@ -158,9 +158,9 @@ Code + Storybook review against wall chrome rules. No browser side-by-side yet f
 
 | Type | Rubric notes (1–5 informal) | Next action |
 |------|-----------------------------|-------------|
-| Scatter | Parity row @ 360×280; multi-series legend (~4) | Optional: bottom legend like wall; bubble size legend — **D-110** Close |
-| Radar | Bottom legend + lifted center (~4) | Optional: match Recharts indicator order / hide radial ticks — **D-210** Close |
-| Histogram | Parity row; theme bars + grid (~4) | Optional: denser rotate when bins ≥6 — **D-202** Close |
+| Scatter | Parity row @ 360×280; multi-series legend (~4) | **D-110** Parity — compact bottom legend; bubble size legend shows min/max |
+| Radar | Bottom legend + lifted center (~4) | **D-210** Parity — `startAngle: 90` spoke order; radial ticks hidden @ compact |
+| Histogram | Parity row; theme bars + grid (~4) | **D-202** Parity — `-25°` bin labels when bins ≥6 @ compact |
 | Bar / stacked | encoding.color + radius/gap + 4-series ramp (~4.5) | **D-102** Closed → Parity |
 | Stat / table | Lane B harness @ 72/120/320px (~4) | **D-106 / D-107** Close |
 
