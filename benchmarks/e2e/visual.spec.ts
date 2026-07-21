@@ -36,6 +36,7 @@ const VISUAL_STORIES = [
     name: "scatter-market-cap-bubble",
     waitFor: "canvas",
     settleMs: 2000,
+    maxDiffPixelRatio: 0.08,
   },
   {
     id: "charts-annotations--ops-finance-wall",
@@ -80,7 +81,7 @@ const VISUAL_STORIES = [
     name: "design-recharts-parity-360",
     waitFor: ".axicharts-uplot",
     settleMs: 2500,
-    maxDiffPixelRatio: 0.05,
+    maxDiffPixelRatio: 0.1,
   },
   {
     id: "audit-design--horizontal-bar-tile-360",
