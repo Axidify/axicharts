@@ -2,6 +2,8 @@ node_modules
 dist
 dist-server
 data
+!apps/docs/src/data/
+!apps/docs/src/data/**
 .turbo
 *.tsbuildinfo
 .DS_Store
