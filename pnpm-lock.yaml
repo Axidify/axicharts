@@ -218,9 +218,6 @@ importers:
       '@axicharts/charts-geo':
         specifier: workspace:*
         version: link:../../packages/charts-geo
-      '@axicharts/charts-mcp':
-        specifier: workspace:*
-        version: link:../../packages/charts-mcp
       '@axicharts/charts-runtime':
         specifier: workspace:*
         version: link:../../packages/charts-runtime
