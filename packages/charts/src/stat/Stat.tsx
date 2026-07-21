@@ -108,6 +108,8 @@ export function Stat({
         justifyContent: plotHeight > 0 ? "center" : undefined,
         height: plotHeight > 0 ? "100%" : undefined,
         minHeight: 0,
+        padding: compactKpi ? "10px 12px" : mediumKpi ? "12px 14px" : undefined,
+        boxSizing: "border-box",
         ...style,
       }}
     >

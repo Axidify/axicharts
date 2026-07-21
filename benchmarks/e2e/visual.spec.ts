@@ -98,6 +98,27 @@ const VISUAL_STORIES = [
     settleMs: 2500,
     maxDiffPixelRatio: 0.06,
   },
+  {
+    id: "audit-design--scatter-tile-360",
+    name: "design-scatter-360",
+    waitFor: "canvas",
+    settleMs: 2500,
+    maxDiffPixelRatio: 0.06,
+  },
+  {
+    id: "audit-design--radar-tile-360",
+    name: "design-radar-360",
+    waitFor: "canvas",
+    settleMs: 2500,
+    maxDiffPixelRatio: 0.06,
+  },
+  {
+    id: "audit-design--histogram-tile-360",
+    name: "design-histogram-360",
+    waitFor: "canvas",
+    settleMs: 2500,
+    maxDiffPixelRatio: 0.06,
+  },
 ] as const;
 
 /** Fixed viewport clip — avoids 1–3px height drift between macOS baselines and Linux CI. */

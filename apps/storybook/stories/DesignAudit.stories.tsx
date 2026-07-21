@@ -8,6 +8,7 @@ import {
 import { compilePanel } from "@axicharts/charts-spec";
 import { cleanTheme } from "@axicharts/charts-theme";
 import {
+  ParityAxiTile,
   RechartsParityCompare,
   TILE_H,
   TILE_W,
@@ -109,6 +110,19 @@ export const HorizontalBarTile360: Story = {
       </div>
     </Tile>
   ),
+};
+
+/** Phase 1 distribution tiles — visual CI @ 360×280. */
+export const ScatterTile360: Story = {
+  render: () => <ParityAxiTile caseId="scatter-risk-return" />,
+};
+
+export const RadarTile360: Story = {
+  render: () => <ParityAxiTile caseId="radar-scorecard" />,
+};
+
+export const HistogramTile360: Story = {
+  render: () => <ParityAxiTile caseId="histogram-latency" />,
 };
 
 /** Imperative API smoke at tile size. */

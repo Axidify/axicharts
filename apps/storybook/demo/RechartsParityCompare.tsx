@@ -709,6 +709,13 @@ export type RechartsParityCompareProps = {
   caseIds?: string[];
 };
 
+/** Single AxiCharts tile from the parity harness — for focused visual CI. */
+export function ParityAxiTile({ caseId }: { caseId: string }): ReactElement | null {
+  const item = buildComparisonCases().find((entry) => entry.id === caseId);
+  if (!item) return null;
+  return <Tile>{item.axi}</Tile>;
+}
+
 export function RechartsParityCompare({
   filter = "all",
   caseIds,

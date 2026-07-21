@@ -52,6 +52,18 @@ function cellTone(
   ) {
     return tone;
   }
+  const label = String(
+    column.toneKey === column.key ? row[column.key] : tone ?? "",
+  );
+  const lower = label.toLowerCase();
+  if (lower.includes("warn")) return "warning";
+  if (
+    lower.includes("critical") ||
+    lower.includes("error") ||
+    lower.includes("offline")
+  ) {
+    return "critical";
+  }
   return undefined;
 }
 

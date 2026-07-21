@@ -13,7 +13,7 @@
       { "key": "device", "label": "Device ID", "monospace": true },
       { "key": "temp", "label": "Temp °C", "align": "right", "monospace": true },
       { "key": "battery", "label": "Battery", "align": "right", "monospace": true },
-      { "key": "status", "label": "Status" }
+      { "key": "status", "label": "Status", "toneKey": "status" }
     ]
   }
 }

@@ -24,6 +24,20 @@ describe("DataTable", () => {
     expect(container.textContent).toContain("100");
   });
 
+  it("infers warning tone from status labels when toneKey matches column", () => {
+    const { container } = render(
+      <DataTable
+        columns={[{ key: "status", label: "Status", toneKey: "status" }]}
+        rows={[{ status: "Warning" }, { status: "Online" }]}
+        surface="light"
+      />,
+    );
+
+    const cells = container.querySelectorAll("td");
+    expect(cells[0]?.style.color).toBe("rgb(217, 119, 6)");
+    expect(cells[1]?.style.color).toBe("rgb(15, 23, 42)");
+  });
+
   it("applies tone colors from toneKey", () => {
     const { container } = render(
       <DataTable

@@ -82,7 +82,7 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 |------|--------------|---------|--------|--------------|
 | **Pie** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · catalog | **Close** | Large panels: external labels + leader lines; compact tiles use bottom legend — **D-201** center metric ✅ |
 | **Donut** | `Compare/Design parity` · `Shadcn parity` | `Charts/Donut` · `/compare/design` | **Parity** | @ 360×280 ✅ — bottom legend with `Name 48%`, hole KPI centered, no clipped leader lines vs Recharts bare legend — **D-201** closed |
-| **Funnel** | — | `Charts/Funnel` · `/compare/design` Lane B | **Close** | @ 360×280 — compact in-stage % labels, tighter insets — **D-220** |
+| **Funnel** | — | `Charts/Funnel` · `/compare/design` Lane B | **Parity** | @ 360×280 ✅ — compact in-stage % labels, tighter insets — **D-220** closed |
 | **Histogram** | `Compare/Design parity` · `/compare/design` | `Charts/Distribution` · catalog | **Parity** | @ 360×280 ✅ — `-25°` bin labels when bins ≥6 @ compact — **D-202** closed |
 | **Boxplot** | — | `Charts/Distribution` | **N/A** | Nivo/ECharts reference — **Lane C** |
 | **Violin / Swarm / Ridgeline** | — | catalog @ 120px | **N/A** | Analytics niche; defer — **Lane C** |
@@ -91,14 +91,14 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
-| **Waterfall** | — (IBCS) | `Charts/Finance` · `/compare/design` Lane B | **Close** | @ 360×280 — rotated dense labels, compact currency, IBCS connectors — **D-221** |
+| **Waterfall** | — (IBCS) | `Charts/Finance` · `/compare/design` Lane B | **Parity** | @ 360×280 ✅ — rotated dense labels, compact currency, IBCS connectors — **D-221** closed |
 | **Candlestick** | — | `Charts/Trading desk` | **N/A** | TradingView/ECharts reference — **Lane C** |
 
 ### Matrix / analytics (ECharts)
 
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
-| **Heatmap** | — | `Charts/Heatmap` · `/compare/design` Lane B | **Close** | @ 360×280 — hide cell labels @ compact; dense x-axis rotate — **D-222** |
+| **Heatmap** | — | `Charts/Heatmap` · `/compare/design` Lane B | **Parity** | @ 360×280 ✅ — hide cell labels @ compact; dense x-axis rotate — **D-222** closed |
 | **Radar** | `Compare/Design parity` · `/compare/design` | `Charts/Radar` | **Parity** | @ 360×280 ✅ — bottom legend, `startAngle: 90` spoke order, radial ticks hidden @ compact — **D-210** closed |
 | **Treemap / Sunburst** | — | catalog | **N/A** | Defer — **Lane C** |
 | **Word cloud** | — | visual CI snapshot | **N/A** | Defer — **Lane C** |
@@ -107,8 +107,8 @@ Columns: **Recharts ref** (Storybook) · **Axi ref** · **Status** · **D-xxx ba
 
 | Type | Recharts ref | Axi ref | Status | Notes / D-id |
 |------|--------------|---------|--------|--------------|
-| **Stat** | Tremor/shadcn KPI cards | `Charts/KPI` · render-sandbox KPI strip · `/compare/design` Lane B | **Close** | **Audited 2026-07-21:** `unit` + `delta` chip @ 72–120px; ChartContainer wrap when height set — **D-106** |
-| **Table** | Tremor Table | `Charts/Data table` · `/compare/design` Lane B | **Close** | **Audited 2026-07-21:** zebra + sticky header + tabular nums @ 320px — **D-107** |
+| **Stat** | Tremor/shadcn KPI cards | `Charts/KPI` · render-sandbox KPI strip · `/compare/design` Lane B | **Parity** | @ 72–120px ✅ — `unit` + `delta` chip, compact padding, ChartContainer @ height — **D-106** closed |
+| **Table** | Tremor Table | `Charts/Data table` · `/compare/design` Lane B | **Parity** | @ 320px ✅ — zebra, sticky header, tabular-nums, status tone — **D-107** closed |
 
 ### Industrial — intentionally not Recharts-shaped
 
@@ -137,12 +137,12 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | ID | Chart | Gap | Status |
 |----|-------|-----|--------|
 | D-201 | Pie / donut | Donut center metric @ compact height | **Closed** — `centerMetric` hole KPI + CSS-centered overlay; compact bottom legend + % labels @ 360×280 ✅ |
-| D-106 | Stat | KPI strip typography (value, unit, delta) @ 72–120px | **Close** — `StatDeltaChip`, unit suffix, ChartContainer @ height; Lane B harness |
-| D-107 | Table | Row density, header stickiness, numeric alignment @ 320px | **Close** — zebra, sticky header, tabular-nums; Lane B harness |
-| D-220 | Funnel | Compact pipeline tile @ 360×280; in-stage % labels | **Close** — Lane B harness + compact insets |
-| D-221 | Waterfall | IBCS bridge @ 360×280; dense category labels | **Close** — rotated labels + compact bar/label sizing |
-| D-222 | Heatmap | Service load tile @ 360×280 | **Close** — no cell labels @ compact; visualMap + axis density |
-| D-223 | Calendar heatmap | 90-day activity @ 360×280 | **Close** — compact cells + short weekday labels |
+| D-106 | Stat | KPI strip typography (value, unit, delta) @ 72–120px | **Closed** — compact padding + delta chip; Lane B harness |
+| D-107 | Table | Row density, header stickiness, numeric alignment @ 320px | **Closed** — zebra, sticky header, status tone inference |
+| D-220 | Funnel | Compact pipeline tile @ 360×280; in-stage % labels | **Closed** — Lane B harness + compact insets |
+| D-221 | Waterfall | IBCS bridge @ 360×280; dense category labels | **Closed** — rotated labels + compact bar/label sizing |
+| D-222 | Heatmap | Service load tile @ 360×280 | **Closed** — no cell labels @ compact; visualMap + axis density |
+| D-223 | Calendar heatmap | 90-day activity @ 360×280 | **Closed** — compact cells + short weekday labels + CSS reference mock |
 
 ### P2 — Coverage & CI
 
@@ -151,8 +151,8 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | D-110 | Scatter | Add `/compare/design` @ 360×280; verify point labels + multi-series legend; bubble size legend optional | **Closed** — compact bottom legend + bubble size legend min/max |
 | D-202 | Histogram | Compact bin labels / axis density @ 360 wide; add compare row | **Closed** — `-25°` rotate when bins ≥6 @ compact |
 | D-210 | Radar | Multi-series bottom/flow legend; compare wall @ 360×280; labels policy at compact width | **Closed** — spoke order + hidden radial ticks @ compact |
-| D-301 | Expand visual CI: one snapshot per P0 cartesian type @ 360px | **In progress** — `Audit/Design` parity wall + horizontal tile + Lane B adjacent wall |
-| D-302 | `Compare/*` wall: add scatter, radar, histogram rows (was: horizontal/combo) | **Close** — scatter / radar / histogram on `/compare/design` @ 360×280 |
+| D-301 | Expand visual CI: one snapshot per P0 cartesian type @ 360px | **Closed** — parity wall + horizontal + scatter/radar/histogram tiles + Lane B wall |
+| D-302 | `Compare/*` wall: add scatter, radar, histogram rows (was: horizontal/combo) | **Closed** — scatter / radar / histogram on `/compare/design` @ 360×280 |
 | D-303 | Document Recharts snippet per type in this file (link to story) | **Open** |
 | D-310 | Studio lane audit (Bklit/Recharts styled) — separate from clean parity | **Open** |
 
@@ -166,7 +166,7 @@ Code + Storybook review against wall chrome rules. No browser side-by-side yet f
 | Radar | Bottom legend + lifted center (~4) | **D-210** Parity — `startAngle: 90` spoke order; radial ticks hidden @ compact |
 | Histogram | Parity row; theme bars + grid (~4) | **D-202** Parity — `-25°` bin labels when bins ≥6 @ compact |
 | Bar / stacked | encoding.color + radius/gap + 4-series ramp (~4.5) | **D-102** Closed → Parity |
-| Stat / table | Lane B harness @ 72/120/320px (~4) | **D-106 / D-107** Close |
+| Stat / table | Lane B harness @ 72/120/320px (~4.5) | **D-106 / D-107** Parity |
 
 **Wall eight baseline (confirmed):** Parity = line, area, combo, multi-line, donut, **vertical bar**, **stacked bar**, **horizontal bar**.
 
@@ -251,6 +251,7 @@ Do **not** file D-xxx for these unless a dashboard user expects Recharts behavio
 
 | Date | Change |
 |------|--------|
+| 2026-07-21 | **D-106 / D-107 / D-220–D-223** Lane B → **Parity**; stat compact padding, table status tones; **D-301** visual CI scatter/radar/histogram tiles |
 | 2026-07-21 | **D-101** horizontal bar @ 360×280 — fixed double left padding; axis-size gutter + 15-step value ticks → **Parity**; wall eight complete |
 | 2026-07-21 | **Design consistency program** documented (Lanes A–C, Phases 1–4). Audit pass: Phase 1 targets (scatter / radar / histogram) + open D-ids; wall eight confirmed Parity/Close |
 | 2026-07-21 | **D-106 / D-107** Lane B: `Stat` unit+delta chip + ChartContainer @ height; `DataTable` zebra/sticky/tabular-nums; `/compare/design` dashboard-adjacent harness |
