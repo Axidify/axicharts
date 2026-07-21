@@ -36,6 +36,23 @@ describe("C158 panel recipes + chart geometry", () => {
     expect(geometry.rules).toContain("geometry:stage-funnel");
   });
 
+  it("infers matrix geometry for heatmap intent", () => {
+    const geometry = inferChartGeometry({
+      kind: "chart",
+      intent: "latency heatmap by hour and day",
+      fieldProfiles: [
+        { name: "hour", role: "dimension" },
+        { name: "day", role: "dimension" },
+        { name: "latency", role: "measure" },
+      ],
+      xField: "hour",
+      yField: "latency",
+    });
+
+    expect(geometry.panelType).toBe("matrix");
+    expect(geometry.rules).toContain("geometry:matrix-heatmap");
+  });
+
   it("infers line geometry for balance over time", () => {
     const geometry = inferChartGeometry({
       kind: "chart",

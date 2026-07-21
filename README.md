@@ -84,36 +84,27 @@ import { cleanTheme } from "@axicharts/charts-theme";
 
 Use these when you outgrow hand-built JSX — agents, codegen, or portable dashboard JSON.
 
-### Agent-safe cartesian spec
+### Agent-safe chart families (cartesian · distribution · matrix)
 
-One `type: "cartesian"` panel with composable `marks[]`, validated **before** render:
+Closed `marks[]` grammars with `validate_panel` before render:
 
 ```ts
-import { Chart, validateCartesianSpec, normalizeToCartesian } from "@axicharts/charts-spec";
+import { Chart, createPanel, validatePanel } from "@axicharts/charts-spec";
 
-const panel = normalizeToCartesian(rawPanel);
-const check = validateCartesianSpec(panel, { rows: data });
-if (!check.ok) throw check.errors; // UNKNOWN_FIELD + suggestions
+const { panel } = createPanel({
+  family: "distribution",
+  intent: "browser share donut",
+  fields: ["browser", "share"],
+});
+const check = validatePanel(panel, { rows: data, strict: true });
+if (!check.ok) throw check.errors;
 
-<Chart panel={panel} data={data} />
+<Chart panel={check.spec ?? panel} data={data} />
 ```
 
-```json
-{
-  "type": "cartesian",
-  "encoding": { "x": { "field": "week" } },
-  "marks": [
-    { "mark": "bar", "field": "revenue", "label": "Revenue" },
-    { "mark": "line", "field": "target", "label": "Target" },
-    { "mark": "rule", "value": 50, "label": "Quota" }
-  ]
-}
-```
-
-- Full guide: [packages/charts-spec/CARTESIAN.md](./packages/charts-spec/CARTESIAN.md)
-- Playground: [docs /spec/blocks](https://axidify.github.io/axicharts/spec/blocks)
-- Eject to JSX: `npx @axicharts/charts-spec eject panel.json`
-- Agent tutorial: [docs /guides/agent-cartesian](https://axidify.github.io/axicharts/guides/agent-cartesian)
+- **5-minute MCP tutorial:** [docs /guides/agent-families](https://axidify.github.io/axicharts/guides/agent-families)
+- Cartesian deep dive: [docs /guides/agent-cartesian](https://axidify.github.io/axicharts/guides/agent-cartesian)
+- MCP server: `@axicharts/charts-mcp`
 
 ### Migrating from Recharts / shadcn Charts
 

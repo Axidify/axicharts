@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://axicharts.dev/schema/matrix-panel.schema.json",
+  "title": "MatrixPanelSpec",
+  "description": "RFC-004 matrix dashboard panel — type matrix with marks[] only.",
+  "type": "object",
+  "required": ["type", "encoding", "marks"],
+  "additionalProperties": true,
+  "properties": {
+    "type": { "const": "matrix" },
+    "encoding": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "object", "required": ["field"] },
+        "y": { "type": "object", "required": ["field"] },
+        "value": { "type": "object" }
+      }
+    },
+    "marks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["mark", "field"],
+            "properties": {
+              "mark": { "const": "cell" },
+              "field": { "type": "string" }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["mark"],
+            "properties": {
+              "mark": { "const": "colorScale" },
+              "field": { "type": "string" },
+              "min": { "type": "number" },
+              "max": { "type": "number" },
+              "scheme": { "type": "string" }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["mark", "dimension"],
+            "properties": {
+              "mark": { "const": "axis" },
+              "dimension": { "enum": ["x", "y"] },
+              "show": { "type": "boolean" }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

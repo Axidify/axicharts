@@ -66,14 +66,17 @@ import {
   marksCurve,
 } from "./blockMarks";
 import { blockMarksToDistributionProps } from "./blockMarksToDistributionProps";
+import { blockMarksToMatrixProps } from "./blockMarksToMatrixProps";
 import { normalizeToCartesian } from "./normalizeToCartesian";
 import { normalizeToDistribution } from "./normalizeToDistribution";
+import { normalizeToMatrix } from "./normalizeToMatrix";
 import { normalizeDistributionMarks } from "./distributionMarks";
 import {
   CartesianSpecValidationError,
   validateCartesianSpec,
 } from "./cartesianValidation";
 import { validateDistributionSpec } from "./distributionValidation";
+import { validateMatrixSpec } from "./matrixValidation";
 import { PanelValidationError } from "./validatePanel";
 import {
   chartPropsWithoutChromeMeta,
@@ -672,6 +675,44 @@ export function compilePanel(
             ...props,
           }),
         ),
+      );
+    }
+
+    case "matrix": {
+      const matrix = normalizeToMatrix(resolved);
+      const shouldValidate = options.validateCartesian !== false;
+      if (shouldValidate) {
+        const validation = validateMatrixSpec(matrix, {
+          rows,
+          dataProfile: options.dataProfile,
+        });
+        if (!validation.ok) {
+          throw new PanelValidationError(
+            "matrix",
+            validation.errors.map((issue) => ({ ...issue, family: "matrix" })),
+          );
+        }
+        for (const warning of validation.warnings) {
+          if (process.env.NODE_ENV !== "production") {
+            console.warn(`[axicharts] ${warning.code}: ${warning.message}`);
+          }
+        }
+      }
+
+      const fromMarks = blockMarksToMatrixProps(
+        rows,
+        matrix.marks ?? [],
+        matrix.encoding,
+      );
+
+      return wrap(
+        createElement(HeatmapChart, {
+          matrix: fromMarks.matrix,
+          min: fromMarks.min,
+          max: fromMarks.max,
+          showLabels: fromMarks.showLabels,
+          showAxes: fromMarks.showAxes,
+        }),
       );
     }
 

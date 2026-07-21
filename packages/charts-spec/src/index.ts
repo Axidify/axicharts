@@ -35,6 +35,10 @@ export {
   type DistributionChartProps,
 } from "./blockMarksToDistributionProps";
 export {
+  blockMarksToMatrixProps,
+  type MatrixHeatmapChartProps,
+} from "./blockMarksToMatrixProps";
+export {
   normalizeBlockMark,
   normalizeMarksArray,
   isDataMark,
@@ -83,6 +87,19 @@ export {
   type DistributionValidationIssue,
 } from "./distributionValidation";
 export { normalizeToDistribution, type NormalizedDistributionSpec } from "./normalizeToDistribution";
+export {
+  createMatrixPanel,
+  listMatrixMarks,
+  MATRIX_MARK_CATALOG,
+  type CreateMatrixPanelInput,
+  type CreateMatrixPanelResult,
+  type MatrixMarkCatalogEntry,
+} from "./createMatrixPanel";
+export {
+  validateMatrixSpec,
+  type MatrixValidationIssue,
+} from "./matrixValidation";
+export { normalizeToMatrix, type NormalizedMatrixSpec } from "./normalizeToMatrix";
 export {
   runDistributionSimulations,
   summarizeSimulations as summarizeDistributionSimulations,

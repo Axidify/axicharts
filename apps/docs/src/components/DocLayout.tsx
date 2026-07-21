@@ -10,6 +10,7 @@ const topLinks = [
   { to: "/guides/theme", label: "Theme playground" },
   { to: "/guides/branding", label: "Badge" },
   { to: "/benchmarks", label: "Benchmarks" },
+  { to: "/guides/agent-families", label: "Agent families (MCP)" },
   { to: "/guides/agent-cartesian", label: "Agent cartesian" },
   { to: "/guides/troubleshooting", label: "Troubleshooting" },
   { to: "/compare/design", label: "vs Recharts" },

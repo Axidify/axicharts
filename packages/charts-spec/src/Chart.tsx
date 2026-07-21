@@ -68,7 +68,7 @@ export function Chart({
 
   if (!skipValidation) {
     const family = resolvePanelFamily(panel);
-    if (family === "cartesian" || family === "distribution") {
+    if (family === "cartesian" || family === "distribution" || family === "matrix") {
       try {
         const validated = assertValidPanel(panel, { rows: asRows(data) });
         resolvedPanel = validated.spec;

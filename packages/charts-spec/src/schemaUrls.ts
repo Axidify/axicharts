@@ -13,6 +13,9 @@ export const HOSTED_DATA_PROFILE_SCHEMA_URL =
 export const DISTRIBUTION_PANEL_SCHEMA_URL =
   "@axicharts/charts-spec/schema/distribution-panel.schema.json";
 
-export const HOSTED_DISTRIBUTION_PANEL_SCHEMA_URL =
-  "https://axicharts.dev/schema/distribution-panel.schema.json";
+export const MATRIX_PANEL_SCHEMA_URL =
+  "@axicharts/charts-spec/schema/matrix-panel.schema.json";
+
+export const HOSTED_MATRIX_PANEL_SCHEMA_URL =
+  "https://axicharts.dev/schema/matrix-panel.schema.json";
 

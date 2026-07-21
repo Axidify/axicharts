@@ -17,7 +17,7 @@ const CARTESIAN_TYPES = new Set([
 
 const DISTRIBUTION_TYPES = new Set(["pie", "donut", "funnel", "distribution"]);
 
-const MATRIX_TYPES = new Set(["heatmap", "calendar", "calendar-heatmap"]);
+const MATRIX_TYPES = new Set(["matrix", "heatmap", "calendar", "calendar-heatmap"]);
 
 /**
  * Resolve which chart family a panel belongs to from `type` (and future mark shape).

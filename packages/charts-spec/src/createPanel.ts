@@ -8,7 +8,12 @@ import {
   type CreateDistributionPanelInput,
   type CreateDistributionPanelResult,
 } from "./createDistributionPanel";
-import { CARTESIAN_PANEL_SCHEMA_URL, DISTRIBUTION_PANEL_SCHEMA_URL } from "./schemaUrls";
+import {
+  createMatrixPanel,
+  type CreateMatrixPanelInput,
+  type CreateMatrixPanelResult,
+} from "./createMatrixPanel";
+import { CARTESIAN_PANEL_SCHEMA_URL, DISTRIBUTION_PANEL_SCHEMA_URL, MATRIX_PANEL_SCHEMA_URL } from "./schemaUrls";
 import type { AgentChartFamily } from "./resolvePanelFamily";
 import type { PanelSpec } from "./types";
 
@@ -29,7 +34,7 @@ export class UnsupportedPanelFamilyError extends Error {
 export type CreatePanelInput =
   | (CreateCartesianPanelInput & { family: "cartesian" })
   | (CreateDistributionPanelInput & { family: "distribution" })
-  | { family: "matrix"; intent: string };
+  | (CreateMatrixPanelInput & { family: "matrix" });
 
 export type CreatePanelResult = {
   family: AgentChartFamily;
@@ -66,7 +71,17 @@ export function createPanel(input: CreatePanelInput): CreatePanelResult {
         reviewReason: result.reviewReason,
       };
     }
-    case "matrix":
-      throw new UnsupportedPanelFamilyError("matrix");
+    case "matrix": {
+      const { family: _family, ...matrixInput } = input;
+      const result: CreateMatrixPanelResult = createMatrixPanel(matrixInput);
+      return {
+        family: "matrix",
+        schema: MATRIX_PANEL_SCHEMA_URL,
+        panel: result.panel,
+        needsReview: result.needsReview,
+        matchedRules: result.matchedRules,
+        reviewReason: result.reviewReason,
+      };
+    }
   }
 }

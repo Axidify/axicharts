@@ -72,6 +72,22 @@ describe("charts-mcp tools", () => {
     expect(payload.family).toBe("distribution");
   });
 
+  it("list_marks returns matrix catalog", () => {
+    const payload = JSON.parse(handleListMarks({ family: "matrix" }).content[0]!.text);
+    expect(payload.closedSet).toEqual(["cell", "colorScale", "axis"]);
+  });
+
+  it("create_panel dispatches matrix family", () => {
+    const result = handleCreatePanel({
+      family: "matrix",
+      intent: "latency heatmap by hour and day",
+      fields: ["hour", "day", "latency"],
+    });
+    const payload = JSON.parse(result.content[0]!.text);
+    expect(payload.panel.type).toBe("matrix");
+    expect(payload.family).toBe("matrix");
+  });
+
   it("create_cartesian_panel returns cartesian spec with planner meta", () => {
     const result = handleCreateCartesianPanel({
       intent: "Weekly revenue bars with target line and quota at 50",

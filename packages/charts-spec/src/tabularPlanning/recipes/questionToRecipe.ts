@@ -175,6 +175,7 @@ function buildCartesianIntent(
   fallback: string,
 ): string {
   if (geometry.panelType === "funnel") return fallback;
+  if (geometry.panelType === "matrix") return `${fallback} heatmap grid intensity`;
   if (geometry.markType === "line") return `${fallback} line chart over time monotone`;
   if (geometry.markType === "area") return `${fallback} area chart cumulative`;
   return `${fallback} bar chart with value labels`;

@@ -54,6 +54,41 @@ function compileDistributionFunnelPanel(
   };
 }
 
+function compileMatrixPanel(
+  recipe: PanelRecipe,
+  rows: Record<string, unknown>[],
+): CompiledRecipeResult {
+  const fields = rows.length > 0 ? Object.keys(rows[0]!) : [];
+  const xField = recipe.xField ?? recipe.groupBy ?? fields[0] ?? "x";
+  const valueField = recipe.yField ?? "value";
+  const yField =
+    fields.find((field) => field !== xField && field !== valueField) ?? "y";
+
+  return {
+    panel: {
+      specVersion: 1,
+      type: "matrix",
+      title: recipe.title,
+      theme: "clean",
+      mode: "interactive",
+      encoding: {
+        x: { field: xField, type: "nominal" },
+        y: { field: yField, type: "nominal" },
+        value: { field: valueField, type: "quantitative" },
+      },
+      marks: [
+        { type: "cell", field: valueField },
+        { type: "colorScale", field: valueField },
+        { type: "axis", dimension: "x", show: true },
+        { type: "axis", dimension: "y", show: true },
+      ],
+    },
+    rows,
+    geometry: { panelType: "matrix", rules: ["compile:matrix-heatmap"] },
+    matchedRules: ["recipe-matrix", "geometry:matrix-heatmap", "mark:cell"],
+  };
+}
+
 function compileStatPanel(
   recipe: PanelRecipe,
   options: CompileRecipeOptions,
@@ -243,6 +278,10 @@ export function compileRecipe(
 
   if (recipe.panelType === "funnel") {
     return compileDistributionFunnelPanel(recipe, chartRows);
+  }
+
+  if (recipe.panelType === "matrix") {
+    return compileMatrixPanel(recipe, chartRows);
   }
 
   const geometry = inferChartGeometry({

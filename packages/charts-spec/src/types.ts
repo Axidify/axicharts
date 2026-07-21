@@ -136,7 +136,28 @@ export type DistributionMarkSpec =
   | DistributionCellMark
   | DistributionLabelMark;
 
-export type PanelMarkSpec = ChartBlockMarkSpec | DistributionMarkSpec;
+export type MatrixCellMark = {
+  type: "cell";
+  field: string;
+};
+
+export type MatrixColorScaleMark = {
+  type: "colorScale";
+  field?: string;
+  min?: number;
+  max?: number;
+  scheme?: string;
+};
+
+export type MatrixAxisMark = {
+  type: "axis";
+  dimension: "x" | "y";
+  show?: boolean;
+};
+
+export type MatrixMarkSpec = MatrixCellMark | MatrixColorScaleMark | MatrixAxisMark;
+
+export type PanelMarkSpec = ChartBlockMarkSpec | DistributionMarkSpec | MatrixMarkSpec;
 
 export type PanelChartType =
   | "line"
@@ -145,6 +166,7 @@ export type PanelChartType =
   | "blocks"
   | "cartesian"
   | "distribution"
+  | "matrix"
   | "combo"
   | "pie"
   | "donut"

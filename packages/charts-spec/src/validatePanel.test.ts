@@ -125,13 +125,15 @@ describe("createPanel", () => {
     expect(result.schema).toContain("cartesian-panel.schema.json");
   });
 
-  it("throws for matrix family", () => {
-    expect(() =>
-      createPanel({
-        family: "matrix",
-        intent: "heatmap",
-      }),
-    ).toThrow(UnsupportedPanelFamilyError);
+  it("creates matrix panels", () => {
+    const result = createPanel({
+      family: "matrix",
+      intent: "latency heatmap by hour and day",
+      fields: ["hour", "day", "latency"],
+    });
+    expect(result.family).toBe("matrix");
+    expect(result.panel.type).toBe("matrix");
+    expect(result.schema).toContain("matrix-panel.schema.json");
   });
 
   it("creates distribution panels", () => {
@@ -156,5 +158,10 @@ describe("listMarks", () => {
   it("lists distribution catalog", () => {
     const result = listMarks("distribution");
     expect(result.closedSet).toEqual(["arc", "funnel", "donut", "cell", "label"]);
+  });
+
+  it("lists matrix catalog", () => {
+    const result = listMarks("matrix");
+    expect(result.closedSet).toEqual(["cell", "colorScale", "axis"]);
   });
 });

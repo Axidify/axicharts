@@ -10,6 +10,21 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.25] - 2026-07-21
+
+### Added
+
+- **charts-spec** — Matrix family (RFC-004 C186–C188): `cell`, `colorScale`, `axis` marks; validate, normalize, compile, `createMatrixPanel`
+- **charts-spec** — Legacy `heatmap` → `type: "matrix"` + `marks[]`; tabular heatmap intent → validated matrix panels
+- **charts-mcp** — `create_panel` / `validate_panel` / `list_marks` dispatch `family: "matrix"`
+- **docs** — `/guides/agent-families` — 5-minute MCP tutorial for cartesian, distribution, and matrix
+- **charts-mcp** — `agent-skills/families/SKILL.md` unified agent workflow
+
+### Fixed
+
+- **charts-spec** — `Chart` validates matrix family before compile
+- **charts-spec** — Local `HeatmapMatrix` type in `heatmapEncoding` (DTS build without `charts-echarts` import)
+
 ## [0.4.24] - 2026-07-21
 
 ### Added

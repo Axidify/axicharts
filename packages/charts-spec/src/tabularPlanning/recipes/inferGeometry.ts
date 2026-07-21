@@ -24,6 +24,11 @@ export function inferChartGeometry(input: GeometryInput): ChartGeometry {
     return { panelType: "waterfall", rules };
   }
 
+  if (/heatmap|heat\s*map|correlation|intensity|grid|matrix/.test(intent)) {
+    rules.push("geometry:matrix-heatmap");
+    return { panelType: "matrix", rules };
+  }
+
   const xRole = input.xField ? roleOf(input.fieldProfiles, input.xField) : undefined;
   const xCardinality = input.xField ? input.cardinalities?.[input.xField] : undefined;
 

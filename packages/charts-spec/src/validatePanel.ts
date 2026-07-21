@@ -4,8 +4,10 @@ import {
   type CartesianValidationIssue,
 } from "./cartesianValidation";
 import { validateDistributionSpec } from "./distributionValidation";
+import { validateMatrixSpec } from "./matrixValidation";
 import { normalizeToCartesian } from "./normalizeToCartesian";
 import { normalizeToDistribution } from "./normalizeToDistribution";
+import { normalizeToMatrix } from "./normalizeToMatrix";
 import {
   resolvePanelFamily,
   type AgentChartFamily,
@@ -71,7 +73,7 @@ function unsupportedFamilyError(
         message: `Family "${family}" is not agent-ready yet (panel type "${spec.type}")`,
         suggestion:
           family === "matrix"
-            ? "Use cartesian family until matrix marks ship (RFC-004 C186+)"
+            ? "Use create_panel({ family: \"matrix\" }) with cell + colorScale marks"
             : "Use a supported agent family",
         severity: "error",
         family,
@@ -164,7 +166,22 @@ export function validatePanel(
   }
 
   if (family === "matrix") {
-    return unsupportedFamilyError(family, spec);
+    const normalized =
+      spec.type === "matrix" ? spec : normalizeToMatrix(spec);
+    const result = validateMatrixSpec(normalized, options);
+    if (!result.ok) {
+      return {
+        ok: false,
+        family,
+        errors: result.errors.map((issue) => ({ ...issue, family })),
+      };
+    }
+    return {
+      ok: true,
+      family,
+      spec: normalized,
+      warnings: result.warnings.map((issue) => ({ ...issue, family })),
+    };
   }
 
   return legacyPanelResult(spec, strict);

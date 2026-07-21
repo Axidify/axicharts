@@ -40,7 +40,7 @@ export function createCartesianMcpServer(
 
   server.tool(
     "create_panel",
-    `Create a panel from natural-language intent. Dispatches by family (cartesian shipped; distribution/matrix C181+). Prefer over create_cartesian_panel.`,
+    `Create a panel from natural-language intent. Dispatches by family (cartesian, distribution, matrix). Prefer over create_cartesian_panel.`,
     {
       family: z
         .enum(["cartesian", "distribution", "matrix"])

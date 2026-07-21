@@ -19,7 +19,7 @@ function tier2PanelStatus(panel: PanelSpec, family: PanelFamily): TabularPanelAg
         code: "TIER2_PANEL",
         path: "type",
         message: `Panel type "${panel.type}" is Tier-2 — not agent grammar`,
-        suggestion: "Use cartesian or distribution family until this chart type ships",
+        suggestion: "Use cartesian, distribution, or matrix family for agent-safe charts",
         severity: "error",
         family,
       },
@@ -29,7 +29,7 @@ function tier2PanelStatus(panel: PanelSpec, family: PanelFamily): TabularPanelAg
 
 /**
  * Classify agent-safety for a tabular dashboard panel (RFC-004).
- * Cartesian and distribution panels must pass `validatePanel`; Tier-2 charts get `needs_review`.
+ * Cartesian, distribution, and matrix panels must pass `validatePanel`; Tier-2 charts get `needs_review`.
  */
 export function classifyTabularPanelAgentStatus(
   panel: PanelSpec,
@@ -49,10 +49,6 @@ export function classifyTabularPanelAgentStatus(
   const family = resolvePanelFamily(panel);
 
   if (family === "legacy") {
-    return tier2PanelStatus(panel, family);
-  }
-
-  if (family === "matrix") {
     return tier2PanelStatus(panel, family);
   }
 
@@ -94,10 +90,28 @@ export function classifyTabularPanelAgentStatus(
     };
   }
 
-  const code = result.errors[0]?.code ?? "NOT_AGENT_SAFE";
+  if (family === "matrix") {
+    if (!result.ok) {
+      return {
+        status: "needs_review",
+        notes: `panel: matrix · errors: ${result.errors.map((issue) => issue.code).join(", ")}`,
+        validationIssues: result.errors,
+      };
+    }
+    return {
+      status: "validated",
+      notes:
+        result.warnings.length > 0
+          ? `panel: matrix · warnings: ${result.warnings.length}`
+          : "panel: matrix",
+      validationIssues: result.warnings,
+    };
+  }
+
+  const code = !result.ok ? result.errors[0]?.code ?? "NOT_AGENT_SAFE" : "NOT_AGENT_SAFE";
   return {
     status: "needs_review",
     notes: `panel: ${panel.type} · ${code}`,
-    validationIssues: result.errors,
+    validationIssues: !result.ok ? result.errors : [],
   };
 }

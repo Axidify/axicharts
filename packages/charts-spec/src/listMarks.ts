@@ -7,14 +7,18 @@ import {
   listDistributionMarks,
   type DistributionMarkCatalogEntry,
 } from "./createDistributionPanel";
-import { CARTESIAN_PANEL_SCHEMA_URL, DISTRIBUTION_PANEL_SCHEMA_URL } from "./schemaUrls";
+import {
+  listMatrixMarks,
+  type MatrixMarkCatalogEntry,
+} from "./createMatrixPanel";
+import { CARTESIAN_PANEL_SCHEMA_URL, DISTRIBUTION_PANEL_SCHEMA_URL, MATRIX_PANEL_SCHEMA_URL } from "./schemaUrls";
 import type { AgentChartFamily } from "./resolvePanelFamily";
 import { UnsupportedPanelFamilyError } from "./createPanel";
 
 export type MarkCatalogResult = {
   family: AgentChartFamily;
   schema: string;
-  catalog: CartesianMarkCatalogEntry[] | DistributionMarkCatalogEntry[];
+  catalog: CartesianMarkCatalogEntry[] | DistributionMarkCatalogEntry[] | MatrixMarkCatalogEntry[];
   closedSet: string[];
 };
 
@@ -41,8 +45,15 @@ export function listMarks(family: AgentChartFamily): MarkCatalogResult {
         closedSet: catalog.map((entry) => entry.mark),
       };
     }
-    case "matrix":
-      throw new UnsupportedPanelFamilyError(family);
+    case "matrix": {
+      const catalog = listMatrixMarks();
+      return {
+        family: "matrix",
+        schema: MATRIX_PANEL_SCHEMA_URL,
+        catalog,
+        closedSet: catalog.map((entry) => entry.mark),
+      };
+    }
     default: {
       const exhaustive: never = family;
       throw new UnsupportedPanelFamilyError(exhaustive);

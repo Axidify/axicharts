@@ -2,7 +2,7 @@ import type { AggregateRowsOptions, AggregateSpec } from "../../aggregateRows";
 import type { FieldProfile } from "../../types";
 import type { VerticalId } from "../../rulePacks/types";
 
-export type PanelRecipeKind = "stat" | "cartesian" | "table" | "waterfall" | "funnel";
+export type PanelRecipeKind = "stat" | "cartesian" | "table" | "waterfall" | "funnel" | "matrix";
 
 export type ChartMarkType = "bar" | "line" | "area";
 

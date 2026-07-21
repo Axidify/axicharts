@@ -1,6 +1,11 @@
-import type { HeatmapMatrix } from "@axicharts/charts-echarts";
 import type { FieldEncoding } from "./types";
 import { pluckField } from "./data";
+
+export type HeatmapMatrix = {
+  xCategories: string[];
+  yCategories: string[];
+  values: number[][];
+};
 
 export function matrixFromRows(
   rows: Record<string, unknown>[],

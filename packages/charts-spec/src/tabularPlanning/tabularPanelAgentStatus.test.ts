@@ -60,15 +60,41 @@ describe("classifyTabularPanelAgentStatus", () => {
     expect(status.validationIssues[0]?.code).toBe("TIER2_PANEL");
   });
 
-  it("flags heatmap matrix panels as Tier-2 needs_review", () => {
+  it("validates matrix panels with agent grammar", () => {
+    const status = classifyTabularPanelAgentStatus(
+      {
+        type: "matrix",
+        encoding: {
+          x: { field: "hour" },
+          y: { field: "day" },
+          value: { field: "latency" },
+        },
+        marks: [
+          { type: "cell", field: "latency" },
+          { type: "colorScale", field: "latency" },
+        ],
+      },
+      [
+        { hour: "09:00", day: "Mon", latency: 42 },
+        { hour: "10:00", day: "Mon", latency: 55 },
+      ],
+    );
+    expect(status.status).toBe("validated");
+  });
+
+  it("flags legacy heatmap without rows as needs_review", () => {
     const status = classifyTabularPanelAgentStatus(
       {
         type: "heatmap",
-        encoding: { x: { field: "week" }, y: { field: "day" }, value: { field: "revenue" } },
+        encoding: {
+          x: { field: "hour" },
+          y: { field: "day" },
+          value: { field: "latency" },
+        },
       },
-      ROWS,
+      [],
     );
     expect(status.status).toBe("needs_review");
-    expect(status.validationIssues[0]?.code).toBe("TIER2_PANEL");
+    expect(status.validationIssues[0]?.code).toBe("EMPTY_DATA");
   });
 });

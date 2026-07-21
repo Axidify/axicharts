@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-spec",
-  "version": "0.4.24",
+  "version": "0.4.25",
   "description": "Layer 2 panel spec compiler and vertical templates for AxiCharts.",
   "license": "MIT",
   "repository": {
@@ -60,6 +60,7 @@
     },
     "./schema/cartesian-panel.schema.json": "./schema/cartesian-panel.schema.json",
     "./schema/distribution-panel.schema.json": "./schema/distribution-panel.schema.json",
+    "./schema/matrix-panel.schema.json": "./schema/matrix-panel.schema.json",
     "./schema/data-profile.schema.json": "./schema/data-profile.schema.json"
   },
   "scripts": {
