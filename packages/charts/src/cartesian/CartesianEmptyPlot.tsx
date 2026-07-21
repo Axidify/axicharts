@@ -10,7 +10,7 @@ export type CartesianEmptyPlotProps = {
   dark?: boolean;
 };
 
-/** Built-in empty UI when all cartesian series values are zero. */
+/** Optional empty UI when a cartesian chart has no categories or series (manual use). */
 export function CartesianEmptyPlot({
   width,
   height,

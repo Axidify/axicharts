@@ -152,7 +152,7 @@ describe("listMarks", () => {
   it("lists cartesian catalog", () => {
     const result = listMarks("cartesian");
     expect(result.family).toBe("cartesian");
-    expect(result.closedSet).toEqual(["bar", "line", "area", "rule", "band"]);
+    expect(result.closedSet).toEqual(["bar", "line", "area", "point", "rule", "band"]);
   });
 
   it("lists distribution catalog", () => {
@@ -212,6 +212,29 @@ describe("validatePanel fix patches", () => {
     if (!result.ok) {
       const err = result.errors.find((issue) => issue.code === "UNKNOWN_FIELD");
       expect(err?.fix).toEqual({ "marks[0].field": "latency" });
+    }
+  });
+
+  it("strict mode blocks DUPLICATE_OVERLAY_CHANNEL on cartesian panels", () => {
+    const result = validatePanel(
+      {
+        type: "cartesian",
+        encoding: { x: { field: "week" } },
+        marks: [
+          { type: "bar", field: "revenue" },
+          { type: "rule", value: 50 },
+        ],
+        props: {
+          referenceLines: [{ value: 60, label: "props" }],
+        },
+      },
+      { rows: ROWS, strict: true },
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(
+        result.errors.some((issue) => issue.code === "DUPLICATE_OVERLAY_CHANNEL"),
+      ).toBe(true);
     }
   });
 });

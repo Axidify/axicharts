@@ -41,6 +41,7 @@ export type OrchestratorPlanResult = {
     chartCount: number;
     needsReview: boolean;
   };
+  followUpQuestionIds?: string[];
 };
 
 export type ByokConfig = {
@@ -61,6 +62,7 @@ export type OrchestratorChatRequest = {
 export type OrchestratorChatResult = OrchestratorPlanResult & {
   followUpIntents: string[];
   assistantMessage: string;
+  followUpQuestionIds?: string[];
   llm: {
     used: boolean;
     provider?: string;

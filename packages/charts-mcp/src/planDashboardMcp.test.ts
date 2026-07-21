@@ -48,10 +48,12 @@ describe("C159 plan_dashboard MCP", () => {
     expect(payload.decisions.some((entry: { api: string }) => entry.api === "rankQuestions")).toBe(
       true,
     );
-    expect(payload.decisions.some((entry: { api: string }) => entry.api === "planFromIntent")).toBe(
+    expect(payload.decisions.some((entry: { api: string }) => entry.api === "planDashboardShellFromIntent")).toBe(
       true,
     );
     expect(payload.dashboardPlan).toBeDefined();
+    expect(payload.dashboardPlan.agentSafe).toBe(true);
+    expect(payload.dashboardPlan.panels).toEqual([]);
     expect(payload.questions.ranked.length).toBeGreaterThan(0);
 
     const stageChart = payload.charts.find(

@@ -7,9 +7,12 @@ import {
   callTool,
   CARTESIAN_PANEL_SCHEMA_URL,
   DATA_PROFILE_SCHEMA_URL,
+  handleComposePanel,
   handleCreateCartesianPanel,
   handleCreatePanel,
+  handleExecuteTransform,
   handleListMarks,
+  handleListTransformOps,
   handleValidateCartesianSpec,
   handleValidatePanel,
 } from "./tools";
@@ -53,7 +56,7 @@ describe("charts-mcp tools", () => {
 
   it("list_marks returns cartesian catalog", () => {
     const payload = JSON.parse(handleListMarks({ family: "cartesian" }).content[0]!.text);
-    expect(payload.closedSet).toEqual(["bar", "line", "area", "rule", "band"]);
+    expect(payload.closedSet).toEqual(["bar", "line", "area", "point", "rule", "band"]);
   });
 
   it("list_marks returns distribution catalog", () => {
@@ -149,12 +152,79 @@ describe("charts-mcp tools", () => {
     );
   });
 
+  it("create_cartesian_panel aggregates when groupBy provided", () => {
+    const rawRows = [
+      { status: "Open", hours: 2 },
+      { status: "Open", hours: 3 },
+      { status: "Closed", hours: 5 },
+    ];
+    const result = handleCreateCartesianPanel({
+      intent: "bar chart of count by status",
+      rows: rawRows,
+      groupBy: "status",
+      aggregates: { count: { op: "count" } },
+      xField: "status",
+      yField: "count",
+    });
+    const payload = JSON.parse(result.content[0]!.text);
+    expect(payload.transformed).toBe(true);
+    expect(payload.rows).toEqual([
+      { status: "Open", count: 2 },
+      { status: "Closed", count: 1 },
+    ]);
+    expect(payload.panel.type).toBe("cartesian");
+  });
+
+  it("execute_transform and compose_panel round-trip", () => {
+    const rawRows = [
+      { category: "Rent", debit: 3500, credit: 0 },
+      { category: "Sales", debit: 0, credit: 12000 },
+    ];
+    const transformed = JSON.parse(
+      handleExecuteTransform({
+        rows: rawRows,
+        groupBy: "category",
+        aggregates: { spend: { op: "sum", field: "debit" } },
+      }).content[0]!.text,
+    );
+    expect(transformed.ok).toBe(true);
+    const composed = JSON.parse(
+      handleComposePanel({
+        recipe: {
+          questionId: "test.chart.spend",
+          title: "Spend by category",
+          intent: "spend bar chart with value labels",
+          panelType: "cartesian",
+          markType: "bar",
+          preparedRows: transformed.rows,
+          xField: "category",
+          yField: "spend",
+        },
+        rows: transformed.rows,
+      }).content[0]!.text,
+    );
+    expect(composed.panel.type).toBe("cartesian");
+    expect(composed.validation.ok).toBe(true);
+  });
+
+  it("list_transform_ops returns catalog", () => {
+    const payload = JSON.parse(handleListTransformOps().content[0]!.text);
+    expect(payload.aggregateOps).toContain("count");
+  });
+
   it("openapi bundle references published schema URLs", () => {
     const byName = Object.fromEntries(OPENAPI_TOOL_BUNDLE.map((tool) => [tool.name, tool]));
     expect(byName.create_cartesian_panel?.schemaUrl).toBe(CARTESIAN_PANEL_SCHEMA_URL);
     expect(byName.describe_data_profile?.schemaUrl).toBe(DATA_PROFILE_SCHEMA_URL);
     for (const tool of OPENAPI_TOOL_BUNDLE) {
-      if (tool.name === "describe_data_profile" || tool.name === "plan_dashboard") continue;
+      if (
+        tool.name === "describe_data_profile" ||
+        tool.name === "plan_dashboard" ||
+        tool.name === "list_transform_ops" ||
+        tool.name === "execute_transform"
+      ) {
+        continue;
+      }
       expect(tool.schemaUrl).toBe(CARTESIAN_PANEL_SCHEMA_URL);
     }
     expect(OPENAPI_TOOL_BUNDLE.map((tool) => tool.name)).toEqual([
@@ -169,6 +239,9 @@ describe("charts-mcp tools", () => {
       "compile_cartesian_panel",
       "create_table_panel",
       "plan_dashboard",
+      "list_transform_ops",
+      "execute_transform",
+      "compose_panel",
     ]);
   });
 

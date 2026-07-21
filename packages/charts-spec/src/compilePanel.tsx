@@ -361,6 +361,7 @@ export function compilePanel(
           fill: resolved.fill,
           valueSuffix: resolved.valueSuffix,
           animate: readPanelAnimation(resolved),
+          ...(resolved.fill ? { renderer: "canvas" as const } : {}),
           ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
         });
 
@@ -430,6 +431,7 @@ export function compilePanel(
         valueSuffix: resolved.valueSuffix,
         animate: readPanelAnimation(resolved),
         ...panelOrientationProps(resolved),
+        ...(resolved.fill ? { renderer: "canvas" as const } : {}),
         ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
       });
 
@@ -516,6 +518,7 @@ export function compilePanel(
         ...(curve ? { curve } : {}),
         animate: readPanelAnimation(cartesian),
         ...panelOrientationProps(cartesian),
+        ...((cartesian.fill ?? fromMarks.fill) ? { renderer: "canvas" as const } : {}),
         ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
       });
 

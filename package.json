@@ -21,6 +21,7 @@
     "bench:stability": "node benchmarks/browser/stability.mjs",
     "test:e2e:share-import": "node benchmarks/e2e/share-import.mjs",
     "test:visual": "node benchmarks/e2e/visual-snapshots.mjs",
+    "test:render-battery": "pnpm --filter @axicharts/charts-spec test:render-battery",
     "test:registry": "node scripts/test-registry-e2e.mjs",
     "bench:all": "node scripts/collect-benchmarks.mjs --browser",
     "check:versions": "node scripts/check-version-lockstep.mjs",

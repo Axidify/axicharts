@@ -24,9 +24,29 @@ export type CartesianValidationError = CartesianValidationIssue & {
 export type ValidateCartesianOptions = {
   dataProfile?: DataProfile;
   rows?: Record<string, unknown>[];
+  /** When true, DUPLICATE_OVERLAY_CHANNEL is an error (RFC-004 / B5). */
+  strict?: boolean;
 };
 
-const DATA_MARKS = new Set(["bar", "line", "area"]);
+const STRICT_BLOCKING_CODES = new Set(["DUPLICATE_OVERLAY_CHANNEL"]);
+
+function pushCartesianIssue(
+  bucket: { errors: CartesianValidationError[]; warnings: CartesianValidationIssue[] },
+  issue: CartesianValidationIssue,
+  strict: boolean,
+): void {
+  if (strict && STRICT_BLOCKING_CODES.has(issue.code)) {
+    bucket.errors.push({ ...issue, severity: "error" });
+    return;
+  }
+  if (issue.severity === "error") {
+    bucket.errors.push(issue as CartesianValidationError);
+  } else {
+    bucket.warnings.push(issue);
+  }
+}
+
+const DATA_MARKS = new Set(["bar", "line", "area", "point"]);
 const OVERLAY_MARKS = new Set(["rule", "band"]);
 const ALL_MARKS = new Set([...DATA_MARKS, ...OVERLAY_MARKS]);
 
@@ -89,12 +109,16 @@ const CARTESIAN_LIKE_TYPES = new Set([
  * Detect warnings on the raw panel spec before `normalizeToCartesian` merges
  * legacy overlay props into `marks[]` (which would hide duplicate-channel issues).
  */
-export function detectPreNormalizeWarnings(spec: PanelSpec): CartesianValidationIssue[] {
+export function detectPreNormalizeWarnings(
+  spec: PanelSpec,
+  options: Pick<ValidateCartesianOptions, "strict"> = {},
+): CartesianValidationIssue[] {
   if (!CARTESIAN_LIKE_TYPES.has(spec.type)) {
     return [];
   }
 
-  const warnings: CartesianValidationIssue[] = [];
+  const strict = options.strict ?? false;
+  const bucket = { errors: [] as CartesianValidationError[], warnings: [] as CartesianValidationIssue[] };
   const props = spec.props ?? {};
   const legacyRules = Array.isArray(props.referenceLines) ? props.referenceLines.length : 0;
   const legacyBands = Array.isArray(props.thresholdBands) ? props.thresholdBands.length : 0;
@@ -116,16 +140,16 @@ export function detectPreNormalizeWarnings(spec: PanelSpec): CartesianValidation
     (legacyBands > 0 && markBands > 0) ||
     (annotationOverlays > 0 && (markRules > 0 || markBands > 0))
   ) {
-    warnings.push({
+    pushCartesianIssue(bucket, {
       code: "DUPLICATE_OVERLAY_CHANNEL",
       path: "props",
       message:
         "Overlay marks in marks[] and legacy referenceLines/thresholdBands props both set — prefer marks[] only",
       severity: "warning",
-    });
+    }, strict);
   }
 
-  return warnings;
+  return [...bucket.errors, ...bucket.warnings];
 }
 
 export function validateCartesianSpec(
@@ -140,6 +164,8 @@ export function validateCartesianSpec(
 } {
   const errors: CartesianValidationError[] = [];
   const warnings: CartesianValidationIssue[] = [];
+  const strict = options.strict ?? false;
+  const issueBucket = { errors, warnings };
 
   if (spec.type !== "cartesian" && spec.type !== "blocks") {
     errors.push({
@@ -218,7 +244,7 @@ export function validateCartesianSpec(
     errors.push({
       code: "MISSING_DATA_MARK",
       path: "marks",
-      message: "At least one data mark (bar, line, area) is required",
+      message: "At least one data mark (bar, line, area, point) is required",
       severity: "error",
     });
   }
@@ -294,13 +320,13 @@ export function validateCartesianSpec(
     (legacyBands > 0 && markBands > 0) ||
     (annotationOverlays > 0 && (markRules > 0 || markBands > 0))
   ) {
-    warnings.push({
+    pushCartesianIssue(issueBucket, {
       code: "DUPLICATE_OVERLAY_CHANNEL",
       path: "props",
       message:
         "Overlay marks in marks[] and legacy referenceLines/thresholdBands props both set — prefer marks[] only",
       severity: "warning",
-    });
+    }, strict);
   }
 
   const fieldUse = new Map<string, string[]>();

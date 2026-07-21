@@ -136,11 +136,25 @@ export function applyRecipeData(recipe: PanelRecipe, enrichment: TabularEnrichme
       };
     case "ledger.chart.waterfall": {
       const waterfallItems = enrichment.extras?.waterfallByCategory;
+      if (!Array.isArray(waterfallItems)) {
+        return { ...recipe, panelType: "cartesian", markType: "bar" };
+      }
+      const preparedRows = waterfallItems.map((item) => ({
+        category: String(item.name),
+        value: Number(item.value),
+      }));
       return {
         ...recipe,
-        panelType: "waterfall",
-        waterfallItems: Array.isArray(waterfallItems) ? waterfallItems : undefined,
-        preparedRows: Array.isArray(waterfallItems) ? waterfallItems : [],
+        panelType: "cartesian",
+        markType: "bar",
+        title: "Net flow bridge by category",
+        intent: "ledger net flow bridge bar chart signed category values",
+        preparedRows,
+        xField: "category",
+        yField: "value",
+        groupBy: undefined,
+        aggregates: undefined,
+        stageOrder: preparedRows.map((row) => String(row.category)),
       };
     }
     case "ledger.table.transactions":

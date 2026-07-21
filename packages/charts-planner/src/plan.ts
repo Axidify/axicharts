@@ -1,11 +1,25 @@
-import type { DataProfile, TemplateId } from "@axicharts/charts-spec/planning";
+import type { DataProfile } from "@axicharts/charts-spec/planning";
 import {
+  PROFILE_PLANNER_AGENT_WARNING,
   planPanelsFromProfile,
   suggestTemplate,
-} from "@axicharts/charts-spec/planning";
+} from "@axicharts/charts-spec";
 import { enrichProfileFromIntent } from "./intent";
-import type { DashboardPlan, MosaicPresetId, PlannerFeed, PlannerLayout } from "./types";
+import {
+  inferFeed,
+  inferMosaicPresetFromIntent,
+  inferTemplateFromIntent,
+  planDashboardShellFromIntent,
+} from "./planShell";
+import type { DashboardPlan, MosaicPresetId, PlannerLayout } from "./types";
 import { isTemplateId } from "./validate";
+
+export {
+  inferFeed,
+  inferMosaicPresetFromIntent,
+  inferTemplateFromIntent,
+  planDashboardShellFromIntent,
+} from "./planShell";
 
 function inferLayout(intent: string | undefined): PlannerLayout {
   if (!intent) return "embed";
@@ -14,68 +28,10 @@ function inferLayout(intent: string | undefined): PlannerLayout {
   return "embed";
 }
 
-export function inferFeed(intent: string | undefined): PlannerFeed {
-  if (!intent) return "historian";
-  const lower = intent.toLowerCase();
-  if (/static|snapshot|csv|batch|historical/.test(lower)) return "static";
-  if (/\bmqtt\b|sparkplug|plant\/|pubsub|broker/.test(lower)) return "mqtt";
-  if (/websocket|web\s*socket|\bws\b|push\s*feed|telemetry\s*stream/.test(lower)) {
-    return "websocket";
-  }
-  if (/\brest\b|\/api\/|polling|poll\b|http\s*pull|endpoint|axios|fetch\b/.test(lower)) {
-    return "rest";
-  }
-  if (/mock[-\s]?live|synthetic|simulator|sandbox|\bdemo\b|fixture\s*drift/.test(lower)) {
-    return "mock-live";
-  }
-  if (/live|stream|historian|realtime|real-time|telemetry/.test(lower)) return "historian";
-  return "historian";
-}
-
 function inferPresentation(intent: string | undefined): boolean {
   if (!intent) return false;
   const lower = intent.toLowerCase();
   return /presentation|board|deck|slide|executive|hero/.test(lower);
-}
-
-export function inferTemplateFromIntent(intent: string): TemplateId | undefined {
-  const lower = intent.toLowerCase();
-  if (/finance|p&l|pnl|revenue|margin/.test(lower)) return "finance-pnl";
-  if (/trading|blotter|positions/.test(lower)) return "trading-blotter";
-  if (/program|burndown|sprint/.test(lower)) return "program-dashboard";
-  if (/plugin|extension/.test(lower)) return "plugins-wall";
-  if (/capacity|resource|utilization/.test(lower)) return "capacity-grid";
-  if (/incident|sre|mttr|on-?call|outage|postmortem/.test(lower)) return "sre-incident";
-  if (/saas|mrr|arr|churn|signup|growth|funnel/.test(lower)) return "saas-growth";
-  if (/line\s*\d+|ops|shift|plant|telemetry|2x2|wall/.test(lower)) return "ops-2x2";
-  if (/overview|single|kpi/.test(lower)) return "line-overview";
-  return undefined;
-}
-
-export function inferMosaicPresetFromIntent(intent: string): MosaicPresetId {
-  const lower = intent.toLowerCase();
-  if (
-    (/trading|blotter|positions/.test(lower) && /program|sprint|burndown/.test(lower)) ||
-    (/trading|blotter/.test(lower) && /mosaic|wall|grid|multi|split/.test(lower))
-  ) {
-    return "trading-program";
-  }
-  if (/command|capacity|resource|utilization/.test(lower)) {
-    return "command-center";
-  }
-  if (/finance|p&l|pnl|revenue|margin/.test(lower)) {
-    return "ops-finance";
-  }
-  if (/overview|throughput|kpi/.test(lower)) {
-    return "ops-overview";
-  }
-  if (/program|sprint|burndown/.test(lower)) {
-    return "trading-program";
-  }
-  if (/trading|blotter/.test(lower)) {
-    return "trading-program";
-  }
-  return "ops-overview";
 }
 
 function resolveMosaicPreset(intent: string | undefined, layout: PlannerLayout): MosaicPresetId | undefined {
@@ -120,6 +76,9 @@ export function planFromProfile(
     presentation,
     mosaicPreset: resolveMosaicPreset(intent, layout),
     panels: planPanelsFromProfile(enriched, { intent }),
+    agentSafe: false,
+    plannerKind: "legacy-profile",
+    warnings: [PROFILE_PLANNER_AGENT_WARNING],
   };
 }
 
@@ -142,6 +101,9 @@ export function planFromIntent(profile: DataProfile, intent: string): DashboardP
     presentation,
     mosaicPreset: resolveMosaicPreset(intent, layout),
     panels: planPanelsFromProfile(enriched, { intent }),
+    agentSafe: false,
+    plannerKind: "legacy-profile",
+    warnings: [PROFILE_PLANNER_AGENT_WARNING],
   };
 }
 

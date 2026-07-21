@@ -16,6 +16,9 @@ describe("planFromIntent", () => {
   it("maps line 3 night shift to ops template", () => {
     const plan = planFromIntent(profile, "Line 3 night shift overview");
     expect(plan.template).toBe("ops-2x2");
+    expect(plan.agentSafe).toBe(false);
+    expect(plan.plannerKind).toBe("legacy-profile");
+    expect(plan.warnings?.length).toBeGreaterThan(0);
     expect(plan.title).toBe("Line 3");
     expect(plan.subtitle).toBe("Night shift overview");
     expect(plan.feed).toBe("historian");

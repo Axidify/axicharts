@@ -17,6 +17,8 @@ export type PanelsDashboardProps = {
    * KPI stat panels and tables are skipped (Tier-2 widgets).
    */
   agentValidated?: boolean;
+  /** Highlight panels added via chat refinement (C181). */
+  highlightQuestionIds?: string[];
 };
 
 function AgentValidationError({
@@ -62,10 +64,12 @@ function ChartTile({
   block,
   height,
   agentValidated,
+  highlighted,
 }: {
   block: TabularPanelBlock;
   height: number;
   agentValidated: boolean;
+  highlighted?: boolean;
 }): ReactElement {
   if (agentValidated) {
     const error = validateAgentChartBlock(block);
@@ -73,7 +77,15 @@ function ChartTile({
       return <AgentValidationError title={block.panel.title} message={error} />;
     }
   }
-  return <Chart panel={block.panel} data={{ rows: block.rows }} height={height} />;
+  return (
+    <div
+      data-question-id={block.questionId}
+      className={highlighted ? "axi-panel-highlight" : undefined}
+      style={{ minWidth: 0, height: "100%" }}
+    >
+      <Chart panel={block.panel} data={{ rows: block.rows }} height={height} />
+    </div>
+  );
 }
 
 export function PanelsDashboard({
@@ -81,10 +93,12 @@ export function PanelsDashboard({
   className,
   flipKpis = true,
   agentValidated = false,
+  highlightQuestionIds = [],
 }: PanelsDashboardProps): ReactElement {
   const columns = panels.columns ?? 2;
   const gap = panels.gap ?? 16;
   const pinTableBottom = panels.layoutVariant === "table-pinned-bottom";
+  const highlightSet = new Set(highlightQuestionIds);
 
   const chartBlocks = pinTableBottom
     ? panels.charts.filter((block) => block.panel.type !== "table")
@@ -152,8 +166,13 @@ export function PanelsDashboard({
           }}
         >
           {chartBlocks.map((block) => (
-            <div key={block.panel.title} style={{ minWidth: 0 }}>
-              <ChartTile block={block} height={280} agentValidated={agentValidated} />
+            <div key={block.questionId ?? block.panel.title} style={{ minWidth: 0 }}>
+              <ChartTile
+                block={block}
+                height={280}
+                agentValidated={agentValidated}
+                highlighted={Boolean(block.questionId && highlightSet.has(block.questionId))}
+              />
             </div>
           ))}
         </div>
@@ -162,7 +181,16 @@ export function PanelsDashboard({
       {tableBlocks.length > 0 ? (
         <div style={{ display: "flex", flexDirection: "column", gap, width: "100%" }}>
           {tableBlocks.map((block) => (
-            <div key={block.panel.title} style={{ minWidth: 0 }}>
+            <div
+              key={block.questionId ?? block.panel.title}
+              data-question-id={block.questionId}
+              className={
+                block.questionId && highlightSet.has(block.questionId)
+                  ? "axi-panel-highlight"
+                  : undefined
+              }
+              style={{ minWidth: 0 }}
+            >
               <Chart panel={block.panel} data={{ rows: block.rows }} height={320} />
             </div>
           ))}

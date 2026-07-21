@@ -1,4 +1,5 @@
 import type { DataProfile } from "@axicharts/charts-spec";
+import { PROFILE_PLANNER_AGENT_WARNING } from "@axicharts/charts-spec";
 import { planFromIntent, planFromProfile, buildPlannerPrompt } from "./plan";
 import type { DashboardPlan, LlmPlannerProvider } from "./types";
 import { parsePlannerJson, validateDashboardPlan } from "./validate";
@@ -18,7 +19,10 @@ export async function planWithProvider(
       return {
         ...validated,
         source: "llm",
+        agentSafe: false,
+        plannerKind: "legacy-profile",
         warnings: [
+          PROFILE_PLANNER_AGENT_WARNING,
           ...(validated.warnings ?? []),
           `Validated output from provider "${provider.id}"`,
         ],

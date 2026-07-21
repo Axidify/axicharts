@@ -38,3 +38,16 @@ export const INVENTORY_CSV = `| SKU | Product | Stock | Reorder Level | Unit Cos
 | WIDGET-02 | Rubber Gasket | 18 | 40 | 2.10 | 5.50 |
 | WIDGET-03 | Copper Wire 2mm | 8 | 25 | 12.00 | 28.00 |
 | WIDGET-04 | Plastic Housing | 95 | 30 | 3.75 | 9.99 |`;
+
+export const INCIDENT_CSV = `| Ticket ID | Priority | Status      | Category | Assigned To | Opened     | Closed     | Resolution Time (hrs) |
+| INC-1001  | High     | Closed      | Network  | Amir        | 2026-07-15 | 2026-07-15 |                   2.4 |
+| INC-1002  | Medium   | In Progress | Software | Sarah       | 2026-07-16 | -          |                     - |
+| INC-1003  | Low      | Closed      | Hardware | Jason       | 2026-07-16 | 2026-07-17 |                  15.6 |
+| INC-1004  | Critical | Closed      | Server   | Amir        | 2026-07-17 | 2026-07-17 |                   1.8 |`;
+
+export const RESTAURANT_CSV = `| Order ID | Menu Item     | Category  | Qty | Revenue (RM) | Order Date |
+| ORD-101  | Nasi Lemak    | Mains     |  42 |       630.00 | 2026-07-18 |
+| ORD-102  | Teh Tarik     | Drinks    |  88 |       352.00 | 2026-07-18 |
+| ORD-103  | Roti Canai    | Mains     |  35 |       245.00 | 2026-07-19 |
+| ORD-104  | Mango Lassi   | Drinks    |  24 |       192.00 | 2026-07-19 |
+| ORD-105  | Satay Platter | Mains     |  18 |       540.00 | 2026-07-20 |`;

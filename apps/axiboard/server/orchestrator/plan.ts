@@ -17,6 +17,7 @@ export function runTabularPlan(
   options: {
     persona?: Persona;
     followUpIntents?: string[];
+    refinementIntent?: string;
     intent?: string;
   } = {},
 ): OrchestratorPlanResult | null {
@@ -45,5 +46,6 @@ export function runTabularPlan(
       chartCount: plan.charts.length,
       needsReview,
     },
+    followUpQuestionIds: plan.followUpQuestionIds,
   };
 }

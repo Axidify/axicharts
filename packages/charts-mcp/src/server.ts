@@ -81,6 +81,30 @@ export function createCartesianMcpServer(
     {
       intent: z.string().describe("Chart intent — must name mark types (bar, line, area)"),
       fields: z.array(z.string()).optional().describe("Row field names from sample data"),
+      rows: rowsSchema.optional().describe("Raw rows — use with groupBy + aggregates to pre-aggregate"),
+      groupBy: z.string().optional().describe("When rows provided, group before binding axes"),
+      aggregates: z
+        .record(
+          z.union([
+            z.object({ op: z.literal("count") }),
+            z.object({ op: z.literal("sum"), field: z.string() }),
+            z.object({ op: z.literal("sum"), fields: z.array(z.string()) }),
+            z.object({ op: z.literal("last"), field: z.string() }),
+          ]),
+        )
+        .optional(),
+      where: z
+        .array(
+          z.object({
+            field: z.string(),
+            op: z.enum(["eq", "neq", "gt", "gte", "lt", "lte"]),
+            value: z.union([z.string(), z.number()]),
+          }),
+        )
+        .optional(),
+      xField: z.string().optional(),
+      yField: z.string().optional(),
+      yFields: z.array(z.string()).optional(),
       dataProfile: dataProfileSchema,
       mode: z.enum(["static", "interactive", "live"]).optional(),
       theme: z.enum(["clean", "studio", "live", "dark"]).optional(),
@@ -177,6 +201,55 @@ export function createCartesianMcpServer(
     async (args) => callTool("plan_dashboard", args),
   );
 
+  server.tool(
+    "list_transform_ops",
+    "List closed transform ops for execute_transform (groupBy + aggregates + where).",
+    {},
+    async () => callTool("list_transform_ops", {}),
+  );
+
+  server.tool(
+    "execute_transform",
+    "Group and aggregate tabular rows before compose_panel or create_cartesian_panel.",
+    {
+      rows: rowsSchema,
+      groupBy: z.string().describe("Dimension field to group by"),
+      aggregates: z
+        .record(
+          z.union([
+            z.object({ op: z.literal("count") }),
+            z.object({ op: z.literal("sum"), field: z.string() }),
+            z.object({ op: z.literal("sum"), fields: z.array(z.string()) }),
+            z.object({ op: z.literal("last"), field: z.string() }),
+          ]),
+        )
+        .describe("Output field name → aggregate spec"),
+      where: z
+        .array(
+          z.object({
+            field: z.string(),
+            op: z.enum(["eq", "neq", "gt", "gte", "lt", "lte"]),
+            value: z.union([z.string(), z.number()]),
+          }),
+        )
+        .optional(),
+    },
+    async (args) => callTool("execute_transform", args),
+  );
+
+  server.tool(
+    "compose_panel",
+    "Compile a PanelRecipe + rows into agent-safe PanelSpec (C174). Prefer over hand-written JSON.",
+    {
+      recipe: z.record(z.unknown()).describe("PanelRecipe from plan_dashboard or catalog"),
+      rows: rowsSchema,
+      dataProfile: dataProfileSchema,
+      mode: z.enum(["static", "interactive", "live"]).optional(),
+      theme: z.enum(["clean", "studio", "live", "dark"]).optional(),
+    },
+    async (args) => callTool("compose_panel", args),
+  );
+
   return server;
 }
 
@@ -200,6 +273,9 @@ export function isToolName(value: string): value is ToolName {
     value === "describe_data_profile" ||
     value === "create_table_panel" ||
     value === "plan_dashboard" ||
+    value === "list_transform_ops" ||
+    value === "execute_transform" ||
+    value === "compose_panel" ||
     value === "compile_cartesian_panel"
   );
 }

@@ -295,7 +295,7 @@ export function buildComboOptions(
                   );
                 }
               : undefined,
-          points: { show: false },
+          points: { show: item.showPoints === true },
         };
       }),
     ],

@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-planner",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Phase 3 server-side dashboard planner — intent parsing, LLM provider hooks, validation with rules fallback.",
   "license": "MIT",
   "repository": {
@@ -42,7 +42,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
-    "@axicharts/charts-spec": "^0.4.34"
+    "@axicharts/charts-spec": "^0.4.35"
   },
   "devDependencies": {
     "@axicharts/charts-spec": "workspace:*",

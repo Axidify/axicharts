@@ -82,6 +82,17 @@ describe("blockMarksToChartProps", () => {
     expect(result.showValues).toBe(true);
   });
 
+  it("maps point marks to line series with showPoints", () => {
+    const result = blockMarksToChartProps(ROWS, [
+      { type: "point", field: "revenue", label: "Revenue" },
+    ]);
+    expect(result.series[0]).toMatchObject({
+      name: "Revenue",
+      kind: "line",
+      showPoints: true,
+    });
+  });
+
   it("maps shared stack id to stacked", () => {
     const result = blockMarksToChartProps(
       [

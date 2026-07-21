@@ -67,6 +67,7 @@ export function planDashboardForMcp(
     intent?: string;
     persona?: Persona;
     followUpIntents?: string[];
+    refinementIntent?: string;
   },
   schemaUrl: string,
 ): McpPlanDashboardResult | { ok: false; error: string } {
@@ -74,6 +75,7 @@ export function planDashboardForMcp(
     intent: options.intent,
     persona: options.persona,
     followUpIntents: options.followUpIntents,
+    refinementIntent: options.refinementIntent,
   });
 
   if (!plan) {

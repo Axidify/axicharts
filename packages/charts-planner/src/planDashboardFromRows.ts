@@ -1,4 +1,4 @@
-import { planFromIntent } from "./plan";
+import { planDashboardShellFromIntent } from "./planShell";
 import type { DashboardPlan } from "./types";
 import {
   planDashboardFromRows as planTabularDashboard,
@@ -23,13 +23,13 @@ export function planDashboardFromRows(
   const tabular = planTabularDashboard(rows, options);
   if (!tabular) return null;
 
-  const dashboardPlan = planFromIntent(tabular.dataProfile, tabular.dashboardIntent);
+  const dashboardPlan = planDashboardShellFromIntent(tabular.dataProfile, tabular.dashboardIntent);
   const shellDecision: TabularPlanDecision = {
     step: "Dashboard shell",
-    api: "planFromIntent",
+    api: "planDashboardShellFromIntent",
     intent: tabular.dashboardIntent,
     status: "ok",
-    notes: `template ${dashboardPlan.template}, feed ${dashboardPlan.feed}, panels ${dashboardPlan.panels.length}`,
+    notes: `template ${dashboardPlan.template}, feed ${dashboardPlan.feed}, tabular panels ${tabular.kpis.length + tabular.charts.length}`,
   };
 
   return {

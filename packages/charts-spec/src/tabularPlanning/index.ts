@@ -1,3 +1,4 @@
+export type { TabularVerticalId, DomainSemantics } from "../classifyTabularDomain";
 export type {
   AnalyticalQuestion,
   Persona,
@@ -47,6 +48,12 @@ export {
 export { suggestAnalyticsFromProfile, type SuggestAnalyticsOptions } from "./suggestAnalyticsFromProfile";
 export { composeLayout, type ComposeLayoutInput, type ComposeLayoutOptions, type LayoutPlan, type LayoutVariant } from "./composeLayout";
 export { extractTabularFromMessage } from "./extractTabularFromMessage";
+export {
+  applyTransformPlans,
+  transformPlanIntents,
+  type AppliedTransformPlan,
+  type TransformPlan,
+} from "./applyTransformPlans";
 export {
   detectIncidentTable,
   suggestIncidentAnalytics,

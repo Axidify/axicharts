@@ -131,6 +131,8 @@ if (!result.ok) {
 
 Empirical simulation: 24 scenarios in `src/compositionSimulation.ts` — run `pnpm --filter @axicharts/charts-spec test compositionSimulation`.
 
+**Render battery:** 41 mount scenarios in `src/renderBatteryCases.ts` — `compilePanel` + RTL mount + DOM surface checks — run `pnpm test:render-battery` (gates `crash === 0` for pass cases).
+
 ## Roadmap slices
 
 | Slice | Status | Deliverable |

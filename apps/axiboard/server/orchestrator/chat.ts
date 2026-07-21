@@ -1,7 +1,14 @@
-import { inferPersonaFromIntent, type Persona } from "@axicharts/charts-spec/planning";
+import {
+  applyTransformPlans,
+  inferPersonaFromIntent,
+  type Persona,
+  type TabularVerticalId,
+  type TransformPlan,
+} from "@axicharts/charts-spec/planning";
 import type { ByokConfig, OrchestratorChatRequest, OrchestratorChatResult } from "../types";
 import { parseChatWithLlm } from "./byok";
 import { runTabularPlan } from "./plan";
+import { refinementAssistantMessage } from "./refinementMessage";
 
 function uniqueStrings(values: string[]): string[] {
   const seen = new Set<string>();
@@ -24,18 +31,6 @@ function isRefinementIntent(message: string): boolean {
   return true;
 }
 
-function followUpPanelsFromPlan(plan: Awaited<ReturnType<typeof runTabularPlan>>): string[] {
-  if (!plan) return [];
-  return plan.charts
-    .filter(
-      (block) =>
-        block.questionId.startsWith("generic.table.below_reorder") ||
-        block.questionId.startsWith("generic.followup."),
-    )
-    .map((block) => block.panel.title ?? block.questionId)
-    .filter((title): title is string => Boolean(title));
-}
-
 export async function runOrchestratorChat(
   rows: Record<string, unknown>[],
   request: OrchestratorChatRequest,
@@ -46,11 +41,13 @@ export async function runOrchestratorChat(
   let followUpIntents = [...(request.followUpIntents ?? [])];
   let llmUsed = false;
   let llmNotes: string | undefined;
+  let llmTransformPlans: TransformPlan[] = [];
 
   if (message) {
     if (byok?.apiKey) {
       const parsed = await parseChatWithLlm(message, byok);
       persona = parsed.persona ?? persona;
+      llmTransformPlans = parsed.transformPlans;
       followUpIntents = uniqueStrings([
         ...followUpIntents,
         ...parsed.followUpIntents,
@@ -70,10 +67,50 @@ export async function runOrchestratorChat(
     persona,
     followUpIntents,
     intent: request.intent,
+    refinementIntent: isRefinementIntent(message) ? message : undefined,
   });
 
   if (!plan) {
     throw new Error("Unable to plan dashboard for this tabular data");
+  }
+
+  if (llmTransformPlans.length > 0) {
+    const applied = applyTransformPlans(rows, llmTransformPlans, {
+      dataProfile: plan.dataProfile,
+      persona: plan.persona,
+      vertical: plan.vertical as TabularVerticalId,
+    });
+    for (const item of applied) {
+      if (!item.ok) continue;
+      const questionId =
+        item.plan.questionId ?? `llm.${item.plan.intent.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 48)}`;
+      const block = {
+        questionId,
+        panel: item.panel,
+        rows: item.rows as Array<Record<string, string | number | boolean>>,
+        decision: {
+          step: "LLM transform plan",
+          api: "applyTransformPlans",
+          intent: item.plan.intent,
+          status: "validated" as const,
+          notes: "C178 structured compose",
+        },
+        validationIssues: [],
+      };
+      if (item.panel.type === "stat" || item.panel.type === "kpi") {
+        plan.kpis.push(block);
+      } else {
+        plan.charts.push(block);
+      }
+      plan.decisions.push(block.decision);
+    }
+    plan.summary = {
+      kpiCount: plan.kpis.length,
+      chartCount: plan.charts.length,
+      needsReview:
+        plan.summary.needsReview ||
+        applied.some((item) => !item.ok),
+    };
   }
 
   const agentComposed = plan.decisions.some((decision) =>
@@ -82,10 +119,15 @@ export async function runOrchestratorChat(
     decision.api === "composeSupportCaseDashboard" ||
     decision.api === "composeDeviceTelemetryDashboard",
   );
-  const addedPanels = isRefinementIntent(message) ? followUpPanelsFromPlan(plan) : [];
+  const followUpQuestionIds = plan.followUpQuestionIds ?? [];
+  const refinementMessage =
+    isRefinementIntent(message) && followUpQuestionIds.length > 0
+      ? refinementAssistantMessage(plan, followUpQuestionIds)
+      : null;
+
   let assistantMessage: string;
-  if (addedPanels.length > 0) {
-    assistantMessage = `Updated dashboard — added ${addedPanels.join(", ")}.`;
+  if (refinementMessage) {
+    assistantMessage = refinementMessage;
   } else if (plan.decisions.some((decision) => decision.api === "composeProjectTaskDashboard")) {
     assistantMessage = `Built a project task dashboard — ${plan.summary.kpiCount} KPIs and ${plan.summary.chartCount} views including status, priority, owners, and the task register.`;
   } else if (plan.decisions.some((decision) => decision.api === "composeSupportCaseDashboard")) {
@@ -103,6 +145,7 @@ export async function runOrchestratorChat(
   return {
     ...plan,
     followUpIntents,
+    followUpQuestionIds: isRefinementIntent(message) ? followUpQuestionIds : [],
     assistantMessage,
     llm: {
       used: llmUsed,

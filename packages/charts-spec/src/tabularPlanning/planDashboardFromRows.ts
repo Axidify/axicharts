@@ -14,6 +14,7 @@ import type { AnalyticalQuestion, Persona, RankQuestionsResult } from "./types";
 import type { PanelRecipe } from "./recipes/types";
 import { composeLayout, type LayoutPlan } from "./composeLayout";
 import { suggestAnalyticsFromProfile } from "./suggestAnalyticsFromProfile";
+import { collectFollowUpRecipes } from "./followUpRecipes";
 import { detectIncidentTable, suggestIncidentAnalytics } from "./composeIncidentDashboard";
 import {
   detectProjectTaskTable,
@@ -57,11 +58,15 @@ export type TabularDashboardPlan = {
   decisions: TabularPlanDecision[];
   layout?: LayoutPlan;
   planSource?: "l4a" | "l4b";
+  /** Question IDs added via follow-up refinement intents (C181). */
+  followUpQuestionIds?: string[];
 };
 
 export type PlanDashboardFromRowsOptions = {
   persona?: Persona;
   followUpIntents?: string[];
+  /** When set, only this intent drives `followUpQuestionIds` (latest chat turn). */
+  refinementIntent?: string;
   enrichment?: TabularEnrichment;
   intent?: string;
 };
@@ -219,6 +224,17 @@ function compileRecipeBlock(
   };
 }
 
+function dedupeRecipesByQuestionId(recipes: PanelRecipe[]): PanelRecipe[] {
+  const seen = new Set<string>();
+  const result: PanelRecipe[] = [];
+  for (const recipe of recipes) {
+    if (seen.has(recipe.questionId)) continue;
+    seen.add(recipe.questionId);
+    result.push(recipe);
+  }
+  return result;
+}
+
 function compileGenericDashboard(
   rows: Record<string, unknown>[],
   options: PlanDashboardFromRowsOptions,
@@ -276,18 +292,33 @@ function compileGenericDashboard(
           ? suggestIncidentAnalytics(rows, fieldProfiles)
           : suggestAnalyticsFromProfile(rows, {
               persona: options.persona,
-              followUpIntents: options.followUpIntents,
               dataProfile: tabularProfile,
             });
 
-  if (recipes.length === 0) return null;
+  const { recipes: followUpRecipes, questionIds: followUpQuestionIds } = collectFollowUpRecipes(
+    options.refinementIntent
+      ? [options.refinementIntent]
+      : (options.followUpIntents ?? []),
+    rows,
+    fieldProfiles,
+    { incident },
+  );
+
+  const allFollowUpRecipes =
+    options.refinementIntent && options.followUpIntents?.length
+      ? collectFollowUpRecipes(options.followUpIntents, rows, fieldProfiles, { incident }).recipes
+      : followUpRecipes;
+
+  const mergedRecipes = dedupeRecipesByQuestionId([...recipes, ...allFollowUpRecipes]);
+
+  if (mergedRecipes.length === 0) return null;
 
   const dataProfile = enrichProfileWithDomain(tabularProfile).profile;
   const persona = options.persona ?? "manager";
   const kpis: TabularPlanBlock[] = [];
   const charts: TabularPlanBlock[] = [];
 
-  for (const recipe of recipes) {
+  for (const recipe of mergedRecipes) {
     const block = compileRecipeBlock(recipe, enrichment, dataProfile, decisions, recipe.panelType === "stat" ? "KPI" : "Chart");
     if (!block) continue;
     if (recipe.panelType === "stat") kpis.push(block);
@@ -315,6 +346,7 @@ function compileGenericDashboard(
     decisions,
     layout,
     planSource: "l4b",
+    followUpQuestionIds,
   };
 }
 
@@ -488,8 +520,14 @@ export function planDashboardFromRows(
     .filter((block): block is TabularPlanBlock => block != null);
 
   const seenChartIds = new Set(chartIds);
-  for (const intent of options.followUpIntents ?? []) {
+  const followUpQuestionIds: string[] = [];
+  const refinementIntent = options.refinementIntent?.trim();
+  const intentsToApply = options.followUpIntents ?? [];
+
+  for (const intent of intentsToApply) {
     const matches = findQuestionsForIntent(intent, vertical);
+    const isHighlightIntent = !refinementIntent || intent === refinementIntent;
+
     pushDecision(decisions, {
       step: "Follow-up intent",
       api: "findQuestionsForIntent",
@@ -504,6 +542,7 @@ export function planDashboardFromRows(
     for (const question of matches) {
       if (seenChartIds.has(question.id)) continue;
       seenChartIds.add(question.id);
+      if (isHighlightIntent) followUpQuestionIds.push(question.id);
       const block = compileQuestionBlock(
         question.id,
         enrichment,
@@ -535,5 +574,6 @@ export function planDashboardFromRows(
     decisions,
     layout,
     planSource: "l4a",
+    followUpQuestionIds,
   };
 }

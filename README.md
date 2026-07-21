@@ -104,6 +104,7 @@ if (!check.ok) throw check.errors;
 
 - **5-minute MCP tutorial:** [docs /guides/agent-families](https://axidify.github.io/axicharts/guides/agent-families)
 - Cartesian deep dive: [docs /guides/agent-cartesian](https://axidify.github.io/axicharts/guides/agent-cartesian)
+- MCP tool schemas: [docs /guides/agent-mcp-schemas](https://axidify.github.io/axicharts/guides/agent-mcp-schemas)
 - MCP server: `@axicharts/charts-mcp`
 
 ### Migrating from Recharts / shadcn Charts

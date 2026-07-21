@@ -11,6 +11,7 @@ export type {
 export {
   isTemplateId,
   parsePlannerJson,
+  validateAgentDashboardPlan,
   validateDashboardPlan,
   validatePanelSpec,
   validatePanelSpecs,
@@ -19,6 +20,7 @@ export { enrichProfileFromIntent } from "./intent";
 export { inferTemplateFromIntent, inferMosaicPresetFromIntent, inferFeed } from "./plan";
 export {
   buildPlannerPrompt,
+  planDashboardShellFromIntent,
   planFromIntent,
   planFromProfile,
 } from "./plan";

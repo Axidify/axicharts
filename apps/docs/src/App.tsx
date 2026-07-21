@@ -19,6 +19,7 @@ import { ShadcnPage } from "./pages/ShadcnPage";
 import { ShadcnRegistryPage } from "./pages/ShadcnRegistryPage";
 import { AgentCartesianGuidePage } from "./pages/AgentCartesianGuidePage";
 import { AgentFamiliesGuidePage } from "./pages/AgentFamiliesGuidePage";
+import { AgentMcpSchemasPage } from "./pages/AgentMcpSchemasPage";
 import { BrandingPage } from "./pages/BrandingPage";
 import { ThemePlaygroundPage } from "./pages/ThemePlaygroundPage";
 import { BenchmarksPage } from "./pages/BenchmarksPage";
@@ -43,6 +44,7 @@ export function App(): ReactElement {
           <Route path="guides/branding" element={<BrandingPage />} />
           <Route path="guides/agent-families" element={<AgentFamiliesGuidePage />} />
           <Route path="guides/agent-cartesian" element={<AgentCartesianGuidePage />} />
+          <Route path="guides/agent-mcp-schemas" element={<AgentMcpSchemasPage />} />
           <Route path="guides/csv-dashboard" element={<CsvDashboardGuidePage />} />
           <Route path="guides/versions" element={<VersionMatrixPage />} />
           <Route path="guides/troubleshooting" element={<TroubleshootingPage />} />

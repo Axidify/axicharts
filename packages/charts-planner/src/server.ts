@@ -4,6 +4,14 @@ import { planFromIntent, planFromProfile } from "./plan";
 import { planWithProvider } from "./provider";
 import type { LlmPlannerProvider, PlannerRequest } from "./types";
 
+const LEGACY_PLANNER_AGENT_ERROR = {
+  ok: false,
+  code: "LEGACY_PLANNER_NOT_AGENT_SAFE",
+  error:
+    "Profile planner is not agent grammar (Tier-2 panel types). Use MCP plan_dashboard or planDashboardFromRows with tabular rows.",
+  useInstead: "plan_dashboard",
+};
+
 async function readJsonBody(request: IncomingMessage): Promise<unknown> {
   const chunks: Buffer[] = [];
   for await (const chunk of request) {
@@ -47,6 +55,11 @@ export function createPlannerServer(options: PlannerServerOptions = {}) {
         const body = await readJsonBody(request);
         if (!isPlannerRequest(body) || !Array.isArray(body.profile.metrics)) {
           sendJson(response, 400, { error: "Request must include profile.metrics" });
+          return;
+        }
+
+        if (body.agent === true) {
+          sendJson(response, 400, LEGACY_PLANNER_AGENT_ERROR);
           return;
         }
 

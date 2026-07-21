@@ -1,0 +1,433 @@
+[
+  {
+    "name": "create_panel",
+    "description": "Create a panel from intent. Dispatches by family (cartesian shipped). Prefer over create_cartesian_panel.",
+    "schemaUrl": "@axicharts/charts-spec/schema/cartesian-panel.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "family",
+        "intent"
+      ],
+      "properties": {
+        "family": {
+          "enum": [
+            "cartesian",
+            "distribution",
+            "matrix"
+          ]
+        },
+        "intent": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dataProfile": {
+          "type": "object"
+        },
+        "mode": {
+          "enum": [
+            "static",
+            "interactive",
+            "live"
+          ]
+        },
+        "theme": {
+          "enum": [
+            "clean",
+            "studio",
+            "live",
+            "dark"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "validate_panel",
+    "description": "Validate a panel spec against sample rows. Dispatches by family. Prefer over validate_cartesian_spec.",
+    "schemaUrl": "@axicharts/charts-spec/schema/cartesian-panel.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "spec"
+      ],
+      "properties": {
+        "spec": {
+          "type": "object"
+        },
+        "dataProfile": {
+          "type": "object"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "strict": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  {
+    "name": "list_marks",
+    "description": "List closed mark catalog for a chart family.",
+    "schemaUrl": "@axicharts/charts-spec/schema/cartesian-panel.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "family"
+      ],
+      "properties": {
+        "family": {
+          "enum": [
+            "cartesian",
+            "distribution",
+            "matrix"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "create_cartesian_panel",
+    "description": "Create a cartesian panel from natural-language intent. Intent must name mark types (bar, line, area). Pass rows + groupBy + aggregates to pre-aggregate.",
+    "schemaUrl": "@axicharts/charts-spec/schema/cartesian-panel.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "intent"
+      ],
+      "properties": {
+        "intent": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "groupBy": {
+          "type": "string"
+        },
+        "aggregates": {
+          "type": "object"
+        },
+        "where": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "xField": {
+          "type": "string"
+        },
+        "yField": {
+          "type": "string"
+        },
+        "yFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dataProfile": {
+          "type": "object"
+        },
+        "mode": {
+          "enum": [
+            "static",
+            "interactive",
+            "live"
+          ]
+        },
+        "theme": {
+          "enum": [
+            "clean",
+            "studio",
+            "live",
+            "dark"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "validate_cartesian_spec",
+    "description": "Validate a cartesian panel spec against sample rows or data profile.",
+    "schemaUrl": "@axicharts/charts-spec/schema/cartesian-panel.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "spec"
+      ],
+      "properties": {
+        "spec": {
+          "type": "object"
+        },
+        "dataProfile": {
+          "type": "object"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "revise_cartesian_panel",
+    "description": "Revise an existing cartesian panel from a follow-up instruction.",
+    "schemaUrl": "@axicharts/charts-spec/schema/cartesian-panel.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "spec",
+        "instruction"
+      ],
+      "properties": {
+        "spec": {
+          "type": "object"
+        },
+        "instruction": {
+          "type": "string"
+        },
+        "dataProfile": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  {
+    "name": "list_cartesian_marks",
+    "description": "List the closed v1 cartesian mark catalog.",
+    "schemaUrl": "@axicharts/charts-spec/schema/cartesian-panel.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "describe_data_profile",
+    "description": "Infer field names and roles from data profile or sample rows.",
+    "schemaUrl": "@axicharts/charts-spec/schema/data-profile.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "dataProfile": {
+          "type": "object",
+          "description": "Data profile input — see @axicharts/charts-spec/schema/data-profile.schema.json"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "compile_cartesian_panel",
+    "description": "Validate and compile a cartesian panel (smoke test).",
+    "schemaUrl": "@axicharts/charts-spec/schema/cartesian-panel.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "spec",
+        "rows"
+      ],
+      "properties": {
+        "spec": {
+          "type": "object"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "create_table_panel",
+    "description": "Create a table panel for transaction lists or row previews.",
+    "schemaUrl": "@axicharts/charts-spec/schema/cartesian-panel.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "key"
+            ],
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "align": {
+                "enum": [
+                  "left",
+                  "right"
+                ]
+              }
+            }
+          }
+        },
+        "compact": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  {
+    "name": "plan_dashboard",
+    "description": "Plan a tabular dashboard — C157 compiled KPIs/charts, decision log, persona, ranked questions, and dashboard shell (C159).",
+    "schemaUrl": "@axicharts/charts-spec/schema/data-profile.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "type": "string"
+        },
+        "csv": {
+          "type": "string"
+        },
+        "dataProfile": {
+          "type": "object"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "persona": {
+          "type": "string",
+          "enum": [
+            "executive",
+            "manager",
+            "analyst",
+            "operator"
+          ]
+        },
+        "followUpIntents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "list_transform_ops",
+    "description": "List closed transform ops for execute_transform.",
+    "schemaUrl": "@axicharts/charts-spec/schema/data-profile.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "execute_transform",
+    "description": "Group and aggregate tabular rows (aggregateRows).",
+    "schemaUrl": "@axicharts/charts-spec/schema/data-profile.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "rows",
+        "groupBy",
+        "aggregates"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "groupBy": {
+          "type": "string"
+        },
+        "aggregates": {
+          "type": "object"
+        },
+        "where": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
+  {
+    "name": "compose_panel",
+    "description": "Compile a PanelRecipe + rows into agent-safe PanelSpec (C174).",
+    "schemaUrl": "@axicharts/charts-spec/schema/cartesian-panel.schema.json",
+    "inputSchema": {
+      "type": "object",
+      "required": [
+        "recipe",
+        "rows"
+      ],
+      "properties": {
+        "recipe": {
+          "type": "object"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "dataProfile": {
+          "type": "object"
+        },
+        "mode": {
+          "enum": [
+            "static",
+            "interactive",
+            "live"
+          ]
+        },
+        "theme": {
+          "enum": [
+            "clean",
+            "studio",
+            "live",
+            "dark"
+          ]
+        }
+      }
+    }
+  }
+]

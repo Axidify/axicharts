@@ -3,7 +3,7 @@ import { parseTabular, planDashboardFromRows, validateCartesianSpec } from "./in
 import { SAMPLE_LEDGER_TEXT } from "../../../apps/axiboard/src/tabular/sampleLedger";
 
 describe("ledger agent panels validate", () => {
-  it("all cartesian panels pass validateCartesianSpec", () => {
+  it("all chart panels pass agent grammar including waterfall bridge", () => {
     const rows = parseTabular(SAMPLE_LEDGER_TEXT);
     const plan = planDashboardFromRows(rows, {
       followUpIntents: [
@@ -18,22 +18,22 @@ describe("ledger agent panels validate", () => {
     const failures: string[] = [];
     for (const block of [...plan!.kpis, ...plan!.charts]) {
       if (block.panel.type === "table" || block.panel.type === "stat") continue;
-      if (block.panel.type === "waterfall") {
-        expect(block.decision.status, block.questionId).toBe("needs_review");
-        expect(
-          block.validationIssues.some((issue) => issue.code === "TIER2_PANEL"),
-          block.questionId,
-        ).toBe(true);
+      expect(block.decision.status, block.questionId).not.toBe("needs_review");
+      expect(block.validationIssues, block.questionId).toEqual([]);
+      if (block.panel.type !== "cartesian" && block.panel.type !== "blocks") {
+        failures.push(`${block.questionId}: unexpected panel type ${block.panel.type}`);
         continue;
       }
-      if (block.panel.type !== "cartesian" && block.panel.type !== "blocks") continue;
       const validation = validateCartesianSpec(block.panel, { rows: block.rows });
       if (!validation.ok) {
         failures.push(
-          `${block.panel.title}: ${validation.errors.map((e) => e.message).join("; ")} | keys=${Object.keys(block.rows[0] ?? {}).join(",")} | marks=${block.panel.marks?.map((m) => m.field).join(",")}`,
+          `${block.panel.title}: ${validation.errors.map((e) => e.message).join("; ")}`,
         );
       }
     }
     expect(failures, failures.join("\n")).toEqual([]);
+
+    const bridge = plan!.charts.find((block) => block.questionId === "ledger.chart.waterfall");
+    expect(bridge?.panel.type).toBe("cartesian");
   });
 });

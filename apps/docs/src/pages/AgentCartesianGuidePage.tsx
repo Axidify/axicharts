@@ -1,54 +1,83 @@
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
-import { docBodyStyle, docCardStyle } from "../styles/docTokens";
+import { AgentErrorGallery } from "../components/AgentErrorGallery";
+import { EjectWalkthrough } from "../components/EjectWalkthrough";
+import { docBodyStyle } from "../styles/docTokens";
 
-const examples = [
-  {
-    code: "UNKNOWN_FIELD",
-    bad: `{ "type": "cartesian", "encoding": { "x": { "field": "wek" } }, "marks": [{ "mark": "line", "field": "revenue" }] }`,
-    fixed: `{ "encoding": { "x": { "field": "week" } } }`,
-    note: "Validator suggests closest column name.",
-  },
-  {
-    code: "MISSING_DATA_MARK",
-    bad: `{ "type": "cartesian", "marks": [{ "mark": "rule", "value": 50 }] }`,
-    fixed: `{ "marks": [{ "mark": "bar", "field": "revenue" }, { "mark": "rule", "value": 50 }] }`,
-    note: "Overlays need at least one data mark (bar/line/area).",
-  },
-  {
-    code: "INVALID_BAND_RANGE",
-    bad: `{ "marks": [{ "mark": "band", "min": 80, "max": 20 }] }`,
-    fixed: `{ "marks": [{ "mark": "band", "min": 20, "max": 80 }] }`,
-    note: "Band min must be less than max.",
-  },
-] as const;
+const MCP_TUTORIAL = `# Cursor / Claude Desktop (~/.cursor/mcp.json)
+{
+  "mcpServers": {
+    "axicharts": {
+      "command": "npx",
+      "args": ["-y", "@axicharts/charts-mcp"]
+    }
+  }
+}
 
-const TUTORIAL_CODE = `import { Chart, validateCartesianSpec, normalizeToCartesian } from "@axicharts/charts-spec";
+# 1. Profile sample rows
+describe_data_profile({ rows: sampleRows })
+
+# 2. Draft cartesian panel (intent must name bar/line/area)
+create_panel({
+  family: "cartesian",
+  intent: "weekly revenue bars with target line at 50",
+  fields: ["week", "revenue", "target"]
+})
+
+# Or low-level cartesian + pre-aggregate raw rows:
+execute_transform({
+  rows: rawRows,
+  groupBy: "status",
+  aggregates: { count: { op: "count" } }
+})
+create_cartesian_panel({
+  intent: "bar chart of count by status",
+  rows: transformed.rows,
+  groupBy: "status",
+  aggregates: { count: { op: "count" } },
+  xField: "status",
+  yField: "count"
+})
+
+# 3. Validate (mandatory)
+validate_panel({ spec: panel, rows: sampleRows, strict: true })
+
+# 4. On error — apply fix patch, retry
+# UNKNOWN_FIELD → errors[0].fix["marks[0].field"] = "revenue"
+
+# 5. Render
+import { Chart } from "@axicharts/charts-spec";
+<Chart panel={validated.spec} data={rows} />
+
+# 6. Pin when done
+npx @axicharts/charts-spec eject panel.json`;
+
+const SDK_TUTORIAL = `import {
+  Chart,
+  validatePanel,
+  normalizeToCartesian,
+} from "@axicharts/charts-spec";
 
 const panel = normalizeToCartesian(agentOutput);
-const check = validateCartesianSpec(panel, { rows: data });
+const check = validatePanel(panel, { rows: data, strict: true });
 
 if (!check.ok) {
-  // Agent retries with check.errors — codes + field suggestions
+  // Agent retries with check.errors — codes, suggestions, fix patches
   throw check.errors;
 }
 
-// Same render path as hand-built JSX
-<Chart panel={check.spec ?? panel} data={data} />
-
-// Pin to codebase when done:
-// npx @axicharts/charts-spec eject panel.json`;
+<Chart panel={check.spec ?? panel} data={data} />`;
 
 export function AgentCartesianGuidePage(): ReactElement {
   return (
     <div>
       <h1 style={{ marginTop: 0 }}>Agent cartesian — validate → retry → eject</h1>
       <p style={docBodyStyle()}>
-        5-minute loop for LLM/MCP agents emitting <code>type: &quot;cartesian&quot;</code> panels.
-        Invalid specs fail <strong>before</strong> render — agents self-correct from structured errors.
+        End-to-end loop for LLM/MCP agents emitting <code>type: &quot;cartesian&quot;</code> panels.
+        Start with the <Link to="/guides/agent-families">families overview</Link> if you need distribution or matrix too.
       </p>
 
-      <h2 style={{ fontSize: 16 }}>1. Validate before render</h2>
+      <h2 style={{ fontSize: 16 }}>1. MCP workflow</h2>
       <pre
         style={{
           padding: 14,
@@ -60,52 +89,64 @@ export function AgentCartesianGuidePage(): ReactElement {
           overflow: "auto",
         }}
       >
-        {TUTORIAL_CODE}
+        {MCP_TUTORIAL}
       </pre>
 
-      <h2 style={{ fontSize: 16, marginTop: 28 }}>2. Try in playground</h2>
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>2. SDK validate before render</h2>
+      <pre
+        style={{
+          padding: 14,
+          borderRadius: 8,
+          background: "#0f172a",
+          color: "#e2e8f0",
+          fontSize: 11,
+          lineHeight: 1.5,
+          overflow: "auto",
+        }}
+      >
+        {SDK_TUTORIAL}
+      </pre>
+
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>3. Tabular dashboards</h2>
       <p style={docBodyStyle()}>
-        <Link to="/spec/blocks">Blocks Playground</Link> — edit JSON, see chart, eject JSX. Use{" "}
-        <strong>Generate spec</strong> for agent eval fixtures.
+        For CSV/chat tables, prefer <code>plan_dashboard</code> over hand-built panels — returns compiled KPIs,
+        charts, decision log, and ranked follow-up questions. Then validate each block with{" "}
+        <code>validate_panel</code>.
       </p>
 
-      <h2 style={{ fontSize: 16, marginTop: 28 }}>3. Bad → fixed</h2>
-      <div style={{ display: "grid", gap: 12 }}>
-        {examples.map((ex) => (
-          <div key={ex.code} style={{ ...docCardStyle(), padding: 16, boxShadow: "none" }}>
-            <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8 }}>
-              <code>{ex.code}</code>
-            </div>
-            <p style={{ margin: "0 0 8px", fontSize: 13, color: "#64748b" }}>{ex.note}</p>
-            <pre
-              style={{
-                margin: "0 0 8px",
-                padding: 10,
-                background: "#fef2f2",
-                borderRadius: 6,
-                fontSize: 11,
-                overflow: "auto",
-              }}
-            >
-              {ex.bad}
-            </pre>
-            <pre
-              style={{
-                margin: 0,
-                padding: 10,
-                background: "#f0fdf4",
-                borderRadius: 6,
-                fontSize: 11,
-                overflow: "auto",
-              }}
-            >
-              {ex.fixed}
-            </pre>
-          </div>
-        ))}
-      </div>
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>4. Playground presets (Generate spec)</h2>
+      <p style={docBodyStyle()}>
+        <Link to="/spec/blocks">Blocks Playground</Link> — edit JSON, preview chart, eject JSX. Open a
+        RFC-002 preset, tweak intent/data, then click <strong>Generate spec</strong> for agent eval fixtures:
+      </p>
+      <ul style={{ ...docBodyStyle(), fontSize: 13, paddingLeft: 20 }}>
+        <li>
+          <Link to="/spec/blocks?preset=revenue-target">revenue-target</Link> — bar, line, rule, band
+        </li>
+        <li>
+          <Link to="/spec/blocks?preset=ops-slo">ops-slo</Link> — latency trend + SLO overlays
+        </li>
+        <li>
+          <Link to="/spec/blocks?preset=studio-cell">studio-cell</Link> — compact bar cell
+        </li>
+        <li>
+          <Link to="/spec/blocks?preset=dual-metric">dual-metric</Link> — bar + line dual axis
+        </li>
+      </ul>
 
-      <h2 style={{ fontSize: 16, marginTop: 28 }}>4. Eject to React</h2>
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>5. Eject walkthrough (invalid → fixed → JSX)</h2>
+      <p style={{ ...docBodyStyle(), fontSize: 13 }}>
+        Interactive one-step repair: typo in <code>encoding.x.field</code>, validate, eject composable React.
+      </p>
+      <EjectWalkthrough />
+
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>6. Bad → fixed gallery</h2>
+      <p style={{ ...docBodyStyle(), fontSize: 13 }}>
+        One example per major validator code — cartesian, distribution, matrix, and cross-family strict gate.
+      </p>
+      <AgentErrorGallery />
+
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>7. Eject CLI</h2>
       <pre
         style={{
           padding: 14,
@@ -117,8 +158,8 @@ export function AgentCartesianGuidePage(): ReactElement {
         npx @axicharts/charts-spec eject panel.json
       </pre>
       <p style={{ ...docBodyStyle(), fontSize: 13 }}>
-        Emits composable <code>CartesianChart</code> blocks by default — same tree agents compiled.
-        Full reference:{" "}
+        Tool schemas: <Link to="/guides/agent-mcp-schemas">MCP OpenAPI bundle</Link>
+        {" · "}
         <a
           href="https://github.com/Axidify/axicharts/blob/main/packages/charts-spec/CARTESIAN.md"
           target="_blank"
@@ -126,26 +167,6 @@ export function AgentCartesianGuidePage(): ReactElement {
         >
           CARTESIAN.md
         </a>
-        {" · "}
-        <a
-          href="https://github.com/Axidify/axiboard/blob/main/docs/charts/rfcs/RFC-002-cartesian-building-blocks.md"
-          target="_blank"
-          rel="noreferrer"
-        >
-          RFC-002
-        </a>
-      </p>
-
-      <p style={{ ...docBodyStyle(), marginTop: 24, fontSize: 13 }}>
-        Composition simulation: <strong>16 valid / 8 throw / 0 silent_bad</strong> — see{" "}
-        <a
-          href="https://github.com/Axidify/axiboard/blob/main/docs/charts/rfcs/RFC-002-composition-simulation.md"
-          target="_blank"
-          rel="noreferrer"
-        >
-          simulation report
-        </a>
-        .
       </p>
     </div>
   );

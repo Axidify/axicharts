@@ -1,21 +1,42 @@
 # @axicharts/charts-mcp
 
-MCP server for **RFC-002 cartesian** panel authoring. Wraps `@axicharts/charts-spec` planner and validation APIs so external agents can compose `type: "cartesian"` + `marks[]` without repo context.
+MCP server for **RFC-004 agent chart families** — cartesian, distribution, and matrix. Wraps `@axicharts/charts-spec` planner and validation APIs so external agents compose closed `marks[]` grammars without repo context.
 
-## Tools
+## Tools (Tier 0)
 
 | Tool | Purpose |
 |------|---------|
-| `create_cartesian_panel` | Intent + fields → `PanelSpec` |
-| `validate_cartesian_spec` | Spec + rows → `{ ok, spec?, errors[] }` |
-| `revise_cartesian_panel` | Multi-turn revise (add rule/band/line) |
-| `list_cartesian_marks` | Closed v1 mark catalog |
+| `create_panel` | Intent + family → `PanelSpec` (prefer over legacy per-family tools) |
+| `validate_panel` | Spec + rows → `{ ok, spec?, errors[] }` with `fix` patches |
+| `list_marks` | Closed mark catalog per family |
+| `plan_dashboard` | Tabular CSV/rows → KPIs, charts, decisions, persona |
+| `compose_panel` | `PanelRecipe` + rows → validated `PanelSpec` (C174) |
+| `execute_transform` | `aggregateRows` — groupBy + aggregates + where |
+| `list_transform_ops` | Closed transform algebra catalog |
 | `describe_data_profile` | Field names + inferred roles |
-| `plan_dashboard` | C157/C159 tabular dashboard — KPIs, charts, decisions, persona |
-| `create_table_panel` | Row preview / transaction table panel |
-| `compile_cartesian_panel` | Validate + compile smoke test |
 
-All cartesian tools reference schema: `@axicharts/charts-spec/schema/cartesian-panel.schema.json`. `describe_data_profile` uses `@axicharts/charts-spec/schema/data-profile.schema.json`.
+## Tools (cartesian debug / compat)
+
+| Tool | Purpose |
+|------|---------|
+| `create_cartesian_panel` | Intent + optional `rows`/`groupBy` pre-aggregate |
+| `validate_cartesian_spec` | Cartesian-only validation |
+| `revise_cartesian_panel` | Multi-turn revise (add rule/band/line) |
+| `list_cartesian_marks` | Cartesian mark catalog |
+| `compile_cartesian_panel` | Validate + compile smoke test |
+| `create_table_panel` | Row preview / transaction table |
+
+Schema URLs: `cartesian-panel.schema.json` · `data-profile.schema.json` on relevant tools.
+
+## OpenAPI tool bundle (non-MCP agents)
+
+```ts
+import { OPENAPI_TOOL_BUNDLE } from "@axicharts/charts-mcp/openapi";
+```
+
+Published JSON (after build): `openapi/tools.bundle.json` in this package.
+
+Docs: [Agent MCP schemas](https://axidify.github.io/axicharts/guides/agent-mcp-schemas)
 
 ## Cursor / Claude Desktop
 
@@ -24,7 +45,7 @@ All cartesian tools reference schema: `@axicharts/charts-spec/schema/cartesian-p
 ```json
 {
   "mcpServers": {
-    "axicharts-cartesian": {
+    "axicharts": {
       "command": "npx",
       "args": ["-y", "@axicharts/charts-mcp"]
     }
@@ -32,68 +53,27 @@ All cartesian tools reference schema: `@axicharts/charts-spec/schema/cartesian-p
 }
 ```
 
-**Local monorepo (recommended for axiboard dev)** — uses `~/.cursor/run-charts-mcp.sh`:
-
-```json
-{
-  "mcpServers": {
-    "axicharts-cartesian": {
-      "command": "bash",
-      "args": ["/Users/axidrain/.cursor/run-charts-mcp.sh"],
-      "env": {
-        "AXICHARTS_ROOT": "/Users/axidrain/Projects/axicharts"
-      }
-    }
-  }
-}
-```
-
 See [examples/cursor-mcp.json](./examples/cursor-mcp.json).
-
-## Local dev (monorepo)
-
-```bash
-pnpm --filter @axicharts/charts-mcp build
-node packages/charts-mcp/dist/cli.js
-```
-
-Or from repo root after build:
-
-```json
-{
-  "mcpServers": {
-    "axicharts-cartesian": {
-      "command": "node",
-      "args": ["/absolute/path/to/axicharts/packages/charts-mcp/dist/cli.js"]
-    }
-  }
-}
-```
-
-## OpenAPI tool bundle
-
-For non-MCP agents (LangChain, Vercel AI SDK):
-
-```ts
-import { OPENAPI_TOOL_BUNDLE } from "@axicharts/charts-mcp/openapi";
-```
-
-## Agent skill
-
-See [agent-skills/cartesian/SKILL.md](./agent-skills/cartesian/SKILL.md) — when to use marks, retry loop, MCP workflow.
 
 ## Typical agent loop
 
 1. `describe_data_profile` — learn field names and roles  
-2. `plan_dashboard` — **C159** full tabular plan: compiled KPIs/charts, decision log, persona, ranked questions  
-3. `create_cartesian_panel` — draft or tweak a single panel from intent (must name bar/line/area)  
-4. `validate_cartesian_spec` — check against sample rows; retry on `UNKNOWN_FIELD`  
-5. `revise_cartesian_panel` — follow-up (“add quota at 50”)  
-6. `compile_cartesian_panel` — smoke before handoff  
+2. `plan_dashboard` — full tabular plan (preferred for CSV/chat tables)  
+3. `create_panel` — single panel from intent (must name mark types for cartesian)  
+4. `execute_transform` + `compose_panel` — when you need explicit aggregation recipes  
+5. `validate_panel` — mandatory; retry on `UNKNOWN_FIELD` using `fix` patches  
+6. `compile_cartesian_panel` — optional smoke before handoff  
 
 For tabular CSV uploads, prefer `plan_dashboard` over hand-building panels.
+
+## Agent skills
+
+- [agent-skills/families](./agent-skills/families/SKILL.md) — 3-family overview  
+- [agent-skills/cartesian](./agent-skills/cartesian/SKILL.md) — cartesian deep dive  
+- [agent-skills/distribution](./agent-skills/distribution/SKILL.md)  
+- [agent-skills/matrix](./agent-skills/matrix/SKILL.md)
 
 ## Related packages
 
 - `@axicharts/charts-spec` — validation, compile, playground  
-- `@axicharts/charts-planner` — full dashboard planning (uses cartesian marks after C139)
+- `@axicharts/charts-planner` — tabular `planDashboardFromRows`

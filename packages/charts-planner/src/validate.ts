@@ -1,5 +1,10 @@
 import type { PanelSpec, TemplateId } from "@axicharts/charts-spec/planning";
-import { SPEC_VERSION, isRegisteredTemplate } from "@axicharts/charts-spec/planning";
+import {
+  SPEC_VERSION,
+  agentRuntimePanelIssues,
+  isRegisteredTemplate,
+  validatePanel,
+} from "@axicharts/charts-spec/planning";
 import type { DashboardPlan } from "./types";
 
 const MOSAIC_PRESET_IDS = new Set<string>([
@@ -52,6 +57,8 @@ export function isTemplateId(value: string): value is TemplateId {
   return TEMPLATE_IDS.has(value) || isRegisteredTemplate(value);
 }
 
+const AGENT_PANEL_TYPES = new Set(["cartesian", "blocks", "distribution", "matrix"]);
+
 export function validatePanelSpec(raw: unknown): PanelSpec | null {
   if (!isRecord(raw) || typeof raw.type !== "string") return null;
   if (!PANEL_TYPES.has(raw.type) && !raw.type) return null;
@@ -59,10 +66,18 @@ export function validatePanelSpec(raw: unknown): PanelSpec | null {
   const version = raw.specVersion;
   if (version != null && version !== SPEC_VERSION) return null;
 
-  return {
+  const panel = {
     specVersion: SPEC_VERSION,
     ...(raw as PanelSpec),
   };
+
+  if (AGENT_PANEL_TYPES.has(panel.type)) {
+    const validation = validatePanel(panel, { strict: true });
+    if (!validation.ok) return null;
+    return validation.spec;
+  }
+
+  return panel;
 }
 
 export function validatePanelSpecs(raw: unknown): PanelSpec[] | null {
@@ -108,6 +123,49 @@ export function validateDashboardPlan(raw: unknown): DashboardPlan | null {
     presentation: raw.presentation === true || mode === "presentation",
     mosaicPreset,
     panels,
+    agentSafe: false,
+    plannerKind: "legacy-profile",
+    warnings: Array.isArray(raw.warnings)
+      ? raw.warnings.filter((item): item is string => typeof item === "string")
+      : undefined,
+  };
+}
+
+/** Reject legacy profile-planner panel types on agent paths (B3). */
+export function validateAgentDashboardPlan(raw: unknown): DashboardPlan | null {
+  if (!isRecord(raw) || typeof raw.template !== "string" || !isTemplateId(raw.template)) {
+    return null;
+  }
+  if (!Array.isArray(raw.panels)) return null;
+
+  const panels: PanelSpec[] = [];
+  for (const item of raw.panels) {
+    if (!isRecord(item) || typeof item.type !== "string") return null;
+    const panel = {
+      specVersion: SPEC_VERSION,
+      ...(item as PanelSpec),
+    };
+    if (agentRuntimePanelIssues(panel).length > 0) return null;
+    panels.push(panel);
+  }
+
+  const layout = raw.layout === "mosaic" ? "mosaic" : "embed";
+  const feed =
+    typeof raw.feed === "string" && FEEDS.has(raw.feed)
+      ? (raw.feed as DashboardPlan["feed"])
+      : "historian";
+
+  return {
+    source: "llm",
+    template: raw.template,
+    title: typeof raw.title === "string" ? raw.title : undefined,
+    subtitle: typeof raw.subtitle === "string" ? raw.subtitle : undefined,
+    layout,
+    feed,
+    presentation: raw.presentation === true,
+    panels,
+    agentSafe: true,
+    plannerKind: "tabular",
     warnings: Array.isArray(raw.warnings)
       ? raw.warnings.filter((item): item is string => typeof item === "string")
       : undefined,

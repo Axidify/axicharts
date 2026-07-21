@@ -12,6 +12,7 @@ const topLinks = [
   { to: "/benchmarks", label: "Benchmarks" },
   { to: "/guides/agent-families", label: "Agent families (MCP)" },
   { to: "/guides/agent-cartesian", label: "Agent cartesian" },
+  { to: "/guides/agent-mcp-schemas", label: "MCP tool schemas" },
   { to: "/guides/troubleshooting", label: "Troubleshooting" },
   { to: "/compare/design", label: "vs Recharts" },
   { to: "/shadcn", label: "shadcn gallery" },

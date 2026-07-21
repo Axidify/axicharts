@@ -37,8 +37,8 @@ export function TroubleshootingPage(): ReactElement {
           <code>minHeight</code> on <code>ChartContainer</code> is the <strong>plot area</strong> budget.
           Multi-series legends render below the plot and the container grows automatically — single- and
           multi-series cards in the same CSS grid row keep aligned canvases. Use{" "}
-          <code>legendVariant=&quot;compact&quot;</code> in tight tiles; set{" "}
-          <code>emptyMessage</code> for all-zero trends (empty state is automatic).
+          <code>legendVariant=&quot;compact&quot;</code> in tight tiles. All-zero weeks still render axes
+          and category clicks; a dashed <strong>All values are zero</strong> caption appears over the plot.
         </p>
         <pre
           style={{

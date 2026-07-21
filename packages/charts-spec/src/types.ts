@@ -64,7 +64,7 @@ export type PanelStyleSpec = {
 };
 
 export type ChartBlockSeriesMark = {
-  type: "line" | "bar" | "area";
+  type: "line" | "bar" | "area" | "point";
   /** Quantitative field on each row. */
   field: string;
   label?: string;

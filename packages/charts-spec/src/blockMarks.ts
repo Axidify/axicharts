@@ -48,7 +48,7 @@ function resolveDualAxis(marks: ChartBlockMarkSpec[]): DualAxisMode | undefined 
   return undefined;
 }
 
-const SERIES_KINDS = new Set(["line", "bar", "area"]);
+const SERIES_KINDS = new Set(["line", "bar", "area", "point"]);
 
 export function isSeriesBlockMark(
   mark: ChartBlockMarkSpec,
@@ -77,6 +77,7 @@ export function blockMarksToChartProps(
         kind,
         tone: mark.tone as SeriesTone | undefined,
         ...(mark.type === "area" ? { fill: true } : {}),
+        ...(mark.type === "point" ? { showPoints: true } : {}),
         ...(mark.curve && mark.type !== "bar" ? { curve: mark.curve } : {}),
       });
       continue;

@@ -5,7 +5,7 @@ import type {
   ChartBlockSeriesMark,
 } from "./types";
 
-const DATA_MARKS = new Set(["bar", "line", "area"]);
+const DATA_MARKS = new Set(["bar", "line", "area", "point"]);
 
 export function isDataMark(
   mark: ChartBlockMarkSpec,
@@ -42,7 +42,7 @@ export function normalizeBlockMark(raw: unknown): ChartBlockMarkSpec | null {
   const kind = raw.mark ?? raw.type;
   if (typeof kind !== "string") return null;
 
-  if (kind === "bar" || kind === "line" || kind === "area") {
+  if (kind === "bar" || kind === "line" || kind === "area" || kind === "point") {
     if (typeof raw.field !== "string") return null;
     const mark: ChartBlockSeriesMark = {
       type: kind,

@@ -10,6 +10,27 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.35] - 2026-07-21
+
+### Added
+
+- **charts-spec** — Agent 100% exit: `point` cartesian mark; `registerChartFamily` / `familyRegistry`; `composePanel`, `executeTransform`, `applyTransformPlans` (C178 BYOK); `getAgentSimulationSummaries` for docs
+- **charts-spec** — `planShell` tabular path (no legacy `charts-spec` barrel — fixes Node ESM uPlot CSS)
+- **charts-mcp** — `compose_panel`, `execute_transform`, `list_transform_ops`; OpenAPI bundle (`openapi/tools.bundle.json`); 14-tool pasteable schemas
+- **charts-planner** — `validatePanelSpec` delegates to `validatePanel`; agent guard on `POST /plan`
+- **axiboard** — C181 follow-up recipes, M1 golden script (`m1DemoScript.test.ts`); C178 BYOK `transformPlans[]` merge path
+- **docs** — Agent cartesian tutorial, error gallery, MCP schemas page, simulation table, eject walkthrough, blocks playground `?preset=`
+
+### Changed
+
+- **charts-spec** — `DUPLICATE_OVERLAY_CHANNEL` errors in strict mode; waterfall ledger recipe → cartesian bridge; legacy profile planner removed from `/planning` entry
+- **charts-canvas** — `showPoints` for `point` marks in uPlot combo
+- **charts-runtime** — `PanelsDashboard` strict `agentValidated` gate
+
+### Fixed
+
+- **charts-planner** — Tabular planning no longer imports uPlot CSS via main `charts-spec` barrel (dev server + `dist-server` work again)
+
 ## [0.4.34] - 2026-07-21
 
 ### Added

@@ -272,8 +272,11 @@ export function compileRecipe(
         })
       : sourceRows);
 
-  if (recipe.stageOrder && recipe.groupBy) {
-    sortByStageOrder(chartRows, recipe.groupBy, recipe.stageOrder);
+  if (recipe.stageOrder) {
+    const orderField = recipe.groupBy ?? recipe.xField;
+    if (orderField) {
+      sortByStageOrder(chartRows, orderField, recipe.stageOrder);
+    }
   }
 
   if (recipe.panelType === "funnel") {

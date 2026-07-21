@@ -1,18 +1,11 @@
-import type { DataProfile, PanelSpec } from "./types";
-import {
-  validateCartesianSpec,
-  type CartesianValidationIssue,
-} from "./cartesianValidation";
-import { validateDistributionSpec } from "./distributionValidation";
-import { validateMatrixSpec } from "./matrixValidation";
-import { normalizeToCartesian } from "./normalizeToCartesian";
-import { normalizeToDistribution } from "./normalizeToDistribution";
-import { normalizeToMatrix } from "./normalizeToMatrix";
+import type { PanelSpec } from "./types";
 import {
   resolvePanelFamily,
   type AgentChartFamily,
   type PanelFamily,
 } from "./resolvePanelFamily";
+import { resolveRegisteredFamily } from "./familyRegistry";
+import { registerBuiltinChartFamilies } from "./registerBuiltinChartFamilies";
 
 export type ValidationSeverity = "error" | "warning";
 
@@ -28,7 +21,7 @@ export type ValidationIssue = {
 };
 
 export type ValidatePanelOptions = {
-  dataProfile?: DataProfile;
+  dataProfile?: import("./types").DataProfile;
   rows?: Record<string, unknown>[];
   /**
    * When true (default for MCP `validate_panel`), Tier-2 and unimplemented families
@@ -51,36 +44,6 @@ export type ValidatePanelFailure = {
 };
 
 export type ValidatePanelResult = ValidatePanelSuccess | ValidatePanelFailure;
-
-function mapCartesianIssue(
-  issue: CartesianValidationIssue,
-  family: PanelFamily,
-): ValidationIssue {
-  return { ...issue, family };
-}
-
-function unsupportedFamilyError(
-  family: AgentChartFamily,
-  spec: PanelSpec,
-): ValidatePanelFailure {
-  return {
-    ok: false,
-    family,
-    errors: [
-      {
-        code: "UNSUPPORTED_FAMILY",
-        path: "type",
-        message: `Family "${family}" is not agent-ready yet (panel type "${spec.type}")`,
-        suggestion:
-          family === "matrix"
-            ? "Use create_panel({ family: \"matrix\" }) with cell + colorScale marks"
-            : "Use a supported agent family",
-        severity: "error",
-        family,
-      },
-    ],
-  };
-}
 
 function legacyPanelResult(
   spec: PanelSpec,
@@ -112,76 +75,47 @@ function legacyPanelResult(
   return { ok: true, family: "legacy", spec, warnings: [warning] };
 }
 
+function unsupportedFamilyError(
+  family: AgentChartFamily,
+  spec: PanelSpec,
+): ValidatePanelFailure {
+  return {
+    ok: false,
+    family,
+    errors: [
+      {
+        code: "UNSUPPORTED_FAMILY",
+        path: "type",
+        message: `Family "${family}" is not agent-ready yet (panel type "${spec.type}")`,
+        suggestion:
+          family === "matrix"
+            ? "Use create_panel({ family: \"matrix\" }) with cell + colorScale marks"
+            : "Use a supported agent family",
+        severity: "error",
+        family,
+      },
+    ],
+  };
+}
+
 /**
- * Unified validation gate (RFC-004 C180). Dispatches by `resolvePanelFamily`.
- * Cartesian panels are normalized before validation.
+ * Unified validation gate (RFC-004 C180). Dispatches by registered family, then legacy tier.
  */
 export function validatePanel(
   spec: PanelSpec,
   options: ValidatePanelOptions = {},
 ): ValidatePanelResult {
-  const family = resolvePanelFamily(spec);
+  registerBuiltinChartFamilies();
   const strict = options.strict ?? false;
 
-  if (family === "cartesian") {
-    const normalized =
-      spec.type === "cartesian" || spec.type === "blocks"
-        ? spec
-        : normalizeToCartesian(spec);
-    const result = validateCartesianSpec(normalized, options);
-    if (!result.ok) {
-      return {
-        ok: false,
-        family,
-        errors: result.errors.map((issue) => mapCartesianIssue(issue, family)),
-      };
-    }
-    return {
-      ok: true,
-      family,
-      spec: normalized,
-      warnings: result.warnings.map((issue) => mapCartesianIssue(issue, family)),
-    };
+  const registered = resolveRegisteredFamily(spec);
+  if (registered) {
+    return registered.validate(spec, { ...options, strict });
   }
 
-  if (family === "distribution") {
-    const normalized =
-      spec.type === "distribution"
-        ? spec
-        : normalizeToDistribution(spec);
-    const result = validateDistributionSpec(normalized, options);
-    if (!result.ok) {
-      return {
-        ok: false,
-        family,
-        errors: result.errors.map((issue) => ({ ...issue, family })),
-      };
-    }
-    return {
-      ok: true,
-      family,
-      spec: normalized,
-      warnings: result.warnings.map((issue) => ({ ...issue, family })),
-    };
-  }
-
-  if (family === "matrix") {
-    const normalized =
-      spec.type === "matrix" ? spec : normalizeToMatrix(spec);
-    const result = validateMatrixSpec(normalized, options);
-    if (!result.ok) {
-      return {
-        ok: false,
-        family,
-        errors: result.errors.map((issue) => ({ ...issue, family })),
-      };
-    }
-    return {
-      ok: true,
-      family,
-      spec: normalized,
-      warnings: result.warnings.map((issue) => ({ ...issue, family })),
-    };
+  const family = resolvePanelFamily(spec);
+  if (family === "cartesian" || family === "distribution" || family === "matrix") {
+    return unsupportedFamilyError(family, spec);
   }
 
   return legacyPanelResult(spec, strict);

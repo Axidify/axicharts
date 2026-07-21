@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync } from "node:fs";
+import { existsSync, cpSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -27,4 +27,10 @@ for (const name of [
   "ops-mock-live.runtime.json",
 ]) {
   cpSync(join(examplesSrc, name), join(examplesDest, name));
+}
+
+const mcpOpenApiSrc = join(root, "packages/charts-mcp/openapi/tools.bundle.json");
+const mcpOpenApiDest = join(root, "apps/docs/public/mcp-tools.bundle.json");
+if (existsSync(mcpOpenApiSrc)) {
+  cpSync(mcpOpenApiSrc, mcpOpenApiDest);
 }

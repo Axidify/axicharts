@@ -1,10 +1,14 @@
 import {
   blockMarksToChartProps,
+  aggregateRows,
+  composePanel,
   createCartesianPanel,
   createPanel,
   createTablePanel,
+  executeTransform,
   listCartesianMarks,
   listMarks,
+  listTransformOps,
   normalizeToCartesian,
   parseTabular,
   reviseCartesianPanel,
@@ -13,8 +17,10 @@ import {
   CARTESIAN_PANEL_SCHEMA_URL,
   DATA_PROFILE_SCHEMA_URL,
   type AgentChartFamily,
+  type AggregateRowsOptions,
   type ChartMode,
   type DataProfile,
+  type PanelRecipe,
   type PanelSpec,
   type Persona,
   type SpecData,
@@ -122,19 +128,44 @@ export function handleCreateCartesianPanel(args: {
   intent: string;
   dataProfile?: DataProfile;
   fields?: string[];
+  rows?: SpecData;
+  groupBy?: string;
+  aggregates?: AggregateRowsOptions["aggregates"];
+  where?: AggregateRowsOptions["where"];
+  xField?: string;
+  yField?: string;
+  yFields?: string[];
   mode?: ChartMode;
   theme?: ThemeName;
 }): ToolTextResult {
+  let rows = asRowArray(args.rows);
+  let fields = args.fields;
+
+  if (rows && args.groupBy && args.aggregates) {
+    rows = aggregateRows(rows, {
+      groupBy: args.groupBy,
+      aggregates: args.aggregates,
+      where: args.where,
+    });
+    fields = rows.length > 0 ? Object.keys(rows[0]!) : fields;
+  }
+
+  const aggregateField = args.aggregates ? Object.keys(args.aggregates)[0] : undefined;
+
   const result = createCartesianPanel({
     intent: args.intent,
     dataProfile: args.dataProfile,
-    fields: args.fields,
+    fields,
+    xField: args.xField ?? args.groupBy,
+    yField: args.yField ?? aggregateField,
+    yFields: args.yFields,
     mode: args.mode,
     theme: args.theme,
   });
   return jsonResult({
     schema: CARTESIAN_PANEL_SCHEMA_URL,
     ...result,
+    ...(rows ? { rows, transformed: Boolean(args.groupBy && args.aggregates) } : {}),
   });
 }
 
@@ -256,6 +287,54 @@ export function handlePlanDashboard(args: {
   return jsonResult(result);
 }
 
+export function handleListTransformOps(): ToolTextResult {
+  return jsonResult(listTransformOps());
+}
+
+export function handleExecuteTransform(args: {
+  rows: SpecData;
+  groupBy: string;
+  aggregates: AggregateRowsOptions["aggregates"];
+  where?: AggregateRowsOptions["where"];
+}): ToolTextResult {
+  const rows = asRowArray(args.rows);
+  if (!rows?.length) {
+    return jsonResult({ ok: false, error: "execute_transform requires non-empty rows" }, true);
+  }
+  const transformed = executeTransform(rows, {
+    groupBy: args.groupBy,
+    aggregates: args.aggregates,
+    where: args.where,
+  });
+  return jsonResult({ ok: true, rows: transformed, rowCount: transformed.length });
+}
+
+export function handleComposePanel(args: {
+  recipe: PanelRecipe;
+  rows: SpecData;
+  dataProfile?: DataProfile;
+  theme?: ThemeName;
+  mode?: ChartMode;
+}): ToolTextResult {
+  const rows = asRowArray(args.rows);
+  if (!rows?.length) {
+    return jsonResult({ ok: false, error: "compose_panel requires non-empty rows" }, true);
+  }
+  const result = composePanel(args.recipe, rows, {
+    dataProfile: args.dataProfile,
+    theme: args.theme,
+    mode: args.mode,
+  });
+  const validation = validatePanel(result.panel, { rows: result.rows, strict: true });
+  return jsonResult({
+    schema: CARTESIAN_PANEL_SCHEMA_URL,
+    ...result,
+    validation: validation.ok
+      ? { ok: true, warnings: validation.warnings }
+      : { ok: false, errors: validation.errors },
+  });
+}
+
 export function handleCompileCartesianPanel(args: {
   spec: PanelSpec;
   rows: SpecData;
@@ -303,6 +382,9 @@ export const TOOL_HANDLERS = {
   describe_data_profile: handleDescribeDataProfile,
   create_table_panel: handleCreateTablePanel,
   plan_dashboard: handlePlanDashboard,
+  list_transform_ops: handleListTransformOps,
+  execute_transform: handleExecuteTransform,
+  compose_panel: handleComposePanel,
   compile_cartesian_panel: handleCompileCartesianPanel,
 } as const;
 

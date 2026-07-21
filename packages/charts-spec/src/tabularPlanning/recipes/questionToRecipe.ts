@@ -154,7 +154,11 @@ export function questionToRecipe(
   }
 
   if (question.id === "ledger.chart.waterfall") {
-    recipe.panelType = "waterfall";
+    recipe.panelType = "cartesian";
+    recipe.markType = "bar";
+    recipe.intent = "ledger net flow bridge bar chart signed category values";
+    recipe.groupBy = undefined;
+    recipe.aggregates = undefined;
   }
 
   if (/stacked|debit.*credit/.test(question.intent)) {

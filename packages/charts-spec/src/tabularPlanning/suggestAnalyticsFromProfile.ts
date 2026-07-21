@@ -7,7 +7,6 @@ import { PANEL_BUDGET } from "./planDashboardFromRows";
 
 export type SuggestAnalyticsOptions = {
   persona?: Persona;
-  followUpIntents?: string[];
   dataProfile?: DataProfile;
 };
 
@@ -53,71 +52,6 @@ function dedupeRecipes(recipes: PanelRecipe[]): PanelRecipe[] {
     result.push(recipe);
   }
   return result;
-}
-
-function recipesFromFollowUp(
-  intent: string,
-  rows: Record<string, unknown>[],
-  fieldProfiles: FieldProfile[],
-): PanelRecipe[] {
-  const recipes: PanelRecipe[] = [];
-  const measures = pickMeasures(fieldProfiles);
-  const dimensions = pickDimensions(fieldProfiles);
-  const lower = intent.toLowerCase();
-
-  const reorderField = fieldProfiles.find((profile) => /reorder/i.test(profile.name))?.name;
-  const stockField = fieldProfiles.find((profile) => /stock|qty|quantity/i.test(profile.name))?.name;
-
-  if (reorderField && stockField && /below|under|low|reorder/i.test(lower)) {
-    const filtered = rows.filter(
-      (row) => cellNumber(row, stockField) < cellNumber(row, reorderField),
-    );
-    recipes.push({
-      questionId: "generic.table.below_reorder",
-      title: "Below reorder level",
-      intent: "filtered data table",
-      panelType: "table",
-      vertical: "ops",
-      preparedRows: filtered,
-      tableColumns: fieldProfiles.map((profile) => ({
-        key: profile.name,
-        label: profile.name,
-        align: profile.role === "measure" ? "right" : "left",
-      })),
-    });
-  }
-
-  for (const dim of dimensions) {
-    if (!lower.includes(dim.name.toLowerCase()) && !/breakdown|by\s/.test(lower)) continue;
-    recipes.push({
-      questionId: `generic.followup.count.${dim.name}`,
-      title: `Count by ${dim.name}`,
-      intent: "count bar chart with value labels",
-      panelType: "cartesian",
-      markType: "bar",
-      vertical: "ops",
-      groupBy: dim.name,
-      xField: dim.name,
-      yField: "count",
-      aggregates: { count: { op: "count" } },
-    });
-    if (measures[0]) {
-      recipes.push({
-        questionId: `generic.followup.sum.${dim.name}`,
-        title: `${measures[0].name} by ${dim.name}`,
-        intent: "bar chart with value labels",
-        panelType: "cartesian",
-        markType: "bar",
-        vertical: "ops",
-        groupBy: dim.name,
-        xField: dim.name,
-        yField: "value",
-        aggregates: { value: { op: "sum", field: measures[0].name } },
-      });
-    }
-  }
-
-  return recipes;
 }
 
 /**
@@ -243,16 +177,11 @@ export function suggestAnalyticsFromProfile(
     })),
   });
 
-  const followUpRecipes: PanelRecipe[] = [];
-  for (const intent of options.followUpIntents ?? []) {
-    followUpRecipes.push(...recipesFromFollowUp(intent, rows, fieldProfiles));
-  }
-
   const statRecipes = dedupeRecipes(recipes.filter((recipe) => recipe.panelType === "stat"));
   const chartRecipes = dedupeRecipes(recipes.filter((recipe) => recipe.panelType !== "stat"));
 
   const kpis = statRecipes.slice(0, PANEL_BUDGET.maxKpis);
-  const charts = dedupeRecipes([...followUpRecipes, ...chartRecipes]).slice(0, PANEL_BUDGET.maxCharts);
+  const charts = chartRecipes.slice(0, PANEL_BUDGET.maxCharts);
 
   return [...kpis, ...charts];
 }

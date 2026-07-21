@@ -35,8 +35,10 @@ export function ChatWorkspaceView({
 }: ChatWorkspaceViewProps): ReactElement {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
+  const [highlightQuestionIds, setHighlightQuestionIds] = useState<string[]>([]);
   const lastAssistantRef = useRef<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const artifactScrollRef = useRef<HTMLDivElement>(null);
 
   const {
     result,
@@ -90,6 +92,24 @@ export function ChatWorkspaceView({
       },
     ]);
   }, [result]);
+
+  useEffect(() => {
+    const ids = result?.followUpQuestionIds ?? [];
+    if (ids.length === 0) return;
+    setHighlightQuestionIds(ids);
+    const timer = window.setTimeout(() => {
+      const root = artifactScrollRef.current;
+      const target = root?.querySelector(`[data-question-id="${ids[0]}"]`);
+      if (target instanceof HTMLElement) {
+        target.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }, 120);
+    const clearTimer = window.setTimeout(() => setHighlightQuestionIds([]), 6000);
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(clearTimer);
+    };
+  }, [result?.followUpQuestionIds]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -147,6 +167,7 @@ export function ChatWorkspaceView({
     resetSession();
     setMessages([]);
     setSaveNotice(null);
+    setHighlightQuestionIds([]);
     lastAssistantRef.current = null;
   };
 
@@ -241,13 +262,17 @@ export function ChatWorkspaceView({
             ) : null}
           </header>
 
-          <div className="axi-artifact-scroll">
+          <div className="axi-artifact-scroll" ref={artifactScrollRef}>
             {loading ? <DashboardSkeleton /> : null}
 
             {!loading && result ? (
               <>
                 <DecisionLog decisions={result.decisions} />
-                <PanelsDashboard panels={panelsSpec!} agentValidated />
+                <PanelsDashboard
+                  panels={panelsSpec!}
+                  agentValidated
+                  highlightQuestionIds={highlightQuestionIds}
+                />
               </>
             ) : null}
 

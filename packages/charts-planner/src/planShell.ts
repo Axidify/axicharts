@@ -1,0 +1,125 @@
+import type { DataProfile, TemplateId } from "@axicharts/charts-spec/planning";
+import { suggestTemplate } from "@axicharts/charts-spec/planning";
+import { enrichProfileFromIntent } from "./intent";
+import type { DashboardPlan, MosaicPresetId, PlannerFeed, PlannerLayout } from "./types";
+import { isTemplateId } from "./validate";
+
+function inferLayout(intent: string | undefined): PlannerLayout {
+  if (!intent) return "embed";
+  const lower = intent.toLowerCase();
+  if (/mosaic|wall|grid|multi|split/.test(lower)) return "mosaic";
+  return "embed";
+}
+
+export function inferFeed(intent: string | undefined): PlannerFeed {
+  if (!intent) return "historian";
+  const lower = intent.toLowerCase();
+  if (/static|snapshot|csv|batch|historical/.test(lower)) return "static";
+  if (/\bmqtt\b|sparkplug|plant\/|pubsub|broker/.test(lower)) return "mqtt";
+  if (/websocket|web\s*socket|\bws\b|push\s*feed|telemetry\s*stream/.test(lower)) {
+    return "websocket";
+  }
+  if (/\brest\b|\/api\/|polling|poll\b|http\s*pull|endpoint|axios|fetch\b/.test(lower)) {
+    return "rest";
+  }
+  if (/mock[-\s]?live|synthetic|simulator|sandbox|\bdemo\b|fixture\s*drift/.test(lower)) {
+    return "mock-live";
+  }
+  if (/live|stream|historian|realtime|real-time|telemetry/.test(lower)) return "historian";
+  return "historian";
+}
+
+function inferPresentation(intent: string | undefined): boolean {
+  if (!intent) return false;
+  const lower = intent.toLowerCase();
+  return /presentation|board|deck|slide|executive|hero/.test(lower);
+}
+
+export function inferTemplateFromIntent(intent: string): TemplateId | undefined {
+  const lower = intent.toLowerCase();
+  if (/finance|p&l|pnl|revenue|margin/.test(lower)) return "finance-pnl";
+  if (/trading|blotter|positions/.test(lower)) return "trading-blotter";
+  if (/program|burndown|sprint/.test(lower)) return "program-dashboard";
+  if (/plugin|extension/.test(lower)) return "plugins-wall";
+  if (/capacity|resource|utilization/.test(lower)) return "capacity-grid";
+  if (/incident|sre|mttr|on-?call|outage|postmortem/.test(lower)) return "sre-incident";
+  if (/saas|mrr|arr|churn|signup|growth|funnel/.test(lower)) return "saas-growth";
+  if (/line\s*\d+|ops|shift|plant|telemetry|2x2|wall/.test(lower)) return "ops-2x2";
+  if (/overview|single|kpi/.test(lower)) return "line-overview";
+  return undefined;
+}
+
+export function inferMosaicPresetFromIntent(intent: string): MosaicPresetId {
+  const lower = intent.toLowerCase();
+  if (
+    (/trading|blotter|positions/.test(lower) && /program|sprint|burndown/.test(lower)) ||
+    (/trading|blotter/.test(lower) && /mosaic|wall|grid|multi|split/.test(lower))
+  ) {
+    return "trading-program";
+  }
+  if (/command|capacity|resource|utilization/.test(lower)) {
+    return "command-center";
+  }
+  if (/finance|p&l|pnl|revenue|margin/.test(lower)) {
+    return "ops-finance";
+  }
+  if (/overview|throughput|kpi/.test(lower)) {
+    return "ops-overview";
+  }
+  if (/program|sprint|burndown/.test(lower)) {
+    return "trading-program";
+  }
+  if (/trading|blotter/.test(lower)) {
+    return "trading-program";
+  }
+  return "ops-overview";
+}
+
+function resolveMosaicPreset(intent: string | undefined, layout: PlannerLayout): MosaicPresetId | undefined {
+  if (layout !== "mosaic" || !intent) return undefined;
+  return inferMosaicPresetFromIntent(intent);
+}
+
+function inferTitle(intent: string | undefined): string | undefined {
+  if (!intent) return undefined;
+  const lineMatch = intent.match(/line\s*(\d+)/i);
+  if (lineMatch) return `Line ${lineMatch[1]}`;
+  return undefined;
+}
+
+function inferSubtitle(intent: string | undefined): string | undefined {
+  if (!intent) return undefined;
+  const lower = intent.toLowerCase();
+  if (/night shift/.test(lower)) return "Night shift overview";
+  if (/day shift/.test(lower)) return "Day shift overview";
+  if (/maintenance/.test(lower)) return "Maintenance window";
+  return undefined;
+}
+
+/** Agent-safe dashboard shell — template/feed/layout only; no legacy profile panels. */
+export function planDashboardShellFromIntent(
+  profile: DataProfile,
+  intent: string,
+): DashboardPlan {
+  const enriched = enrichProfileFromIntent(profile, intent);
+  const template = inferTemplateFromIntent(intent) ?? suggestTemplate(enriched);
+  const resolvedTemplate = isTemplateId(template) ? template : suggestTemplate(enriched);
+  const presentation = inferPresentation(intent);
+  const layout = inferLayout(intent);
+
+  return {
+    source: "intent",
+    template: resolvedTemplate,
+    title: inferTitle(intent),
+    subtitle: inferSubtitle(intent),
+    theme: presentation ? "presentation" : undefined,
+    mode: presentation ? "presentation" : undefined,
+    layout,
+    feed: inferFeed(intent),
+    presentation,
+    mosaicPreset: resolveMosaicPreset(intent, layout),
+    panels: [],
+    agentSafe: true,
+    plannerKind: "tabular",
+  };
+}

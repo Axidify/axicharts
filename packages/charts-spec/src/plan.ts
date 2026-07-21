@@ -13,12 +13,16 @@ export type PlanPanelsOptions = {
   fieldProfiles?: FieldProfile[];
 };
 
+/** Shown on charts-planner `/plan` responses — not exported from `@axicharts/charts-spec/planning`. */
+export const PROFILE_PLANNER_AGENT_WARNING =
+  "Legacy profile planner — emits Tier-2 panel types (donut, gauge, waterfall, …). Not agent grammar. Use planDashboardFromRows or MCP plan_dashboard.";
+
 /**
  * Legacy profile planner — infers panel `type` from metric names/tags (pie, funnel, waterfall, …).
  *
  * **Not agent grammar.** For RFC-004 agent-safe panels use `planDashboardFromRows` (tabular rows)
- * or MCP `create_panel` / `validate_panel`. This API remains for charts-planner server, Storybook,
- * and CSV/profile demos only.
+ * or MCP `create_panel` / `validate_panel`. Import from `@axicharts/charts-spec` only — **not**
+ * the `/planning` entry (B3).
  */
 
 function inferChartType(metric: MetricProfile): PanelSpec["type"] {

@@ -63,4 +63,15 @@ describe("composeIncidentDashboard", () => {
     );
     expect(plan!.layout?.variant).toBe("table-pinned-bottom");
   });
+
+  it("adds open tickets table on follow-up refinement", () => {
+    const intent = "Show open tickets only";
+    const plan = planDashboardFromRows(rows, {
+      persona: "manager",
+      followUpIntents: [intent],
+      refinementIntent: intent,
+    });
+    expect(plan!.followUpQuestionIds).toContain("agent.incident.followup.open_table");
+    expect(plan!.charts.some((block) => block.panel.title === "Open tickets")).toBe(true);
+  });
 });

@@ -68,6 +68,21 @@ export {
   type ValidatePanelResult,
 } from "./validatePanel";
 export {
+  registerChartFamily,
+  getChartFamily,
+  listChartFamilies,
+  resolveRegisteredFamily,
+  clearChartFamilies,
+  type ChartFamilyRegistration,
+  type FamilyMarkCatalogEntry,
+} from "./familyRegistry";
+export { registerBuiltinChartFamilies } from "./registerBuiltinChartFamilies";
+export {
+  getAgentSimulationSummaries,
+  type AgentSimulationFamily,
+  type AgentSimulationSummary,
+} from "./agentIntegrator";
+export {
   createPanel,
   UnsupportedPanelFamilyError,
   type CreatePanelInput,
@@ -163,9 +178,17 @@ export { ejectPanel, type EjectOptions } from "./eject";
 export {
   planPanelFromMetric,
   planPanelsFromProfile,
+  PROFILE_PLANNER_AGENT_WARNING,
   suggestTemplate,
   type PlanPanelsOptions,
 } from "./plan";
+export {
+  AGENT_RUNTIME_PANEL_TYPES,
+  LEGACY_PROFILE_PLANNER_PANEL_TYPES,
+  agentRuntimePanelIssues,
+  isAgentRuntimePanel,
+  isAgentRuntimePanelType,
+} from "./agentRuntimePanel";
 export {
   findProfileColorField,
   inferColorEncodingForPanel,

@@ -132,12 +132,24 @@ describe("validateCartesianSpec (RFC-002 simulation gates)", () => {
     }
   });
 
-  it("S19 rejects unknown mark", () => {
+  it("S19 accepts point mark", () => {
     const result = validateCartesianSpec(
       {
         type: "cartesian",
         encoding: { x: { field: "week" } },
         marks: [{ mark: "point", field: "revenue" }],
+      },
+      { rows: ROWS },
+    );
+    expect(result.ok).toBe(true);
+  });
+
+  it("S19 rejects unknown mark", () => {
+    const result = validateCartesianSpec(
+      {
+        type: "cartesian",
+        encoding: { x: { field: "week" } },
+        marks: [{ mark: "bubble", field: "revenue" }],
       },
       { rows: ROWS },
     );
@@ -148,24 +160,30 @@ describe("validateCartesianSpec (RFC-002 simulation gates)", () => {
   });
 
   it("S22b warns on duplicate overlay channels", () => {
-    const result = validateCartesianSpec(
-      {
-        type: "cartesian",
-        encoding: { x: { field: "week" } },
-        marks: [
-          { type: "bar", field: "revenue" },
-          { type: "rule", value: 50 },
-        ],
-        props: {
-          referenceLines: [{ value: 60, label: "props" }],
-        },
+    const spec = {
+      type: "cartesian" as const,
+      encoding: { x: { field: "week" } },
+      marks: [
+        { type: "bar", field: "revenue" },
+        { type: "rule", value: 50 },
+      ],
+      props: {
+        referenceLines: [{ value: 60, label: "props" }],
       },
-      { rows: ROWS },
-    );
+    };
+    const result = validateCartesianSpec(spec, { rows: ROWS });
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(
         result.warnings.some((w) => w.code === "DUPLICATE_OVERLAY_CHANNEL"),
+      ).toBe(true);
+    }
+
+    const strict = validateCartesianSpec(spec, { rows: ROWS, strict: true });
+    expect(strict.ok).toBe(false);
+    if (!strict.ok) {
+      expect(
+        strict.errors.some((e) => e.code === "DUPLICATE_OVERLAY_CHANNEL"),
       ).toBe(true);
     }
   });

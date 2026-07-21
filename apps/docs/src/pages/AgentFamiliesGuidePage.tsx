@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
+import { AgentSimulationTable } from "../components/AgentSimulationTable";
 import { docBodyStyle, docCardStyle } from "../styles/docTokens";
 
 const MCP_WORKFLOW = `# 1. Add MCP server to Cursor (~/.cursor/mcp.json)
@@ -121,9 +122,15 @@ export function AgentFamiliesGuidePage(): ReactElement {
           <code>validate_panel</code> is mandatory. <code>needsReview: true</code> means refine intent, do not render.
         </li>
         <li>
-          Waterfall, gauge, and geo charts are still Tier-2 — flag for human review.
+          Waterfall on tabular agent path compiles to cartesian bridge; gauge and geo remain Tier-2.
         </li>
       </ul>
+
+      <h2 style={{ fontSize: 16, marginTop: 28 }}>Composition simulation</h2>
+      <p style={docBodyStyle()}>
+        Every family ships a simulation suite — <strong>silent_bad must stay 0</strong> (no charts that compile but lie).
+      </p>
+      <AgentSimulationTable />
 
       <h2 style={{ fontSize: 16, marginTop: 28 }}>Runtime gate</h2>
       <pre
@@ -145,7 +152,9 @@ if (!check.ok) throw check.errors; // agent retries
 
       <h2 style={{ fontSize: 16, marginTop: 28 }}>Further reading</h2>
       <p style={{ ...docBodyStyle(), fontSize: 13 }}>
-        <Link to="/guides/agent-cartesian">Cartesian deep dive</Link>
+        <Link to="/guides/agent-cartesian">Cartesian deep dive + error gallery</Link>
+        {" · "}
+        <Link to="/guides/agent-mcp-schemas">MCP tool schemas (OpenAPI)</Link>
         {" · "}
         <Link to="/spec/blocks">Blocks playground</Link>
         {" · "}

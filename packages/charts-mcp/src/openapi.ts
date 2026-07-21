@@ -1,4 +1,9 @@
-import { CARTESIAN_PANEL_SCHEMA_URL, DATA_PROFILE_SCHEMA_URL } from "./tools";
+import {
+  CARTESIAN_PANEL_SCHEMA_URL,
+  DATA_PROFILE_SCHEMA_URL,
+} from "@axicharts/charts-spec/planning";
+
+export { CARTESIAN_PANEL_SCHEMA_URL, DATA_PROFILE_SCHEMA_URL };
 
 export type OpenApiToolDefinition = {
   name: string;
@@ -58,7 +63,7 @@ export const OPENAPI_TOOL_BUNDLE: OpenApiToolDefinition[] = [
   {
     name: "create_cartesian_panel",
     description:
-      "Create a cartesian panel from natural-language intent. Intent must name mark types (bar, line, area).",
+      "Create a cartesian panel from natural-language intent. Intent must name mark types (bar, line, area). Pass rows + groupBy + aggregates to pre-aggregate.",
     schemaUrl: CARTESIAN_PANEL_SCHEMA_URL,
     inputSchema: {
       type: "object",
@@ -66,6 +71,13 @@ export const OPENAPI_TOOL_BUNDLE: OpenApiToolDefinition[] = [
       properties: {
         intent: { type: "string" },
         fields: { type: "array", items: { type: "string" } },
+        rows: { type: "array", items: { type: "object" } },
+        groupBy: { type: "string" },
+        aggregates: { type: "object" },
+        where: { type: "array", items: { type: "object" } },
+        xField: { type: "string" },
+        yField: { type: "string" },
+        yFields: { type: "array", items: { type: "string" } },
         dataProfile: { type: "object" },
         mode: { enum: ["static", "interactive", "live"] },
         theme: { enum: ["clean", "studio", "live", "dark"] },
@@ -179,6 +191,43 @@ export const OPENAPI_TOOL_BUNDLE: OpenApiToolDefinition[] = [
           type: "array",
           items: { type: "string" },
         },
+      },
+    },
+  },
+  {
+    name: "list_transform_ops",
+    description: "List closed transform ops for execute_transform.",
+    schemaUrl: DATA_PROFILE_SCHEMA_URL,
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "execute_transform",
+    description: "Group and aggregate tabular rows (aggregateRows).",
+    schemaUrl: DATA_PROFILE_SCHEMA_URL,
+    inputSchema: {
+      type: "object",
+      required: ["rows", "groupBy", "aggregates"],
+      properties: {
+        rows: { type: "array", items: { type: "object" } },
+        groupBy: { type: "string" },
+        aggregates: { type: "object" },
+        where: { type: "array", items: { type: "object" } },
+      },
+    },
+  },
+  {
+    name: "compose_panel",
+    description: "Compile a PanelRecipe + rows into agent-safe PanelSpec (C174).",
+    schemaUrl: CARTESIAN_PANEL_SCHEMA_URL,
+    inputSchema: {
+      type: "object",
+      required: ["recipe", "rows"],
+      properties: {
+        recipe: { type: "object" },
+        rows: { type: "array", items: { type: "object" } },
+        dataProfile: { type: "object" },
+        mode: { enum: ["static", "interactive", "live"] },
+        theme: { enum: ["clean", "studio", "live", "dark"] },
       },
     },
   },

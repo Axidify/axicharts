@@ -240,8 +240,8 @@ export function runCompositionSimulations(): SimulationResult[] {
       { type: "line", field: "revenue" },
       { type: "band", min: 52, max: 44 },
     ], BASE_ROWS, "error"),
-    evaluate("S19", "invalid", "unknown mark type point", [
-      { type: "point", field: "revenue" } as unknown as ChartBlockMarkSpec,
+    evaluate("S19", "invalid", "unknown mark type scatter", [
+      { type: "scatter", field: "revenue" } as unknown as ChartBlockMarkSpec,
     ], BASE_ROWS, "error"),
     evaluate("S20", "redundant", "duplicate same field twice", [
       { type: "bar", field: "revenue" },

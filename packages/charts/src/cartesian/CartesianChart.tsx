@@ -19,7 +19,7 @@ import { useChartLayout } from "../container/ChartLayoutContext";
 import { CartesianChartShell } from "../chrome/CartesianChartShell";
 import { getInteractionChrome } from "../interaction/mode";
 import { resolveCartesianPlotSize } from "../cartesian/cartesianPlotLayout";
-import { CartesianEmptyPlot } from "../cartesian/CartesianEmptyPlot";
+import { FlatZeroSeriesCaption } from "../interaction/FlatZeroSeriesCaption";
 import { isFlatZeroSeries } from "../interaction/cartesianPointerChartProps";
 import { usePlotSync } from "../sync/usePlotSync";
 import { usePlotSampling } from "../plot/usePlotSampling";
@@ -207,7 +207,7 @@ export function CartesianChart({
   animate,
   liveAnimate: liveAnimateProp,
 }: CartesianChartProps): ReactElement | null {
-  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate, dataState, emptyMessage } =
+  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate, dataState } =
     useChartLayout();
   const annotationProps = useCartesianAnnotations({
     annotations,
@@ -284,18 +284,7 @@ export function CartesianChart({
     return null;
   }
 
-  const dark = theme.name === "live" || theme.name === "industrial";
-  if (dataState === "ready" && isFlatZeroSeries(series)) {
-    return (
-      <CartesianEmptyPlot
-        width={size.width}
-        height={size.height}
-        message={emptyMessage}
-        dark={dark}
-      />
-    );
-  }
-
+  const flatZero = dataState === "ready" && isFlatZeroSeries(series);
   const compact = size.height < 72;
   const axes = showAxes ?? (theme.axis.show && !compact);
 
@@ -341,6 +330,7 @@ export function CartesianChart({
           />
         }
       />
+      {flatZero ? <FlatZeroSeriesCaption /> : null}
     </CartesianChartA11yRoot>
   );
 }

@@ -9,6 +9,12 @@ export {
   type DomainSemantics,
 } from "../classifyTabularDomain";
 export { aggregateRows, type AggregateRowsOptions, type AggregateSpec } from "../aggregateRows";
+export { composePanel } from "../composePanel";
+export {
+  executeTransform,
+  listTransformOps,
+  type TransformOpCatalog,
+} from "../executeTransform";
 export {
   createCartesianPanel,
   listCartesianMarks,
@@ -35,6 +41,12 @@ export {
   type ValidatePanelResult,
 } from "../validatePanel";
 export {
+  registerChartFamily,
+  getChartFamily,
+  listChartFamilies,
+  type ChartFamilyRegistration,
+} from "../familyRegistry";
+export {
   createPanel,
   UnsupportedPanelFamilyError,
   type CreatePanelInput,
@@ -52,7 +64,14 @@ export { normalizeToDistribution } from "../normalizeToDistribution";
 export { DISTRIBUTION_PANEL_SCHEMA_URL } from "../schemaUrls";
 export { inferFieldRoles, fieldProfilesToDataProfile } from "../inferFieldRoles";
 export { CARTESIAN_PANEL_SCHEMA_URL, DATA_PROFILE_SCHEMA_URL } from "../schemaUrls";
-export { planPanelFromMetric, planPanelsFromProfile, suggestTemplate } from "../plan";
+export { suggestTemplate } from "../plan";
+export {
+  AGENT_RUNTIME_PANEL_TYPES,
+  LEGACY_PROFILE_PLANNER_PANEL_TYPES,
+  agentRuntimePanelIssues,
+  isAgentRuntimePanel,
+  isAgentRuntimePanelType,
+} from "../agentRuntimePanel";
 export { isRegisteredTemplate } from "../templateRegistry";
 export { SPEC_VERSION } from "../types";
 export type {

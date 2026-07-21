@@ -22,7 +22,7 @@ import {
 } from "../chrome/CartesianChartShell";
 import { getInteractionChrome } from "../interaction/mode";
 import { cartesianPlotHeight, resolveCartesianPlotSize } from "../cartesian/cartesianPlotLayout";
-import { CartesianEmptyPlot } from "../cartesian/CartesianEmptyPlot";
+import { FlatZeroSeriesCaption } from "../interaction/FlatZeroSeriesCaption";
 import { usePlotSync } from "../sync/usePlotSync";
 import { sliceCartesianByBrushRange } from "../sync/brushRange";
 import { useCartesianBrush } from "../sync/useCartesianBrush";
@@ -273,7 +273,7 @@ export function LineChart({
   onSeriesClick,
   a11y,
 }: LineChartProps): ReactElement | null {
-  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate, dataState, emptyMessage } =
+  const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate, dataState } =
     useChartLayout();
   const annotationProps = useCartesianAnnotations({
     annotations,
@@ -347,18 +347,7 @@ export function LineChart({
     return null;
   }
 
-  const dark = theme.name === "live" || theme.name === "industrial";
-  if (dataState === "ready" && isFlatZeroSeries(series)) {
-    return (
-      <CartesianEmptyPlot
-        width={size.width}
-        height={size.height}
-        message={emptyMessage}
-        dark={dark}
-      />
-    );
-  }
-
+  const flatZero = dataState === "ready" && isFlatZeroSeries(series);
   const compact = size.height < 72;
   const axes =
     showAxes ?? (theme.axis.show && !compact);
@@ -448,6 +437,7 @@ export function LineChart({
           Live chart
         </span>
       ) : null}
+      {flatZero ? <FlatZeroSeriesCaption /> : null}
     </CartesianChartA11yRoot>
   );
 }

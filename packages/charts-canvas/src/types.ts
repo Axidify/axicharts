@@ -34,6 +34,8 @@ export type ComboSeries = PlotSeries & {
   fill?: boolean;
   /** Per-series line curve (overrides chart-level `curve` for this series). */
   curve?: LineCurve;
+  /** Show point markers (RFC-002 `point` mark). */
+  showPoints?: boolean;
 };
 
 export type ReferenceLine = {
