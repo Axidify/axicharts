@@ -53,7 +53,9 @@ describe("C161 golden contract — MCP plan_dashboard ≡ orchestrator plan", ()
     });
     expect(orch!.vertical).toBe("sales");
     const stageChart = orch!.charts.find((block) => block.questionId === "sales.chart.by_stage");
-    expect(stageChart?.panel.type).toBe("funnel");
+    expect(stageChart?.panel.type).toBe("distribution");
+    expect(stageChart?.panel.marks?.some((mark) => mark.type === "funnel")).toBe(true);
+    expect(stageChart?.decision.status).toBe("validated");
   });
 
   it("attendance fixture (manager)", () => {
