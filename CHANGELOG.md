@@ -10,6 +10,22 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.29] - 2026-07-21
+
+### Added
+
+- **charts** — `Stat` `unit` + `delta` chip (`StatDeltaChip`); narrow KPI layout @ 72px strip width
+- **charts** — `DataTable` zebra rows, sticky header, `maxHeight` scroll, tabular-nums on numeric columns
+- **charts-spec** — bar-only cartesian panels compile through `BarChart` (uPlot) for `encoding.color` fills
+- **charts-canvas** — theme bar radius on all vertical/stacked bars; top-cap radius on stacks; compact gap sizing
+- **charts-echarts** — radar bottom legend + lifted center; histogram compact bin label density
+- **docs** — `/compare/design` Lane B harness (KPI strip, table) + scatter/radar/histogram parity rows
+
+### Fixed
+
+- **charts** — `BarChart` always uses canvas path so dashboard bars get radius, fills, and value labels
+- **charts-spec** — boolean semantic `encoding.color` maps to success/warning (not critical) for throughput tiles
+
 ## [0.4.28] - 2026-07-21
 
 ### Fixed

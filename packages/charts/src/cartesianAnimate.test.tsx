@@ -23,18 +23,17 @@ describe("cartesian animate prop", () => {
     expect(container.querySelector("svg")).toBeTruthy();
   });
 
-  it("renders BarChart with animate enter", () => {
+  it("renders BarChart with animate enter on canvas", () => {
     const { container } = render(
       <ChartContainer theme={cleanTheme} width={320} height={180}>
         <BarChart
           categories={CATEGORIES}
           series={SERIES}
           animate="enter"
-          renderer="svg"
         />
       </ChartContainer>,
     );
-    expect(container.querySelector("svg")).toBeTruthy();
+    expect(container.querySelector("canvas")).toBeTruthy();
   });
 
   it("renders LineChart with animate update in static mode", () => {
