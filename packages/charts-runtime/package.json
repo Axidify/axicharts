@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-runtime",
-  "version": "0.4.26",
+  "version": "0.4.27",
   "description": "C4 dashboard runtime — data source adapters and embed shell for AxiCharts.",
   "license": "MIT",
   "repository": {

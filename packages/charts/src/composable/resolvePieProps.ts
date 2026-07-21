@@ -1,5 +1,5 @@
 import { useMemo, type ReactNode } from "react";
-import type { PieSlice } from "@axicharts/charts-echarts";
+import type { PieCenterMetricInput, PieSlice } from "@axicharts/charts-echarts";
 import type { ChartConfig } from "../container/ChartLayoutContext";
 import { composePieMarks } from "./composePie";
 
@@ -9,6 +9,7 @@ export type PieDataProps = {
   children?: ReactNode;
   innerRadius?: number;
   showLabels?: boolean;
+  centerMetric?: PieCenterMetricInput;
 };
 
 export function useResolvedPieProps(
@@ -18,8 +19,9 @@ export function useResolvedPieProps(
   slices: PieSlice[];
   innerRadius?: number;
   showLabels?: boolean;
+  centerMetric?: PieCenterMetricInput;
 } {
-  const { slices, data, children, innerRadius, showLabels } = props;
+  const { slices, data, children, innerRadius, showLabels, centerMetric } = props;
 
   return useMemo(() => {
     if (data && children) {
@@ -28,6 +30,7 @@ export function useResolvedPieProps(
         slices: composed.slices,
         innerRadius: innerRadius ?? composed.innerRadius,
         showLabels: showLabels ?? composed.showLabels,
+        centerMetric,
       };
     }
 
@@ -35,6 +38,7 @@ export function useResolvedPieProps(
       slices: slices ?? [],
       innerRadius,
       showLabels,
+      centerMetric,
     };
-  }, [slices, data, children, config, innerRadius, showLabels]);
+  }, [slices, data, children, config, innerRadius, showLabels, centerMetric]);
 }

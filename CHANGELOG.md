@@ -10,6 +10,18 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.27] - 2026-07-21
+
+### Added
+
+- **charts-echarts** — Donut center hole KPI (`centerMetric`: `largest`, explicit value/label, or named `slice`)
+- **charts-spec** — `props.centerMetric` on donut/distribution panels; `readPanelCenterMetric` resolver
+- **charts** — `PieChart` `centerMetric` prop
+
+### Fixed
+
+- **storybook** — Recharts + Shadcn parity walls share `DONUT_PARITY_SPEC` @ 360×280 (matched colors, no duplicate in-tile title)
+
 ## [0.4.26] - 2026-07-21
 
 ### Added

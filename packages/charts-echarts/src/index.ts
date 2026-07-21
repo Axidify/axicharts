@@ -102,6 +102,12 @@ export {
 } from "./EChartsLiquidFill";
 export { useLiquidFillExtension } from "./useLiquidFillExtension";
 export { EChartsPie, type EChartsPieProps } from "./EChartsPie";
+export {
+  resolveLargestSliceMetric,
+  resolvePieCenterMetric,
+  type PieCenterMetric,
+  type PieCenterMetricInput,
+} from "./pieCenterMetric";
 export { EChartsWaterfall, type EChartsWaterfallProps } from "./EChartsWaterfall";
 export type { TreemapNode } from "./treemapTypes";
 export type { ScatterPoint, ScatterSeries } from "./scatterTypes";

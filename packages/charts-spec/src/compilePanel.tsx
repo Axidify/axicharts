@@ -117,6 +117,7 @@ import { ridgelineFromRows } from "./ridgelineEncoding";
 import { wordCloudFromRows } from "./wordCloudEncoding";
 import { panelPropsWithAnnotations } from "./panelAnnotations";
 import { panelPropsWithGraphics } from "./panelGraphics";
+import { readPanelCenterMetric } from "./panelCenterMetric";
 import {
   isHorizontalBarPanel,
   panelOrientationProps,
@@ -691,7 +692,8 @@ export function compilePanel(
             slices: fromMarks.slices,
             innerRadius,
             showLabels,
-            ...props,
+            ...chartPropsFromPanel(props),
+            centerMetric: readPanelCenterMetric(props, fromMarks.slices),
           }),
         ),
       );
@@ -753,11 +755,13 @@ export function compilePanel(
         resolved.innerRadius ??
         (props.innerRadius as number | undefined) ??
         (resolved.type === "donut" ? 42 : undefined);
+      const centerMetric = readPanelCenterMetric(props, slices);
       return wrap(
         createElement(PieChart, panelChartProps(resolved, {
           slices,
           innerRadius,
           showLabels: props.showLabels as boolean | undefined,
+          centerMetric,
         })),
       );
     }

@@ -71,7 +71,7 @@ const PRIORITY_ROWS = [
   { priority: "P4 – Low", count: 19 },
 ];
 
-const BROWSER_SHARE_ROWS = [
+export const BROWSER_SHARE_ROWS = [
   { name: "Chrome", value: 48 },
   { name: "Safari", value: 28 },
   { name: "Firefox", value: 14 },
@@ -95,7 +95,25 @@ const BURNDOWN_ROWS = [
   { day: "D7", remaining: 58, ideal: 48 },
 ];
 
-const DONUT_COLORS = ["#2563eb", "#16a34a", "#d97706", "#64748b"];
+export const DONUT_COLORS = ["#2563eb", "#16a34a", "#d97706", "#64748b"];
+
+const BROWSER_SHARE_CHART_CONFIG = Object.fromEntries(
+  BROWSER_SHARE_ROWS.map((row, index) => [
+    row.name,
+    { color: DONUT_COLORS[index % DONUT_COLORS.length] },
+  ]),
+);
+
+/** Tile compare: no in-panel title (row label only) + Recharts-matched slice colors. */
+export const DONUT_PARITY_SPEC = {
+  ...(donutSpec as PanelSpec),
+  title: undefined,
+  props: {
+    ...((donutSpec as PanelSpec).props ?? {}),
+    chartConfig: BROWSER_SHARE_CHART_CONFIG,
+    centerMetric: "largest",
+  },
+} satisfies PanelSpec;
 
 const PRIORITY_PANEL: PanelSpec = {
   specVersion: 1,
@@ -387,7 +405,7 @@ function buildComparisonCases(): ComparisonCase[] {
       ...PARITY_CASES[7]!,
       axi: (
         <div style={{ width: TILE_W, height: TILE_H }}>
-          {compilePanel(donutSpec as PanelSpec, BROWSER_SHARE_ROWS, { height: TILE_H })}
+          {compilePanel(DONUT_PARITY_SPEC, BROWSER_SHARE_ROWS, { height: TILE_H })}
         </div>
       ),
       recharts: (

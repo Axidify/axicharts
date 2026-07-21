@@ -15,6 +15,8 @@ export type GraphicStyle = {
   text?: string;
   fontSize?: number;
   fontWeight?: string;
+  textAlign?: "left" | "center" | "right";
+  textVerticalAlign?: "top" | "middle" | "bottom";
 };
 
 export type ChartGraphicElement =

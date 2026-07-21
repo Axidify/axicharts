@@ -75,3 +75,16 @@ export const StaticMix: Story = {
     </ChartContainer>
   ),
 };
+
+export const CenterMetricLargest: Story = {
+  render: (): ReactElement => (
+    <ChartContainer theme={cleanTheme} mode="interactive" height={260} width={360}>
+      <PieChart
+        slices={INITIAL_SLICES}
+        innerRadius={42}
+        showLabels
+        centerMetric="largest"
+      />
+    </ChartContainer>
+  ),
+};

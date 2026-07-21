@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Chart, ejectPanel, type PanelSpec } from "@axicharts/charts-spec";
+import { Chart, compilePanel, ejectPanel, type PanelSpec } from "@axicharts/charts-spec";
 import { QuickLineChart } from "@axicharts/charts/quick";
 import throughputSpec from "../../../packages/charts-spec/examples/throughput-bar-color.panel.json";
 import areaSloSpec from "../../../packages/charts-spec/examples/area-slo-line.panel.json";
@@ -11,11 +11,17 @@ import stackedBarSpec from "../../../packages/charts-spec/examples/velocity-stac
 import multiLineSpec from "../../../packages/charts-spec/examples/burndown-multi-line.panel.json";
 import comboSpec from "../../../packages/charts-spec/examples/combo-revenue-bar-line.panel.json";
 import {
+  BROWSER_SHARE_ROWS,
+  DONUT_COLORS,
+  DONUT_PARITY_SPEC,
+  TILE_H,
+  TILE_W,
+} from "../demo/RechartsParityCompare";
+import {
   Bar,
   BarChart,
   Cell,
   ChartContainer,
-  PieChart,
   XAxis,
   YAxis,
 } from "@axicharts/charts";
@@ -59,13 +65,6 @@ const REVENUE_ROWS = [
   { day: "Fri", revenue: 5900 },
 ];
 
-const BROWSER_SHARE_ROWS = [
-  { name: "Chrome", value: 48 },
-  { name: "Safari", value: 28 },
-  { name: "Firefox", value: 14 },
-  { name: "Other", value: 10 },
-];
-
 const COMBO_ROWS = [
   { week: "W1", total: 120, avg: 17 },
   { week: "W2", total: 90, avg: 13 },
@@ -80,8 +79,6 @@ const SPRINT_ROWS = [
   { sprint: "S3", done: 24, carry: 5 },
   { sprint: "S4", done: 28, carry: 3 },
 ];
-
-const DONUT_COLORS = ["#2563eb", "#16a34a", "#d97706", "#64748b"];
 
 const TILE_LABEL: React.CSSProperties = {
   fontSize: 11,
@@ -288,26 +285,20 @@ function RechartsParityWallGallery(): ReactElement {
       <ParityRow
         title="Donut — browser share"
         axi={
-          <ChartContainer theme={cleanTheme} height={220} width="100%">
-            <PieChart
-              innerRadius={60}
-              slices={BROWSER_SHARE_ROWS.map((row) => ({
-                name: row.name.toLowerCase(),
-                value: row.value,
-              }))}
-            />
-          </ChartContainer>
+          <div style={{ width: TILE_W, height: TILE_H }}>
+            {compilePanel(DONUT_PARITY_SPEC, BROWSER_SHARE_ROWS, { height: TILE_H })}
+          </div>
         }
         recharts={
-          <RechartsPieChart width={420} height={220}>
+          <RechartsPieChart width={TILE_W} height={TILE_H}>
             <Pie
               data={BROWSER_SHARE_ROWS}
               dataKey="value"
               nameKey="name"
               cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={90}
+              cy="46%"
+              innerRadius={58}
+              outerRadius={88}
               isAnimationActive={false}
             >
               {BROWSER_SHARE_ROWS.map((row, index) => (

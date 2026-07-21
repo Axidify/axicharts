@@ -10,6 +10,7 @@
     "value": { "field": "value", "type": "quantitative" }
   },
   "props": {
-    "showLabels": true
+    "showLabels": true,
+    "centerMetric": "largest"
   }
 }

@@ -3,7 +3,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { useMemo } from "react";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
-import { EChartsPie, type PieSlice } from "@axicharts/charts-echarts";
+import { EChartsPie, type PieCenterMetricInput, type PieSlice } from "@axicharts/charts-echarts";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { EChartsInteractionShell } from "../chrome/EChartsInteractionShell";
 import { useEChartsInteraction } from "../sync/useEChartsInteraction";
@@ -19,17 +19,20 @@ export type PieChartProps = {
   children?: ReactNode;
   innerRadius?: number;
   showLabels?: boolean;
+  centerMetric?: PieCenterMetricInput;
 };
 
 function PiePlot({
   slices,
   innerRadius,
   showLabels,
+  centerMetric,
   graphics,
 }: {
   slices: PieSlice[];
   innerRadius?: number;
   showLabels?: boolean;
+  centerMetric?: PieCenterMetricInput;
   graphics?: ChartGraphicElement[];
 }): ReactElement {
   const { size, theme, mode } = useChartLayout();
@@ -43,6 +46,7 @@ function PiePlot({
       theme={theme}
       innerRadius={innerRadius}
       showLabels={showLabels}
+      centerMetric={centerMetric}
       graphics={graphics}
       animate={mode === "presentation"}
       mergeOption={mode === "live"}
@@ -57,16 +61,18 @@ export function PieChart({
   children,
   innerRadius: innerRadiusProp,
   showLabels: showLabelsProp,
+  centerMetric: centerMetricProp,
   graphics,
 }: PieChartProps): ReactElement | null {
   const { size, ready, config } = useChartLayout();
-  const { slices: resolvedSlices, innerRadius, showLabels } = useResolvedPieProps(
+  const { slices: resolvedSlices, innerRadius, showLabels, centerMetric } = useResolvedPieProps(
     {
       slices: slicesProp,
       data,
       children,
       innerRadius: innerRadiusProp,
       showLabels: showLabelsProp,
+      centerMetric: centerMetricProp,
     },
     config,
   );
@@ -94,6 +100,7 @@ export function PieChart({
             slices={slices}
             innerRadius={innerRadius}
             showLabels={showLabels}
+            centerMetric={centerMetric}
             graphics={graphics}
           />
         }

@@ -11,6 +11,11 @@ import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { resolvePieSliceColor } from "./pieSliceColor";
 import { pieGapOptions } from "./pieGapOptions";
+import {
+  pieCenterMetricGraphics,
+  resolvePieCenterMetric,
+  type PieCenterMetricInput,
+} from "./pieCenterMetric";
 import { pieCenter, pieEmphasisOptions, pieLabelMode, pieOuterRadius } from "./pieLayout";
 import type { PieSlice } from "./types";
 
@@ -21,6 +26,7 @@ export type EChartsPieProps = {
   theme: ChartTheme;
   innerRadius?: number;
   showLabels?: boolean;
+  centerMetric?: PieCenterMetricInput;
   animate?: boolean;
   mergeOption?: boolean;
   graphics?: ChartGraphicElement[];
@@ -34,6 +40,7 @@ export function EChartsPie({
   theme,
   innerRadius = 0,
   showLabels = true,
+  centerMetric,
   animate = false,
   mergeOption,
   graphics,
@@ -48,6 +55,24 @@ export function EChartsPie({
   const compact = isCompactTile(width, height);
   const labelMode = pieLabelMode(width, height, showLabels);
   const useExternalLabels = labelMode === "external";
+  const resolvedCenterMetric =
+    innerRadius > 0 && centerMetric
+      ? resolvePieCenterMetric(slices, centerMetric)
+      : undefined;
+  const centerGraphics =
+    resolvedCenterMetric != null
+      ? pieCenterMetricGraphics(
+          resolvedCenterMetric,
+          theme,
+          labelMode,
+          width,
+          height,
+        )
+      : [];
+  const mergedGraphics =
+    centerGraphics.length > 0 || graphics?.length
+      ? [...centerGraphics, ...(graphics ?? [])]
+      : undefined;
 
   const data = slices.map((slice, index) => ({
     name: slice.name,
@@ -134,7 +159,7 @@ export function EChartsPie({
 
   const rootRef = useEChart({
     option,
-    graphics,
+    graphics: mergedGraphics,
     width,
     height,
     onItemHover,
