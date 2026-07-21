@@ -10,6 +10,18 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.34] - 2026-07-21
+
+### Added
+
+- **charts-echarts** — full pie `62%` outer radius @ compact legend mode; sunburst/swarm/ridgeline catalog compact layouts
+- **storybook** — pie + cartesian blocks parity rows; `Audit/Studio` wall; Lane C swarm/ridgeline/sunburst + plugins harness
+- **docs** — Recharts reference index (**D-303**); visual CI pie/blocks/studio tiles
+
+### Changed
+
+- **docs** — pie **D-201**, cartesian blocks **D-105** → **Parity**; studio lane **D-310** → **Close**
+
 ## [0.4.33] - 2026-07-21
 
 ### Added
