@@ -8,7 +8,10 @@ import {
   CARTESIAN_PANEL_SCHEMA_URL,
   DATA_PROFILE_SCHEMA_URL,
   handleCreateCartesianPanel,
+  handleCreatePanel,
+  handleListMarks,
   handleValidateCartesianSpec,
+  handleValidatePanel,
 } from "./tools";
 import { describeDataProfile } from "./describeDataProfile";
 
@@ -18,6 +21,57 @@ const ROWS = [
 ];
 
 describe("charts-mcp tools", () => {
+  it("create_panel dispatches cartesian family", () => {
+    const result = handleCreatePanel({
+      family: "cartesian",
+      intent: "Weekly revenue bars with target line",
+      fields: ["week", "revenue", "target"],
+    });
+    const payload = JSON.parse(result.content[0]!.text);
+    expect(payload.panel.type).toBe("cartesian");
+    expect(payload.family).toBe("cartesian");
+    expect(payload.schema).toBe(CARTESIAN_PANEL_SCHEMA_URL);
+  });
+
+  it("validate_panel returns fix patch for unknown fields", () => {
+    const created = JSON.parse(
+      handleCreatePanel({
+        family: "cartesian",
+        intent: "bar chart of revenue",
+        fields: ["week", "revenue"],
+      }).content[0]!.text,
+    );
+    const spec = created.panel;
+    spec.marks[0].field = "revnue";
+    const result = handleValidatePanel({ spec, rows: ROWS });
+    expect(result.isError).toBe(true);
+    const payload = JSON.parse(result.content[0]!.text);
+    const err = payload.errors.find((e: { code: string }) => e.code === "UNKNOWN_FIELD");
+    expect(err?.fix).toEqual({ "marks[0].field": "revenue" });
+    expect(payload.family).toBe("cartesian");
+  });
+
+  it("list_marks returns cartesian catalog", () => {
+    const payload = JSON.parse(handleListMarks({ family: "cartesian" }).content[0]!.text);
+    expect(payload.closedSet).toEqual(["bar", "line", "area", "rule", "band"]);
+  });
+
+  it("list_marks returns distribution catalog", () => {
+    const payload = JSON.parse(handleListMarks({ family: "distribution" }).content[0]!.text);
+    expect(payload.closedSet).toEqual(["arc", "funnel", "donut", "cell", "label"]);
+  });
+
+  it("create_panel dispatches distribution family", () => {
+    const result = handleCreatePanel({
+      family: "distribution",
+      intent: "browser share donut chart",
+      fields: ["browser", "share"],
+    });
+    const payload = JSON.parse(result.content[0]!.text);
+    expect(payload.panel.type).toBe("distribution");
+    expect(payload.family).toBe("distribution");
+  });
+
   it("create_cartesian_panel returns cartesian spec with planner meta", () => {
     const result = handleCreateCartesianPanel({
       intent: "Weekly revenue bars with target line and quota at 50",
@@ -88,6 +142,9 @@ describe("charts-mcp tools", () => {
       expect(tool.schemaUrl).toBe(CARTESIAN_PANEL_SCHEMA_URL);
     }
     expect(OPENAPI_TOOL_BUNDLE.map((tool) => tool.name)).toEqual([
+      "create_panel",
+      "validate_panel",
+      "list_marks",
       "create_cartesian_panel",
       "validate_cartesian_spec",
       "revise_cartesian_panel",

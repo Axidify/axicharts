@@ -1,14 +1,18 @@
 import {
   blockMarksToChartProps,
   createCartesianPanel,
+  createPanel,
   createTablePanel,
   listCartesianMarks,
+  listMarks,
   normalizeToCartesian,
   parseTabular,
   reviseCartesianPanel,
   validateCartesianSpec,
+  validatePanel,
   CARTESIAN_PANEL_SCHEMA_URL,
   DATA_PROFILE_SCHEMA_URL,
+  type AgentChartFamily,
   type ChartMode,
   type DataProfile,
   type PanelSpec,
@@ -36,6 +40,82 @@ function jsonResult(payload: unknown, isError = false): ToolTextResult {
     content: [{ type: "text", text: JSON.stringify(payload, null, 2) }],
     isError,
   };
+}
+
+export function handleCreatePanel(args: {
+  family: AgentChartFamily;
+  intent: string;
+  dataProfile?: DataProfile;
+  fields?: string[];
+  mode?: ChartMode;
+  theme?: ThemeName;
+}): ToolTextResult {
+  try {
+    const result = createPanel({
+      family: args.family,
+      intent: args.intent,
+      dataProfile: args.dataProfile,
+      fields: args.fields,
+      mode: args.mode,
+      theme: args.theme,
+    });
+    return jsonResult(result);
+  } catch (error) {
+    return jsonResult(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
+        family: args.family,
+      },
+      true,
+    );
+  }
+}
+
+export function handleValidatePanel(args: {
+  spec: PanelSpec;
+  dataProfile?: DataProfile;
+  rows?: SpecData;
+  strict?: boolean;
+}): ToolTextResult {
+  const validation = validatePanel(args.spec, {
+    dataProfile: args.dataProfile,
+    rows: asRowArray(args.rows),
+    strict: args.strict ?? true,
+  });
+  if (!validation.ok) {
+    return jsonResult(
+      {
+        ok: false,
+        family: validation.family,
+        errors: validation.errors,
+      },
+      true,
+    );
+  }
+  return jsonResult({
+    ok: true,
+    family: validation.family,
+    spec: validation.spec,
+    warnings: validation.warnings,
+    schema:
+      validation.family === "cartesian" ? CARTESIAN_PANEL_SCHEMA_URL : undefined,
+  });
+}
+
+export function handleListMarks(args: { family: AgentChartFamily }): ToolTextResult {
+  try {
+    return jsonResult(listMarks(args.family));
+  } catch (error) {
+    return jsonResult(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
+        family: args.family,
+      },
+      true,
+    );
+  }
 }
 
 export function handleCreateCartesianPanel(args: {
@@ -213,6 +293,9 @@ export function handleCompileCartesianPanel(args: {
 }
 
 export const TOOL_HANDLERS = {
+  create_panel: handleCreatePanel,
+  validate_panel: handleValidatePanel,
+  list_marks: handleListMarks,
   create_cartesian_panel: handleCreateCartesianPanel,
   validate_cartesian_spec: handleValidateCartesianSpec,
   revise_cartesian_panel: handleReviseCartesianPanel,

@@ -10,6 +10,52 @@ export type OpenApiToolDefinition = {
 /** OpenAPI-compatible tool bundle for non-MCP agents (LangChain, Vercel AI SDK, etc.). */
 export const OPENAPI_TOOL_BUNDLE: OpenApiToolDefinition[] = [
   {
+    name: "create_panel",
+    description:
+      "Create a panel from intent. Dispatches by family (cartesian shipped). Prefer over create_cartesian_panel.",
+    schemaUrl: CARTESIAN_PANEL_SCHEMA_URL,
+    inputSchema: {
+      type: "object",
+      required: ["family", "intent"],
+      properties: {
+        family: { enum: ["cartesian", "distribution", "matrix"] },
+        intent: { type: "string" },
+        fields: { type: "array", items: { type: "string" } },
+        dataProfile: { type: "object" },
+        mode: { enum: ["static", "interactive", "live"] },
+        theme: { enum: ["clean", "studio", "live", "dark"] },
+      },
+    },
+  },
+  {
+    name: "validate_panel",
+    description:
+      "Validate a panel spec against sample rows. Dispatches by family. Prefer over validate_cartesian_spec.",
+    schemaUrl: CARTESIAN_PANEL_SCHEMA_URL,
+    inputSchema: {
+      type: "object",
+      required: ["spec"],
+      properties: {
+        spec: { type: "object" },
+        dataProfile: { type: "object" },
+        rows: { type: "array", items: { type: "object" } },
+        strict: { type: "boolean" },
+      },
+    },
+  },
+  {
+    name: "list_marks",
+    description: "List closed mark catalog for a chart family.",
+    schemaUrl: CARTESIAN_PANEL_SCHEMA_URL,
+    inputSchema: {
+      type: "object",
+      required: ["family"],
+      properties: {
+        family: { enum: ["cartesian", "distribution", "matrix"] },
+      },
+    },
+  },
+  {
     name: "create_cartesian_panel",
     description:
       "Create a cartesian panel from natural-language intent. Intent must name mark types (bar, line, area).",

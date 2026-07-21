@@ -78,6 +78,7 @@ describe("validateCartesianSpec (RFC-002 simulation gates)", () => {
       const err = result.errors.find((e) => e.code === "UNKNOWN_FIELD");
       expect(err?.path).toBe("marks[0].field");
       expect(err?.suggestion).toBe("revenue");
+      expect(err?.fix).toEqual({ "marks[0].field": "revenue" });
     }
   });
 

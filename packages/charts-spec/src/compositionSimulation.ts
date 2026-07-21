@@ -1,5 +1,5 @@
 import { shouldUseDualAxis } from "@axicharts/charts-canvas";
-import type { ChartBlockMarkSpec, PanelSpec } from "./types";
+import type { ChartBlockMarkSpec, ChartBlockSeriesMark, PanelSpec } from "./types";
 import { blockMarksToChartProps, marksCurve, marksNeedFill } from "./blockMarks";
 import { compilePanel } from "./compilePanel";
 import {
@@ -146,9 +146,10 @@ function evaluate(
     notes.push(`dualAxis auto=${dual}`);
   }
 
-  const curves = marks.filter((m) => m.type === "line" || m.type === "area") as Array<
-    Extract<ChartBlockMarkSpec, { type: "line" | "area" }>
-  >;
+  const curves = marks.filter(
+    (mark): mark is ChartBlockSeriesMark =>
+      mark.type === "line" || mark.type === "area",
+  );
   if (curves.length > 1 && curves.some((c) => c.curve) && curves.some((c) => c.curve && c.curve !== curves[0]?.curve)) {
     const perSeries = props.series.every(
       (s, i) => !curves[i]?.curve || s.curve === curves[i]?.curve,

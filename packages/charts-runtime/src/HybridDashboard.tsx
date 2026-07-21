@@ -36,7 +36,7 @@ export function HybridDashboard({
           ) : null}
         </div>
       ) : null}
-      <PanelsDashboard panels={hybrid.panels} />
+      <PanelsDashboard panels={hybrid.panels} agentValidated />
       <MosaicWall
         wall={hybrid.wall}
         alarmScopeId={alarmScopeId}

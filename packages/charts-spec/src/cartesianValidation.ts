@@ -13,6 +13,8 @@ export type CartesianValidationIssue = {
   message: string;
   suggestion?: string;
   severity: ValidationSeverity;
+  /** Mechanical patch for agent self-correction (RFC-004). */
+  fix?: Record<string, unknown>;
 };
 
 export type CartesianValidationError = CartesianValidationIssue & {
@@ -49,6 +51,22 @@ function rowValueNumeric(rows: Record<string, unknown>[], field: string): boolea
     if (value == null || value === "") return true;
     return typeof value === "number" || (typeof value === "string" && value !== "" && !Number.isNaN(Number(value)));
   });
+}
+
+function unknownFieldIssue(
+  path: string,
+  field: string,
+  keys: string[],
+): CartesianValidationError {
+  const suggestion = keys.length > 0 ? suggestField(field, keys) : undefined;
+  return {
+    code: "UNKNOWN_FIELD",
+    path,
+    message: `Field "${field}" not found in data`,
+    suggestion,
+    fix: suggestion ? { [path]: suggestion } : undefined,
+    severity: "error",
+  };
 }
 
 function rawMarkKind(raw: unknown): string | undefined {
@@ -206,13 +224,7 @@ export function validateCartesianSpec(
   }
 
   if (xField && keys.length > 0 && !keys.includes(xField)) {
-    errors.push({
-      code: "UNKNOWN_FIELD",
-      path: "encoding.x.field",
-      message: `Field "${xField}" not found in data`,
-      suggestion: suggestField(xField, keys),
-      severity: "error",
-    });
+    errors.push(unknownFieldIssue("encoding.x.field", xField, keys));
   }
 
   for (let i = 0; i < normalizedMarks.length; i++) {
@@ -228,13 +240,7 @@ export function validateCartesianSpec(
         continue;
       }
       if (keys.length > 0 && !keys.includes(mark.field)) {
-        errors.push({
-          code: "UNKNOWN_FIELD",
-          path: `marks[${i}].field`,
-          message: `Field "${mark.field}" not found in data`,
-          suggestion: suggestField(mark.field, keys),
-          severity: "error",
-        });
+        errors.push(unknownFieldIssue(`marks[${i}].field`, mark.field, keys));
       } else if (rows.length > 0 && !rowValueNumeric(rows, mark.field)) {
         errors.push({
           code: "INVALID_FIELD_TYPE",

@@ -154,6 +154,35 @@ describe("compilePanel donut", () => {
   });
 });
 
+describe("compilePanel distribution", () => {
+  it("compiles distribution panels from marks", () => {
+    const panel = compilePanel(
+      {
+        type: "distribution",
+        encoding: {
+          angle: { field: "share" },
+          color: { field: "browser" },
+        },
+        marks: [
+          { type: "arc", field: "share" },
+          { type: "donut", innerRadius: 42 },
+          { type: "label", show: true },
+        ],
+        height: 200,
+      },
+      {
+        rows: [
+          { browser: "Chrome", share: 48 },
+          { browser: "Safari", share: 32 },
+        ],
+      },
+    );
+
+    const { container } = render(panel);
+    expect(container.innerHTML.length).toBeGreaterThan(0);
+  });
+});
+
 describe("compilePanel alarm tones", () => {
   it("applies tag tones from runtime data to line series", () => {
     const panel = compilePanel(

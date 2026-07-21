@@ -66,7 +66,10 @@ describe("C157 planDashboardFromRows", () => {
     expect(plan!.charts.length).toBeGreaterThanOrEqual(2);
 
     const stageChart = plan!.charts.find((block) => block.questionId === "sales.chart.by_stage");
-    expect(stageChart?.panel.type).toBe("funnel");
+    expect(stageChart?.panel.type).toBe("distribution");
+    expect(stageChart?.panel.marks?.some((mark) => mark.type === "funnel")).toBe(true);
+    expect(stageChart?.decision.status).toBe("validated");
+    expect(stageChart?.validationIssues).toEqual([]);
 
     const forecastChart = plan!.charts.find((block) => block.questionId === "sales.chart.weighted_forecast");
     expect(forecastChart?.panel.type).toBe("cartesian");
@@ -84,6 +87,27 @@ describe("C157 planDashboardFromRows", () => {
 
     const costCenter = plan!.charts.find((block) => block.questionId === "ledger.chart.cost_center");
     expect(costCenter).toBeDefined();
+  });
+
+  it("flags ledger waterfall follow-up as Tier-2 needs_review", () => {
+    const rows = parseTabular(LEDGER_TEXT);
+    const plan = planDashboardFromRows(rows, {
+      followUpIntents: ["waterfall by category"],
+    });
+    expect(plan).not.toBeNull();
+
+    const waterfall = plan!.charts.find((block) => block.questionId === "ledger.chart.waterfall");
+    expect(waterfall).toBeDefined();
+    expect(waterfall?.panel.type).toBe("waterfall");
+    expect(waterfall?.decision.status).toBe("needs_review");
+    expect(waterfall?.validationIssues.some((issue) => issue.code === "TIER2_PANEL")).toBe(true);
+    expect(
+      plan!.decisions.some(
+        (decision) =>
+          decision.status === "needs_review" &&
+          decision.notes.includes("Tier-2"),
+      ),
+    ).toBe(true);
   });
 
   it("plans attendance dashboard and adds follow-up charts", () => {

@@ -99,12 +99,52 @@ export type ChartBlockMarkSpec =
   | ChartBlockRuleMark
   | ChartBlockBandMark;
 
+export type DistributionArcMark = {
+  type: "arc";
+  field: string;
+  label?: string;
+};
+
+export type DistributionFunnelMark = {
+  type: "funnel";
+  field: string;
+  sort?: "ascending" | "descending" | "none";
+};
+
+export type DistributionDonutMark = {
+  type: "donut";
+  innerRadius?: number;
+};
+
+export type DistributionCellMark = {
+  type: "cell";
+  dataKey: string;
+  tone?: "default" | "info" | "success" | "warning" | "critical";
+  color?: string;
+};
+
+export type DistributionLabelMark = {
+  type: "label";
+  show?: boolean;
+  position?: "inside" | "outside";
+};
+
+export type DistributionMarkSpec =
+  | DistributionArcMark
+  | DistributionFunnelMark
+  | DistributionDonutMark
+  | DistributionCellMark
+  | DistributionLabelMark;
+
+export type PanelMarkSpec = ChartBlockMarkSpec | DistributionMarkSpec;
+
 export type PanelChartType =
   | "line"
   | "area"
   | "bar"
   | "blocks"
   | "cartesian"
+  | "distribution"
   | "combo"
   | "pie"
   | "donut"
@@ -162,6 +202,7 @@ export type PanelSpec = {
     y?: FieldEncoding | FieldEncoding[];
     date?: FieldEncoding;
     color?: ColorEncoding;
+    angle?: FieldEncoding;
     size?: SizeEncoding;
     name?: FieldEncoding;
     value?: FieldEncoding;
@@ -191,7 +232,7 @@ export type PanelSpec = {
    * Cartesian building blocks — line/bar/area series plus rule/band overlays.
    * Requires `type: "cartesian"` (or legacy `"blocks"`) and `encoding.x`.
    */
-  marks?: ChartBlockMarkSpec[];
+  marks?: PanelMarkSpec[];
   /** Declarative cartesian annotations — labels, bands, lines, markers. */
   annotations?: AnnotationSpec[];
   /** ECharts-style graphic overlay elements (separate from annotations). */

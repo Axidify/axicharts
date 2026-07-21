@@ -247,7 +247,7 @@ export function ChatWorkspaceView({
             {!loading && result ? (
               <>
                 <DecisionLog decisions={result.decisions} />
-                <PanelsDashboard panels={panelsSpec!} />
+                <PanelsDashboard panels={panelsSpec!} agentValidated />
               </>
             ) : null}
 

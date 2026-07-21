@@ -57,7 +57,10 @@ describe("C159 plan_dashboard MCP", () => {
     const stageChart = payload.charts.find(
       (block: { questionId: string }) => block.questionId === "sales.chart.by_stage",
     );
-    expect(stageChart?.panel.type).toBe("funnel");
+    expect(stageChart?.panel.type).toBe("distribution");
+    expect(stageChart?.panel.marks?.some((mark: { type: string }) => mark.type === "funnel")).toBe(
+      true,
+    );
     expect(payload.summary.needsReview).toBe(false);
   });
 

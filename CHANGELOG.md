@@ -10,6 +10,22 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.24] - 2026-07-21
+
+### Added
+
+- **charts-spec** — RFC-004 C180 orchestrator: `resolvePanelFamily`, `validatePanel`, `createPanel`, `listMarks`
+- **charts-spec** — Distribution family (C181–C185): `arc`, `funnel`, `donut`, `cell`, `label` marks; validate, normalize, compile, eject, simulation
+- **charts-spec** — Tabular stage funnel → `type: "distribution"` + `funnel` mark; `classifyTabularPanelAgentStatus` with `TIER2_PANEL` for waterfall/legacy charts
+- **charts-mcp** — Tier-0 tools `create_panel`, `validate_panel`, `list_marks` (cartesian aliases retained)
+- **charts-runtime** — `PanelsDashboard` `agentValidated` enabled on Axiboard tabular + panels layout paths
+- **axiboard** — Profile planner gated behind `VITE_ENABLE_PROFILE_PLANNER` (M1 uses tabular orchestrator only)
+
+### Fixed
+
+- **charts-spec** — `ValidationIssue.fix` patch on cartesian `UNKNOWN_FIELD` for agent self-correction
+- **charts-spec** — `Chart` validates cartesian and distribution families before compile
+
 ## [0.4.23] - 2026-07-20
 
 ### Added

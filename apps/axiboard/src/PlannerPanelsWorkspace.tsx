@@ -7,7 +7,7 @@ export type PlannerPanelsWorkspaceProps = {
   plan: DashboardPlan;
 };
 
-/** C151 — render planner `plan.panels` against static ops rows. */
+/** Legacy profile planner panels (C151). Not agent-validated — use tabular path for M1. */
 export function PlannerPanelsWorkspace({ plan }: PlannerPanelsWorkspaceProps): ReactElement {
   const rows = opsStaticRows();
 

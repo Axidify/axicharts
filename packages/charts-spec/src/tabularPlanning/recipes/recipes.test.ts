@@ -73,8 +73,8 @@ describe("C158 panel recipes + chart geometry", () => {
     expect(domain.vertical).toBe("sales");
 
     const compiled = compileRecipe(recipe, derivedRows, { dataProfile: profile });
-    expect(compiled.panel.type).toBe("funnel");
-    expect(compiled.panel.props?.stages).toHaveLength(3);
+    expect(compiled.panel.type).toBe("distribution");
+    expect(compiled.panel.marks?.some((mark) => mark.type === "funnel")).toBe(true);
     expect(compiled.matchedRules).toContain("geometry:stage-funnel");
   });
 

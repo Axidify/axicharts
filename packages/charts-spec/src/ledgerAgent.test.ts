@@ -17,8 +17,15 @@ describe("ledger agent panels validate", () => {
 
     const failures: string[] = [];
     for (const block of [...plan!.kpis, ...plan!.charts]) {
-      if (block.panel.type === "table" || block.panel.type === "waterfall") continue;
-      if (block.panel.type === "stat") continue;
+      if (block.panel.type === "table" || block.panel.type === "stat") continue;
+      if (block.panel.type === "waterfall") {
+        expect(block.decision.status, block.questionId).toBe("needs_review");
+        expect(
+          block.validationIssues.some((issue) => issue.code === "TIER2_PANEL"),
+          block.questionId,
+        ).toBe(true);
+        continue;
+      }
       if (block.panel.type !== "cartesian" && block.panel.type !== "blocks") continue;
       const validation = validateCartesianSpec(block.panel, { rows: block.rows });
       if (!validation.ok) {

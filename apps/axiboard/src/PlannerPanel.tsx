@@ -77,6 +77,7 @@ function sourceLabel(plan: DashboardPlan | null): string {
   }
 }
 
+/** Legacy profile planner overlay (C151). Hidden in M1 — set `VITE_ENABLE_PROFILE_PLANNER=true`. */
 export function PlannerPanel({
   open,
   serverUrl,

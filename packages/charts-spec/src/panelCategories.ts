@@ -18,6 +18,7 @@ export const PANEL_TYPE_CATEGORY: Record<string, PanelCategory> = {
   navigator: "cartesian",
   pie: "distribution",
   donut: "distribution",
+  distribution: "distribution",
   funnel: "distribution",
   "pictorial-bar": "distribution",
   pictorialBar: "distribution",

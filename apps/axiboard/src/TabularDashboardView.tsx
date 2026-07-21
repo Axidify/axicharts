@@ -100,7 +100,7 @@ export function TabularDashboardView({
 
       <DecisionLog decisions={decisions} />
 
-      <PanelsDashboard panels={viewSpec} />
+      <PanelsDashboard panels={viewSpec} agentValidated />
     </div>
   );
 }

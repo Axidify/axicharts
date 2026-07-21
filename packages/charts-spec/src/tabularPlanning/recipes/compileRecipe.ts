@@ -25,29 +25,32 @@ function sortByStageOrder(
   });
 }
 
-function compileFunnelPanel(
+function compileDistributionFunnelPanel(
   recipe: PanelRecipe,
   rows: Record<string, unknown>[],
 ): CompiledRecipeResult {
   const xField = recipe.xField ?? recipe.groupBy ?? "stage";
   const yField = recipe.yField ?? "value";
-  const stages = rows.map((row) => ({
-    name: String(row[xField]),
-    value: Number(row[yField] ?? 0),
-  }));
 
   return {
     panel: {
       specVersion: 1,
-      type: "funnel",
+      type: "distribution",
       title: recipe.title,
       theme: "clean",
       mode: "interactive",
-      props: { stages },
+      encoding: {
+        angle: { field: yField, type: "quantitative" },
+        color: { field: xField, type: "nominal" },
+      },
+      marks: [
+        { type: "funnel", field: yField },
+        { type: "label", show: true },
+      ],
     },
     rows,
-    geometry: { panelType: "funnel", rules: ["compile:funnel"] },
-    matchedRules: ["recipe-funnel", "geometry:stage-funnel"],
+    geometry: { panelType: "funnel", rules: ["compile:distribution-funnel"] },
+    matchedRules: ["recipe-funnel", "geometry:stage-funnel", "mark:funnel"],
   };
 }
 
@@ -239,7 +242,7 @@ export function compileRecipe(
   }
 
   if (recipe.panelType === "funnel") {
-    return compileFunnelPanel(recipe, chartRows);
+    return compileDistributionFunnelPanel(recipe, chartRows);
   }
 
   const geometry = inferChartGeometry({

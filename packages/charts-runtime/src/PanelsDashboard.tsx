@@ -2,20 +2,85 @@
 
 import type { ReactElement } from "react";
 import { Chart } from "@axicharts/charts-spec";
+import { validatePanel } from "@axicharts/charts-spec/planning";
 import { KpiFlipCard } from "./KpiFlipCard";
 import type { PanelsDashboardSpec } from "./types";
+import type { TabularPanelBlock } from "./types";
 
 export type PanelsDashboardProps = {
   panels: PanelsDashboardSpec;
   className?: string;
   /** Flip KPI cards to show agent rationale (default true). */
   flipKpis?: boolean;
+  /**
+   * When true, chart panels must pass `validate_panel` in strict mode before render.
+   * KPI stat panels and tables are skipped (Tier-2 widgets).
+   */
+  agentValidated?: boolean;
 };
+
+function AgentValidationError({
+  title,
+  message,
+}: {
+  title?: string;
+  message: string;
+}): ReactElement {
+  return (
+    <div
+      role="alert"
+      style={{
+        padding: 12,
+        borderRadius: 8,
+        border: "1px solid #fecaca",
+        background: "#fef2f2",
+        color: "#991b1b",
+        fontSize: 12,
+        minHeight: 120,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
+      {title ? <div style={{ fontWeight: 600, marginBottom: 4 }}>{title}</div> : null}
+      <div>{message}</div>
+    </div>
+  );
+}
+
+function validateAgentChartBlock(block: TabularPanelBlock): string | null {
+  const result = validatePanel(block.panel, {
+    rows: block.rows,
+    strict: true,
+  });
+  if (result.ok) return null;
+  const first = result.errors[0];
+  return first?.message ?? "Panel failed agent validation";
+}
+
+function ChartTile({
+  block,
+  height,
+  agentValidated,
+}: {
+  block: TabularPanelBlock;
+  height: number;
+  agentValidated: boolean;
+}): ReactElement {
+  if (agentValidated) {
+    const error = validateAgentChartBlock(block);
+    if (error) {
+      return <AgentValidationError title={block.panel.title} message={error} />;
+    }
+  }
+  return <Chart panel={block.panel} data={{ rows: block.rows }} height={height} />;
+}
 
 export function PanelsDashboard({
   panels,
   className,
   flipKpis = true,
+  agentValidated = false,
 }: PanelsDashboardProps): ReactElement {
   const columns = panels.columns ?? 2;
   const gap = panels.gap ?? 16;
@@ -88,7 +153,7 @@ export function PanelsDashboard({
         >
           {chartBlocks.map((block) => (
             <div key={block.panel.title} style={{ minWidth: 0 }}>
-              <Chart panel={block.panel} data={{ rows: block.rows }} height={280} />
+              <ChartTile block={block} height={280} agentValidated={agentValidated} />
             </div>
           ))}
         </div>

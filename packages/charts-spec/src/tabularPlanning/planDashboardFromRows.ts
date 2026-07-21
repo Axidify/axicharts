@@ -2,7 +2,7 @@ import type { DomainSemantics } from "../classifyTabularDomain";
 import type { VerticalId } from "../rulePacks/types";
 import type { DataProfile, PanelSpec } from "../types";
 import { classifyTabularDomain, enrichProfileWithDomain } from "../classifyTabularDomain";
-import { validateCartesianSpec, type CartesianValidationIssue } from "../cartesianValidation";
+import type { ValidationIssue } from "../validatePanel";
 import { profileTabular } from "../profileTabular";
 import { questionsForVertical } from "./catalogs";
 import { enrichTabular } from "./enrich";
@@ -27,6 +27,7 @@ import {
   detectSupportCaseTable,
   suggestSupportCaseAnalytics,
 } from "./composeSupportCaseDashboard";
+import { classifyTabularPanelAgentStatus } from "./tabularPanelAgentStatus";
 
 export type TabularPlanDecision = {
   step: string;
@@ -40,7 +41,7 @@ export type TabularPlanBlock = {
   questionId: string;
   panel: PanelSpec;
   rows: Array<Record<string, string | number | boolean>>;
-  validationIssues: CartesianValidationIssue[];
+  validationIssues: ValidationIssue[];
   decision: TabularPlanDecision;
 };
 
@@ -199,42 +200,21 @@ function compileRecipeBlock(
     };
   }
 
-  const validationIssues: CartesianValidationIssue[] = [];
-  let status: TabularPlanDecision["status"] = "validated";
-  let notes = `panel: ${panel.type}`;
-
-  if (panel.type === "cartesian") {
-    const validation = validateCartesianSpec(panel, { dataProfile, rows: compiled.rows });
-    validationIssues.push(...(validation.ok ? validation.warnings : validation.errors));
-    if (!validation.ok) {
-      status = "needs_review";
-      notes += ` · errors: ${validation.errors.map((issue) => issue.code).join(", ")}`;
-    } else if (validation.warnings.length > 0) {
-      notes += ` · warnings: ${validation.warnings.length}`;
-    }
-  } else if (panel.type === "stat") {
-    status = "ok";
-    notes = `Stat KPI — ${recipe.title}`;
-  } else if (panel.type === "table") {
-    status = "ok";
-    notes = `${compiled.rows.length} rows`;
-  } else if (panel.type === "funnel") {
-    notes = "geometry: stage funnel";
-  }
+  const agentStatus = classifyTabularPanelAgentStatus(panel, compiled.rows, dataProfile);
 
   pushDecision(decisions, {
     step: `${stepPrefix} — ${recipe.title}`,
     api: recipe.panelType === "stat" ? "compileRecipe + stat" : "compileRecipe",
     intent: recipe.intent,
-    status,
-    notes,
+    status: agentStatus.status,
+    notes: agentStatus.notes,
   });
 
   return {
     questionId: recipe.questionId,
     panel,
     rows: compiled.rows as Array<Record<string, string | number | boolean>>,
-    validationIssues,
+    validationIssues: agentStatus.validationIssues,
     decision: decisions[decisions.length - 1]!,
   };
 }
@@ -376,42 +356,21 @@ function compileQuestionBlock(
     };
   }
 
-  const validationIssues: CartesianValidationIssue[] = [];
-  let status: TabularPlanDecision["status"] = "validated";
-  let notes = `panel: ${panel.type}`;
-
-  if (panel.type === "cartesian") {
-    const validation = validateCartesianSpec(panel, { dataProfile, rows: compiled.rows });
-    validationIssues.push(...(validation.ok ? validation.warnings : validation.errors));
-    if (!validation.ok) {
-      status = "needs_review";
-      notes += ` · errors: ${validation.errors.map((issue) => issue.code).join(", ")}`;
-    } else if (validation.warnings.length > 0) {
-      notes += ` · warnings: ${validation.warnings.length}`;
-    }
-  } else if (panel.type === "stat") {
-    status = "ok";
-    notes = `Stat KPI — ${KPI_LABELS[questionId] ?? recipe.title}`;
-  } else if (panel.type === "table") {
-    status = "ok";
-    notes = `${compiled.rows.length} rows`;
-  } else if (panel.type === "funnel") {
-    notes = "geometry: stage funnel";
-  }
+  const agentStatus = classifyTabularPanelAgentStatus(panel, compiled.rows, dataProfile);
 
   const decision = pushDecision(decisions, {
     step: `${stepPrefix} — ${KPI_LABELS[questionId] ?? recipe.title}`,
     api: recipe.panelType === "stat" ? "compileRecipe + stat" : "compileRecipe",
     intent: recipe.intent,
-    status,
-    notes,
+    status: agentStatus.status,
+    notes: agentStatus.notes,
   });
 
   return {
     questionId,
     panel,
     rows: compiled.rows as Array<Record<string, string | number | boolean>>,
-    validationIssues,
+    validationIssues: agentStatus.validationIssues,
     decision,
   };
 }

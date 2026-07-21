@@ -472,4 +472,31 @@ describe("ejectPanel", () => {
     expect(jsx).toContain('mode="presentation"');
     expect(jsx).toContain("presentationTheme");
   });
+
+  it("emits composable distribution marks", () => {
+    const jsx = ejectPanel(
+      {
+        type: "distribution",
+        encoding: {
+          angle: { field: "share" },
+          color: { field: "browser" },
+        },
+        marks: [
+          { type: "arc", field: "share" },
+          { type: "donut", innerRadius: 42 },
+          { type: "label", show: true },
+        ],
+        theme: "clean",
+        height: 280,
+      },
+      "rows",
+      { style: "composable" },
+    );
+
+    expect(jsx).toContain('@axicharts/charts/distribution');
+    expect(jsx).toContain("<Pie ");
+    expect(jsx).toContain('dataKey="share"');
+    expect(jsx).toContain('nameKey="browser"');
+    expect(jsx).toContain("innerRadius={42}");
+  });
 });

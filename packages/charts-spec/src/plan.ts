@@ -13,6 +13,14 @@ export type PlanPanelsOptions = {
   fieldProfiles?: FieldProfile[];
 };
 
+/**
+ * Legacy profile planner — infers panel `type` from metric names/tags (pie, funnel, waterfall, …).
+ *
+ * **Not agent grammar.** For RFC-004 agent-safe panels use `planDashboardFromRows` (tabular rows)
+ * or MCP `create_panel` / `validate_panel`. This API remains for charts-planner server, Storybook,
+ * and CSV/profile demos only.
+ */
+
 function inferChartType(metric: MetricProfile): PanelSpec["type"] {
   const name = metric.name.toLowerCase();
   const kind = metric.kind;
@@ -204,13 +212,14 @@ export function planPanelFromMetric(
   if (lineCurve && finalized.type === "cartesian" && finalized.marks) {
     return {
       ...finalized,
-      marks: applyCurveToMarks(finalized.marks, lineCurve),
+      marks: applyCurveToMarks(finalized.marks as ChartBlockMarkSpec[], lineCurve),
     };
   }
 
   return finalized;
 }
 
+/** @see planPanelFromMetric — legacy profile planner; not agent grammar. */
 export function planPanelsFromProfile(
   profile: DataProfile,
   options: PlanPanelsOptions = {},

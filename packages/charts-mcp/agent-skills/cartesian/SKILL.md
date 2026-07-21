@@ -11,13 +11,23 @@ Use the **@axicharts/charts-mcp** server when building cartesian charts in Curso
 
 ## MCP tools
 
+**Prefer unified Tier-0 tools (RFC-004):**
+
 | Tool | When |
 |------|------|
 | `describe_data_profile` | First — learn fields and roles from sample rows |
-| `create_cartesian_panel` | Draft spec from intent (must name bar/line/area) |
-| `validate_cartesian_spec` | Always before render — retry on errors |
+| `create_panel` | Draft spec — use `{ family: "cartesian", intent }` |
+| `validate_panel` | Always before render — retry on errors; apply `fix` when present |
+| `list_marks` | Discovery — `{ family: "cartesian" }` closed catalog |
+
+**Cartesian aliases (backward compatible):**
+
+| Tool | When |
+|------|------|
+| `create_cartesian_panel` | Same as `create_panel({ family: "cartesian" })` |
+| `validate_cartesian_spec` | Same as `validate_panel` for cartesian specs |
 | `revise_cartesian_panel` | Follow-up turns (“add SLO at 200”) |
-| `list_cartesian_marks` | Discovery — closed v1 catalog only |
+| `list_cartesian_marks` | Same as `list_marks({ family: "cartesian" })` |
 | `compile_cartesian_panel` | Smoke test compile path |
 
 Schema: `@axicharts/charts-spec/schema/cartesian-panel.schema.json` · data profile: `@axicharts/charts-spec/schema/data-profile.schema.json`
@@ -25,10 +35,10 @@ Schema: `@axicharts/charts-spec/schema/cartesian-panel.schema.json` · data prof
 ## Workflow
 
 1. Call `describe_data_profile` with sample rows.
-2. Call `create_cartesian_panel` with explicit mark types in intent.
+2. Call `create_panel` with `{ family: "cartesian", intent }` — intent must name bar/line/area.
 3. If `needsReview` is true, refine intent — do not ship empty or overlay-only specs.
-4. Call `validate_cartesian_spec` with spec + rows.
-5. On `UNKNOWN_FIELD`, use `suggestion` and retry validate.
+4. Call `validate_panel` with spec + rows.
+5. On `UNKNOWN_FIELD`, apply `fix` if present, else use `suggestion` and retry validate.
 6. On `MISSING_DATA_MARK`, refine intent with bar/line/area.
 7. Optional: `revise_cartesian_panel` for incremental edits.
 8. Optional: `compile_cartesian_panel` before handoff.

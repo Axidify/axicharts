@@ -39,6 +39,43 @@ export function createCartesianMcpServer(
   });
 
   server.tool(
+    "create_panel",
+    `Create a panel from natural-language intent. Dispatches by family (cartesian shipped; distribution/matrix C181+). Prefer over create_cartesian_panel.`,
+    {
+      family: z
+        .enum(["cartesian", "distribution", "matrix"])
+        .describe("Chart family — only cartesian is agent-ready today"),
+      intent: z.string().describe("Chart intent — must name mark types for cartesian"),
+      fields: z.array(z.string()).optional().describe("Row field names from sample data"),
+      dataProfile: dataProfileSchema,
+      mode: z.enum(["static", "interactive", "live"]).optional(),
+      theme: z.enum(["clean", "studio", "live", "dark"]).optional(),
+    },
+    async (args) => callTool("create_panel", args),
+  );
+
+  server.tool(
+    "validate_panel",
+    `Validate any panel spec against data. Dispatches by family; strict mode rejects Tier-2 panels. Prefer over validate_cartesian_spec.`,
+    {
+      spec: panelSpecSchema,
+      dataProfile: dataProfileSchema,
+      rows: rowsSchema.optional(),
+      strict: z.boolean().optional().describe("Reject Tier-2 / unimplemented families (default true)"),
+    },
+    async (args) => callTool("validate_panel", args),
+  );
+
+  server.tool(
+    "list_marks",
+    "List closed mark catalog for a chart family. Prefer over list_cartesian_marks.",
+    {
+      family: z.enum(["cartesian", "distribution", "matrix"]),
+    },
+    async (args) => callTool("list_marks", args),
+  );
+
+  server.tool(
     "create_cartesian_panel",
     `Create a cartesian panel (type: cartesian + marks[]) from natural-language intent. Schema: ${CARTESIAN_PANEL_SCHEMA_URL}`,
     {
@@ -153,6 +190,9 @@ export async function runCartesianMcpServer(
 
 export function isToolName(value: string): value is ToolName {
   return (
+    value === "create_panel" ||
+    value === "validate_panel" ||
+    value === "list_marks" ||
     value === "create_cartesian_panel" ||
     value === "validate_cartesian_spec" ||
     value === "revise_cartesian_panel" ||

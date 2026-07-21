@@ -20,6 +20,11 @@ import { chartPropsWithoutLiveAnimate } from "./panelLiveAnimate";
 import { mapDrillEjectProps } from "./mapEncoding";
 import { ejectGraphicsProp } from "./panelGraphics";
 import { normalizeToCartesian } from "./normalizeToCartesian";
+import { normalizeToDistribution } from "./normalizeToDistribution";
+import {
+  ejectDistributionBody,
+  ejectDistributionImports,
+} from "./ejectDistribution";
 import {
   SIZE_SCALE_HELPER,
   sizeFieldMinMaxBlock,
@@ -63,6 +68,8 @@ function resolveChartName(spec: PanelSpec): string {
     ? "ComboChart"
     : spec.type === "blocks" || spec.type === "cartesian"
       ? "CartesianChart"
+      : spec.type === "distribution"
+        ? "PieChart"
       : spec.type === "pie"
       ? "PieChart"
       : spec.type === "donut"
@@ -140,6 +147,9 @@ export function ejectPanel(
   if (spec.type === "cartesian" || spec.type === "blocks") {
     spec = normalizeToCartesian(spec);
   }
+  if (spec.type === "distribution") {
+    spec = normalizeToDistribution(spec);
+  }
   const theme = spec.theme ?? "clean";
   const panelStyle = readPanelStyle(spec.props);
   const chrome = readPanelChrome(spec.props);
@@ -204,6 +214,8 @@ export function ejectPanel(
     const cartesian = ejectCartesianBody(spec, dataVar);
     chartBody = cartesian.body;
     preamble = cartesian.preamble ?? "";
+  } else if (spec.type === "distribution") {
+    chartBody = ejectDistributionBody(spec, dataVar, ejectStyle);
   } else if (spec.type === "pie" || spec.type === "donut") {
     const nameField = encoding?.name?.field ?? "name";
     const valueField = encoding?.value?.field ?? "value";
@@ -597,6 +609,10 @@ export function ejectPanel(
     for (const item of ejectBlocksImports(ejectStyle)) {
       imports.add(item);
     }
+  } else if (spec.type === "distribution") {
+    for (const item of ejectDistributionImports(spec)) {
+      imports.add(item);
+    }
   } else if (
     spec.type !== "sankey" &&
     spec.type !== "geo" &&
@@ -627,8 +643,21 @@ export function ejectPanel(
       ? ejectStyle === "composable"
       : cartesianUsesComposableMarks(spec);
 
+  const isComposableDistribution =
+    spec.type === "distribution" && ejectStyle === "composable";
+
   if (isComposableCartesian) {
     return `${preambleBlock}import { ${[...imports].join(", ")} } from "@axicharts/charts/cartesian";
+import { ${themeImport} } from "@axicharts/charts-theme";
+${chartsImport ? `${chartsImport}\n` : ""}
+<ChartContainer theme={${themeExpr}}${mode}${chromeAttrs} height={${height}} width="100%">
+  <${chartName}
+    ${chartBody}
+</ChartContainer>`;
+  }
+
+  if (isComposableDistribution) {
+    return `${preambleBlock}import { ${[...imports].join(", ")} } from "@axicharts/charts/distribution";
 import { ${themeImport} } from "@axicharts/charts-theme";
 ${chartsImport ? `${chartsImport}\n` : ""}
 <ChartContainer theme={${themeExpr}}${mode}${chromeAttrs} height={${height}} width="100%">

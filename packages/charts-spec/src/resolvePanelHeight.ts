@@ -10,6 +10,7 @@ const MIN_PLOT_HEIGHT: Partial<Record<string, number>> = {
   scatter: 200,
   pie: 200,
   donut: 200,
+  distribution: 200,
   waterfall: 200,
   candlestick: 220,
   heatmap: 200,

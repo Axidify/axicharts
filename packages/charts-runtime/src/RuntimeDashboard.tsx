@@ -27,7 +27,7 @@ export function RuntimeDashboard({
   if (spec.layout === "panels") {
     return (
       <div className={className} style={{ width: "100%", height: "100%" }}>
-        <PanelsDashboard panels={spec.panels} />
+        <PanelsDashboard panels={spec.panels} agentValidated />
       </div>
     );
   }

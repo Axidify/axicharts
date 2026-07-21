@@ -31,6 +31,10 @@ export type {
 
 export { blockMarksToChartProps, type BlockMarksChartProps } from "./blockMarks";
 export {
+  blockMarksToDistributionProps,
+  type DistributionChartProps,
+} from "./blockMarksToDistributionProps";
+export {
   normalizeBlockMark,
   normalizeMarksArray,
   isDataMark,
@@ -45,6 +49,52 @@ export {
   type CartesianValidationIssue,
   type ValidateCartesianOptions,
 } from "./cartesianValidation";
+export {
+  resolvePanelFamily,
+  isAgentChartFamily,
+  type AgentChartFamily,
+  type PanelFamily,
+} from "./resolvePanelFamily";
+export {
+  validatePanel,
+  assertValidPanel,
+  PanelValidationError,
+  type ValidationIssue,
+  type ValidatePanelOptions,
+  type ValidatePanelResult,
+} from "./validatePanel";
+export {
+  createPanel,
+  UnsupportedPanelFamilyError,
+  type CreatePanelInput,
+  type CreatePanelResult,
+} from "./createPanel";
+export { listMarks, type MarkCatalogResult } from "./listMarks";
+export {
+  createDistributionPanel,
+  listDistributionMarks,
+  DISTRIBUTION_MARK_CATALOG,
+  type CreateDistributionPanelInput,
+  type CreateDistributionPanelResult,
+  type DistributionMarkCatalogEntry,
+} from "./createDistributionPanel";
+export {
+  validateDistributionSpec,
+  type DistributionValidationIssue,
+} from "./distributionValidation";
+export { normalizeToDistribution, type NormalizedDistributionSpec } from "./normalizeToDistribution";
+export {
+  runDistributionSimulations,
+  summarizeSimulations as summarizeDistributionSimulations,
+  type SimulationOutcome,
+  type SimulationResult,
+} from "./distributionSimulation";
+export {
+  DISTRIBUTION_PLAYGROUND_PRESETS,
+  findDistributionPreset,
+  distributionPresetSpecJson,
+  type DistributionPlaygroundPreset,
+} from "./distributionPlayground/presets";
 export { normalizeToCartesian, normalizeRawCartesianPanel, type NormalizedCartesianSpec } from "./normalizeToCartesian";
 export { suggestField, levenshtein } from "./fieldSuggest";
 export {

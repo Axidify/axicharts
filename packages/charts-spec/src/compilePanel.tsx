@@ -65,11 +65,16 @@ import {
   blockMarksToChartProps,
   marksCurve,
 } from "./blockMarks";
+import { blockMarksToDistributionProps } from "./blockMarksToDistributionProps";
 import { normalizeToCartesian } from "./normalizeToCartesian";
+import { normalizeToDistribution } from "./normalizeToDistribution";
+import { normalizeDistributionMarks } from "./distributionMarks";
 import {
   CartesianSpecValidationError,
   validateCartesianSpec,
 } from "./cartesianValidation";
+import { validateDistributionSpec } from "./distributionValidation";
+import { PanelValidationError } from "./validatePanel";
 import {
   chartPropsWithoutChromeMeta,
   readPanelChrome,
@@ -119,6 +124,11 @@ function panelChartProps<T extends Record<string, unknown>>(
   props: T,
 ): T {
   return panelPropsWithGraphics(spec, panelPropsWithAnnotations(spec, props));
+}
+
+function panelUsesDistributionMarks(spec: PanelSpec): boolean {
+  const marks = normalizeDistributionMarks((spec.marks ?? []) as unknown[]);
+  return marks.length > 0;
 }
 
 function chartPropsFromPanel(props: Record<string, unknown>): Record<string, unknown> {
@@ -604,8 +614,73 @@ export function compilePanel(
       );
     }
 
+    case "distribution": {
+      const distribution = normalizeToDistribution(resolved);
+      const shouldValidate = options.validateCartesian !== false;
+      if (shouldValidate) {
+        const validation = validateDistributionSpec(distribution, {
+          rows,
+          dataProfile: options.dataProfile,
+        });
+        if (!validation.ok) {
+          throw new PanelValidationError(
+            "distribution",
+            validation.errors.map((issue) => ({ ...issue, family: "distribution" })),
+          );
+        }
+        for (const warning of validation.warnings) {
+          if (process.env.NODE_ENV !== "production") {
+            console.warn(`[axicharts] ${warning.code}: ${warning.message}`);
+          }
+        }
+      }
+
+      const fromMarks = blockMarksToDistributionProps(
+        rows,
+        distribution.marks ?? [],
+        distribution.encoding,
+      );
+
+      if (fromMarks.variant === "funnel") {
+        return wrap(
+          createElement(
+            FunnelChart,
+            panelChartProps(distribution, {
+              stages: fromMarks.stages,
+              sort: fromMarks.sort ?? "descending",
+              showLabels: fromMarks.showLabels,
+              ...props,
+            }),
+          ),
+        );
+      }
+
+      const innerRadius =
+        fromMarks.innerRadius ??
+        distribution.innerRadius ??
+        (props.innerRadius as number | undefined);
+      const showLabels =
+        fromMarks.showLabels ?? (props.showLabels as boolean | undefined);
+
+      return wrap(
+        createElement(
+          PieChart,
+          panelChartProps(distribution, {
+            slices: fromMarks.slices,
+            innerRadius,
+            showLabels,
+            ...props,
+          }),
+        ),
+      );
+    }
+
     case "pie":
     case "donut": {
+      if (panelUsesDistributionMarks(resolved)) {
+        return compilePanel({ ...resolved, type: "distribution" }, data, options);
+      }
+
       const nameField = resolved.encoding?.name?.field ?? "name";
       const valueField = resolved.encoding?.value?.field ?? "value";
       const slices =

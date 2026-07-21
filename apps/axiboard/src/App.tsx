@@ -45,6 +45,7 @@ import { TabularDashboardView } from "./TabularDashboardView";
 import { AuthStatus } from "./AuthStatus";
 import type { OrchestratorChatResult } from "./api/orchestratorClient";
 import { buildTabularRuntimeSpec, isPanelsRuntimeSpec } from "./runtime/tabularRuntimeSpec";
+import { PROFILE_PLANNER_ENABLED } from "./featureFlags";
 import {
   buildRuntimeSpec,
   defaultSeedSpec,
@@ -474,6 +475,7 @@ export function App(): ReactElement {
   const canDeleteDashboard = (activeWorkspace?.dashboards.length ?? 0) > 1;
   const isTabularDashboard = activeSpec?.layout === "panels";
   const showPlannerPanels =
+    PROFILE_PLANNER_ENABLED &&
     !tabularUploadOpen &&
     !isTabularDashboard &&
     feed === "static" &&
@@ -660,7 +662,7 @@ export function App(): ReactElement {
               >
                 Upload CSV
               </button>
-              {!isTabularDashboard ? (
+              {!isTabularDashboard && PROFILE_PLANNER_ENABLED ? (
                 <button type="button" onClick={() => setPlannerOpen(true)} style={buttonStyle}>
                   Plan
                 </button>
@@ -794,12 +796,14 @@ export function App(): ReactElement {
           )}
         </main>
       </div>
-      <PlannerPanel
-        open={plannerOpen}
-        serverUrl={PLANNER_URL}
-        onClose={() => setPlannerOpen(false)}
-        onApply={handleApplyPlan}
-      />
+      {PROFILE_PLANNER_ENABLED ? (
+        <PlannerPanel
+          open={plannerOpen}
+          serverUrl={PLANNER_URL}
+          onClose={() => setPlannerOpen(false)}
+          onApply={handleApplyPlan}
+        />
+      ) : null}
       <EmbedDialog
         open={embedOpen}
         spec={activeSpec}
