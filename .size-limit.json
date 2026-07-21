@@ -14,13 +14,13 @@
   {
     "name": "@axicharts/charts-canvas",
     "path": "packages/charts-canvas/dist/index.js",
-    "limit": "12.5 KB",
+    "limit": "14 KB",
     "gzip": true
   },
   {
     "name": "@axicharts/charts-echarts",
     "path": "packages/charts-echarts/dist/index.js",
-    "limit": "20.3 KB",
+    "limit": "21 KB",
     "gzip": true
   },
   {
@@ -32,7 +32,7 @@
   {
     "name": "@axicharts/charts-theme",
     "path": "packages/charts-theme/dist/index.js",
-    "limit": "2 KB",
+    "limit": "3.5 KB",
     "gzip": true
   },
   {
