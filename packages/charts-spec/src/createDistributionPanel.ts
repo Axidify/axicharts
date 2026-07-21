@@ -1,4 +1,5 @@
 import type { ChartMode, DataProfile, DistributionMarkSpec, PanelSpec, ThemeName } from "./types";
+import { detectIntentFamilyConflict } from "./intentFamilyConflict";
 import { normalizeToDistribution } from "./normalizeToDistribution";
 
 export type DistributionMarkCatalogEntry = {
@@ -58,7 +59,7 @@ export type CreateDistributionPanelResult = {
   panel: PanelSpec;
   needsReview: boolean;
   matchedRules: string[];
-  reviewReason: "no_data_mark" | "vague_intent" | null;
+  reviewReason: "no_data_mark" | "vague_intent" | "conflicting_families" | null;
 };
 
 /**
@@ -92,7 +93,14 @@ export function createDistributionPanel(
     matchedRules.push("mark:label");
   }
 
-  const needsReview = !PIE_INTENT_RE.test(intent) && !DONUT_INTENT_RE.test(intent);
+  let needsReview = !PIE_INTENT_RE.test(intent) && !DONUT_INTENT_RE.test(intent);
+  let reviewReason: CreateDistributionPanelResult["reviewReason"] = needsReview
+    ? "vague_intent"
+    : null;
+  if (detectIntentFamilyConflict(intent)) {
+    needsReview = true;
+    reviewReason = "conflicting_families";
+  }
 
   const panel = normalizeToDistribution({
     specVersion: 1,
@@ -111,6 +119,6 @@ export function createDistributionPanel(
     panel,
     needsReview,
     matchedRules,
-    reviewReason: needsReview ? "vague_intent" : null,
+    reviewReason,
   };
 }

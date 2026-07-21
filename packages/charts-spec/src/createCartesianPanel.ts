@@ -1,5 +1,6 @@
 import type { ChartBlockMarkSpec, ChartBlockSeriesMark, ChartMode, DataProfile, PanelSpec, ThemeName } from "./types";
 import { suggestField } from "./fieldSuggest";
+import { detectIntentFamilyConflict } from "./intentFamilyConflict";
 import { normalizeToCartesian } from "./normalizeToCartesian";
 
 export type CartesianMarkCatalogEntry = {
@@ -35,6 +36,7 @@ export type PlannerReviewReason =
   | "no_data_mark"
   | "vague_intent"
   | "unresolved_field"
+  | "conflicting_families"
   | null;
 
 const INTENT_STOP_WORDS = new Set([
@@ -349,13 +351,16 @@ export function createCartesianPanel(
     matchedRules.some((rule) => rule === "bar" || rule === "line" || rule === "area");
   const vague = isVagueIntent(intent);
   const missingField = unresolvedIntentField(intent, fields);
-  const reviewReason: PlannerReviewReason = missingField
+  let reviewReason: PlannerReviewReason = missingField
     ? "unresolved_field"
     : !hasDataMark
       ? vague
         ? "vague_intent"
         : "no_data_mark"
       : null;
+  if (detectIntentFamilyConflict(intent)) {
+    reviewReason = "conflicting_families";
+  }
   const needsReview = reviewReason != null;
 
   const panel: PanelSpec = {

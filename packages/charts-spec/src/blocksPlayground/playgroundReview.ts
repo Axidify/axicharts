@@ -8,6 +8,9 @@ export function plannerReviewMessage(reviewReason: PlannerReviewReason): string 
   if (reviewReason === "no_data_mark") {
     return "Intent matched overlays only (rule/band) — add a data mark (bar, line, area) or refine your intent.";
   }
+  if (reviewReason === "conflicting_families") {
+    return "Intent names multiple chart families (e.g. bar and pie) — pick one panel per family or refine your intent.";
+  }
   return "Generated spec needs review — adjust marks manually or refine your intent.";
 }
 

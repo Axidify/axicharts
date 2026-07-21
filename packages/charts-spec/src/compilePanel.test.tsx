@@ -11,6 +11,7 @@ import {
 import { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 import { compilePanel } from "./compilePanel";
 import { ejectPanel } from "./eject";
+import { assertChartsSpecTestHarness } from "./testHarness";
 import stackedBarSpec from "../examples/velocity-stacked-bar.panel.json";
 
 describe("compilePanel registered types", () => {
@@ -341,6 +342,7 @@ describe("compilePanel panel style", () => {
   });
 
   it("renders flow legend for stacked bar dashboard panels", async () => {
+    assertChartsSpecTestHarness();
     const panel = compilePanel(stackedBarSpec, [], { height: 280 });
     const { container } = render(panel);
     await waitFor(() => {

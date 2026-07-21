@@ -1,4 +1,5 @@
 import type { ChartMode, DataProfile, MatrixMarkSpec, PanelSpec, ThemeName } from "./types";
+import { detectIntentFamilyConflict } from "./intentFamilyConflict";
 import { normalizeToMatrix } from "./normalizeToMatrix";
 
 export type MatrixMarkCatalogEntry = {
@@ -69,7 +70,7 @@ export type CreateMatrixPanelResult = {
   panel: PanelSpec;
   needsReview: boolean;
   matchedRules: string[];
-  reviewReason: "no_data_mark" | "vague_intent" | null;
+  reviewReason: "no_data_mark" | "vague_intent" | "conflicting_families" | null;
 };
 
 /**
@@ -95,7 +96,14 @@ export function createMatrixPanel(input: CreateMatrixPanelInput): CreateMatrixPa
   ];
   const matchedRules: string[] = ["mark:cell", "mark:colorScale", "mark:axis"];
 
-  const needsReview = !HEATMAP_INTENT_RE.test(intent);
+  let needsReview = !HEATMAP_INTENT_RE.test(intent);
+  let reviewReason: CreateMatrixPanelResult["reviewReason"] = needsReview
+    ? "vague_intent"
+    : null;
+  if (detectIntentFamilyConflict(intent)) {
+    needsReview = true;
+    reviewReason = "conflicting_families";
+  }
 
   const panel = normalizeToMatrix({
     specVersion: 1,
@@ -115,6 +123,6 @@ export function createMatrixPanel(input: CreateMatrixPanelInput): CreateMatrixPa
     panel,
     needsReview,
     matchedRules,
-    reviewReason: needsReview ? "vague_intent" : null,
+    reviewReason,
   };
 }

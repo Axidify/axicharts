@@ -163,6 +163,16 @@ describe("createCartesianPanel", () => {
     );
     expect(panel.marks?.some((mark) => mark.type === "rule" && mark.value === 100)).toBe(true);
   });
+
+  it("flags cross-family intents that name bar and pie chart types", () => {
+    const { needsReview, reviewReason, matchedRules } = createCartesianPanel({
+      intent: "bar chart and also pie chart of revenue by month",
+      fields: ["month", "revenue"],
+    });
+    expect(needsReview).toBe(true);
+    expect(reviewReason).toBe("conflicting_families");
+    expect(matchedRules).toContain("bar");
+  });
 });
 
 describe("reviseCartesianPanel", () => {
