@@ -58,6 +58,30 @@ export {
 } from "./serialize";
 export { enhanceSvgElement, enhanceSvgMarkup } from "./enhanceSvgA11y";
 export { ChartA11yFallback, type ChartA11yFallbackProps } from "./ChartA11yFallback";
+export { ChartA11yTableView, SR_ONLY_STYLE, type ChartA11yTableViewProps } from "./ChartA11yTableView";
+export { ChartDataTableToggle, type ChartDataTableToggleProps } from "./ChartDataTableToggle";
+export { ChartKeyboardExplorer, type ChartKeyboardExplorerProps } from "./ChartKeyboardExplorer";
+export { ChartA11yShell, type ChartA11yShellProps } from "./ChartA11yShell";
+export {
+  resolveA11yDataTable,
+  resolveA11yKeyboardNav,
+  isInteractiveA11y,
+  type ChartA11yOptions,
+  type ChartA11yKeyboardNavMode,
+  type ChartA11yKeyboardOptions,
+  type ChartA11yDataTableOptions,
+  type ResolvedChartA11yKeyboard,
+  type ResolvedChartA11yDataTable,
+} from "./a11yOptions";
+export {
+  buildA11yNavModel,
+  getA11yNavPoint,
+  getInitialA11yNavCursor,
+  moveA11yNavCursor,
+  type A11yNavCursor,
+  type A11yNavModel,
+  type A11yNavPoint,
+} from "./a11yNavigation";
 export {
   CartesianChartA11yRoot,
   type CartesianChartA11yRootProps,

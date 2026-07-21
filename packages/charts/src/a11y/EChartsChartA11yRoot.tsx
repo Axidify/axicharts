@@ -1,15 +1,16 @@
 "use client";
 
 import type { CSSProperties, ReactElement, ReactNode } from "react";
-import { ChartA11yFallback } from "./ChartA11yFallback";
+import { ChartA11yShell } from "./ChartA11yShell";
 import { chartA11ySummary } from "./echartsDescriptor";
-import { CHART_A11Y_ATTR, serializeA11yDescriptor } from "./serialize";
+import type { ChartA11yOptions } from "./a11yOptions";
 import type { ChartA11yDescriptor } from "./types";
 
 export type EChartsChartA11yRootProps = {
   descriptor: ChartA11yDescriptor;
   style?: CSSProperties;
   children: ReactNode;
+  a11y?: ChartA11yOptions;
 };
 
 /**
@@ -19,18 +20,13 @@ export function EChartsChartA11yRoot({
   descriptor,
   style,
   children,
+  a11y,
 }: EChartsChartA11yRootProps): ReactElement {
   const ariaLabel = descriptor.title ?? chartA11ySummary(descriptor);
 
   return (
-    <div
-      role="img"
-      aria-label={ariaLabel}
-      {...{ [CHART_A11Y_ATTR]: serializeA11yDescriptor(descriptor) }}
-      style={style}
-    >
+    <ChartA11yShell descriptor={descriptor} ariaLabel={ariaLabel} style={style} a11y={a11y}>
       {children}
-      <ChartA11yFallback descriptor={descriptor} />
-    </div>
+    </ChartA11yShell>
   );
 }

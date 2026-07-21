@@ -11,6 +11,7 @@ import { useResolvedPieProps } from "../composable/resolvePieProps";
 import { applyChartConfigToPieSlices } from "../config/applyChartConfig";
 import { buildPieA11yDescriptor } from "../a11y/echartsDescriptor";
 import { EChartsChartA11yRoot } from "../a11y/EChartsChartA11yRoot";
+import type { ChartA11yOptions } from "../a11y/a11yOptions";
 
 export type PieChartProps = {
   slices?: PieSlice[];
@@ -20,6 +21,7 @@ export type PieChartProps = {
   innerRadius?: number;
   showLabels?: boolean;
   centerMetric?: PieCenterMetricInput;
+  a11y?: ChartA11yOptions;
 };
 
 function PiePlot({
@@ -63,6 +65,7 @@ export function PieChart({
   showLabels: showLabelsProp,
   centerMetric: centerMetricProp,
   graphics,
+  a11y,
 }: PieChartProps): ReactElement | null {
   const { size, ready, config } = useChartLayout();
   const { slices: resolvedSlices, innerRadius, showLabels, centerMetric } = useResolvedPieProps(
@@ -92,6 +95,7 @@ export function PieChart({
   return (
     <EChartsChartA11yRoot
       descriptor={a11yDescriptor}
+      a11y={a11y}
       style={{ width: size.width, height: size.height, position: "relative" }}
     >
       <EChartsInteractionShell

@@ -39,6 +39,7 @@ import { seriesValueBounds } from "../annotations/seriesValueBounds";
 import { GraphicOverlay } from "../graphic/GraphicOverlay";
 import { useChartGraphics } from "../graphic/useChartGraphics";
 import { CartesianChartA11yRoot } from "../a11y/CartesianChartA11yRoot";
+import type { ChartA11yOptions } from "../a11y/a11yOptions";
 import type { ChartAnimate, LiveAnimate } from "../motion/types";
 import {
   seriesDataSignature,
@@ -77,6 +78,7 @@ export type LineChartProps<TMeta = unknown> = CartesianPointerChartProps<TMeta> 
   onMarkerDragEnd?: (event: MarkerDragEndEvent) => void;
   animate?: ChartAnimate;
   liveAnimate?: LiveAnimate;
+  a11y?: ChartA11yOptions;
 };
 
 type LinePlotProps = {
@@ -269,6 +271,7 @@ export function LineChart({
   selectedCategoryIndex,
   onCategoryClick,
   onSeriesClick,
+  a11y,
 }: LineChartProps): ReactElement | null {
   const { size, ready, theme, mode, config, tagTones, liveAnimate: contextLiveAnimate, dataState, emptyMessage } =
     useChartLayout();
@@ -369,6 +372,7 @@ export function LineChart({
       categories={categories}
       series={series}
       engine={engine}
+      a11y={a11y}
       style={{
         width: size.width,
         height: "100%",
