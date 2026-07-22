@@ -10,6 +10,19 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.36] - 2026-07-22
+
+### Added
+
+- **charts-spec** — `toUserFacingHint()` / `toUserFacingHints()` for chat UI validation fallbacks (exported from main and `/planning`)
+- **docs** — Agent chat integration guide (Nest + Next): tool result → adapter → envelope → lazy block; Jest/CJS testing section
+- **docs** — Version matrix tested combo table (`spec@0.4.36` + `echarts@0.4.15` + `planner@0.2.4`)
+
+### Changed
+
+- **charts-planner** — README documents server entry points (`./tabular`, `./server`), Nest/CJS dynamic import pattern
+- **charts-echarts** — peers `@axicharts/charts-spec` at platform minor
+
 ## [0.4.35] - 2026-07-21
 
 ### Added

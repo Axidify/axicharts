@@ -100,11 +100,11 @@ jest.mock("../chartAdapter", () => ({
 }));`;
 
 const INSTALL = `pnpm add \\
-  @axicharts/charts-spec@^0.4.35 \\
-  @axicharts/charts@^0.4.35 \\
-  @axicharts/charts-theme@^0.4.35 \\
-  @axicharts/charts-echarts@^0.4.14 \\
-  @axicharts/charts-planner@^0.2.3 \\
+  @axicharts/charts-spec@^0.4.36 \\
+  @axicharts/charts@^0.4.36 \\
+  @axicharts/charts-theme@^0.4.36 \\
+  @axicharts/charts-echarts@^0.4.15 \\
+  @axicharts/charts-planner@^0.2.4 \\
   uplot`;
 
 function CodeBlock({ children, dark }: { children: string; dark?: boolean }): ReactElement {

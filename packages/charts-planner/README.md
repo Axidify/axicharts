@@ -12,10 +12,11 @@ See [charts-spec/CARTESIAN.md](../charts-spec/CARTESIAN.md).
 npm install @axicharts/charts-planner @axicharts/charts-spec
 ```
 
-**Version lockstep:** `@axicharts/charts-planner` peers `@axicharts/charts-spec` at the same **minor** as `@axicharts/charts` (e.g. planner `0.2.3` + spec/charts `0.4.35`). Install both explicitly — do not rely on a nested spec copy from an older planner release.
+**Version lockstep:** `@axicharts/charts-planner` peers `@axicharts/charts-spec` at the same **minor** as `@axicharts/charts` (e.g. planner `0.2.4` + spec/charts `0.4.36`). Install both explicitly — do not rely on a nested spec copy from an older planner release.
 
 | Platform (`@axicharts/charts`) | Planner | Spec peer |
 |-------------------------------|---------|-----------|
+| `0.4.36` | `@axicharts/charts-planner@0.2.4` | `@axicharts/charts-spec@^0.4.36` |
 | `0.4.35` | `@axicharts/charts-planner@0.2.3` | `@axicharts/charts-spec@^0.4.35` |
 | `0.4.3+` | `@axicharts/charts-planner@0.2.1+` | `@axicharts/charts-spec@^0.4.3` |
 

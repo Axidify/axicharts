@@ -2,9 +2,9 @@ import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { docBodyStyle, docCardStyle } from "../styles/docTokens";
 
-const PLATFORM_VERSION = "0.4.35";
-const PLANNER_VERSION = "0.2.3";
-const ECHARTS_VERSION = "0.4.14";
+const PLATFORM_VERSION = "0.4.36";
+const PLANNER_VERSION = "0.2.4";
+const ECHARTS_VERSION = "0.4.15";
 
 const MATRIX = [
   {
