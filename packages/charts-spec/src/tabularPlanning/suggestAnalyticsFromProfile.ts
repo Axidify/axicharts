@@ -8,7 +8,17 @@ import { PANEL_BUDGET } from "./planDashboardFromRows";
 export type SuggestAnalyticsOptions = {
   persona?: Persona;
   dataProfile?: DataProfile;
+  /** When set, pie/donut intents emit distribution panels instead of bar charts. */
+  intent?: string;
 };
+
+const PIE_INTENT_RE = /\b(pie|donut|doughnut|share|breakdown|composition|portion)\b/i;
+const DONUT_INTENT_RE = /\b(donut|doughnut|ring)\b/i;
+
+function wantsDistributionChart(intent?: string): boolean {
+  if (!intent?.trim()) return false;
+  return PIE_INTENT_RE.test(intent) || DONUT_INTENT_RE.test(intent);
+}
 
 const HIGH_CARDINALITY = 24;
 const LOW_CARDINALITY_MIN = 2;
@@ -70,6 +80,12 @@ export function suggestAnalyticsFromProfile(
   const timeFields = pickTimeFields(fieldProfiles);
 
   const recipes: PanelRecipe[] = [];
+  const distributionIntent = wantsDistributionChart(options.intent);
+  const distributionPanelType: PanelRecipe["panelType"] = DONUT_INTENT_RE.test(
+    options.intent ?? "",
+  )
+    ? "donut"
+    : "pie";
 
   recipes.push({
     questionId: "generic.kpi.rows",
@@ -122,6 +138,42 @@ export function suggestAnalyticsFromProfile(
   }
 
   const primaryMeasure = measures[0];
+
+  if (distributionIntent) {
+    for (const dim of dimensions) {
+      const card = cardinalityOf(dim.name, rows, cardinalities);
+      if (card < LOW_CARDINALITY_MIN || card > HIGH_CARDINALITY) continue;
+      if (/(\bid\b|_id$| id$)/i.test(dim.name) && card >= rows.length) continue;
+
+      if (primaryMeasure) {
+        recipes.push({
+          questionId: `generic.chart.pie.${dim.name}`,
+          title: `${primaryMeasure.name} by ${dim.name}`,
+          intent: options.intent ?? "pie chart breakdown",
+          panelType: distributionPanelType,
+          vertical: "ops",
+          groupBy: dim.name,
+          xField: dim.name,
+          yField: "value",
+          aggregates: { value: { op: "sum", field: primaryMeasure.name } },
+        });
+      } else {
+        recipes.push({
+          questionId: `generic.chart.pie.${dim.name}`,
+          title: `Count by ${dim.name}`,
+          intent: options.intent ?? "pie chart count breakdown",
+          panelType: distributionPanelType,
+          vertical: "ops",
+          groupBy: dim.name,
+          xField: dim.name,
+          yField: "count",
+          aggregates: { count: { op: "count" } },
+        });
+      }
+      break;
+    }
+  }
+
   if (primaryMeasure) {
     for (const dim of dimensions) {
       const card = cardinalityOf(dim.name, rows, cardinalities);

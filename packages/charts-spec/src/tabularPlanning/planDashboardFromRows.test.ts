@@ -40,6 +40,27 @@ describe("C173/C175 generic compose", () => {
     }
   });
 
+  it("emits distribution pie chart when intent requests pie", () => {
+    const rows = parseTabular(INVENTORY_TEXT);
+    const plan = planDashboardFromRows(rows, { intent: "pie chart by product" });
+    expect(plan).not.toBeNull();
+    expect(plan!.planSource).toBe("l4b");
+
+    const pieChart = plan!.charts.find((block) => block.questionId.startsWith("generic.chart.pie."));
+    expect(pieChart).toBeDefined();
+    expect(pieChart?.panel.type).toBe("distribution");
+    expect(pieChart?.panel.marks?.some((mark) => mark.type === "arc")).toBe(true);
+    expect(pieChart?.validationIssues).toEqual([]);
+  });
+
+  it("emits donut when intent requests donut", () => {
+    const rows = parseTabular(INVENTORY_TEXT);
+    const plan = planDashboardFromRows(rows, { intent: "donut chart of stock by product" });
+    expect(plan).not.toBeNull();
+    const donutChart = plan!.charts.find((block) => block.questionId.startsWith("generic.chart.pie."));
+    expect(donutChart?.panel.marks?.some((mark) => mark.type === "donut")).toBe(true);
+  });
+
   it("adds below-reorder table on follow-up intent", () => {
     const rows = parseTabular(INVENTORY_TEXT);
     const intent = "Which items are below reorder level?";

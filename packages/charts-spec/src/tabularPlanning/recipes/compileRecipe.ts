@@ -25,6 +25,45 @@ function sortByStageOrder(
   });
 }
 
+function compileDistributionArcPanel(
+  recipe: PanelRecipe,
+  rows: Record<string, unknown>[],
+): CompiledRecipeResult {
+  const xField = recipe.xField ?? recipe.groupBy ?? "category";
+  const yField = recipe.yField ?? "value";
+  const marks: PanelSpec["marks"] = [{ type: "arc", field: yField }];
+  const matchedRules = ["recipe-pie", "mark:arc"];
+
+  if (recipe.panelType === "donut") {
+    marks.push({ type: "donut", innerRadius: 42 });
+    matchedRules.push("mark:donut");
+  }
+
+  marks.push({ type: "label", show: true });
+  matchedRules.push("mark:label");
+
+  return {
+    panel: {
+      specVersion: 1,
+      type: "distribution",
+      title: recipe.title,
+      theme: "clean",
+      mode: "interactive",
+      encoding: {
+        angle: { field: yField, type: "quantitative" },
+        color: { field: xField, type: "nominal" },
+      },
+      marks,
+    },
+    rows,
+    geometry: {
+      panelType: recipe.panelType === "donut" ? "donut" : "pie",
+      rules: [`compile:distribution-${recipe.panelType}`],
+    },
+    matchedRules,
+  };
+}
+
 function compileDistributionFunnelPanel(
   recipe: PanelRecipe,
   rows: Record<string, unknown>[],
@@ -281,6 +320,10 @@ export function compileRecipe(
 
   if (recipe.panelType === "funnel") {
     return compileDistributionFunnelPanel(recipe, chartRows);
+  }
+
+  if (recipe.panelType === "pie" || recipe.panelType === "donut") {
+    return compileDistributionArcPanel(recipe, chartRows);
   }
 
   if (recipe.panelType === "matrix") {

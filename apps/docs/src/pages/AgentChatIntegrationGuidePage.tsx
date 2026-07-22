@@ -229,7 +229,9 @@ export function AgentChatIntegrationGuidePage(): ReactElement {
         Two renderer families today (RFC-004): <code>type: &quot;cartesian&quot;</code> for bar/line/area,{" "}
         <code>type: &quot;distribution&quot;</code> for pie/donut. Domain adapters should set{" "}
         <code>chartStyle: &quot;pie&quot;</code> and emit a distribution panel; the tabular planner
-        currently emits cartesian only — use adapters for pie intents until tabular pie support ships.
+        currently emits cartesian only — pie/donut intents on the tabular fallback now emit{" "}
+        <code>type: &quot;distribution&quot;</code> panels when using{" "}
+        <code>planDashboardFromRows(rows, {"{ intent: \"pie chart by status\" }"})</code>.
       </p>
 
       <h2 id="jest--cjs-test-runners" style={{ fontSize: 16 }}>

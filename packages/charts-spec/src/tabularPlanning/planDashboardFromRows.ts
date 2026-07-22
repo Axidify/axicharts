@@ -293,6 +293,7 @@ function compileGenericDashboard(
           : suggestAnalyticsFromProfile(rows, {
               persona: options.persona,
               dataProfile: tabularProfile,
+              intent: options.intent,
             });
 
   const { recipes: followUpRecipes, questionIds: followUpQuestionIds } = collectFollowUpRecipes(
