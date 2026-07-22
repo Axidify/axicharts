@@ -2,11 +2,27 @@ import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { docBodyStyle, docCardStyle } from "../styles/docTokens";
 
+const PLATFORM_VERSION = "0.4.35";
+const PLANNER_VERSION = "0.2.3";
+const ECHARTS_VERSION = "0.4.14";
+
 const MATRIX = [
+  {
+    path: "Agent chat (Nest + Next)",
+    packages: [
+      "@axicharts/charts-spec",
+      "@axicharts/charts",
+      "@axicharts/charts-theme",
+      "@axicharts/charts-echarts",
+      "@axicharts/charts-planner",
+      "uplot",
+    ],
+    rule: `Platform ${PLATFORM_VERSION} + echarts ${ECHARTS_VERSION} + planner ${PLANNER_VERSION}. See agent chat guide.`,
+  },
   {
     path: "Hand-built cartesian (Path 1)",
     packages: ["@axicharts/charts", "@axicharts/charts-theme", "uplot"],
-    rule: "charts + charts-theme + charts-core on the same minor (e.g. 0.4.5)",
+    rule: `charts + charts-theme + charts-core on the same minor (${PLATFORM_VERSION})`,
   },
   {
     path: "CSV → dashboard (Path 2)",
@@ -17,8 +33,7 @@ const MATRIX = [
       "@axicharts/charts-theme",
       "uplot",
     ],
-    rule:
-      "Install charts-spec at the app level. Planner 0.2.1+ peers spec ^0.4.3 at the platform minor.",
+    rule: `Platform ${PLATFORM_VERSION}. Planner ${PLANNER_VERSION} peers spec ^${PLATFORM_VERSION}. Use ./tabular in Node.`,
   },
   {
     path: "Spec / agent JSON",
@@ -43,7 +58,22 @@ const MATRIX = [
   {
     path: "Planner server / CLI",
     packages: ["@axicharts/charts-planner", "@axicharts/charts-spec"],
-    rule: "planner peers spec — never rely on a nested spec from an old planner release",
+    rule: "planner peers spec — use @axicharts/charts-planner/tabular in API processes",
+  },
+] as const;
+
+const TESTED_COMBOS = [
+  {
+    chartsSpec: PLATFORM_VERSION,
+    chartsEcharts: ECHARTS_VERSION,
+    chartsPlanner: PLANNER_VERSION,
+    status: "Tested — agent chat (Nest + Next)",
+  },
+  {
+    chartsSpec: PLATFORM_VERSION,
+    chartsEcharts: ECHARTS_VERSION,
+    chartsPlanner: PLANNER_VERSION,
+    status: "Tested — Axiboard tabular orchestrator",
   },
 ] as const;
 
@@ -53,9 +83,47 @@ export function VersionMatrixPage(): ReactElement {
       <h1 style={{ marginTop: 0 }}>Version matrix</h1>
       <p style={docBodyStyle()}>
         AxiCharts is modular on npm, but adopters should keep a <strong>single platform minor</strong>{" "}
-        across core packages. This page is the supported combo reference for C147 trust fixes — see also{" "}
-        <Link to="/guides/troubleshooting">troubleshooting</Link>.
+        across core packages. This page is the supported combo reference — see also{" "}
+        <Link to="/guides/troubleshooting">troubleshooting</Link> and{" "}
+        <Link to="/guides/agent-chat-integration">agent chat integration</Link>.
       </p>
+
+      <section style={{ ...docCardStyle(), padding: 20, marginBottom: 20, boxShadow: "none" }}>
+        <h2 style={{ margin: "0 0 10px", fontSize: 16 }}>Tested compatibility (current release)</h2>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>
+                <th style={{ padding: "8px" }}>charts-spec</th>
+                <th style={{ padding: "8px" }}>charts-echarts</th>
+                <th style={{ padding: "8px" }}>charts-planner</th>
+                <th style={{ padding: "8px" }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {TESTED_COMBOS.map((row, i) => (
+                <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                  <td style={{ padding: "8px" }}>
+                    <code>{row.chartsSpec}</code>
+                  </td>
+                  <td style={{ padding: "8px" }}>
+                    <code>{row.chartsEcharts}</code>
+                  </td>
+                  <td style={{ padding: "8px" }}>
+                    <code>{row.chartsPlanner}</code>
+                  </td>
+                  <td style={{ padding: "8px", color: "#475569" }}>{row.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b", lineHeight: 1.6 }}>
+          <code>@axicharts/charts-echarts</code> is <strong>independently versioned</strong> from the
+          platform lockstep train. It declares a peer on <code>@axicharts/charts-spec@^{PLATFORM_VERSION}</code>.
+          Mismatched minors may work but are not guaranteed — use the tested row above for production.
+        </p>
+      </section>
 
       <div style={{ overflowX: "auto", marginBottom: 24 }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
@@ -106,16 +174,21 @@ export function VersionMatrixPage(): ReactElement {
 @axicharts/charts-spec
 @axicharts/charts-runtime
 @axicharts/charts-full
-(+ canvas, echarts, map siblings at the same minor)`}
+@axicharts/charts-canvas
+
+Independently versioned siblings:
+@axicharts/charts-echarts  (peers charts-spec at platform minor)
+@axicharts/charts-map`}
         </pre>
       </section>
 
       <section style={{ ...docCardStyle(), padding: 20, marginBottom: 16, boxShadow: "none" }}>
         <h2 style={{ margin: "0 0 10px", fontSize: 16 }}>Planner is separate semver</h2>
         <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
-          <code>@axicharts/charts-planner</code> is <strong>0.2.x</strong> and declares a{" "}
-          <strong>peer</strong> on <code>@axicharts/charts-spec</code> at the platform minor (currently{" "}
-          <code>^0.4.3</code>). Always install both at the app level:
+          <code>@axicharts/charts-planner</code> is <strong>{PLANNER_VERSION.split(".")[0]}.x</strong> and
+          declares a <strong>peer</strong> on <code>@axicharts/charts-spec</code> at the platform minor
+          (currently <code>^{PLATFORM_VERSION}</code>). Always install both at the app level. In API
+          processes, import <code>@axicharts/charts-planner/tabular</code> — not the main entry.
         </p>
         <pre
           style={{
@@ -127,8 +200,9 @@ export function VersionMatrixPage(): ReactElement {
             fontSize: 12,
           }}
         >
-          {`pnpm add @axicharts/charts@^0.4.5 @axicharts/charts-spec@^0.4.5 \\
-  @axicharts/charts-planner@^0.2.1 @axicharts/charts-theme@^0.4.5 uplot`}
+          {`pnpm add @axicharts/charts@^${PLATFORM_VERSION} @axicharts/charts-spec@^${PLATFORM_VERSION} \\
+  @axicharts/charts-planner@^${PLANNER_VERSION} @axicharts/charts-theme@^${PLATFORM_VERSION} \\
+  @axicharts/charts-echarts@^${ECHARTS_VERSION} uplot`}
         </pre>
         <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b" }}>
           Two <code>charts-spec</code> copies under <code>node_modules</code> usually means planner{" "}
@@ -157,7 +231,8 @@ export function VersionMatrixPage(): ReactElement {
       </section>
 
       <p style={{ ...docBodyStyle(), marginTop: 24, fontSize: 13 }}>
-        Related: <Link to="/guides/csv-dashboard">CSV dashboard</Link> ·{" "}
+        Related: <Link to="/guides/agent-chat-integration">Agent chat integration</Link> ·{" "}
+        <Link to="/guides/csv-dashboard">CSV dashboard</Link> ·{" "}
         <Link to="/guides/choosing-your-path">Choosing your path</Link> ·{" "}
         <Link to="/packages">All packages</Link>
       </p>

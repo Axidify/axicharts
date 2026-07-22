@@ -11,6 +11,7 @@ const topLinks = [
   { to: "/guides/branding", label: "Badge" },
   { to: "/benchmarks", label: "Benchmarks" },
   { to: "/guides/agent-families", label: "Agent families (MCP)" },
+  { to: "/guides/agent-chat-integration", label: "Agent chat (Nest+Next)" },
   { to: "/guides/agent-cartesian", label: "Agent cartesian" },
   { to: "/guides/agent-mcp-schemas", label: "MCP tool schemas" },
   { to: "/guides/troubleshooting", label: "Troubleshooting" },

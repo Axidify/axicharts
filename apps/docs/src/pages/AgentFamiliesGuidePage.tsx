@@ -152,6 +152,8 @@ if (!check.ok) throw check.errors; // agent retries
 
       <h2 style={{ fontSize: 16, marginTop: 28 }}>Further reading</h2>
       <p style={{ ...docBodyStyle(), fontSize: 13 }}>
+        <Link to="/guides/agent-chat-integration">Agent chat integration (Nest + Next)</Link>
+        {" · "}
         <Link to="/guides/agent-cartesian">Cartesian deep dive + error gallery</Link>
         {" · "}
         <Link to="/guides/agent-mcp-schemas">MCP tool schemas (OpenAPI)</Link>

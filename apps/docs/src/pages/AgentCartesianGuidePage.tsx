@@ -158,6 +158,8 @@ export function AgentCartesianGuidePage(): ReactElement {
         npx @axicharts/charts-spec eject panel.json
       </pre>
       <p style={{ ...docBodyStyle(), fontSize: 13 }}>
+        Production path: <Link to="/guides/agent-chat-integration">Agent chat integration (Nest + Next)</Link>
+        {" · "}
         Tool schemas: <Link to="/guides/agent-mcp-schemas">MCP OpenAPI bundle</Link>
         {" · "}
         <a
