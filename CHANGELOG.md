@@ -10,6 +10,19 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.37] - 2026-07-22
+
+### Added
+
+- **charts-planner** — `@axicharts/charts-planner/tabular` CJS bundle (`tabular.cjs`) for Nest/CJS static `require()` / import
+- **charts-spec** — Tabular planner pie/donut intent on generic L4b path (`0.4.36` feature, documented in 0.4.37 matrix)
+- **docs** — RFC-005 agent chat envelope freeze; Project Desk integration reply template
+
+### Changed
+
+- **charts-echarts** — peers `@axicharts/charts-spec` at platform minor (`^0.4.37`)
+- **charts-planner** — `0.2.5`; README documents CJS `./tabular` entry
+
 ## [0.4.36] - 2026-07-22
 
 ### Added

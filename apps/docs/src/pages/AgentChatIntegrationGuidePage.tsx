@@ -39,12 +39,13 @@ export function buildChartEnvelope(
   };
 }
 
-/** Tabular fallback when no domain adapter exists. */
-export async function planTabularFallback(
+/** Tabular fallback when no domain adapter exists (planner 0.2.5+ CJS-safe). */
+import { planDashboardFromRows } from "@axicharts/charts-planner/tabular";
+
+export function planTabularFallback(
   rows: Record<string, unknown>[],
   intent: string,
 ) {
-  const { planDashboardFromRows } = await import("@axicharts/charts-planner/tabular");
   return planDashboardFromRows(rows, { intent });
 }`;
 
@@ -78,18 +79,7 @@ export function AxiChartsBlock({
   return <Chart panel={panel} data={data} />;
 }`;
 
-const JEST_CONFIG = `// jest.config.js — only if you need real subpath resolution in tests
-module.exports = {
-  moduleNameMapper: {
-    "^@axicharts/charts-planner/tabular$":
-      "<rootDir>/node_modules/@axicharts/charts-planner/dist/entry/tabular.js",
-    "^@axicharts/charts-spec/planning$":
-      "<rootDir>/node_modules/@axicharts/charts-spec/dist/entry/planning.js",
-  },
-  transformIgnorePatterns: ["node_modules/(?!@axicharts/)"],
-};
-
-// Preferred: mock at the adapter boundary
+const JEST_CONFIG = `// jest.config.js — mock at adapter boundary (preferred)
 jest.mock("../chartAdapter", () => ({
   buildChartEnvelope: jest.fn(() => ({
     specVersion: 1,
@@ -97,14 +87,22 @@ jest.mock("../chartAdapter", () => ({
     panel: { type: "cartesian", encoding: { x: { field: "status" } }, marks: [{ type: "bar", field: "count" }] },
     data: [{ status: "open", count: 3 }],
   })),
-}));`;
+}));
+
+// Or resolve CJS tabular bundle (planner 0.2.5+):
+module.exports = {
+  moduleNameMapper: {
+    "^@axicharts/charts-planner/tabular$":
+      "<rootDir>/node_modules/@axicharts/charts-planner/dist/entry/tabular.cjs",
+  },
+};`;
 
 const INSTALL = `pnpm add \\
-  @axicharts/charts-spec@^0.4.36 \\
-  @axicharts/charts@^0.4.36 \\
-  @axicharts/charts-theme@^0.4.36 \\
-  @axicharts/charts-echarts@^0.4.15 \\
-  @axicharts/charts-planner@^0.2.4 \\
+  @axicharts/charts-spec@^0.4.37 \\
+  @axicharts/charts@^0.4.37 \\
+  @axicharts/charts-theme@^0.4.37 \\
+  @axicharts/charts-echarts@^0.4.16 \\
+  @axicharts/charts-planner@^0.2.5 \\
   uplot`;
 
 function CodeBlock({ children, dark }: { children: string; dark?: boolean }): ReactElement {
@@ -162,9 +160,16 @@ export function AgentChatIntegrationGuidePage(): ReactElement {
       </p>
       <CodeBlock dark>{NEST_ADAPTER}</CodeBlock>
       <p style={{ ...docBodyStyle(), fontSize: 13 }}>
-        For tabular fallback in CJS-compiled Nest, use <strong>dynamic import</strong> of{" "}
-        <code>@axicharts/charts-planner/tabular</code> — static imports fail under CommonJS. See{" "}
-        <a href="https://www.npmjs.com/package/@axicharts/charts-planner">charts-planner README</a>.
+        Tabular fallback uses <code>@axicharts/charts-planner/tabular</code> — static import /{" "}
+        <code>require()</code> on planner <code>0.2.5+</code> (CJS bundle). See{" "}
+        <a
+          href="https://github.com/Axidify/axicharts/blob/main/docs/rfc/RFC-005-agent-chat-envelope-freeze.md"
+          target="_blank"
+          rel="noreferrer"
+        >
+          RFC-005 envelope freeze
+        </a>
+        .
       </p>
 
       <h2 style={{ fontSize: 16 }}>2. Envelope contract</h2>
@@ -229,8 +234,7 @@ export function AgentChatIntegrationGuidePage(): ReactElement {
         Two renderer families today (RFC-004): <code>type: &quot;cartesian&quot;</code> for bar/line/area,{" "}
         <code>type: &quot;distribution&quot;</code> for pie/donut. Domain adapters should set{" "}
         <code>chartStyle: &quot;pie&quot;</code> and emit a distribution panel; the tabular planner
-        currently emits cartesian only — pie/donut intents on the tabular fallback now emit{" "}
-        <code>type: &quot;distribution&quot;</code> panels when using{" "}
+        emits <code>type: &quot;distribution&quot;</code> for pie/donut intents on the generic path —{" "}
         <code>planDashboardFromRows(rows, {"{ intent: \"pie chart by status\" }"})</code>.
       </p>
 
@@ -238,9 +242,8 @@ export function AgentChatIntegrationGuidePage(): ReactElement {
         Jest / CJS test runners
       </h2>
       <p style={docBodyStyle()}>
-        <code>@axicharts/charts-planner</code> and <code>@axicharts/charts-spec</code> subpaths are
-        ESM-only. Jest may fail to resolve <code>/tabular</code> or <code>/planning</code> without
-        configuration.
+        <code>@axicharts/charts-planner/tabular</code> ships a CJS bundle (<code>0.2.5+</code>). Prefer
+        mocking at the adapter boundary; or map to <code>tabular.cjs</code> in Jest.
       </p>
       <CodeBlock dark>{JEST_CONFIG}</CodeBlock>
 
@@ -253,10 +256,15 @@ export function AgentChatIntegrationGuidePage(): ReactElement {
       </p>
 
       <p style={{ ...docBodyStyle(), marginTop: 24, fontSize: 13 }}>
-        Related: <Link to="/guides/agent-cartesian">Agent cartesian deep dive</Link> ·{" "}
-        <Link to="/guides/agent-families">Agent families</Link> ·{" "}
-        <Link to="/guides/versions">Version matrix</Link> ·{" "}
-        <Link to="/guides/troubleshooting">Troubleshooting</Link>
+        Related: <Link to="/guides/versions">Version matrix</Link> ·{" "}
+        <a
+          href="https://github.com/Axidify/axicharts/blob/main/docs/rfc/RFC-005-agent-chat-envelope-freeze.md"
+          target="_blank"
+          rel="noreferrer"
+        >
+          RFC-005 envelope freeze
+        </a>{" "}
+        · <Link to="/guides/troubleshooting">Troubleshooting</Link>
       </p>
     </div>
   );

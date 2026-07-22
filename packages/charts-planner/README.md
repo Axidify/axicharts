@@ -16,6 +16,7 @@ npm install @axicharts/charts-planner @axicharts/charts-spec
 
 | Platform (`@axicharts/charts`) | Planner | Spec peer |
 |-------------------------------|---------|-----------|
+| `0.4.37` | `@axicharts/charts-planner@0.2.5` | `@axicharts/charts-spec@^0.4.37` |
 | `0.4.36` | `@axicharts/charts-planner@0.2.4` | `@axicharts/charts-spec@^0.4.36` |
 | `0.4.35` | `@axicharts/charts-planner@0.2.3` | `@axicharts/charts-spec@^0.4.35` |
 | `0.4.3+` | `@axicharts/charts-planner@0.2.1+` | `@axicharts/charts-spec@^0.4.3` |
@@ -45,22 +46,23 @@ const plan = planDashboardFromRows(rows, { intent: "tasks by status" });
 
 ### NestJS / CommonJS consumers
 
-The package is **ESM-only** (`"type": "module"`). NestJS apps compiled to CommonJS cannot use a static `import` of `./tabular` — Node will throw `ERR_PACKAGE_PATH_NOT_EXPORTED` or fail to resolve `require()`.
-
-**Supported pattern today:** dynamic `import()` inside an async helper:
+`@axicharts/charts-planner/tabular` ships **both** ESM and a bundled CJS build (`tabular.cjs`, `0.2.5+`). NestJS apps compiled to CommonJS can use a static import or `require()`:
 
 ```ts
-// apps/api — NestJS service (compiled to CJS)
-async function planFromTabularRows(
-  rows: Record<string, unknown>[],
-  intent: string,
-) {
-  const { planDashboardFromRows } = await import("@axicharts/charts-planner/tabular");
-  return planDashboardFromRows(rows, { intent });
-}
+// apps/api — NestJS service (CJS compile) — supported in planner 0.2.5+
+import { planDashboardFromRows } from "@axicharts/charts-planner/tabular";
+
+// or CommonJS require()
+const { planDashboardFromRows } = require("@axicharts/charts-planner/tabular");
 ```
 
-Alternatively, compile the API to ESM (`"module": "NodeNext"` in `tsconfig`) so static imports work.
+On planner `0.2.4` and below, use dynamic `import()`:
+
+```ts
+const { planDashboardFromRows } = await import("@axicharts/charts-planner/tabular");
+```
+
+Alternatively, compile the API to ESM (`"module": "NodeNext"` in `tsconfig`) so static ESM imports work.
 
 ### Main entry (browser / full planner)
 

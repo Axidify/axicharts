@@ -2,9 +2,9 @@ import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 import { docBodyStyle, docCardStyle } from "../styles/docTokens";
 
-const PLATFORM_VERSION = "0.4.36";
-const PLANNER_VERSION = "0.2.4";
-const ECHARTS_VERSION = "0.4.15";
+const PLATFORM_VERSION = "0.4.37";
+const PLANNER_VERSION = "0.2.5";
+const ECHARTS_VERSION = "0.4.16";
 
 const MATRIX = [
   {
@@ -120,8 +120,8 @@ export function VersionMatrixPage(): ReactElement {
         </div>
         <p style={{ margin: "12px 0 0", fontSize: 13, color: "#64748b", lineHeight: 1.6 }}>
           <code>@axicharts/charts-echarts</code> is <strong>independently versioned</strong> from the
-          platform lockstep train. It declares a peer on <code>@axicharts/charts-spec@^{PLATFORM_VERSION}</code>.
-          Mismatched minors may work but are not guaranteed — use the tested row above for production.
+          platform lockstep train. It declares a peer on <code>@axicharts/charts-spec@^0.4.36</code>{" "}
+          (tested with <code>{PLATFORM_VERSION}</code>).
         </p>
       </section>
 

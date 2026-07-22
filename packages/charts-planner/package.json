@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-planner",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Phase 3 server-side dashboard planner — intent parsing, LLM provider hooks, validation with rules fallback.",
   "license": "MIT",
   "repository": {
@@ -32,17 +32,18 @@
     },
     "./tabular": {
       "types": "./dist/entry/tabular.d.ts",
-      "import": "./dist/entry/tabular.js"
+      "import": "./dist/entry/tabular.js",
+      "require": "./dist/entry/tabular.cjs"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts src/server-entry.ts src/entry/tabular.ts --format esm --dts --external @axicharts/charts-spec --clean",
+    "build": "tsup src/index.ts src/cli.ts src/server-entry.ts src/entry/tabular.ts --format esm --dts --external @axicharts/charts-spec --clean && tsup --config tsup.tabular-cjs.config.ts",
     "dev": "tsup src/index.ts src/cli.ts src/server-entry.ts src/entry/tabular.ts --format esm --dts --external @axicharts/charts-spec --watch",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
-    "@axicharts/charts-spec": "^0.4.36"
+    "@axicharts/charts-spec": "^0.4.37"
   },
   "devDependencies": {
     "@axicharts/charts-spec": "workspace:*",

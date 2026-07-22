@@ -526,6 +526,9 @@ importers:
       '@axicharts/charts-canvas':
         specifier: workspace:*
         version: link:../charts-canvas
+      '@axicharts/charts-spec':
+        specifier: ^0.4.36
+        version: link:../charts-spec
       '@axicharts/charts-theme':
         specifier: workspace:*
         version: link:../charts-theme
