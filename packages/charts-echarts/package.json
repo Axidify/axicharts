@@ -28,7 +28,6 @@
     "test": "vitest run"
   },
   "peerDependencies": {
-    "@axicharts/charts-spec": "^0.4.36",
     "echarts": "^5.5.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
@@ -40,7 +39,6 @@
     "echarts-liquidfill": "^3.1.0"
   },
   "devDependencies": {
-    "@axicharts/charts-spec": "workspace:*",
     "@testing-library/react": "^16.2.0",
     "@types/react": "^19.0.10",
     "echarts": "^5.6.0",
