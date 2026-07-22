@@ -1,5 +1,4 @@
-import { validatePanel, type PanelSpec } from "@axicharts/charts-spec";
-import { toUserFacingHints } from "@axicharts/charts-spec/planning";
+import { toUserFacingHints, validatePanel, type PanelSpec } from "@axicharts/charts-spec/planning";
 
 export type AgentChartVisualizationHint = "chart" | "table" | "none";
 
