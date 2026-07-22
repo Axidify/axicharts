@@ -12,13 +12,80 @@ See [charts-spec/CARTESIAN.md](../charts-spec/CARTESIAN.md).
 npm install @axicharts/charts-planner @axicharts/charts-spec
 ```
 
-**Version lockstep:** `@axicharts/charts-planner` peers `@axicharts/charts-spec` at the same **minor** as `@axicharts/charts` (e.g. planner `0.2.x` + spec/charts `0.4.3+`). Install both explicitly — do not rely on a nested spec copy from an older planner release.
+**Version lockstep:** `@axicharts/charts-planner` peers `@axicharts/charts-spec` at the same **minor** as `@axicharts/charts` (e.g. planner `0.2.3` + spec/charts `0.4.35`). Install both explicitly — do not rely on a nested spec copy from an older planner release.
 
 | Platform (`@axicharts/charts`) | Planner | Spec peer |
 |-------------------------------|---------|-----------|
+| `0.4.35` | `@axicharts/charts-planner@0.2.3` | `@axicharts/charts-spec@^0.4.35` |
 | `0.4.3+` | `@axicharts/charts-planner@0.2.1+` | `@axicharts/charts-spec@^0.4.3` |
 
 Full matrix: [Version matrix guide](https://axidify.github.io/axicharts/guides/versions).
+
+## Server vs browser entry points
+
+`@axicharts/charts-planner` ships **three** npm subpaths. Pick the one that matches your runtime — importing the wrong entry is the most common Node integration failure.
+
+| Entry | Use when | Exports |
+|-------|----------|---------|
+| `@axicharts/charts-planner/tabular` | **API / Nest / Node** — tabular fallback only | `planDashboardFromRows` |
+| `@axicharts/charts-planner/server` | Standalone HTTP planner | `createPlannerServer` |
+| `@axicharts/charts-planner` | Browser bundlers, full planner surface | `planFromIntent`, `planWithProvider`, CSV path, … |
+
+### Tabular planner (server-safe)
+
+Use this in API processes and agent chat backends. It imports `@axicharts/charts-spec/planning` only — **no React Chart, no uPlot CSS**.
+
+```ts
+import { planDashboardFromRows } from "@axicharts/charts-planner/tabular";
+
+const plan = planDashboardFromRows(rows, { intent: "tasks by status" });
+// → { panels: [...], layout, notes }
+```
+
+### NestJS / CommonJS consumers
+
+The package is **ESM-only** (`"type": "module"`). NestJS apps compiled to CommonJS cannot use a static `import` of `./tabular` — Node will throw `ERR_PACKAGE_PATH_NOT_EXPORTED` or fail to resolve `require()`.
+
+**Supported pattern today:** dynamic `import()` inside an async helper:
+
+```ts
+// apps/api — NestJS service (compiled to CJS)
+async function planFromTabularRows(
+  rows: Record<string, unknown>[],
+  intent: string,
+) {
+  const { planDashboardFromRows } = await import("@axicharts/charts-planner/tabular");
+  return planDashboardFromRows(rows, { intent });
+}
+```
+
+Alternatively, compile the API to ESM (`"module": "NodeNext"` in `tsconfig`) so static imports work.
+
+### Main entry (browser / full planner)
+
+The default export re-exports through the main `@axicharts/charts-spec` barrel, which pulls React Chart and uPlot CSS. **Do not import the main entry in server-only processes.**
+
+```ts
+// ✅ Browser / Vite / Next client components
+import { planFromIntent } from "@axicharts/charts-planner";
+
+// ❌ Nest API / Node scripts — use ./tabular instead
+import { planFromIntent } from "@axicharts/charts-planner";
+```
+
+### HTTP server entry
+
+```ts
+import { createPlannerServer } from "@axicharts/charts-planner/server";
+
+const server = createPlannerServer({ port: 3921 });
+```
+
+Or use the CLI: `charts-planner serve --port 3921` (see [HTTP server](#http-server) below).
+
+### Jest / CJS test runners
+
+When testing adapters that call the tabular planner, prefer **mocking at the adapter boundary**. If you need real resolution, add `moduleNameMapper` entries — see [Agent chat integration guide](https://axidify.github.io/axicharts/guides/agent-chat-integration#jest--cjs-test-runners).
 
 ## Rules + intent planner
 

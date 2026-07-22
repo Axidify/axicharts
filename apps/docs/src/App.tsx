@@ -17,6 +17,7 @@ import { CompareDesignPage } from "./pages/CompareDesignPage";
 import { ComparePage } from "./pages/ComparePage";
 import { ShadcnPage } from "./pages/ShadcnPage";
 import { ShadcnRegistryPage } from "./pages/ShadcnRegistryPage";
+import { AgentChatIntegrationGuidePage } from "./pages/AgentChatIntegrationGuidePage";
 import { AgentCartesianGuidePage } from "./pages/AgentCartesianGuidePage";
 import { AgentFamiliesGuidePage } from "./pages/AgentFamiliesGuidePage";
 import { AgentMcpSchemasPage } from "./pages/AgentMcpSchemasPage";
@@ -43,6 +44,7 @@ export function App(): ReactElement {
           <Route path="guides/theme" element={<ThemePlaygroundPage />} />
           <Route path="guides/branding" element={<BrandingPage />} />
           <Route path="guides/agent-families" element={<AgentFamiliesGuidePage />} />
+          <Route path="guides/agent-chat-integration" element={<AgentChatIntegrationGuidePage />} />
           <Route path="guides/agent-cartesian" element={<AgentCartesianGuidePage />} />
           <Route path="guides/agent-mcp-schemas" element={<AgentMcpSchemasPage />} />
           <Route path="guides/csv-dashboard" element={<CsvDashboardGuidePage />} />

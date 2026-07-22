@@ -67,6 +67,7 @@ export {
   type ValidatePanelOptions,
   type ValidatePanelResult,
 } from "./validatePanel";
+export { toUserFacingHint, toUserFacingHints } from "./userFacingHints";
 export {
   registerChartFamily,
   getChartFamily,
