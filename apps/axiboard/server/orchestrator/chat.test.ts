@@ -120,6 +120,9 @@ describe("axiboard orchestrator", () => {
     expect(result.decisions.some((decision) => decision.api === "composeProjectTaskDashboard")).toBe(true);
     expect(result.kpis.some((block) => block.panel.title === "Total tasks")).toBe(true);
     expect(result.charts.some((block) => block.panel.title === "Tasks by status")).toBe(true);
+    expect(result.charts.every((block) => block.envelope?.specVersion === 1 || block.panel.type === "table")).toBe(
+      true,
+    );
     expect(result.assistantMessage.toLowerCase()).toContain("project task dashboard");
   });
 

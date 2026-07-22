@@ -1,15 +1,16 @@
 import { planDashboardFromRows, type PlannerDashboardPlan } from "@axicharts/charts-planner/tabular";
 import type { Persona } from "@axicharts/charts-spec";
+import { withAgentChartEnvelope } from "./agentChartEnvelope";
 import type { AgentChartBlock, OrchestratorPlanResult } from "../types";
 
 function mapBlock(block: PlannerDashboardPlan["kpis"][number]): AgentChartBlock {
-  return {
+  return withAgentChartEnvelope({
     questionId: block.questionId,
     panel: block.panel,
     rows: block.rows,
     decision: block.decision,
     validationIssues: block.validationIssues,
-  };
+  });
 }
 
 export function runTabularPlan(

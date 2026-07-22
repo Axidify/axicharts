@@ -9,6 +9,7 @@ import type { ByokConfig, OrchestratorChatRequest, OrchestratorChatResult } from
 import { parseChatWithLlm } from "./byok";
 import { runTabularPlan } from "./plan";
 import { refinementAssistantMessage } from "./refinementMessage";
+import { withAgentChartEnvelope } from "./agentChartEnvelope";
 
 function uniqueStrings(values: string[]): string[] {
   const seen = new Set<string>();
@@ -84,7 +85,7 @@ export async function runOrchestratorChat(
       if (!item.ok) continue;
       const questionId =
         item.plan.questionId ?? `llm.${item.plan.intent.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 48)}`;
-      const block = {
+      const block = withAgentChartEnvelope({
         questionId,
         panel: item.panel,
         rows: item.rows as Array<Record<string, string | number | boolean>>,
@@ -96,7 +97,7 @@ export async function runOrchestratorChat(
           notes: "C178 structured compose",
         },
         validationIssues: [],
-      };
+      });
       if (item.panel.type === "stat" || item.panel.type === "kpi") {
         plan.kpis.push(block);
       } else {

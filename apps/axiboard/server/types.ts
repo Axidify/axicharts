@@ -7,6 +7,7 @@ import type {
   Persona,
 } from "@axicharts/charts-spec";
 import type { DomainSemantics } from "@axicharts/charts-spec/planning";
+import type { AgentChartEnvelope, AgentChartSpecError } from "./orchestrator/agentChartEnvelope";
 
 export type AgentDecision = {
   step: string;
@@ -22,6 +23,10 @@ export type AgentChartBlock = {
   rows: Array<Record<string, string | number | boolean>>;
   decision: AgentDecision;
   validationIssues: CartesianValidationIssue[];
+  /** RFC-005 envelope when `validatePanel` strict passes. */
+  envelope?: AgentChartEnvelope;
+  /** RFC-005 error shape when strict validation fails. */
+  chartSpecError?: AgentChartSpecError;
 };
 
 export type OrchestratorPlanResult = {
