@@ -526,9 +526,6 @@ importers:
       '@axicharts/charts-canvas':
         specifier: workspace:*
         version: link:../charts-canvas
-      '@axicharts/charts-spec':
-        specifier: ^0.4.35
-        version: 0.4.35(tgv4tprjuwra4k5vd3xbfbjaja)
       '@axicharts/charts-theme':
         specifier: workspace:*
         version: link:../charts-theme
@@ -539,6 +536,9 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0(echarts@5.6.0)
     devDependencies:
+      '@axicharts/charts-spec':
+        specifier: workspace:*
+        version: link:../charts-spec
       '@testing-library/react':
         specifier: ^16.2.0
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -984,109 +984,6 @@ packages:
 
   '@asamuzakjp/css-color@3.2.0':
     resolution: {integrity: sha512-K1A6z8tS3XsmCMM86xoWdn7Fkdn9m6RSVtocUrJYIwZnFVkng/PvkEoWtOWmP+Scc6saYWHWZYbndEEXxl24jw==}
-
-  '@axicharts/charts-andon@0.1.0':
-    resolution: {integrity: sha512-1JEER8jbhureaYHleLjQCVE2Bpxb0XXZI/ga0R2nwlEcBtYJg44G3pZ2MB7qdzy8gv1X2+GscGf6vl9YsPekfg==}
-    peerDependencies:
-      '@axicharts/charts': 0.2.5
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-
-  '@axicharts/charts-canvas@0.4.32':
-    resolution: {integrity: sha512-DukZQgwrnfJnwt3WqrVwrutovb9wgEMgk03Ir3QSgJw9SnJG5lj8ezv7KBbUN05y4IN+c7i8rikLnzsJeOzICA==}
-    peerDependencies:
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-      uplot: ^1.6.31
-
-  '@axicharts/charts-canvas@0.4.35':
-    resolution: {integrity: sha512-RAvUBS9rSrVD8fzkgEzabDq7DvdTszYOow9smJtB7acC/CQk8tmlGQuXaDvVlvQnNg7EUlB1SHplcQmG+Fc+RA==}
-    peerDependencies:
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-      uplot: ^1.6.31
-
-  '@axicharts/charts-core@0.4.32':
-    resolution: {integrity: sha512-e8N6Y13zjeKsLSS/7vCy+JL5FZWsFFS6MCckx3vlQ/Skijq095bLa39t2bS0ZCFFKB/cUdpXHjJsgMzkNcbNoQ==}
-
-  '@axicharts/charts-core@0.4.35':
-    resolution: {integrity: sha512-Hxb52a1BFOoyxoHVJgBE2VloIQGkJjt+cvZB8bGSQ7jfhAP7ErhdhHG1kqzXhhERopYNIOTzc2m24fAbb6rxiw==}
-
-  '@axicharts/charts-echarts@0.4.14':
-    resolution: {integrity: sha512-B9lItraBPGbpSWHC69d9Fgs87x56WAxhk4TnPjgWU+7oUURPo57JhR7yOdDHEp1qbVB7IVJLt9FMrqY2KDVKWg==}
-    peerDependencies:
-      echarts: ^5.5.0
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-
-  '@axicharts/charts-gantt@0.1.0':
-    resolution: {integrity: sha512-oLAVJmK2mk4hYnEXIQLBf+Do8usyRTJn9MufwvszjlM5jr0o+5ZQ1tPTbqK7W1cls456Us2tHY8MtaEgouDthg==}
-    peerDependencies:
-      '@axicharts/charts': 0.2.6
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-
-  '@axicharts/charts-geo@0.1.0':
-    resolution: {integrity: sha512-/fMhdr6+J5GPoyXGt0VbY9fFh72mo5Uk5PH7NDAyNpW3WsataiYJad/Xt5dSJsaAI+gv+0odkSX1JunVN9cK/w==}
-    peerDependencies:
-      '@axicharts/charts': 0.2.5
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-
-  '@axicharts/charts-map@0.4.6':
-    resolution: {integrity: sha512-5w5ANMTsqQ/lAy5w2N0tNgv3e3eQRB0EoEcpn7AKLC4VbISNiSlU4y3uCOLoxcrAkOERui78GVaD6kYUc4NNlg==}
-    peerDependencies:
-      '@axicharts/charts': 0.4.6
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-
-  '@axicharts/charts-sankey@0.1.0':
-    resolution: {integrity: sha512-SKOdJ1i78h+amPu59rasmh1LG0XqPmh7EyFh3KF0p+D+peYJ8RRLU/bBqjpou9co+3MSUBsHftf2e4yg8xkz2Q==}
-    peerDependencies:
-      '@axicharts/charts': 0.2.5
-      echarts: ^5.5.0
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-
-  '@axicharts/charts-spec@0.4.35':
-    resolution: {integrity: sha512-rES8cnnyxdvoMi8gwJUTD3rYfPtCNqtjsvgUQGMldUxzCFchKnCSXRSmOemT+qIZHXNbrTD6Gv9NsK3omUu38Q==}
-    hasBin: true
-    peerDependencies:
-      '@axicharts/charts': 0.4.35
-      '@axicharts/charts-andon': 0.1.0
-      '@axicharts/charts-gantt': 0.1.0
-      '@axicharts/charts-geo': 0.1.0
-      '@axicharts/charts-map': 0.4.6
-      '@axicharts/charts-sankey': 0.1.0
-      '@axicharts/charts-tank': 0.1.0
-      '@axicharts/charts-theme': 0.4.35
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-
-  '@axicharts/charts-tank@0.1.0':
-    resolution: {integrity: sha512-NxtyMPZBo6zlhABg3AZdJrBmE/jSj/5nO2tFkcvdTjXwWoqXE6ANtPbKeqAFebKXIdLBNoTp4KgaSNo7s7Ro/g==}
-    peerDependencies:
-      '@axicharts/charts': 0.2.5
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-
-  '@axicharts/charts-theme@0.4.32':
-    resolution: {integrity: sha512-7wpmuoRaWSXpC97BnnDuUBQ4mGDe1ZUZctuSa5XwAC/X7VhX3pvy5MgQQO9vZrj7mkC3dS4luQi/J4ZHSJuMZg==}
-
-  '@axicharts/charts-theme@0.4.34':
-    resolution: {integrity: sha512-B1sE0mocEw2OG8QBPmni/0zkVcgAB5G5H8RM+EvoLerDryFJvSRnwgvhqzp/EX4wuQfd7DVnGi1AzhxlBsdFYw==}
-
-  '@axicharts/charts-theme@0.4.35':
-    resolution: {integrity: sha512-epRKJV/94itxYzNUY9RNG1Xgd3Iob7/0NIx10yMI5Nn3alrnsJdXi6/If2bL4/94TXBu/kHVH3sJBKbKhHI4Dw==}
-
-  '@axicharts/charts@0.4.35':
-    resolution: {integrity: sha512-rovr63Gh5bs61Ji/WfqujYD4yXjV+9/KxZ51QnweDzKTE6yCx6rhmcWHIUm5QcpVSUR/m343D6dlQ8zr564M8g==}
-    hasBin: true
-    peerDependencies:
-      echarts: ^5.5.0
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-      uplot: ^1.6.31
 
   '@babel/code-frame@7.29.7':
     resolution: {integrity: sha512-Aup7aUOfpbAUg2ROOJN6Iw5f9DMBlzu0mIkm/malLQFN/YQgO48wCj0Kxa3sEHJvPVFg7siR+qRInwXd2qhQKw==}
@@ -5415,113 +5312,6 @@ snapshots:
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
-
-  '@axicharts/charts-andon@0.1.0(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@axicharts/charts': 0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-
-  '@axicharts/charts-canvas@0.4.32(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)':
-    dependencies:
-      '@axicharts/charts-core': 0.4.32
-      '@axicharts/charts-theme': 0.4.32
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      uplot: 1.6.32
-
-  '@axicharts/charts-canvas@0.4.35(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)':
-    dependencies:
-      '@axicharts/charts-core': 0.4.35
-      '@axicharts/charts-theme': 0.4.35
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      uplot: 1.6.32
-
-  '@axicharts/charts-core@0.4.32': {}
-
-  '@axicharts/charts-core@0.4.35': {}
-
-  '@axicharts/charts-echarts@0.4.14(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)':
-    dependencies:
-      '@axicharts/charts-canvas': 0.4.32(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)
-      '@axicharts/charts-theme': 0.4.34
-      echarts: 5.6.0
-      echarts-liquidfill: 3.1.0(echarts@5.6.0)
-      echarts-wordcloud: 2.1.0(echarts@5.6.0)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-    transitivePeerDependencies:
-      - uplot
-
-  '@axicharts/charts-gantt@0.1.0(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@axicharts/charts': 0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-
-  '@axicharts/charts-geo@0.1.0(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@axicharts/charts': 0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-
-  '@axicharts/charts-map@0.4.6(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@axicharts/charts': 0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)
-      d3-geo: 3.1.1
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      topojson-client: 3.1.0
-
-  '@axicharts/charts-sankey@0.1.0(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@axicharts/charts': 0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)
-      echarts: 5.6.0
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-
-  '@axicharts/charts-spec@0.4.35(tgv4tprjuwra4k5vd3xbfbjaja)':
-    dependencies:
-      '@axicharts/charts': 0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)
-      '@axicharts/charts-andon': 0.1.0(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@axicharts/charts-canvas': 0.4.35(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)
-      '@axicharts/charts-gantt': 0.1.0(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@axicharts/charts-geo': 0.1.0(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@axicharts/charts-map': 0.4.6(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@axicharts/charts-sankey': 0.1.0(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@axicharts/charts-tank': 0.1.0(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@axicharts/charts-theme': link:packages/charts-theme
-      ajv: 8.20.0
-      ajv-formats: 3.0.1(ajv@8.20.0)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-    transitivePeerDependencies:
-      - uplot
-
-  '@axicharts/charts-tank@0.1.0(@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@axicharts/charts': 0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-
-  '@axicharts/charts-theme@0.4.32': {}
-
-  '@axicharts/charts-theme@0.4.34': {}
-
-  '@axicharts/charts-theme@0.4.35': {}
-
-  '@axicharts/charts@0.4.35(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)':
-    dependencies:
-      '@axicharts/charts-canvas': 0.4.35(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)
-      '@axicharts/charts-core': 0.4.35
-      '@axicharts/charts-echarts': 0.4.14(echarts@5.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(uplot@1.6.32)
-      '@axicharts/charts-theme': 0.4.35
-      echarts: 5.6.0
-      jspdf: 3.0.4
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      uplot: 1.6.32
 
   '@babel/code-frame@7.29.7':
     dependencies:
