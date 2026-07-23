@@ -158,27 +158,23 @@ export function SankeyPlot({
     const chart = echarts.init(rootRef.current, undefined, { renderer: "canvas" });
     chartRef.current = chart;
 
-    const handleMouseOver = (params: {
-      componentType?: string;
-      name?: string;
-      value?: number;
-      color?: string;
-      dataType?: "node" | "edge";
-      data?: { source?: string; target?: string; value?: number };
-      event?: { event?: MouseEvent };
-    }) => {
+    const handleMouseOver = (params: Record<string, unknown>) => {
       if (!onItemHoverRef.current || params.componentType !== "series") return;
-      const mouse = params.event?.event;
+      const mouse = (params.event as { event?: MouseEvent } | undefined)?.event;
       if (!mouse) return;
 
+      const color = typeof params.color === "string" ? params.color : undefined;
+      const data = params.data as { source?: string; target?: string; value?: unknown } | undefined;
+
       if (params.dataType === "edge") {
-        const source = params.data?.source ?? "";
-        const target = params.data?.target ?? "";
+        const source = data?.source ?? "";
+        const target = data?.target ?? "";
+        const flowValue = data?.value;
         onItemHoverRef.current({
           title: `${source} → ${target}`,
           rows:
-            params.data?.value != null
-              ? [{ label: "Flow", value: String(params.data.value), color: params.color }]
+            flowValue != null
+              ? [{ label: "Flow", value: String(flowValue), color }]
               : [],
           left: mouse.offsetX,
           top: mouse.offsetY,
@@ -186,19 +182,19 @@ export function SankeyPlot({
         return;
       }
 
-      if (params.name == null) return;
+      if (typeof params.name !== "string") return;
       onItemHoverRef.current({
         title: params.name,
         rows:
           params.value != null
-            ? [{ label: "Value", value: String(params.value), color: params.color }]
+            ? [{ label: "Value", value: String(params.value), color }]
             : [],
         left: mouse.offsetX,
         top: mouse.offsetY,
       });
     };
 
-    const handleMouseOut = (params: { componentType?: string }) => {
+    const handleMouseOut = (params: Record<string, unknown>) => {
       if (params.componentType !== "series") return;
       onItemHoverRef.current?.(null);
     };
