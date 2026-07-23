@@ -1,6 +1,6 @@
 {
   "name": "@axicharts/charts-sankey",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Community Sankey flow plugin for AxiCharts — registerChartType extension with lazy ECharts.",
   "license": "MIT",
   "repository": {

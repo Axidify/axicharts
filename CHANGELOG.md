@@ -8,6 +8,10 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
+_Nothing yet._
+
+## [0.4.38] - 2026-07-23
+
 ### Added
 
 - **charts-theme** — shared hover tokens (`resolveHoverChrome`, `resolvePluginHoverPalette`, `ChartTheme.hover`)

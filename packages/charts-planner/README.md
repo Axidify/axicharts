@@ -16,6 +16,7 @@ npm install @axicharts/charts-planner @axicharts/charts-spec
 
 | Platform (`@axicharts/charts`) | Planner | Spec peer |
 |-------------------------------|---------|-----------|
+| `0.4.38` | `@axicharts/charts-planner@0.2.5` | `@axicharts/charts-spec@^0.4.38` |
 | `0.4.37` | `@axicharts/charts-planner@0.2.5` | `@axicharts/charts-spec@^0.4.37` |
 | `0.4.36` | `@axicharts/charts-planner@0.2.4` | `@axicharts/charts-spec@^0.4.36` |
 | `0.4.35` | `@axicharts/charts-planner@0.2.3` | `@axicharts/charts-spec@^0.4.35` |
