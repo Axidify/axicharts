@@ -98,11 +98,11 @@ module.exports = {
 };`;
 
 const INSTALL = `pnpm add \\
-  @axicharts/charts-spec@^0.4.38 \\
-  @axicharts/charts@^0.4.38 \\
-  @axicharts/charts-theme@^0.4.38 \\
-  @axicharts/charts-echarts@^0.4.17 \\
-  @axicharts/charts-planner@^0.2.5 \\
+  @axicharts/charts-spec@^0.4.39 \\
+  @axicharts/charts@^0.4.39 \\
+  @axicharts/charts-theme@^0.4.39 \\
+  @axicharts/charts-echarts@^0.4.18 \\
+  @axicharts/charts-planner@^0.2.6 \\
   uplot`;
 
 function CodeBlock({ children, dark }: { children: string; dark?: boolean }): ReactElement {

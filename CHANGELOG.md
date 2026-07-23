@@ -10,6 +10,19 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 _Nothing yet._
 
+## [0.4.39] - 2026-07-23
+
+### Added
+
+- **axiboard** — light instrument-desk chat UX (starter rows, Source Serif / Plus Jakarta Sans, teal accent)
+- **charts-runtime** — `KpiFlipCard.css` light-safe flip chrome (hard-hide back face when not flipped)
+
+### Changed
+
+- **charts-runtime** — `PanelsDashboard` forces `theme: "clean"` for KPI/chart tiles
+- **axiboard** — welcome starters, segmented Chat/Workspace control, light composer + BYOK fields
+- **docs** — version matrix / agent chat install line → `0.4.39` / planner `0.2.6` / echarts `0.4.18`
+
 ## [0.4.38] - 2026-07-23
 
 ### Added
