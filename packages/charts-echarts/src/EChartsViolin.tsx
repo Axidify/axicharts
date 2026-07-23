@@ -13,6 +13,7 @@ import {
   gridOptions,
   hiddenTooltip,
   isCompactTile,
+  itemEmphasisOptions,
   splitLineStyle,
   seriesPalette,
   toneColor,
@@ -251,6 +252,7 @@ export function EChartsViolin({
               resolveViolinBoxStats(item),
             ],
           })),
+          emphasis: itemEmphasisOptions(theme),
         };
       }),
     },

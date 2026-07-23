@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ReactElement } from "react";
 import { useOptionalChartLayout } from "@axicharts/charts";
+import { resolvePluginHoverPalette } from "@axicharts/charts-theme";
 
 export type GeoRegion = {
   id: string;
@@ -104,13 +105,14 @@ export function GeoMapChart({
 
   const scaleHeight = showScale ? 18 : 0;
   const mapHeight = height - scaleHeight;
+  const hover = resolvePluginHoverPalette(surface, layout?.theme);
   const palette = surface === "dark"
     ? {
         canvas: "#0f172a",
         label: "#e2e8f0",
         value: "#94a3b8",
         stroke: "#475569",
-        hoverStroke: "#38bdf8",
+        hoverStroke: hover.hoverStroke,
         scaleTrack: "#334155",
         scaleText: "#94a3b8",
       }
@@ -119,7 +121,7 @@ export function GeoMapChart({
         label: "#0f172a",
         value: "#334155",
         stroke: "#94a3b8",
-        hoverStroke: "#2563eb",
+        hoverStroke: hover.hoverStroke,
         scaleTrack: "#e2e8f0",
         scaleText: "#64748b",
       };
@@ -153,7 +155,7 @@ export function GeoMapChart({
               fill={fill}
               stroke={active ? palette.hoverStroke : palette.stroke}
               strokeWidth={active ? 2 : 1}
-              opacity={hoverId && !active ? 0.72 : 1}
+              opacity={hoverId && !active ? hover.dimOpacity : 1}
             />
             {showLabels ? (
               <>

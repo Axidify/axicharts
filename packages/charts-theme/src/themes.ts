@@ -1,5 +1,6 @@
 import type { ChartColorTokens } from "./cssTokens";
 import { createTheme } from "./createTheme";
+import type { ChartThemeHover } from "./hover";
 
 export type ChartThemeSvgPolish = {
   areaGradient?: boolean;
@@ -12,6 +13,7 @@ export type ChartTheme = {
   name: string;
   tokens?: ChartColorTokens;
   svg?: ChartThemeSvgPolish;
+  hover?: Partial<ChartThemeHover>;
   grid: {
     show: boolean;
     horizontal: boolean;

@@ -9,6 +9,7 @@ import {
   gridOptions,
   hiddenTooltip,
   isCompactTile,
+  itemEmphasisOptions,
   splitLineStyle,
   seriesPalette,
   toneColor,
@@ -114,6 +115,7 @@ export function EChartsBoxplot({
         borderColor:
           toneColor(group.tone, theme) ?? palette[index % palette.length],
       },
+      emphasis: itemEmphasisOptions(theme),
     })),
   },
     animate,

@@ -14,6 +14,7 @@ import {
   gridOptions,
   hiddenTooltip,
   isCompactTile,
+  itemEmphasisOptions,
   splitLineStyle,
   seriesPalette,
   toneColor,
@@ -225,6 +226,7 @@ export function EChartsRidgeline({
               ],
             };
           }),
+          emphasis: itemEmphasisOptions(theme),
         };
       }),
     },

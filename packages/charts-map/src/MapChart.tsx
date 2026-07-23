@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { Topology } from "topojson-specification";
 import { useOptionalChartLayout } from "@axicharts/charts";
+import { resolvePluginHoverPalette } from "@axicharts/charts-theme";
 import {
   colorForValue,
   resolveBounds,
@@ -312,6 +313,7 @@ export function MapChart({
   if (layout && !layout.ready) return null;
   if (width < 1 || height < 1) return null;
 
+  const hover = resolvePluginHoverPalette(surface, layout?.theme);
   const palette =
     surface === "dark"
       ? {
@@ -319,7 +321,7 @@ export function MapChart({
           label: "#e2e8f0",
           value: "#94a3b8",
           stroke: "#475569",
-          hoverStroke: "#38bdf8",
+          hoverStroke: hover.hoverStroke,
           scaleTrack: "#334155",
           scaleText: "#94a3b8",
           tooltipBg: "rgba(15, 23, 42, 0.92)",
@@ -333,7 +335,7 @@ export function MapChart({
           label: "#0f172a",
           value: "#334155",
           stroke: "#94a3b8",
-          hoverStroke: "#2563eb",
+          hoverStroke: hover.hoverStroke,
           scaleTrack: "#e2e8f0",
           scaleText: "#64748b",
           tooltipBg: "rgba(255, 255, 255, 0.96)",
@@ -404,7 +406,7 @@ export function MapChart({
                 fill={fill}
                 stroke={active ? palette.hoverStroke : palette.stroke}
                 strokeWidth={active ? 1.5 : 0.75}
-                opacity={hoverKey && !active ? 0.72 : 1}
+                opacity={hoverKey && !active ? hover.dimOpacity : 1}
               />
               {showLabels && centroid ? (
                 <>

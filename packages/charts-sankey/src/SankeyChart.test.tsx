@@ -8,14 +8,16 @@ import { registerSankeyChart } from "./registerCore";
 describe("SankeyChart", () => {
   it("renders chart root with aria label", () => {
     const { container } = render(
-      <SankeyChart nodes={SAMPLE_SANKEY_FLOW.nodes} links={SAMPLE_SANKEY_FLOW.links} />,
+      <ChartContainer width={320} height={200} mode="interactive">
+        <SankeyChart nodes={SAMPLE_SANKEY_FLOW.nodes} links={SAMPLE_SANKEY_FLOW.links} />
+      </ChartContainer>,
     );
     expect(container.querySelector('[aria-label="Sankey flow diagram"]')).toBeTruthy();
   });
 
   it("fills chart container dimensions", () => {
     const { container } = render(
-      <ChartContainer width={320} height={200}>
+      <ChartContainer width={320} height={200} mode="interactive">
         <SankeyChart nodes={SAMPLE_SANKEY_FLOW.nodes} links={SAMPLE_SANKEY_FLOW.links} />
       </ChartContainer>,
     );

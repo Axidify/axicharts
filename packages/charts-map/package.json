@@ -30,14 +30,15 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/register.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external d3-geo --external topojson-client --clean",
-    "dev": "tsup src/index.ts src/register.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external d3-geo --external topojson-client --watch",
+    "build": "tsup src/index.ts src/register.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-theme --external d3-geo --external topojson-client --clean",
+    "dev": "tsup src/index.ts src/register.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-theme --external d3-geo --external topojson-client --watch",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",
-    "topojson-client": "^3.1.0"
+    "topojson-client": "^3.1.0",
+    "@axicharts/charts-theme": "workspace:*"
   },
   "peerDependencies": {
     "@axicharts/charts": "workspace:*",

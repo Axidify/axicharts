@@ -174,6 +174,19 @@ Use **industrial** and **studio** themes as separate audit lanes (not Recharts p
 | D-411 | Sunburst | Catalog card @ 280×140 | **Close** — hide labels @ compact |
 | D-412 | Plugins (map/sankey/gantt) | Catalog @ 280×140 | **Close** — Lane C plugins wall; N/A for Recharts |
 
+### P4 — Interaction uniformity (D-5xx)
+
+Cross-catalog hover chrome per [chart-design-language.md](./chart-design-language.md) § Interaction & hover. Harness: `Charts/Interaction`.
+
+| ID | Task | Status |
+|----|------|--------|
+| D-501 | Hover tokens in `charts-theme` (`hoverDimOpacity`, band colors, stroke) | **Closed** — `resolveHoverChrome`, `resolvePluginHoverPalette` |
+| D-502 | `itemEmphasisOptions()` in `themeBridge.ts`; wire on ECharts types missing explicit `emphasis` | **Closed** — histogram, boxplot, violin, funnel, radar, ridgeline, swarm, pictorial bar, treemap |
+| D-503 | Pie `interactive` emphasis — sibling dim, no scale; keep presentation scale | **Closed** — `pieEmphasisOptions` `focus: "self"` + subtle shadow |
+| D-504 | `CategoryHighlight` — generalize `SyncHighlight` for all cartesian hover (not sync-only) | **Closed** — band renders on any `cursor` when crosshair enabled |
+| D-505 | Plugin token alignment (map, geo, gantt); Sankey → React tooltip overlay | **Closed** — shared hover tokens; Sankey `onItemHover` + hidden native tooltip |
+| D-506 | uPlot mark emphasis (bar brighten, line dot) — optional Phase 2 | **Deferred** |
+
 ### Phase 1 audit snapshot (2026-07-21)
 
 Code + Storybook review against wall chrome rules. No browser side-by-side yet for Gap types.
@@ -187,6 +200,78 @@ Code + Storybook review against wall chrome rules. No browser side-by-side yet f
 | Stat / table | Lane B harness @ 72/120/320px (~4.5) | **D-106 / D-107** Parity |
 
 **Wall eight baseline (confirmed):** Parity = line, area, combo, multi-line, donut, **vertical bar**, **stacked bar**, **horizontal bar**.
+
+---
+
+## Interaction hover audit (2026-07-22)
+
+Code review against [chart-design-language.md](./chart-design-language.md) § Interaction & hover. Scored in **`interactive`** mode unless noted. `static` @ 360×280 intentionally has no hover — not a gap.
+
+**Legend:** ✅ spec met · ⚠️ partial · ❌ gap · — not applicable
+
+### Category-hover (cartesian / axis-index)
+
+| Type | Shell | Tooltip | Crosshair | Band highlight | Mark emphasis | Notes |
+|------|-------|---------|-----------|----------------|---------------|-------|
+| Line | Cartesian | ✅ | ✅ | ✅ | ❌ | uPlot; `SyncHighlight` band on any `cursor` (**D-504**) |
+| Area | Cartesian | ✅ | ✅ | ✅ | ❌ | via `LineChart` + `fill` |
+| Bar (V/H) | Cartesian | ✅ | ✅ | ✅ | ❌ | uPlot canvas + SVG `static` fallback |
+| Stacked bar | Cartesian | ✅ | ✅ | ✅ | ❌ | same as bar |
+| Combo | Cartesian | ✅ | ✅ | ✅ | ❌ | uPlot `UPlotCombo` |
+| Cartesian blocks | Cartesian | ✅ | ✅ | ✅ | ❌ | composable marks path |
+| Candlestick | Cartesian | ✅ | ✅ | ✅ | ❌ | ECharts `onCursor`; no bar pop |
+| Waterfall | Cartesian | ✅ | ✅ | ✅ | ⚠️ | ECharts `onCursor`; placeholder `emphasis` only |
+| Sparkline | Cartesian | — | — | — | — | `static` / compact; hover N/A |
+
+**Category-hover gaps:** mark emphasis only (**D-506** deferred).
+
+### Item-hover (ECharts)
+
+| Type | Tooltip | Explicit `emphasis` | Sibling dim | Scale pop | Notes |
+|------|---------|---------------------|-------------|-----------|-------|
+| Pie / donut | ✅ | ✅ | ✅ interactive | ❌ interactive | `pieEmphasisOptions` — no scale outside presentation (**D-503**) |
+| Scatter | ✅ | ✅ | ⚠️ | ✅ 1.2× | |
+| Histogram | ✅ | ✅ | ✅ | — | `itemEmphasisOptions` (**D-502**) |
+| Boxplot | ✅ | ✅ | ✅ | — | **D-502** |
+| Violin | ✅ | ✅ | ✅ | — | **D-502** |
+| Swarm | ✅ | ✅ | ✅ | — | **D-502** |
+| Ridgeline | ✅ | ✅ | ✅ | — | **D-502** |
+| Funnel | ✅ | ✅ | ✅ | — | **D-502** |
+| Radar | ✅ | ✅ | ✅ | — | `focus: "series"` (**D-502**) |
+| Pictorial bar | ✅ | ✅ | ✅ | — | **D-502** |
+| Treemap | ✅ | ✅ | ✅ | — | **D-502** |
+| Sunburst | ✅ | ✅ | ✅ ancestor | — | |
+| Heatmap | ✅ | ✅ | ✅ column | — | sync-aware |
+| Calendar heatmap | ✅ | ✅ | ✅ | — | |
+| Graph | ✅ | ✅ | ✅ adjacency | — | |
+| Parallel | ✅ | ✅ | ✅ | — | |
+| Theme river | ✅ | ✅ | ✅ | — | |
+| Bump | ✅ | ✅ | ✅ series | — | |
+| Word cloud | ✅ | ✅ | ✅ | — | |
+| Liquid fill | — | — | — | — | gauge-like; hover N/A |
+
+### Item-hover (community plugins)
+
+| Type | Tooltip | Sibling dim | Stroke / band | React overlay | Notes |
+|------|---------|-------------|---------------|---------------|-------|
+| Map | ✅ inline SVG | ✅ 0.72 | ✅ | ❌ | `resolvePluginHoverPalette` (**D-505**) |
+| Geo | ✅ | ✅ 0.72 | ✅ | ❌ | same pattern as map |
+| Gantt | ✅ | ✅ 0.45 | ✅ | ❌ | **D-505** |
+| Sankey | ✅ | ✅ adjacency | — | ✅ | React `Tooltip` via `onItemHover` (**D-505**) |
+| Tank | — | — | — | — | industrial; hover N/A |
+
+### Rubric impact (dimension 5 — Chrome)
+
+| Family | Score (interactive) | Blocker |
+|--------|---------------------|---------|
+| Cartesian uPlot | **4** | Band highlight shipped (**D-504**); mark pop deferred (**D-506**) |
+| ECharts item (with `emphasis`) | **4** | Shared tokens via **D-502** |
+| ECharts item (without `emphasis`) | **4** | **D-502** closed |
+| Pie interactive | **4** | Sibling dim shipped (**D-503**) |
+| Map / geo / gantt | **4** | Shared hover tokens (**D-505**) |
+| Sankey | **4** | React tooltip + shell (**D-505**) |
+
+**Ship bar for interaction uniformity:** average ≥ 4.0 after **D-501–D-505**; **D-506** optional.
 
 ---
 
@@ -238,6 +323,17 @@ Audit for internal consistency (margins, type scale, theme tokens) — no Rechar
 - **D-301**–**D-303** ✅ snapshot matrix + Recharts story index
 - Per-type **last audited** date in matrix rows / history below
 
+#### Phase 5 — Interaction uniformity (D-5xx)
+Apply [chart-design-language.md](./chart-design-language.md) § Interaction & hover:
+1. **D-501** — hover tokens in `charts-theme`
+2. **D-502** — `itemEmphasisOptions()` + ECharts normalization (~9 types)
+3. **D-503** — pie interactive sibling dim (no scale)
+4. **D-504** — `CategoryHighlight` for all cartesian charts
+5. **D-505** — plugin token alignment; Sankey React tooltip
+6. **D-506** — uPlot mark emphasis (deferred — canvas draw hooks)
+
+Harness: `Charts/Interaction` (existing) + pie/scatter stories in `interactive` mode.
+
 #### Studio lane (D-310)
 Editorial `studioTheme` — gradient areas, soft grid, bar highlight. **Not** scored on Recharts 1–5 rubric.
 - Harness: `Audit/Studio → StudioTileWall` @ 360×280 (Recharts bare / `cleanTheme` / `studioTheme`)
@@ -284,6 +380,7 @@ Storybook base: `pnpm storybook` → iframe `?id=<story-id>&viewMode=story`
 | `Compare/Composition priority` | Priority bars; horizontal Recharts reference |
 | `Charts/ShadcnParity` | Bar, line, area, pie, donut, stacked, combo, multi-line |
 | `Charts/Pie` | Full pie @ 360×280 — status distribution |
+| `Charts/Interaction` | Tooltip + crosshair over uPlot; mode variants (`static` / `live` / `interactive`) — **D-5xx** harness |
 | `Audit/Studio` | Studio lane 3-way wall (D-310) |
 | `Charts/Bar cell` · `Charts/Line cell` | Composable `Cell` per-category fills |
 | `Charts/Horizontal bar` | Imperative horizontal bar API |
@@ -309,6 +406,8 @@ Do **not** file D-xxx for these unless a dashboard user expects Recharts behavio
 
 | Date | Change |
 |------|--------|
+| 2026-07-22 | **D-501–D-505 shipped** — hover tokens, `itemEmphasisOptions`, pie interactive dim, cartesian band highlight, plugin + Sankey alignment |
+| 2026-07-22 | **Interaction hover audit** — matrix + rubric scores; **D-501–D-506** backlog; Phase 5 in consistency program; design-language § Interaction & hover |
 | 2026-07-21 | **Optional backlog** — pie **D-201** parity row; blocks **D-105**; studio **D-310**; **D-303** story index; Lane C **D-409–D-412** (swarm/ridgeline/sunburst/plugins) |
 | 2026-07-21 | **Phase 3 Lane C** — `nicheCompactLayout` + harness **D-401–D-408** @ 280×140 / 180×120; visual CI `design-lane-c-niche-360` |
 | 2026-07-21 | **D-106 / D-107 / D-220–D-223** Lane B → **Parity**; stat compact padding, table status tones; **D-301** visual CI scatter/radar/histogram tiles |

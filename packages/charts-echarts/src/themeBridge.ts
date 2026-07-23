@@ -1,9 +1,35 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
-import { resolveChartChrome, resolveToneColors } from "@axicharts/charts-theme";
+import { resolveChartChrome, resolveHoverChrome, resolveToneColors } from "@axicharts/charts-theme";
 import { echartsColor } from "./echartsColor";
 
 export { toneColor, seriesPalette } from "./palette";
 export type { SeriesTone } from "./types";
+
+export type ItemEmphasisFocus = "self" | "series";
+
+/** Shared ECharts `emphasis` for item-hover charts — dims siblings, optional presentation scale. */
+export function itemEmphasisOptions(
+  theme: Pick<ChartTheme, "name" | "hover">,
+  options?: {
+    presentation?: boolean;
+    focus?: ItemEmphasisFocus;
+  },
+) {
+  const hover = resolveHoverChrome(theme);
+  const presentation = options?.presentation ?? false;
+  return {
+    focus: options?.focus ?? "self",
+    scale: presentation,
+    ...(presentation ? { scaleSize: hover.scaleSize } : {}),
+    itemStyle: {
+      shadowBlur: presentation ? hover.shadowBlur : 4,
+      shadowOffsetX: 0,
+      shadowColor: presentation
+        ? hover.shadowColor
+        : "rgba(15, 23, 42, 0.08)",
+    },
+  };
+}
 
 /** Dashboard tile (~360px wide or short height) — tighter ECharts grid margins. */
 export function isCompactTile(width?: number, height?: number): boolean {

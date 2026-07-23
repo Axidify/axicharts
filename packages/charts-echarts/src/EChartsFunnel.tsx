@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
-import { hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
+import { hiddenTooltip, itemEmphasisOptions, seriesPalette, toneColor } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { FunnelStage } from "./funnelTypes";
@@ -78,6 +78,7 @@ export function EChartsFunnel({
           borderWidth: 1,
         },
         data,
+        emphasis: itemEmphasisOptions(theme),
       },
     ],
     },

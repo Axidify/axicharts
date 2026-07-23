@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
-import { hiddenTooltip } from "./themeBridge";
+import { hiddenTooltip, itemEmphasisOptions } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { flattenTreemapValues, mapTreemapData } from "./treemapData";
@@ -92,6 +92,7 @@ export function EChartsTreemap({
           },
         ],
         data,
+        emphasis: itemEmphasisOptions(theme, { focus: "self" }),
       },
     ],
     },

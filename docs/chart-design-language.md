@@ -201,6 +201,100 @@ Horizontal is a **layout variant**, not a separate aesthetic. Same rules:
 
 ---
 
+## Interaction & hover
+
+Prescriptive rules for **tooltip, crosshair, and visual emphasis** across chart families. Audited in [chart-design-audit.md](./chart-design-audit.md) (**D-5xx** backlog). Harness: Storybook `Charts/Interaction`.
+
+**North star:** In `interactive` / `presentation` mode, every chart type uses the same *interaction language* — highlight what is active, dim what is not, show values in the shared React `Tooltip`. We do **not** require identical mechanics (crosshair on pies, slice scale on bars).
+
+### Mode matrix
+
+Source: `packages/charts/src/interaction/mode.ts` → `getInteractionChrome()`.
+
+| Mode | Tooltip | Crosshair | Visual emphasis | Typical context |
+|------|---------|-----------|-----------------|-----------------|
+| `static` | off | off | off | Axiboard tiles @ 360×280 — **intentional** |
+| `live` | off | on | optional band | Ops walls, streaming panels |
+| `interactive` | on | on | on (per pattern below) | Exploratory dashboards, docs |
+| `presentation` | on | on | on (stronger item pop) | Decks, large-format demos |
+
+**Rule:** Do not enable hover chrome in `static` to “fix” parity gaps. Tiles are embed-first; hover belongs in interactive contexts.
+
+### Two interaction patterns
+
+| Pattern | Charts | Active signal | Inactive signal | Data readout |
+|---------|--------|---------------|-----------------|--------------|
+| **Category-hover** | Line, area, bar, combo, candlestick, waterfall | Vertical band + crosshair at category index | Dim outside band (target) | React `Tooltip` @ `cursor.index` |
+| **Item-hover** | Pie, scatter, treemap, funnel, map, heatmap, … | Emphasize hovered mark | Dim siblings (`~0.72` opacity) | React `Tooltip` via `onItemHover` |
+
+Implementation shells:
+
+- **Category-hover** — `CartesianChartShell` + uPlot `setCursor` hook (`UPlotBar`, `UPlotLine`, `UPlotCombo`) or ECharts `onCursor` (waterfall, candlestick).
+- **Item-hover** — `EChartsInteractionShell` + `useEChart` `mouseover` → `ChartInteractionContext.setItemHover`.
+
+Synced panels: `SyncHighlight` renders a category band on any cartesian hover when crosshair is enabled (**D-504**). In a `ChartSyncGroup`, follower charts also dim outside the active band.
+
+### Hover tokens
+
+Source: `packages/charts-theme/src/hover.ts` → `resolveHoverChrome()` / `resolvePluginHoverPalette()` (**D-501**).
+
+| Token | Value | Use |
+|-------|-------|-----|
+| `dimOpacity` | `0.72` | Inactive marks/regions (map, geo, ECharts blur) |
+| `taskDimOpacity` | `0.45` | Gantt task dim |
+| `bandColor` | theme-aware `rgba` | Category band fill |
+| `bandFollowerBorder` | theme-aware `rgba` | Follower sync band edge |
+| `stroke` | `#2563eb` / `#38bdf8` | Active region stroke (light / dark) |
+| `scaleSize` | `6` (presentation only) | Pie slice pop — **not** dashboard interactive |
+| `shadowBlur` | `10` | Presentation item emphasis |
+
+Shared ECharts helper (**D-502**): `itemEmphasisOptions()` in `packages/charts-echarts/src/themeBridge.ts`.
+
+### Category-hover (cartesian)
+
+| Element | Status |
+|---------|--------|
+| Crosshair | ✅ `Crosshair` overlay |
+| Tooltip | ✅ `Tooltip` @ category index |
+| Category band | ✅ `SyncHighlight` on any hover (**D-504**) |
+| Bar/line mark pop | ❌ deferred (**D-506**) — canvas draw hooks |
+
+### Item-hover (ECharts + plugins)
+
+| Element | Rule |
+|---------|------|
+| Tooltip | React overlay; `hiddenTooltip()` on ECharts series |
+| Sibling dim | `emphasis.focus: "self"` (or `"adjacency"` / `"ancestor"` where semantically correct) |
+| Scale / translate | **Presentation only** for pie; no slice jump on compact tiles |
+| Sankey | React overlay via `onItemHover` + `hiddenTooltip()` (**D-505**) |
+
+#### Pie / donut (special case)
+
+Source: `packages/charts-echarts/src/pieLayout.ts` → `pieEmphasisOptions()`.
+
+| Mode | Scale | Sibling dim | Shadow |
+|------|-------|-------------|--------|
+| `static` | off | off | off |
+| `interactive` | off | on | subtle or off |
+| `presentation` | on (`scaleSize: 6`) | on (`focus: "self"`) | on |
+
+**Regression guard:** `pieGapOptions.test.ts` — “dashboard donuts stable on hover” means **no scale** outside presentation, not “no hover at all.”
+
+### N/A — no item hover expected
+
+Gauge, digital, status lamp, tank, liquid fill, KPI stat, data table — single-value or non-mark surfaces. Do not force category or item hover.
+
+### New chart checklist (interaction)
+
+Add to the feature checklist below:
+
+8. [ ] Declares **category-hover** or **item-hover** pattern
+9. [ ] `interactive` mode: tooltip + emphasis per pattern
+10. [ ] `static` mode: no hover chrome (if shipped as tile)
+11. [ ] Row in interaction audit matrix ([chart-design-audit.md](./chart-design-audit.md))
+
+---
+
 ## Panel spec conventions
 
 ```json
@@ -243,6 +337,9 @@ Before merging a new chart type, orientation, or compile route:
 5. [ ] Row added to [chart-design-audit.md](./chart-design-audit.md) matrix
 6. [ ] Snapshot in visual CI when status reaches **Parity**
 7. [ ] Compared on `/compare/design` or Storybook `Compare/Design parity`
+8. [ ] Interaction pattern declared (category-hover vs item-hover); see **Interaction & hover** above
+9. [ ] `interactive` mode: tooltip + emphasis per pattern; `static` tiles remain hoverless
+10. [ ] Interaction audit row updated in [chart-design-audit.md](./chart-design-audit.md)
 
 ---
 
@@ -276,4 +373,5 @@ Before merging a new chart type, orientation, or compile route:
 
 | Date | Change |
 |------|--------|
+| 2026-07-22 | **Interaction & hover** — mode matrix, category vs item patterns, hover tokens, pie rules, D-5xx backlog cross-ref |
 | 2026-07-20 | Initial design language doc from `/compare/design` reviews (line win, bar toss-up, horizontal gap) |

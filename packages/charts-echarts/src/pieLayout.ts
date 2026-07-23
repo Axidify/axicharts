@@ -1,4 +1,5 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
+import { defaultChartThemeHover } from "@axicharts/charts-theme";
 import { isCompactTile } from "./themeBridge";
 
 export type PieLabelMode = "none" | "external" | "legend";
@@ -38,7 +39,7 @@ export function pieOuterRadius(
 export function pieEmphasisOptions(presentation: boolean): {
   scale: boolean;
   scaleSize?: number;
-  focus: "none" | "self";
+  focus: "self";
   itemStyle: {
     shadowBlur: number;
     shadowOffsetX: number;
@@ -48,23 +49,23 @@ export function pieEmphasisOptions(presentation: boolean): {
   if (presentation) {
     return {
       scale: true,
-      scaleSize: 6,
+      scaleSize: defaultChartThemeHover.scaleSize,
       focus: "self",
       itemStyle: {
-        shadowBlur: 10,
+        shadowBlur: defaultChartThemeHover.shadowBlur,
         shadowOffsetX: 0,
-        shadowColor: "rgba(15, 23, 42, 0.12)",
+        shadowColor: defaultChartThemeHover.shadowColor,
       },
     };
   }
 
   return {
     scale: false,
-    focus: "none",
+    focus: "self",
     itemStyle: {
-      shadowBlur: 0,
+      shadowBlur: 4,
       shadowOffsetX: 0,
-      shadowColor: "transparent",
+      shadowColor: "rgba(15, 23, 42, 0.08)",
     },
   };
 }

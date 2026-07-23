@@ -1,12 +1,24 @@
 "use client";
 
 import { useEffect, useMemo, useRef, type ReactElement } from "react";
-import { useOptionalChartLayout } from "@axicharts/charts";
+import {
+  EChartsInteractionShell,
+  useEChartsInteraction,
+  useOptionalChartLayout,
+} from "@axicharts/charts";
 import { SankeyChart as EChartsSankeySeries } from "echarts/charts";
-import { TooltipComponent } from "echarts/components";
+import { CanvasRenderer } from "echarts/renderers";
 import * as echarts from "echarts/core";
 import type { EChartsOption } from "echarts";
-import { CanvasRenderer } from "echarts/renderers";
+import { itemEmphasisOptions } from "@axicharts/charts-echarts";
+import { cleanTheme, liveTheme } from "@axicharts/charts-theme";
+
+export type SankeyItemHoverEvent = {
+  title: string;
+  rows: Array<{ label: string; value: string; color?: string }>;
+  left: number;
+  top: number;
+} | null;
 
 export type SankeyNode = {
   name: string;
@@ -26,13 +38,14 @@ export type SankeyChartProps = {
   width?: number;
   height?: number;
   surface?: SankeySurface;
+  onItemHover?: (event: SankeyItemHoverEvent) => void;
 };
 
 let echartsReady = false;
 
 function ensureEcharts(): void {
   if (echartsReady) return;
-  echarts.use([EChartsSankeySeries, TooltipComponent, CanvasRenderer]);
+  echarts.use([EChartsSankeySeries, CanvasRenderer]);
   echartsReady = true;
 }
 
@@ -89,22 +102,17 @@ function buildOption(
 ): EChartsOption {
   const palette = surface === "dark" ? NODE_COLORS_DARK : NODE_COLORS_LIGHT;
   const labelColor = surface === "dark" ? "#cbd5e1" : "#334155";
-  const tooltipBg = surface === "dark" ? "rgba(15, 23, 42, 0.94)" : "rgba(255, 255, 255, 0.96)";
-  const tooltipBorder = surface === "dark" ? "#334155" : "#e2e8f0";
-  const tooltipText = surface === "dark" ? "#e2e8f0" : "#0f172a";
+  const emphasisTheme = surface === "dark" ? liveTheme : cleanTheme;
 
   return {
-    tooltip: {
-      trigger: "item",
-      triggerOn: "mousemove",
-      backgroundColor: tooltipBg,
-      borderColor: tooltipBorder,
-      textStyle: { color: tooltipText, fontSize: 11 },
-    },
+    tooltip: { show: false },
     series: [
       {
         type: "sankey",
-        emphasis: { focus: "adjacency" },
+        emphasis: {
+          ...itemEmphasisOptions(emphasisTheme),
+          focus: "adjacency",
+        },
         data: nodes.map((node, index) => ({
           ...node,
           itemStyle: { color: palette[index % palette.length] },
@@ -123,12 +131,13 @@ function buildOption(
   };
 }
 
-export function SankeyChart({
+export function SankeyPlot({
   nodes,
   links,
   width: widthProp,
   height: heightProp,
   surface: surfaceProp,
+  onItemHover,
 }: SankeyChartProps): ReactElement | null {
   const layout = useOptionalChartLayout();
   const width = Math.floor(widthProp ?? layout?.size.width ?? 420);
@@ -136,6 +145,8 @@ export function SankeyChart({
   const surface = resolveSurface(surfaceProp, layout?.theme.name);
   const rootRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<echarts.ECharts | null>(null);
+  const onItemHoverRef = useRef(onItemHover);
+  onItemHoverRef.current = onItemHover;
   const option = useMemo(
     () => buildOption(nodes, links, surface),
     [nodes, links, surface],
@@ -146,7 +157,64 @@ export function SankeyChart({
     ensureEcharts();
     const chart = echarts.init(rootRef.current, undefined, { renderer: "canvas" });
     chartRef.current = chart;
+
+    const handleMouseOver = (params: {
+      componentType?: string;
+      name?: string;
+      value?: number;
+      color?: string;
+      dataType?: "node" | "edge";
+      data?: { source?: string; target?: string; value?: number };
+      event?: { event?: MouseEvent };
+    }) => {
+      if (!onItemHoverRef.current || params.componentType !== "series") return;
+      const mouse = params.event?.event;
+      if (!mouse) return;
+
+      if (params.dataType === "edge") {
+        const source = params.data?.source ?? "";
+        const target = params.data?.target ?? "";
+        onItemHoverRef.current({
+          title: `${source} → ${target}`,
+          rows:
+            params.data?.value != null
+              ? [{ label: "Flow", value: String(params.data.value), color: params.color }]
+              : [],
+          left: mouse.offsetX,
+          top: mouse.offsetY,
+        });
+        return;
+      }
+
+      if (params.name == null) return;
+      onItemHoverRef.current({
+        title: params.name,
+        rows:
+          params.value != null
+            ? [{ label: "Value", value: String(params.value), color: params.color }]
+            : [],
+        left: mouse.offsetX,
+        top: mouse.offsetY,
+      });
+    };
+
+    const handleMouseOut = (params: { componentType?: string }) => {
+      if (params.componentType !== "series") return;
+      onItemHoverRef.current?.(null);
+    };
+
+    const handleGlobalOut = () => {
+      onItemHoverRef.current?.(null);
+    };
+
+    chart.on("mouseover", handleMouseOver);
+    chart.on("mouseout", handleMouseOut);
+    chart.getZr().on("globalout", handleGlobalOut);
+
     return () => {
+      chart.off("mouseover", handleMouseOver);
+      chart.off("mouseout", handleMouseOut);
+      chart.getZr().off("globalout", handleGlobalOut);
       chart.dispose();
       chartRef.current = null;
     };
@@ -170,6 +238,28 @@ export function SankeyChart({
       aria-label="Sankey flow diagram"
       className="axicharts-sankey"
       style={{ width, height, background: "transparent" }}
+    />
+  );
+}
+
+function SankeyPlotConnected({
+  onItemHover: onItemHoverProp,
+  ...props
+}: SankeyChartProps): ReactElement | null {
+  const interaction = useEChartsInteraction();
+
+  return (
+    <SankeyPlot
+      {...props}
+      onItemHover={onItemHoverProp ?? interaction.onItemHover}
+    />
+  );
+}
+
+export function SankeyChart(props: SankeyChartProps): ReactElement {
+  return (
+    <EChartsInteractionShell
+      plot={<SankeyPlotConnected {...props} />}
     />
   );
 }

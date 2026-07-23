@@ -8,7 +8,19 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
-_Nothing yet._
+### Added
+
+- **charts-theme** — shared hover tokens (`resolveHoverChrome`, `resolvePluginHoverPalette`, `ChartTheme.hover`)
+- **charts-echarts** — `itemEmphasisOptions()` for normalized item-hover emphasis across distribution charts
+- **docs** — Phase 5 interaction uniformity (D-501–D-505); design-language § Interaction & hover
+
+### Changed
+
+- **charts** — `SyncHighlight` renders category band on any cartesian hover when crosshair is enabled (**D-504**)
+- **charts-echarts** — pie interactive emphasis dims siblings without slice scale; wired `itemEmphasisOptions` on histogram, boxplot, violin, funnel, radar, ridgeline, swarm, pictorial bar, treemap (**D-502–D-503**)
+- **charts-map**, **charts-geo**, **charts-gantt** — plugin hover palette from shared theme tokens (**D-505**)
+- **charts-sankey** — React tooltip overlay via `onItemHover`; hidden native ECharts tooltip (**D-505**)
+- **storybook** — `Charts/Interaction` harness; Sankey plugin interactive stories
 
 ## [0.4.37] - 2026-07-22
 

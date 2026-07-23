@@ -30,10 +30,13 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/register.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --clean",
-    "dev": "tsup src/index.ts src/register.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --watch",
+    "build": "tsup src/index.ts src/register.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-theme --clean",
+    "dev": "tsup src/index.ts src/register.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-theme --watch",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@axicharts/charts-theme": "workspace:*"
   },
   "peerDependencies": {
     "@axicharts/charts": "workspace:*",

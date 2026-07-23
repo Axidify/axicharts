@@ -10,6 +10,16 @@ export {
 } from "./themes";
 export { createTheme } from "./createTheme";
 export {
+  defaultChartThemeHover,
+  isDarkHoverSurface,
+  resolveHoverChrome,
+  resolveHoverTokens,
+  resolvePluginHoverPalette,
+  type ChartThemeHover,
+  type HoverChrome,
+  type PluginHoverPalette,
+} from "./hover";
+export {
   readCssChartTokens,
   resolveThemeTokens,
   resolveChartPalette,

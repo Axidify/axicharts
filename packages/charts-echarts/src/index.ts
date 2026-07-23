@@ -116,6 +116,7 @@ export {
   type EChartCursorEvent,
   type EChartItemHoverEvent,
 } from "./useEChart";
+export { itemEmphasisOptions, type ItemEmphasisFocus } from "./themeBridge";
 export {
   SERIES_COLORS,
   SERIES_PALETTE,

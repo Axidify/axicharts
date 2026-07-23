@@ -10,6 +10,7 @@ import {
   gridOptions,
   hiddenTooltip,
   isCompactTile,
+  itemEmphasisOptions,
   splitLineStyle,
   seriesPalette,
   toneColor,
@@ -149,6 +150,7 @@ export function EChartsSwarm({
             color,
             opacity: pointOpacity,
           },
+          emphasis: itemEmphasisOptions(theme),
         };
 
         if (!showMedianLine) {

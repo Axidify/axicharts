@@ -9,7 +9,7 @@ const ERRORS = [1, 2, 5, 3, 2, 4, 3];
 
 function InteractionDemo(): ReactElement {
   return (
-    <ChartContainer theme={cleanTheme} height={240} width={520}>
+    <ChartContainer theme={cleanTheme} mode="interactive" height={240} width={520}>
       <LineChart
         categories={DAYS}
         series={[
@@ -32,7 +32,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "C2 interaction chrome — React tooltip, legend, and crosshair over uPlot. Hover the chart to inspect values.",
+          "D-5xx interaction harness — React tooltip, crosshair, and category band highlight over uPlot in `interactive` mode.",
       },
     },
   },

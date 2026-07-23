@@ -32,3 +32,19 @@ export const StatusDistribution: Story = {
     </ChartContainer>
   ),
 };
+
+export const InteractiveStatusDistribution: Story = {
+  render: (): ReactElement => (
+    <ChartContainer theme={cleanTheme} mode="interactive" height={280} width={360}>
+      <PieChart slices={STATUS_SLICES} showLabels />
+    </ChartContainer>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "D-503 — interactive pie hover dims sibling slices without scale (contrast with static tile above).",
+      },
+    },
+  },
+};

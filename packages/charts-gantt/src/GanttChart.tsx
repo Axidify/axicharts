@@ -2,6 +2,7 @@
 
 import { useState, type ReactElement } from "react";
 import { useChartLayout } from "@axicharts/charts";
+import { resolvePluginHoverPalette } from "@axicharts/charts-theme";
 import {
   barGeometry,
   resolveRange,
@@ -31,7 +32,8 @@ function resolveSurface(
   return "light";
 }
 
-function surfacePalette(surface: GanttSurface) {
+function surfacePalette(surface: GanttSurface, theme?: { hover?: { taskDimOpacity?: number; dimOpacity?: number } }) {
+  const hover = resolvePluginHoverPalette(surface, theme);
   if (surface === "dark") {
     return {
       canvas: "#0f172a",
@@ -39,7 +41,8 @@ function surfacePalette(surface: GanttSurface) {
       tick: "#94a3b8",
       label: "#e2e8f0",
       track: "#1e293b",
-      hoverStroke: "#38bdf8",
+      hoverStroke: hover.hoverStroke,
+      taskDimOpacity: hover.taskDimOpacity,
     };
   }
   return {
@@ -48,7 +51,8 @@ function surfacePalette(surface: GanttSurface) {
     tick: "#64748b",
     label: "#334155",
     track: "#e2e8f0",
-    hoverStroke: "#2563eb",
+    hoverStroke: hover.hoverStroke,
+    taskDimOpacity: hover.taskDimOpacity,
   };
 }
 
@@ -74,7 +78,7 @@ export function GanttChart({
   const { size, ready, theme } = useChartLayout();
   const [hoverTask, setHoverTask] = useState<string | null>(null);
   const surface = resolveSurface(surfaceProp, theme.name);
-  const palette = surfacePalette(surface);
+  const palette = surfacePalette(surface, theme);
 
   if (!ready || size.width < 1 || size.height < 1 || tasks.length === 0) {
     return null;
@@ -188,7 +192,7 @@ export function GanttChart({
             key={task.name}
             onMouseEnter={() => setHoverTask(task.name)}
             onMouseLeave={() => setHoverTask(null)}
-            opacity={dimmed ? 0.45 : 1}
+            opacity={dimmed ? palette.taskDimOpacity : 1}
             style={{ cursor: "default" }}
           >
             <text

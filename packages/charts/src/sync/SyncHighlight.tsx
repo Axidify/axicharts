@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement } from "react";
+import { resolveHoverChrome } from "@axicharts/charts-theme";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { useChartInteraction } from "../interaction/ChartInteractionContext";
 import { getInteractionChrome } from "../interaction/mode";
@@ -10,8 +11,16 @@ export type SyncHighlightProps = {
   categories: string[];
 };
 
-function isDarkSurface(themeName: string): boolean {
-  return themeName === "live" || themeName === "industrial";
+export function categoryBandGeometry(
+  width: number,
+  categoryCount: number,
+  cursorLeft: number,
+): { bandLeft: number; bandRight: number } {
+  const count = Math.max(categoryCount, 1);
+  const bandWidth = Math.min(48, Math.max(20, (width / count) * 0.75));
+  const bandLeft = Math.max(0, cursorLeft - bandWidth / 2);
+  const bandRight = Math.min(width, cursorLeft + bandWidth / 2);
+  return { bandLeft, bandRight };
 }
 
 export function SyncHighlight({
@@ -22,28 +31,24 @@ export function SyncHighlight({
   const { cursor } = useChartInteraction();
   const chrome = getInteractionChrome(mode);
 
-  if (!sync || !chrome.showCrosshair || !syncId) return null;
-  if (sync.index == null || sync.index < 0) return null;
-  if (!cursor || cursor.index !== sync.index || cursor.left < 0) return null;
+  if (!chrome.showCrosshair) return null;
+  if (!cursor || cursor.index < 0 || cursor.left < 0) return null;
 
-  const categoryCount = Math.max(categories.length, 1);
-  const bandWidth = Math.min(
-    48,
-    Math.max(20, (size.width / categoryCount) * 0.75),
+  const hover = resolveHoverChrome(theme);
+  const { bandLeft, bandRight } = categoryBandGeometry(
+    size.width,
+    categories.length,
+    cursor.left,
   );
-  const bandLeft = Math.max(0, cursor.left - bandWidth / 2);
-  const bandRight = Math.min(size.width, cursor.left + bandWidth / 2);
   const isFollower =
-    sync.sourceId != null && sync.sourceId !== syncId;
-  const dark = isDarkSurface(theme.name);
-  const bandColor = isFollower
-    ? dark
-      ? "rgba(56, 189, 248, 0.14)"
-      : "rgba(59, 130, 246, 0.12)"
-    : dark
-      ? "rgba(148, 163, 184, 0.1)"
-      : "rgba(100, 116, 139, 0.08)";
-  const dimColor = dark ? "rgba(2, 6, 23, 0.28)" : "rgba(248, 250, 252, 0.45)";
+    sync != null &&
+    syncId != null &&
+    sync.sourceId != null &&
+    sync.sourceId !== syncId &&
+    sync.index != null &&
+    sync.index >= 0 &&
+    cursor.index === sync.index;
+  const bandColor = isFollower ? hover.bandFollowerColor : hover.bandColor;
 
   return (
     <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
@@ -56,7 +61,7 @@ export function SyncHighlight({
               bottom: 0,
               left: 0,
               width: bandLeft,
-              background: dimColor,
+              background: hover.dimOverlay,
             }}
           />
           <div
@@ -66,7 +71,7 @@ export function SyncHighlight({
               bottom: 0,
               left: bandRight,
               right: 0,
-              background: dimColor,
+              background: hover.dimOverlay,
             }}
           />
         </>
@@ -81,10 +86,10 @@ export function SyncHighlight({
           width: bandRight - bandLeft,
           background: bandColor,
           borderLeft: isFollower
-            ? `1px solid ${dark ? "rgba(56, 189, 248, 0.35)" : "rgba(59, 130, 246, 0.25)"}`
+            ? `1px solid ${hover.bandFollowerBorder}`
             : undefined,
           borderRight: isFollower
-            ? `1px solid ${dark ? "rgba(56, 189, 248, 0.35)" : "rgba(59, 130, 246, 0.25)"}`
+            ? `1px solid ${hover.bandFollowerBorder}`
             : undefined,
         }}
       />

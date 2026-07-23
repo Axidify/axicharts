@@ -48,7 +48,41 @@ function SyncHarness(): ReactElement {
   return <SyncHighlight categories={["Mon", "Tue", "Wed", "Thu", "Fri"]} />;
 }
 
+function CursorHarness(): ReactElement {
+  const { setCursor } = useChartInteraction();
+
+  useEffect(() => {
+    setCursor({ index: 2, left: 120, top: 40 });
+  }, [setCursor]);
+
+  return <SyncHighlight categories={["Mon", "Tue", "Wed", "Thu", "Fri"]} />;
+}
+
 describe("SyncHighlight", () => {
+  it("renders category highlight band without sync group", () => {
+    const { container } = render(
+      <ChartLayoutContext.Provider
+        value={{
+          size: { width: 400, height: 180 },
+          ready: true,
+          theme: cleanTheme,
+          mode: "interactive",
+          syncId: null,
+          dataState: "ready",
+          isStale: false,
+        }}
+      >
+        <ChartInteractionProvider>
+          <CursorHarness />
+        </ChartInteractionProvider>
+      </ChartLayoutContext.Provider>,
+    );
+
+    act(() => {});
+
+    expect(container.querySelector(".axicharts-sync-highlight")).toBeTruthy();
+  });
+
   it("renders follower highlight band when sync index is active", () => {
     const { container } = render(
       <TestProviders>

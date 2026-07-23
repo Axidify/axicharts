@@ -22,5 +22,8 @@ export function createTheme(
     svg: overrides.svg
       ? { ...(base.svg ?? {}), ...overrides.svg }
       : base.svg,
+    hover: overrides.hover
+      ? { ...(base.hover ?? {}), ...overrides.hover }
+      : base.hover,
   };
 }

@@ -23,6 +23,7 @@ describe("pieLayout", () => {
 
   it("keeps dashboard donuts stable on hover", () => {
     expect(pieEmphasisOptions(false).scale).toBe(false);
+    expect(pieEmphasisOptions(false).focus).toBe("self");
     expect(pieEmphasisOptions(true).scale).toBe(true);
   });
 
