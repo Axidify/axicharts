@@ -18,3 +18,4 @@ audit-*.png
 !benchmarks/e2e/visual-snapshots/audit-*.png
 .audit-*.png
 grid-cells-audit.png
+.cache/
