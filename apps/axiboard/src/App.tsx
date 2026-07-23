@@ -151,10 +151,10 @@ export function App(): ReactElement {
 
   useEffect(() => {
     document.documentElement.classList.toggle("axi-chat-mode", chatWorkspaceOpen);
-    document.documentElement.classList.toggle("dark", chatWorkspaceOpen);
+    // Chat workspace is light; classic workspace keeps its own chrome.
+    document.documentElement.classList.remove("dark");
     return () => {
       document.documentElement.classList.remove("axi-chat-mode");
-      document.documentElement.classList.remove("dark");
     };
   }, [chatWorkspaceOpen]);
 
@@ -501,8 +501,8 @@ export function App(): ReactElement {
       className={chatWorkspaceOpen ? "axi-app-chat" : undefined}
       style={{
         minHeight: "100dvh",
-        background: chatWorkspaceOpen ? "#171717" : "#0f172a",
-        color: "#e2e8f0",
+        background: chatWorkspaceOpen ? undefined : "#0f172a",
+        color: chatWorkspaceOpen ? undefined : "#e2e8f0",
         display: chatWorkspaceOpen ? "flex" : undefined,
         flexDirection: chatWorkspaceOpen ? "column" : undefined,
       }}
@@ -634,18 +634,39 @@ export function App(): ReactElement {
               ) : null}
             </>
           ) : null}
+          {chatWorkspaceOpen ? (
+            <div className="axi-nav-tabs" role="tablist" aria-label="View">
+              <button
+                type="button"
+                role="tab"
+                className="axi-nav-tab is-active"
+                aria-pressed="true"
+                onClick={() => {
+                  setChatWorkspaceOpen(true);
+                  setTabularUploadOpen(false);
+                }}
+              >
+                Chat
+              </button>
+              <button
+                type="button"
+                role="tab"
+                className="axi-nav-tab"
+                aria-pressed="false"
+                onClick={() => setChatWorkspaceOpen(false)}
+              >
+                Workspace
+              </button>
+            </div>
+          ) : (
+            <>
           <button
             type="button"
             onClick={() => {
               setChatWorkspaceOpen(true);
               setTabularUploadOpen(false);
             }}
-            style={{
-              ...buttonStyle,
-              ...(chatWorkspaceOpen
-                ? { border: "none", color: "#ececec", background: "rgba(255,255,255,0.08)" }
-                : {}),
-            }}
+            style={buttonStyle}
           >
             Chat
           </button>
@@ -685,19 +706,8 @@ export function App(): ReactElement {
                 Import
               </button>
             </>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setChatWorkspaceOpen(false)}
-              style={{
-                ...buttonStyle,
-                border: "none",
-                background: "transparent",
-                color: "#a1a1a1",
-              }}
-            >
-              Workspace
-            </button>
+          ) : null}
+            </>
           )}
         </div>
       </header>

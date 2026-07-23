@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Axiboard">
-  <rect width="32" height="32" rx="8" fill="#4f46e5"/>
+  <rect width="32" height="32" rx="8" fill="#0f766e"/>
   <path
     fill="#fff"
     d="M8 22V10h3.2l4.1 7.2L19.4 10H22.5v12h-2.8v-7.1l-3.8 6.6h-1.8l-3.8-6.6V22H8z"
