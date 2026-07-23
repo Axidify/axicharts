@@ -40,7 +40,6 @@
     "echarts-liquidfill": "^3.1.0"
   },
   "devDependencies": {
-    "@axicharts/charts-spec": "workspace:*",
     "@testing-library/react": "^16.2.0",
     "@types/react": "^19.0.10",
     "echarts": "^5.6.0",
