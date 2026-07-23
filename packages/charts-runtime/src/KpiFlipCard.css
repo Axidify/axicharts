@@ -1,0 +1,94 @@
+.axi-kpi-flip {
+  --kpi-border: rgba(15, 23, 42, 0.1);
+  --kpi-front-bg: #ffffff;
+  --kpi-back-bg: linear-gradient(160deg, #f0fdfa 0%, #f8fafc 55%);
+  --kpi-eyebrow: #0f766e;
+  --kpi-body: #0f172a;
+  --kpi-muted: #64748b;
+}
+
+.dark .axi-kpi-flip {
+  --kpi-border: rgba(255, 255, 255, 0.08);
+  --kpi-front-bg: rgba(255, 255, 255, 0.04);
+  --kpi-back-bg: linear-gradient(145deg, rgba(15, 118, 110, 0.16) 0%, rgba(255, 255, 255, 0.05) 55%);
+  --kpi-eyebrow: #5eead4;
+  --kpi-body: #ececec;
+  --kpi-muted: #a1a1a1;
+}
+
+.axi-kpi-flip__scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 88px;
+  transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.axi-kpi-flip--flipped .axi-kpi-flip__scene {
+  transform: rotateY(180deg);
+}
+
+.axi-kpi-flip__face {
+  border-radius: 12px;
+  border: 1px solid var(--kpi-border);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.axi-kpi-flip__face--front {
+  background: var(--kpi-front-bg);
+  padding: 14px 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.axi-kpi-flip__face--back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  background: var(--kpi-back-bg);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  overflow: hidden;
+  /* Hard hide when not flipped — overflow/filter ancestors often break preserve-3d */
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.axi-kpi-flip--flipped .axi-kpi-flip__face--back {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.axi-kpi-flip--flipped .axi-kpi-flip__face--front {
+  visibility: hidden;
+}
+
+.axi-kpi-flip__eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--kpi-eyebrow);
+}
+
+.axi-kpi-flip__body {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--kpi-body);
+}
+
+.axi-kpi-flip__hint {
+  font-size: 10px;
+  color: var(--kpi-muted);
+  line-height: 1.35;
+}
+
+.axi-kpi-flip__id {
+  font-size: 9px;
+  font-family: ui-monospace, monospace;
+  color: var(--kpi-muted);
+}

@@ -280,9 +280,9 @@ export function ChatWorkspaceView({
               <div className="axi-artifact-empty">
                 <div className="axi-artifact-empty-icon" aria-hidden />
                 <p>
-                  Your charts and metrics will appear here.
-                  <br />
-                  Start with a sample on the left.
+                  <strong>Dashboard canvas</strong>
+                  Pick a sample on the left, or paste tabular data into chat.
+                  Panels appear here as the plan runs.
                 </p>
               </div>
             ) : null}

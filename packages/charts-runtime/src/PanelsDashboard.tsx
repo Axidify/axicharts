@@ -83,7 +83,7 @@ function ChartTile({
       className={highlighted ? "axi-panel-highlight" : undefined}
       style={{ minWidth: 0, height: "100%" }}
     >
-      <Chart panel={block.panel} data={{ rows: block.rows }} height={height} />
+      <Chart panel={block.panel} data={{ rows: block.rows }} height={height} theme="clean" />
     </div>
   );
 }
@@ -130,7 +130,7 @@ export function PanelsDashboard({
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
           {panels.kpis.map((block) => {
             const chart = (
-              <Chart panel={block.panel} data={{ rows: block.rows }} height={72} />
+              <Chart panel={block.panel} data={{ rows: block.rows }} height={72} theme="clean" />
             );
             if (!flipKpis) {
               return (

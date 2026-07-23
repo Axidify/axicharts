@@ -2,6 +2,7 @@
 
 import { useCallback, useState, type CSSProperties, type ReactElement, type ReactNode } from "react";
 import type { TabularPlanDecision } from "./types";
+import "./KpiFlipCard.css";
 
 export type KpiFlipCardProps = {
   title?: string;
@@ -26,33 +27,6 @@ const shellStyle: CSSProperties = {
   textAlign: "left",
   font: "inherit",
   color: "inherit",
-};
-
-const faceStyle: CSSProperties = {
-  borderRadius: 10,
-  border: "1px solid rgba(255, 255, 255, 0.06)",
-  backfaceVisibility: "hidden",
-  WebkitBackfaceVisibility: "hidden",
-};
-
-const frontFaceStyle: CSSProperties = {
-  ...faceStyle,
-  background: "rgba(255, 255, 255, 0.03)",
-  padding: "14px 16px",
-};
-
-const backFaceStyle: CSSProperties = {
-  ...faceStyle,
-  position: "absolute",
-  inset: 0,
-  transform: "rotateY(180deg)",
-  background: "linear-gradient(145deg, rgba(217, 119, 87, 0.12) 0%, rgba(255, 255, 255, 0.05) 55%)",
-  padding: "12px 14px",
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  gap: 6,
-  overflow: "hidden",
 };
 
 export function resolveKpiRationale(
@@ -102,8 +76,11 @@ export function KpiFlipCard({
 
   if (!canFlip) {
     return (
-      <div className={className} style={{ ...shellStyle, cursor: "default", ...style, minHeight: 88 }}>
-        <div style={frontFaceStyle}>{children}</div>
+      <div
+        className={["axi-kpi-flip", "axi-kpi-flip--static", className].filter(Boolean).join(" ")}
+        style={{ ...shellStyle, cursor: "default", ...style, minHeight: 88 }}
+      >
+        <div className="axi-kpi-flip__face axi-kpi-flip__face--front">{children}</div>
       </div>
     );
   }
@@ -111,45 +88,21 @@ export function KpiFlipCard({
   return (
     <button
       type="button"
-      className={className}
+      className={["axi-kpi-flip", flipped ? "axi-kpi-flip--flipped" : "", className]
+        .filter(Boolean)
+        .join(" ")}
       style={{ ...shellStyle, ...style }}
       onClick={toggle}
       aria-pressed={flipped}
       aria-label={flipped ? `Hide details for ${title ?? "metric"}` : `Show how ${title ?? "metric"} was computed`}
     >
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          height: "100%",
-          minHeight: 88,
-          transition: "transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1)",
-          transformStyle: "preserve-3d",
-          transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
-        }}
-      >
-        <div style={frontFaceStyle}>{children}</div>
-        <div style={backFaceStyle}>
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 600,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              color: "#d97757",
-            }}
-          >
-            How this was built
-          </div>
-          <div style={{ fontSize: 12, lineHeight: 1.45, color: "#ececec" }}>{copy!.body}</div>
-          {copy!.hint ? (
-            <div style={{ fontSize: 10, color: "#a1a1a1", lineHeight: 1.35 }}>{copy!.hint}</div>
-          ) : null}
-          {questionId ? (
-            <div style={{ fontSize: 9, fontFamily: "ui-monospace, monospace", color: "#737373" }}>
-              {questionId}
-            </div>
-          ) : null}
+      <div className="axi-kpi-flip__scene">
+        <div className="axi-kpi-flip__face axi-kpi-flip__face--front">{children}</div>
+        <div className="axi-kpi-flip__face axi-kpi-flip__face--back" aria-hidden={!flipped}>
+          <div className="axi-kpi-flip__eyebrow">How this was built</div>
+          <div className="axi-kpi-flip__body">{copy!.body}</div>
+          {copy!.hint ? <div className="axi-kpi-flip__hint">{copy!.hint}</div> : null}
+          {questionId ? <div className="axi-kpi-flip__id">{questionId}</div> : null}
         </div>
       </div>
     </button>

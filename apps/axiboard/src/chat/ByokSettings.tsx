@@ -6,9 +6,9 @@ const inputStyle = {
   boxSizing: "border-box" as const,
   padding: "8px 12px",
   borderRadius: 8,
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "#171717",
-  color: "#ececec",
+  border: "1px solid rgba(15, 23, 42, 0.12)",
+  background: "#fff",
+  color: "#0f172a",
   fontSize: 12,
 };
 
@@ -41,7 +41,7 @@ export function ByokSettings({ compact = false }: { compact?: boolean }): ReactE
       <details className="axi-byok-details">
         <summary>API key (optional)</summary>
         <form className="axi-byok-panel" onSubmit={onSubmit}>
-          <p style={{ margin: "0 0 8px", fontSize: 11, color: "#737373", lineHeight: 1.5 }}>
+          <p style={{ margin: "0 0 8px", fontSize: 11, color: "#64748b", lineHeight: 1.5 }}>
             OpenAI-compatible key for richer intent parsing. Stored server-side only.
           </p>
           <input

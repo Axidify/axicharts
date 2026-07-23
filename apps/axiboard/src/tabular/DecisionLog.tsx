@@ -21,7 +21,7 @@ export function DecisionLog({
             key={`${decision.step}-${decision.api}-${decision.intent ?? index}-${index}`}
             style={{ marginBottom: 6 }}
           >
-            <span style={{ color: "#ececec" }}>{decision.step}</span>
+            <span className="axi-decision-step">{decision.step}</span>
             {" · "}
             <code>{decision.api}</code>
             {decision.intent ? (
@@ -33,7 +33,7 @@ export function DecisionLog({
             {" — "}
             {decision.notes}
             {decision.status === "needs_review" ? (
-              <span style={{ color: "#fbbf24" }}> (needs review)</span>
+              <span className="axi-decision-warn"> (needs review)</span>
             ) : null}
           </li>
         ))}
