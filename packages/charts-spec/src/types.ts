@@ -271,6 +271,16 @@ export type PanelSpec = {
   height?: number;
   width?: number | string;
   valueSuffix?: string;
+  /**
+   * Value-axis / tooltip / value-label format: a built-in (`number`, `currency`,
+   * `percent`, `compact`, `bps`) or `registerTickFormat` id. JSON-safe — the
+   * React props also accept a function.
+   */
+  valueFormat?: string;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
+  yDomain?: [number | "auto", number | "auto"];
+  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  yTickCount?: number;
   fill?: boolean;
   stacked?: boolean;
   /** Bar chart orientation — horizontal for long category labels. */

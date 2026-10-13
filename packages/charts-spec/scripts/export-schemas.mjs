@@ -104,6 +104,18 @@ const exportedSchemas = {
       mode: { enum: ["static", "interactive", "live"] },
       theme: { enum: ["clean", "studio", "live", "dark"] },
       height: { type: "number", minimum: 80 },
+      valueFormat: {
+        type: "string",
+        description:
+          "Built-in (number | currency | percent | compact | bps) or registerTickFormat id",
+      },
+      yDomain: {
+        type: "array",
+        minItems: 2,
+        maxItems: 2,
+        items: { oneOf: [{ type: "number" }, { const: "auto" }] },
+      },
+      yTickCount: { type: "integer", minimum: 2 },
       encoding: {
         type: "object",
         required: ["x"],

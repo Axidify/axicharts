@@ -268,6 +268,19 @@ function objectDataFromSpec(data: SpecData): Record<string, unknown> {
   return {};
 }
 
+/** Panel `valueFormat` / `yDomain` / `yTickCount` → cartesian chart props (only when set). */
+function valueAxisSpecProps(spec: PanelSpec): {
+  valueFormat?: string;
+  yDomain?: [number | "auto", number | "auto"];
+  yTickCount?: number;
+} {
+  return {
+    ...(spec.valueFormat ? { valueFormat: spec.valueFormat } : {}),
+    ...(spec.yDomain ? { yDomain: spec.yDomain } : {}),
+    ...(spec.yTickCount ? { yTickCount: spec.yTickCount } : {}),
+  };
+}
+
 const warnedLegacyOverlay = new WeakSet<PanelSpec>();
 
 function warnLegacyOverlayProps(spec: PanelSpec): void {
@@ -382,6 +395,7 @@ export function compilePanel(
           series: applyTagTonesToSeries(baseSeries, tagTones) as ComboSeries[],
           fill: resolved.fill,
           valueSuffix: resolved.valueSuffix,
+          ...valueAxisSpecProps(resolved),
           animate: readPanelAnimation(resolved),
           ...(resolved.fill ? { renderer: "canvas" as const } : {}),
           ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
@@ -451,6 +465,7 @@ export function compilePanel(
         fill: resolved.fill,
         stacked: resolved.stacked,
         valueSuffix: resolved.valueSuffix,
+        ...valueAxisSpecProps(resolved),
         animate: readPanelAnimation(resolved),
         ...panelOrientationProps(resolved),
         ...(resolved.fill ? { renderer: "canvas" as const } : {}),
@@ -519,6 +534,7 @@ export function compilePanel(
         series: applyTagTonesToSeries(seriesWithColor, tagTones) as ComboSeries[],
         fill: cartesian.fill ?? fromMarks.fill,
         valueSuffix: cartesian.valueSuffix,
+        ...valueAxisSpecProps(cartesian),
         ...(fromMarks.showValues || cartesian.showValues
           ? { showValues: true }
           : {}),

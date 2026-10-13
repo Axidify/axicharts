@@ -26,6 +26,9 @@ function markComponent(type: string): "Bar" | "Line" | "Area" {
 function blocksChartFlags(spec: PanelSpec): string[] {
   const flags: string[] = [];
   if (spec.valueSuffix) flags.push(`valueSuffix="${spec.valueSuffix}"`);
+  if (spec.valueFormat) flags.push(`valueFormat=${JSON.stringify(spec.valueFormat)}`);
+  if (spec.yDomain) flags.push(`yDomain={${JSON.stringify(spec.yDomain)}}`);
+  if (spec.yTickCount) flags.push(`yTickCount={${spec.yTickCount}}`);
   if (spec.props?.showValues === true) flags.push("showValues");
   const dualAxis = spec.props?.dualAxis;
   if (dualAxis === true) flags.push("dualAxis");
