@@ -36,6 +36,7 @@
     "playwright": "^1.51.1",
     "shadcn": "^4.13.1",
     "turbo": "^2.4.4",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vite": "^6.2.2"
   }
 }
