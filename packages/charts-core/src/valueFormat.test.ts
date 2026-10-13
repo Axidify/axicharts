@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { clearTickFormats, registerTickFormat } from "./formatters";
 import {
   applyYDomain,
-  evenTicks,
+  niceTicks,
   formatChartValue,
   resolveValueFormat,
 } from "./valueFormat";
@@ -42,9 +42,18 @@ describe("applyYDomain", () => {
   });
 });
 
-describe("evenTicks", () => {
-  it("spaces ticks inclusively", () => {
-    expect(evenTicks(0, 100, 5)).toEqual([0, 25, 50, 75, 100]);
-    expect(evenTicks(0, 10, 1)).toEqual([0, 10]);
+describe("niceTicks", () => {
+  it("picks round steps close to the requested count", () => {
+    expect(niceTicks(0, 1_510_000, 5)).toEqual([0, 500_000, 1_000_000, 1_500_000]);
+    expect(niceTicks(0, 100, 5)).toEqual([0, 25, 50, 75, 100]);
+    expect(niceTicks(0, 0.9, 4)).toEqual([0, 0.25, 0.5, 0.75]);
+  });
+
+  it("starts at the first round value inside the range", () => {
+    expect(niceTicks(13, 97, 5)).toEqual([20, 40, 60, 80]);
+  });
+
+  it("handles a flat range", () => {
+    expect(niceTicks(5, 5, 4)).toEqual([5]);
   });
 });

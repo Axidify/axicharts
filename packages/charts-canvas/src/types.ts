@@ -74,7 +74,7 @@ export type UPlotLineProps = {
   valueFormat?: ValueFormat;
   /** Value-axis bounds; `"auto"` keeps the data-derived side. */
   yDomain?: YDomain;
-  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  /** Approximate number of value-axis ticks (placed at round values). */
   yTickCount?: number;
   dualAxis?: DualAxisMode;
   stacked?: boolean;
@@ -109,7 +109,7 @@ export type UPlotBarProps = {
   valueFormat?: ValueFormat;
   /** Value-axis bounds; `"auto"` keeps the data-derived side. */
   yDomain?: YDomain;
-  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  /** Approximate number of value-axis ticks (placed at round values). */
   yTickCount?: number;
   referenceLines?: ReferenceLine[];
   stacked?: boolean;
@@ -142,7 +142,7 @@ export type UPlotComboProps = {
   valueFormat?: ValueFormat;
   /** Value-axis bounds; `"auto"` keeps the data-derived side. */
   yDomain?: YDomain;
-  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  /** Approximate number of value-axis ticks (placed at round values). */
   yTickCount?: number;
   dualAxis?: DualAxisMode;
   stacked?: boolean;

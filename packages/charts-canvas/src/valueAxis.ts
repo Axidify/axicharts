@@ -1,7 +1,7 @@
 import uPlot from "uplot";
 import {
   applyYDomain,
-  evenTicks,
+  niceTicks,
   resolveValueFormat,
   type ValueFormat,
   type YDomain,
@@ -40,7 +40,7 @@ function fittedAxisSize(font: string) {
  * - `yDomain` wraps the primary `y` scale's range (or uPlot's auto range).
  * - `valueFormat` formats value-axis ticks and fits the axis width to them
  *   (opt-in, so default layouts and visual baselines don't shift).
- * - `yTickCount` replaces the value-axis splits (not in compact tiles, which
+ * - `yTickCount` sets round-valued value-axis splits (not in compact tiles, which
  *   use their own quartile splits).
  */
 export function applyValueAxisOptions(
@@ -75,7 +75,7 @@ export function applyValueAxisOptions(
       ...(yTickCount && !compact
         ? {
             splits: (_u: uPlot, _axisIdx: number, min: number, max: number) =>
-              evenTicks(min, max, yTickCount),
+              niceTicks(min, max, yTickCount),
           }
         : {}),
     };

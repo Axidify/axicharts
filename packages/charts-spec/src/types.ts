@@ -279,7 +279,7 @@ export type PanelSpec = {
   valueFormat?: string;
   /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
   yDomain?: [number | "auto", number | "auto"];
-  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  /** Approximate number of value-axis ticks (placed at round values). */
   yTickCount?: number;
   fill?: boolean;
   stacked?: boolean;

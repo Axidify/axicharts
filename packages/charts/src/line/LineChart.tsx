@@ -70,7 +70,7 @@ export type LineChartProps<TMeta = unknown> = CartesianPointerChartProps<TMeta> 
   valueFormat?: ValueFormat;
   /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
   yDomain?: YDomain;
-  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  /** Approximate number of value-axis ticks (placed at round values). */
   yTickCount?: number;
   dualAxis?: boolean | "auto";
   stacked?: boolean;
@@ -100,7 +100,7 @@ type LinePlotProps = {
   valueFormat?: ValueFormat;
   /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
   yDomain?: YDomain;
-  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  /** Approximate number of value-axis ticks (placed at round values). */
   yTickCount?: number;
   dualAxis?: boolean | "auto";
   stacked?: boolean;

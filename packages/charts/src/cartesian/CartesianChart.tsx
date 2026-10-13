@@ -58,7 +58,7 @@ export type CartesianChartProps = {
   valueFormat?: ValueFormat;
   /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
   yDomain?: YDomain;
-  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  /** Approximate number of value-axis ticks (placed at round values). */
   yTickCount?: number;
   curve?: LineCurve;
   dualAxis?: DualAxisMode;
@@ -85,7 +85,7 @@ type CartesianPlotProps = {
   valueFormat?: ValueFormat;
   /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
   yDomain?: YDomain;
-  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  /** Approximate number of value-axis ticks (placed at round values). */
   yTickCount?: number;
   curve?: LineCurve;
   dualAxis?: DualAxisMode;

@@ -8,7 +8,7 @@ export {
 } from "./formatters";
 export {
   applyYDomain,
-  evenTicks,
+  niceTicks,
   formatChartValue,
   resolveValueFormat,
   type ValueFormat,

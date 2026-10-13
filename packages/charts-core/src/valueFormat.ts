@@ -47,11 +47,31 @@ export function applyYDomain(
   return max > min ? [min, max] : range;
 }
 
-/** `count` evenly spaced ticks across `[min, max]`, inclusive (count ≥ 2). */
-export function evenTicks(min: number, max: number, count: number): number[] {
+/**
+ * About `count` ticks at a round step (1 / 2 / 2.5 / 5 × 10^k) inside
+ * `[min, max]`. Evenly dividing the range instead produced values like 377.5K
+ * whose compact labels ("1.1M" for 1.13M) misplaced the gridline.
+ */
+export function niceTicks(min: number, max: number, count: number): number[] {
   const n = Math.max(2, Math.round(count));
-  const step = (max - min) / (n - 1);
-  return Array.from({ length: n }, (_, index) =>
-    index === n - 1 ? max : min + step * index,
-  );
+  const span = max - min;
+  if (!(span > 0)) return [min];
+  const magnitude = 10 ** Math.floor(Math.log10(span / (n - 1)));
+  let best: number[] = [];
+  // Of the round steps around the rough step, keep the one whose tick count is closest to n.
+  for (const multiple of [0.5, 1, 2, 2.5, 5, 10]) {
+    const ticks = ticksAtStep(min, max, multiple * magnitude);
+    if (best.length === 0 || Math.abs(ticks.length - n) < Math.abs(best.length - n)) best = ticks;
+  }
+  return best;
+}
+
+function ticksAtStep(min: number, max: number, step: number): number[] {
+  const first = Math.ceil(min / step - 1e-9) * step;
+  const ticks: number[] = [];
+  for (let value = first; value <= max + step * 1e-9; value += step) {
+    // Snap float drift (0.30000000000000004 → 0.3).
+    ticks.push(Number(value.toPrecision(12)));
+  }
+  return ticks;
 }
