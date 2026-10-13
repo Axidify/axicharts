@@ -43,7 +43,6 @@ export function TabularUploadView({
   onCancel,
   onApply,
   initialCsv = "",
-  autoPlan = true,
   initialPersona,
   initialFollowUpIntents,
 }: TabularUploadViewProps): ReactElement {

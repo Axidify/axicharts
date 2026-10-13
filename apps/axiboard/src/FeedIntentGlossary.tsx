@@ -4,7 +4,7 @@ import {
   feedAdapterGalleryDeepLink,
   plannerFeedGalleryIndexDeepLink,
 } from "@axicharts/charts-runtime/validation";
-import type { FeedMode, LayoutMode } from "./runtime/buildRuntimeSpec";
+import { adapterFixtureLayout, type FeedMode, type LayoutMode } from "./runtime/buildRuntimeSpec";
 
 const panelStyle = {
   position: "absolute" as const,
@@ -85,7 +85,7 @@ export function FeedIntentGlossary({
               <div style={{ color: "#94a3b8", marginTop: 4 }}>{row.intentSample}</div>
               <div style={{ marginTop: 4 }}>
                 <a
-                  href={feedAdapterGalleryDeepLink(row.feed, layout)}
+                  href={feedAdapterGalleryDeepLink(row.feed, adapterFixtureLayout(layout))}
                   target="_blank"
                   rel="noreferrer"
                   style={{ color: "#93c5fd" }}

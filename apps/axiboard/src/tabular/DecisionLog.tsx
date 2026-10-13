@@ -1,8 +1,11 @@
 import type { ReactElement } from "react";
 import type { AgentDecision } from "../../server/types";
 
+/** Agent decisions, or ones restored from a saved panels spec (status widened to string). */
+export type DecisionLogEntry = Omit<AgentDecision, "status"> & { status: AgentDecision["status"] | (string & {}) };
+
 export type DecisionLogProps = {
-  decisions: AgentDecision[];
+  decisions: DecisionLogEntry[];
   defaultCollapsed?: boolean;
 };
 

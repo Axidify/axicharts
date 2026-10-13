@@ -66,7 +66,7 @@ async function runDemoFlow(csv: string, label: string): Promise<void> {
   expect(spec.panels.charts.length).toBeGreaterThan(0);
   expect(spec.panels.sourceCsv).toContain("|");
 
-  const seed = createDefaultWorkspaceStore({ layout: "embed", panels: [] });
+  const seed = createDefaultWorkspaceStore({ layout: "panels", panels: { kpis: [], charts: [] } });
   const saved = saveDashboardSpec(seed, seed.activeWorkspaceId, seed.activeDashboardId, spec, {
     meta: {
       layout: "panels",

@@ -3,13 +3,13 @@ import {
   enrichLedger,
   enrichSales,
   parseTabular,
-  type TabularVerticalId,
 } from "@axicharts/charts-spec";
 import { formatHours, formatRm, type TabularEnrichment } from "@axicharts/charts-spec/planning";
 
 export function enrichForDisplay(
   rawText: string,
-  vertical: TabularVerticalId,
+  // Any vertical id; only ledger/sales/attendance have display enrichers.
+  vertical: string,
 ): TabularEnrichment | null {
   const rows = parseTabular(rawText);
   if (rows.length === 0) return null;

@@ -43,7 +43,15 @@ export const OPS_DATA = {
   ],
 };
 
-export type LayoutMode = "embed" | "mosaic" | "panels";
+export type LayoutMode = "embed" | "mosaic" | "panels" | "hybrid";
+/**
+ * Adapter-fixture helpers (feedAdapterGalleryDeepLink, plannerAdapterFixtures)
+ * only distinguish mosaic walls; every other layout uses the embed fixtures.
+ */
+export function adapterFixtureLayout(layout: string | undefined): "embed" | "mosaic" {
+  return layout === "mosaic" ? "mosaic" : "embed";
+}
+
 export type FeedMode = "static" | "historian" | "websocket" | "mqtt" | "rest" | "mock-live";
 export type LiveFeedMode = Exclude<FeedMode, "static">;
 
@@ -431,7 +439,7 @@ export function hydrateRuntimeSpec(
   feed: FeedMode,
   presentation = false,
 ): RuntimeDashboardSpec {
-  if (spec.layout === "panels") return spec;
+  if (spec.layout === "panels" || spec.layout === "hybrid") return spec;
 
   if (presentation) return spec;
 

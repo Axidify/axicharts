@@ -14,7 +14,7 @@ import {
   feedAdapterGalleryDeepLink,
   validateRuntimeSpecDualJson,
 } from "@axicharts/charts-runtime/validation";
-import type { FeedMode, LayoutMode } from "./runtime/buildRuntimeSpec";
+import { adapterFixtureLayout, type FeedMode, type LayoutMode } from "./runtime/buildRuntimeSpec";
 import { ErrorList, LayerStatus, ValidateCommandCopy } from "./validationChrome";
 
 const overlayStyle = {
@@ -64,7 +64,7 @@ export type EmbedDialogProps = {
 function runtimeTitle(spec: RuntimeDashboardSpec | undefined): string | undefined {
   if (!spec) return undefined;
   if (spec.layout === "mosaic") return spec.wall?.title;
-  return spec.dashboard?.title;
+  return "dashboard" in spec ? spec.dashboard?.title : undefined;
 }
 
 export function EmbedDialog({
@@ -100,7 +100,7 @@ export function EmbedDialog({
   const plannerFixtures =
     feed != null
       ? plannerAdapterFixtures({
-          layout: layout ?? spec.layout,
+          layout: adapterFixtureLayout(layout ?? spec.layout),
           feed,
         })
       : [];
@@ -233,7 +233,7 @@ export function EmbedDialog({
             Planner intent: <em>{feedRow.intentSample}</em>
             {" · "}
             <a
-              href={feedAdapterGalleryDeepLink(feed, layout ?? spec.layout)}
+              href={feedAdapterGalleryDeepLink(feed, adapterFixtureLayout(layout ?? spec.layout))}
               style={{ color: "#93c5fd" }}
               target="_blank"
               rel="noreferrer"

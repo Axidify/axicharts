@@ -19,6 +19,7 @@ import {
   selectDashboard,
   selectWorkspace,
   type RuntimeDashboardSpec,
+  type SavedDashboard,
   type ShareExport,
   type WorkspaceStore,
 } from "@axicharts/charts-runtime";
@@ -47,6 +48,7 @@ import type { OrchestratorChatResult } from "./api/orchestratorClient";
 import { buildTabularRuntimeSpec, isPanelsRuntimeSpec } from "./runtime/tabularRuntimeSpec";
 import { PROFILE_PLANNER_ENABLED } from "./featureFlags";
 import {
+  adapterFixtureLayout,
   buildRuntimeSpec,
   defaultSeedSpec,
   hydrateRuntimeSpec,
@@ -218,10 +220,10 @@ export function App(): ReactElement {
     const next = buildRuntimeSpec({ template, layout, feed, presentation, mosaicPreset });
     if (!store || layout !== "embed") return next;
 
-    if (next.layout === "mosaic") return next;
+    if (!("dashboard" in next)) return next;
 
     const saved = parseDashboardSpec(getActiveDashboard(store));
-    if (saved.layout === "mosaic" || !saved.dashboard.chartConfig) return next;
+    if (!("dashboard" in saved) || !saved.dashboard.chartConfig) return next;
 
     return {
       ...next,
@@ -394,7 +396,7 @@ export function App(): ReactElement {
   );
 
   const handleTabularPlanUpdate = useCallback(
-    (spec: ReturnType<typeof buildTabularRuntimeSpec>, meta: NonNullable<typeof builderMeta>) => {
+    (spec: ReturnType<typeof buildTabularRuntimeSpec>, meta: SavedDashboard["meta"]) => {
       if (!store) return;
       const next = saveDashboardSpec(
         store,
@@ -575,7 +577,7 @@ export function App(): ReactElement {
                     <option value="static">Static</option>
                   </select>
                   <a
-                    href={feedAdapterGalleryDeepLink(feed, layout)}
+                    href={feedAdapterGalleryDeepLink(feed, adapterFixtureLayout(layout))}
                     target="_blank"
                     rel="noreferrer"
                     style={{ color: "#93c5fd", textDecoration: "none" }}
