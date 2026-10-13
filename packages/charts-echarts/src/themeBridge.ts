@@ -1,5 +1,10 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
-import { resolveChartChrome, resolveHoverChrome, resolveToneColors } from "@axicharts/charts-theme";
+import {
+  isDarkTheme,
+  resolveChartChrome,
+  resolveHoverChrome,
+  resolveToneColors,
+} from "@axicharts/charts-theme";
 import { echartsColor } from "./echartsColor";
 
 export { toneColor, seriesPalette } from "./palette";
@@ -37,7 +42,7 @@ export function segmentItemStyle(theme: Pick<ChartTheme, "name">): {
   borderWidth: number;
   gapWidth?: number;
 } {
-  const dark = theme.name === "live" || theme.name === "industrial";
+  const dark = isDarkTheme(theme);
   if (dark) {
     return { borderColor: "#0f172a", borderWidth: 0.5, gapWidth: 1 };
   }

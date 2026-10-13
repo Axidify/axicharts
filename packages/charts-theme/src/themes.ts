@@ -11,6 +11,8 @@ export type ChartThemeSvgPolish = {
 
 export type ChartTheme = {
   name: string;
+  /** Background the chart sits on. Drives dark chrome, hover and KPI defaults; inherited by `createTheme`. */
+  surface?: "light" | "dark";
   tokens?: ChartColorTokens;
   svg?: ChartThemeSvgPolish;
   hover?: Partial<ChartThemeHover>;
@@ -69,6 +71,7 @@ export const cleanTheme: ChartTheme = {
 
 export const liveTheme: ChartTheme = {
   name: "live",
+  surface: "dark",
   grid: { ...baseGrid, vertical: true, opacity: 0.55 },
   axis: { show: true },
   line: { strokeWidth: 1.75, curve: "monotone" },
@@ -80,6 +83,7 @@ export const liveTheme: ChartTheme = {
 
 export const industrialTheme: ChartTheme = {
   name: "industrial",
+  surface: "dark",
   grid: { ...baseGrid, vertical: true, opacity: 0.62 },
   axis: { show: true },
   line: { strokeWidth: 1.75, curve: "monotone" },

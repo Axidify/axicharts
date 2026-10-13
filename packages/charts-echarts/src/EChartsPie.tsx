@@ -3,7 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
-import { resolveChartChrome } from "@axicharts/charts-theme";
+import { isDarkTheme, resolveChartChrome } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { echartsColor } from "./echartsColor";
 import { gridOptions, hiddenTooltip, isCompactTile, seriesPalette } from "./themeBridge";
@@ -45,7 +45,7 @@ function PieCenterMetricOverlay({
   compact: boolean;
 }): ReactElement {
   const chrome = resolveChartChrome(theme);
-  const dark = theme.name === "live" || theme.name === "industrial";
+  const dark = isDarkTheme(theme);
   const [, cy] = pieCenter(labelMode);
   const valueSize = compact ? 18 : 22;
   const labelSize = compact ? 10 : 11;

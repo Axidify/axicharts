@@ -1,4 +1,5 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
+import { isDarkTheme } from "@axicharts/charts-theme";
 
 export type SessionShading = boolean | "rth";
 
@@ -22,7 +23,7 @@ function isTimeCategory(categories: string[]): boolean {
 }
 
 function sessionBandColor(theme: ChartTheme, kind: "premarket" | "afterhours"): string {
-  const dark = theme.name === "live" || theme.name === "industrial";
+  const dark = isDarkTheme(theme);
   if (kind === "premarket") {
     return dark ? "rgba(59, 130, 246, 0.08)" : "rgba(59, 130, 246, 0.06)";
   }

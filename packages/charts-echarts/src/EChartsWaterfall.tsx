@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import { isDarkTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import {
   axisLabelStyle,
@@ -34,7 +35,7 @@ export type EChartsWaterfallProps = {
 };
 
 function connectorLineColor(theme: ChartTheme): string {
-  const dark = theme.name === "live" || theme.name === "industrial";
+  const dark = isDarkTheme(theme);
   return dark ? "#64748b" : "#94a3b8";
 }
 
@@ -143,7 +144,7 @@ export function EChartsWaterfall({
         data: values.map((value, index) => {
           const total = isTotals[index];
           const color = colors[index]!;
-          const dark = theme.name === "live" || theme.name === "industrial";
+          const dark = isDarkTheme(theme);
           return {
             value,
             label: showLabels

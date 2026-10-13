@@ -7,6 +7,7 @@ import {
   cleanTheme,
   resolveThemeTokens,
   type ChartTheme,
+  isDarkTheme,
 } from "@axicharts/charts-theme";
 import type { SeriesTone } from "@axicharts/charts-canvas";
 import type { LegendVariant, TooltipVariant } from "../chrome/chromeVariants";
@@ -64,10 +65,6 @@ export type ChartContainerProps = {
   inheritThemeTokens?: boolean;
   onResize?: (size: { width: number; height: number }) => void;
 };
-
-function isDarkTheme(theme: ChartTheme): boolean {
-  return theme.name === "live" || theme.name === "industrial";
-}
 
 export function ChartContainer({
   children,

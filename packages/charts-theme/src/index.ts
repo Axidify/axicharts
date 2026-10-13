@@ -29,6 +29,7 @@ export {
   type ChartColorTokens,
   type SeriesTone as ChartSeriesTone,
 } from "./cssTokens";
+export { isDarkTheme } from "./surface";
 export {
   contrastRatio,
   isAcceptableChromeColor,

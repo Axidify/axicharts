@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactElement } from "react";
+import { useDefaultSurface } from "../container/useDefaultSurface";
 import type { StatSurface } from "../stat/Stat";
 import { markdownSurfaceStyles, parseMarkdownBlocks } from "./parseMarkdown";
 
@@ -15,10 +16,12 @@ export type MarkdownPanelProps = {
 export function MarkdownPanel({
   content,
   markdown,
-  surface = "dark",
+  surface: surfaceProp,
   title,
   style,
 }: MarkdownPanelProps): ReactElement {
+  const defaultSurface = useDefaultSurface();
+  const surface = surfaceProp ?? defaultSurface;
   const source = (content ?? markdown ?? "").trim();
   const muted = surface === "dark" ? "#94a3b8" : "#64748b";
 

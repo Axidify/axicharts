@@ -1,4 +1,5 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
+import { isDarkTheme } from "@axicharts/charts-theme";
 import type { DataZoomComponentOption } from "echarts";
 
 export type BuildDataZoomInput = {
@@ -9,10 +10,6 @@ export type BuildDataZoomInput = {
   /** Initial visible window end (%). Default 100 = full range. */
   end?: number;
 };
-
-function isDarkTheme(theme: ChartTheme): boolean {
-  return theme.name === "live" || theme.name === "industrial";
-}
 
 export function buildDataZoom({
   withVolume,

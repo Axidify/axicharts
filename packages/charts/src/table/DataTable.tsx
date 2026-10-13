@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactElement } from "react";
+import { useDefaultSurface } from "../container/useDefaultSurface";
 import type { StatSurface, StatTone } from "../stat/Stat";
 
 export type TableColumn = {
@@ -70,7 +71,7 @@ function cellTone(
 export function DataTable({
   columns,
   rows,
-  surface = "dark",
+  surface: surfaceProp,
   compact = false,
   zebra = true,
   stickyHeader = false,
@@ -78,6 +79,8 @@ export function DataTable({
   caption,
   style,
 }: DataTableProps): ReactElement {
+  const defaultSurface = useDefaultSurface();
+  const surface = surfaceProp ?? defaultSurface;
   const borderColor = surface === "light" ? "#e2e8f0" : "#334155";
   const headerBg = surface === "light" ? "#f8fafc" : "#1e293b";
   const headerColor = surface === "light" ? "#64748b" : "#94a3b8";
