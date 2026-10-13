@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement } from "react";
+import { applyYDomain, type YDomain } from "@axicharts/charts-core";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import {
   resolveSeriesColor,
@@ -35,6 +36,8 @@ export type SvgCartesianBarProps = {
   theme: ChartTheme;
   showAxes?: boolean;
   stacked?: boolean;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side. */
+  yDomain?: YDomain;
 };
 
 export function SvgCartesianBar({
@@ -45,9 +48,11 @@ export function SvgCartesianBar({
   theme,
   showAxes = true,
   stacked = false,
+  yDomain,
 }: SvgCartesianBarProps): ReactElement {
   const plot = plotRect(width, height);
-  const { min, max } = computeValueExtents(series, stacked);
+  const extents = computeValueExtents(series, stacked);
+  const [min, max] = applyYDomain([extents.min, extents.max], yDomain);
   const scales = buildChartScales({
     width,
     height,

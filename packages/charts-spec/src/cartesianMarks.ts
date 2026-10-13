@@ -1,8 +1,10 @@
 import type {
   ChartBlockBandMark,
+  ChartBlockMarkerMark,
   ChartBlockMarkSpec,
   ChartBlockRuleMark,
   ChartBlockSeriesMark,
+  ChartBlockTextMark,
 } from "./types";
 
 const DATA_MARKS = new Set(["bar", "line", "area", "point"]);
@@ -14,8 +16,16 @@ export function isDataMark(
 }
 
 export function isOverlayMark(mark: ChartBlockMarkSpec): boolean {
-  return mark.type === "rule" || mark.type === "band";
+  return OVERLAY_MARK_TYPES.has(mark.type);
 }
+
+/** Overlay (non-data) cartesian mark types. */
+export const OVERLAY_MARK_TYPES: ReadonlySet<string> = new Set([
+  "rule",
+  "band",
+  "text",
+  "marker",
+]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -34,6 +44,14 @@ function readTone(value: unknown): SeriesTone | undefined {
     return value;
   }
   return undefined;
+}
+
+function readX(value: unknown): number | string | undefined {
+  return typeof value === "number" || typeof value === "string" ? value : undefined;
+}
+
+function readId(value: unknown): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 
 /** Normalize RFC `mark` key to internal `type` key. */
@@ -75,6 +93,10 @@ export function normalizeBlockMark(raw: unknown): ChartBlockMarkSpec | null {
     if (raw.orientation === "horizontal" || raw.orientation === "vertical") {
       mark.orientation = raw.orientation;
     }
+    const x = readX(raw.x);
+    if (x != null) mark.x = x;
+    const id = readId(raw.id);
+    if (id) mark.id = id;
     return mark;
   }
 
@@ -88,6 +110,43 @@ export function normalizeBlockMark(raw: unknown): ChartBlockMarkSpec | null {
     if (typeof raw.label === "string") mark.label = raw.label;
     const tone = readTone(raw.tone);
     if (tone) mark.tone = tone;
+    const id = readId(raw.id);
+    if (id) mark.id = id;
+    return mark;
+  }
+
+  if (kind === "text") {
+    if (typeof raw.text !== "string" || typeof raw.y !== "number") return null;
+    const mark: ChartBlockTextMark = { type: "text", text: raw.text, y: raw.y };
+    const x = readX(raw.x);
+    if (x != null) mark.x = x;
+    const tone = readTone(raw.tone);
+    if (tone) mark.tone = tone;
+    if (
+      raw.position === "top" ||
+      raw.position === "bottom" ||
+      raw.position === "left" ||
+      raw.position === "right" ||
+      raw.position === "center"
+    ) {
+      mark.position = raw.position;
+    }
+    const id = readId(raw.id);
+    if (id) mark.id = id;
+    return mark;
+  }
+
+  if (kind === "marker") {
+    if (typeof raw.y !== "number") return null;
+    const mark: ChartBlockMarkerMark = { type: "marker", y: raw.y };
+    const x = readX(raw.x);
+    if (x != null) mark.x = x;
+    if (typeof raw.label === "string") mark.label = raw.label;
+    const tone = readTone(raw.tone);
+    if (tone) mark.tone = tone;
+    if (raw.draggable === true) mark.draggable = true;
+    const id = readId(raw.id);
+    if (id) mark.id = id;
     return mark;
   }
 

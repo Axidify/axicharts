@@ -1,4 +1,5 @@
 import type { ChartTheme } from "./themes";
+import { isDarkTheme } from "./surface";
 import {
   isAcceptableChromeColor,
   resolveCanvasRgb,
@@ -65,12 +66,14 @@ function readVar(style: CSSStyleDeclaration, name: string): string {
   return formatCssColor(style.getPropertyValue(name));
 }
 
-function isDarkThemeName(themeName: string): boolean {
-  return themeName === "live" || themeName === "industrial";
+type ThemeRef = string | Pick<ChartTheme, "name" | "surface">;
+
+function isDarkRef(theme: ThemeRef): boolean {
+  return isDarkTheme(typeof theme === "string" ? { name: theme } : theme);
 }
 
-function plotBackgroundRgb(themeName: string): { r: number; g: number; b: number } {
-  return isDarkThemeName(themeName)
+function plotBackgroundRgb(theme: ThemeRef): { r: number; g: number; b: number } {
+  return isDarkRef(theme)
     ? { r: 15, g: 23, b: 42 }
     : { r: 255, g: 255, b: 255 };
 }
@@ -103,19 +106,19 @@ function sanitizeChromeColor(
 export function sanitizeChromeToken(
   color: string,
   role: "grid" | "axis",
-  themeName: string,
+  theme: ThemeRef,
   element?: Element | null,
 ): string | null {
   const fallback =
     role === "grid"
-      ? (isDarkThemeName(themeName)
+      ? (isDarkRef(theme)
           ? FALLBACK_CHROME_DARK.grid
           : FALLBACK_CHROME_LIGHT.grid)
-      : isDarkThemeName(themeName)
+      : isDarkRef(theme)
         ? FALLBACK_CHROME_DARK.axis
         : FALLBACK_CHROME_LIGHT.axis;
 
-  const background = plotBackgroundRgb(themeName);
+  const background = plotBackgroundRgb(theme);
   if (!isAcceptableChromeColor(color, role, background, element)) {
     return null;
   }
@@ -124,13 +127,13 @@ export function sanitizeChromeToken(
 
 function sanitizeChartTokens(
   tokens: ChartColorTokens,
-  themeName: string,
+  theme: ThemeRef,
   element?: Element | null,
 ): ChartColorTokens {
-  const fallback = isDarkThemeName(themeName)
+  const fallback = isDarkRef(theme)
     ? FALLBACK_CHROME_DARK
     : FALLBACK_CHROME_LIGHT;
-  const background = plotBackgroundRgb(themeName);
+  const background = plotBackgroundRgb(theme);
 
   return {
     ...tokens,
@@ -207,7 +210,7 @@ export function resolveThemeTokens(
 
   return {
     ...theme,
-    tokens: sanitizeChartTokens(merged, theme.name, element),
+    tokens: sanitizeChartTokens(merged, theme, element),
   };
 }
 
@@ -234,18 +237,18 @@ export function resolveToneColors(
 }
 
 export function resolveChartChrome(
-  theme: Pick<ChartTheme, "name" | "tokens">,
+  theme: Pick<ChartTheme, "name" | "surface" | "tokens">,
 ): { grid: string; axis: string } {
-  const dark = isDarkThemeName(theme.name);
+  const dark = isDarkTheme(theme);
   const fallback = dark ? FALLBACK_CHROME_DARK : FALLBACK_CHROME_LIGHT;
 
   if (theme.tokens) {
     return {
       grid:
-        sanitizeChromeToken(theme.tokens.grid, "grid", theme.name) ??
+        sanitizeChromeToken(theme.tokens.grid, "grid", theme) ??
         fallback.grid,
       axis:
-        sanitizeChromeToken(theme.tokens.axis, "axis", theme.name) ??
+        sanitizeChromeToken(theme.tokens.axis, "axis", theme) ??
         fallback.axis,
     };
   }

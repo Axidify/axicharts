@@ -30,6 +30,7 @@ import {
   type ViolinSeries,
 } from "./violinTypes";
 import { resolveDistributionNicheLayout } from "./nicheCompactLayout";
+import { kdeValueExtent } from "./kdeExtent";
 
 export type EChartsViolinProps = {
   width: number;
@@ -53,7 +54,15 @@ function formatValue(value: number, suffix = ""): string {
   return `${rounded}${suffix}`;
 }
 
+/**
+ * Per-category shape data, looked up by `dataIndex`. ECharts stores custom
+ * series `value` dimensions as numbers, so arrays/objects can't ride along in
+ * `value` (`api.value(1)` would return NaN and nothing would draw).
+ */
+type ViolinShape = { kdePoints: KdePoint[]; stats: ViolinBoxStats | null };
+
 function createViolinRenderItem({
+  shapes,
   color,
   seriesCount,
   seriesIndex,
@@ -61,6 +70,7 @@ function createViolinRenderItem({
   showMedianLine,
   medianLineWidth,
 }: {
+  shapes: ViolinShape[];
   color: string;
   medianLineWidth: number;
   seriesCount: number;
@@ -69,12 +79,13 @@ function createViolinRenderItem({
   showMedianLine: boolean;
 }) {
   return (
-    _params: CustomSeriesRenderItemParams,
+    params: CustomSeriesRenderItemParams,
     api: CustomSeriesRenderItemAPI,
   ) => {
     const categoryIndex = api.value(0) as number;
-    const kdePoints = api.value(1) as unknown as KdePoint[];
-    const stats = api.value(2) as unknown as ViolinBoxStats | null;
+    const shape = shapes[params.dataIndex];
+    if (!shape) return null;
+    const { kdePoints, stats } = shape;
 
     if (!kdePoints.length) {
       return null;
@@ -194,6 +205,13 @@ export function EChartsViolin({
         ? [{ name: "Distribution", items }]
         : [];
   const categories = violinCategories(groups.length > 0 ? groups : items);
+  const groupShapes: ViolinShape[][] = groups.map((group) =>
+    group.items.map((item) => ({
+      kdePoints: resolveViolinDensity(item, bandwidth),
+      stats: resolveViolinBoxStats(item),
+    })),
+  );
+  const valueExtent = kdeValueExtent(groupShapes.flat());
   const compact = isCompactTile(width, height);
   const layout = resolveDistributionNicheLayout(width, height, groups.length);
   const grid = gridOptions(theme, compact);
@@ -226,6 +244,7 @@ export function EChartsViolin({
       },
       yAxis: {
         type: "value",
+        ...valueExtent,
         show: showAxes,
         axisLabel: {
           ...axisStyle,
@@ -236,10 +255,12 @@ export function EChartsViolin({
       series: groups.map((group, groupIndex) => {
         const color =
           toneColor(group.tone, theme) ?? palette[groupIndex % palette.length]!;
+        const shapes = groupShapes[groupIndex]!;
         return {
           type: "custom" as const,
           name: group.name,
           renderItem: createViolinRenderItem({
+            shapes,
             color,
             seriesCount: groups.length,
             seriesIndex: groupIndex,
@@ -249,11 +270,8 @@ export function EChartsViolin({
           }),
           data: group.items.map((item, categoryIndex) => ({
             name: item.category,
-            value: [
-              categoryIndex,
-              resolveViolinDensity(item, bandwidth),
-              resolveViolinBoxStats(item),
-            ],
+            value: [categoryIndex],
+            stats: shapes[categoryIndex]!.stats,
           })),
           emphasis: itemEmphasisOptions(theme),
         };
@@ -275,8 +293,8 @@ export function EChartsViolin({
 
       const category =
         typeof params.name === "string" ? params.name : "Category";
-      const raw = params.value;
-      const stats = Array.isArray(raw) ? (raw[2] as ViolinBoxStats | null) : null;
+      const stats =
+        (params.data as { stats?: ViolinBoxStats | null } | undefined)?.stats ?? null;
       const rows = stats
         ? [
             { label: "Min", value: formatValue(stats.min, valueSuffix) },

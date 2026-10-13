@@ -36,7 +36,7 @@ import {
   type GraphChartData,
 } from "@axicharts/charts";
 import { Chart } from "@axicharts/charts-spec";
-import { cleanTheme, industrialTheme } from "@axicharts/charts-theme";
+import { cleanTheme } from "@axicharts/charts-theme";
 import { MapChart, SAMPLE_US_TOPOLOGY, SAMPLE_US_VALUES } from "@axicharts/charts-map";
 import { SankeyChart, SAMPLE_SANKEY_FLOW } from "@axicharts/charts-sankey";
 import { GeoMapChart, SAMPLE_GEO_REGIONS } from "@axicharts/charts-geo";
@@ -506,17 +506,17 @@ function ChartCatalogWall(): ReactElement {
         <h3 style={sectionTitle}>Industrial</h3>
         <div style={grid}>
           <CatalogCard label="Gauge">
-            <ChartContainer theme={industrialTheme} height={120} width="100%">
+            <ChartContainer theme={cleanTheme} height={120} width="100%">
               <Gauge value={78} min={0} max={100} label="OEE" unit="%" />
             </ChartContainer>
           </CatalogCard>
           <CatalogCard label="Stat">
-            <div style={{ padding: "8px 4px" }}>
+            <ChartContainer theme={cleanTheme} height={72} width="100%">
               <Stat value="1,284" label="units/hr" tone="success" />
-            </div>
+            </ChartContainer>
           </CatalogCard>
           <CatalogCard label="Digital">
-            <ChartContainer theme={industrialTheme} height={56} width="100%">
+            <ChartContainer theme={cleanTheme} height={56} width="100%">
               <Digital value={1428} unit="rpm" />
             </ChartContainer>
           </CatalogCard>
@@ -524,7 +524,7 @@ function ChartCatalogWall(): ReactElement {
             <StatusLamp status="running" label="Line 3" />
           </CatalogCard>
           <CatalogCard label="Liquid fill">
-            <ChartContainer theme={industrialTheme} height={120} width="100%">
+            <ChartContainer theme={cleanTheme} height={120} width="100%">
               <LiquidFillChart value={0.68} label="Tank" />
             </ChartContainer>
           </CatalogCard>
@@ -558,7 +558,7 @@ function ChartCatalogWall(): ReactElement {
             </ChartContainer>
           </CatalogCard>
           <CatalogCard label="Tank">
-            <ChartContainer theme={industrialTheme} height={120} width="100%">
+            <ChartContainer theme={cleanTheme} height={120} width="100%">
               <TankChart level={68} label="T-1" warningAt={75} />
             </ChartContainer>
           </CatalogCard>

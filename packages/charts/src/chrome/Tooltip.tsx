@@ -1,12 +1,12 @@
 "use client";
 
 import type { ReactElement } from "react";
+import { formatChartValue, type ValueFormat } from "@axicharts/charts-core";
 import type { PlotSeries } from "@axicharts/charts-canvas";
 import { isDarkChartTheme } from "@axicharts/charts-canvas";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import { useChartInteraction } from "../interaction/ChartInteractionContext";
 import {
-  formatSeriesValue,
   resolveSeriesColor,
   resolveSeriesLabel,
 } from "./resolveSeries";
@@ -28,6 +28,7 @@ export type TooltipProps = {
   categories?: string[];
   series?: PlotSeries[];
   valueSuffix?: string;
+  valueFormat?: ValueFormat;
   getRows?: (index: number) => TooltipRow[] | null;
 };
 
@@ -88,11 +89,12 @@ export function Tooltip({
   categories = [],
   series = [],
   valueSuffix = "",
+  valueFormat,
   getRows,
 }: TooltipProps): ReactElement | null {
   const { cursor, itemHover } = useChartInteraction();
   const { config, theme, tooltipVariant = DEFAULT_TOOLTIP_VARIANT } = useChartLayout();
-  const dark = isDarkChartTheme(theme.name);
+  const dark = isDarkChartTheme(theme);
   const surface = tooltipSurfaceStyle(tooltipVariant, dark);
   const titleStyle = tooltipTitleStyle(dark);
 
@@ -131,7 +133,7 @@ export function Tooltip({
       if (value == null) continue;
       derivedRows.push({
         label: resolveSeriesLabel(item, config),
-        value: formatSeriesValue(value, suffix),
+        value: formatChartValue(value, { format: valueFormat, suffix }),
         color: resolveSeriesColor(item, config, index),
       });
     }

@@ -1,4 +1,5 @@
 import { useMemo, type CSSProperties, type ReactElement } from "react";
+import { useDefaultSurface } from "../container/useDefaultSurface";
 import { buildSingleValueA11yDescriptor } from "../a11y/singleValueDescriptor";
 import { SingleValueChartA11yRoot } from "../a11y/SingleValueChartA11yRoot";
 import { useOptionalChartLayout } from "../container/useOptionalChartLayout";
@@ -46,11 +47,13 @@ export function Stat({
   delta,
   deltaDirection,
   tone = "neutral",
-  surface = "dark",
+  surface: surfaceProp,
   monospace = false,
   stale = false,
   style,
 }: StatProps): ReactElement {
+  const defaultSurface = useDefaultSurface();
+  const surface = surfaceProp ?? defaultSurface;
   const layout = useOptionalChartLayout();
   const animatedValue = usePresentationCountUp(
     value,

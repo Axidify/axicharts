@@ -50,12 +50,13 @@ export function drawStackBarTotals(
   labelColor: string,
   formatValue: (value: number, suffix?: string) => string,
   orientation: BarOrientation = "vertical",
+  font = "10px ui-sans-serif, system-ui, sans-serif",
 ): void {
   if (totals.size === 0) return;
 
   ctx.save();
   ctx.fillStyle = labelColor;
-  ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
+  ctx.font = font;
 
   if (orientation === "horizontal") {
     ctx.textAlign = "left";

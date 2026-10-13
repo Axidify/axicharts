@@ -27,3 +27,14 @@ describe("themeBridge", () => {
     expect(segmentItemStyle(liveTheme).borderWidth).toBe(0.5);
   });
 });
+
+describe("axisLabelStyle typography", () => {
+  it("follows theme font size and family when set", async () => {
+    const { axisLabelStyle } = await import("./themeBridge");
+    const { cleanTheme } = await import("@axicharts/charts-theme");
+    expect(axisLabelStyle(cleanTheme)).toMatchObject({ fontSize: 11, fontFamily: "inherit" });
+    expect(
+      axisLabelStyle({ ...cleanTheme, font: { family: "Inter, sans-serif", size: 13 } }),
+    ).toMatchObject({ fontSize: 13, fontFamily: "Inter, sans-serif" });
+  });
+});

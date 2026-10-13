@@ -32,7 +32,7 @@ export function Legend({
   layout = "overlay",
 }: LegendProps): ReactElement | null {
   const { config, theme, legendVariant = DEFAULT_LEGEND_VARIANT } = useChartLayout();
-  const dark = isDarkChartTheme(theme.name);
+  const dark = isDarkChartTheme(theme);
   const legendHeight = legendHeightForVariant(legendVariant);
 
   if (series.length < 2) return null;

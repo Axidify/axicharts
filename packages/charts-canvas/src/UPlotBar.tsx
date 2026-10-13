@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { themeFont } from "@axicharts/charts-theme";
 import type { ReactElement } from "react";
 import uPlot from "uplot";
+import { formatChartValue } from "@axicharts/charts-core";
+import { applyValueAxisOptions } from "./valueAxis";
 import "uplot/dist/uPlot.min.css";
 import {
   CANVAS_BG,
@@ -12,7 +15,9 @@ import {
 import type { UPlotBarProps, BarOrientation } from "./types";
 import { applySyncedCursor } from "./plotCursor";
 import {
+  annotationStyle,
   createAnnotationDrawHook,
+  createBandDrawHook,
   expandYRange,
 } from "./plotAnnotations";
 import { resolveAnnotationPlotProps } from "./annotations";
@@ -133,13 +138,20 @@ function stackCapKeys(
   );
 }
 
-function formatValue(value: number, suffix = ""): string {
-  const rounded =
-    Math.abs(value) >= 100 ? value.toFixed(0) : value.toFixed(1);
-  return `${rounded}${suffix}`;
+
+/** Builds options, then applies `valueFormat` / `yDomain` / `yTickCount` (see valueAxis.ts). */
+export function buildBarOptions(
+  props: Parameters<typeof buildBarOptionsBase>[0],
+): ReturnType<typeof buildBarOptionsBase> {
+  return applyValueAxisOptions(buildBarOptionsBase(props), {
+    valueFormat: props.valueFormat,
+    yDomain: props.yDomain,
+    yTickCount: props.yTickCount,
+    compact: props.height < 72,
+  }) as ReturnType<typeof buildBarOptionsBase>;
 }
 
-export function buildBarOptions({
+function buildBarOptionsBase({
   width,
   height,
   categories,
@@ -148,6 +160,7 @@ export function buildBarOptions({
   showAxes = true,
   showValues = false,
   valueSuffix = "",
+  valueFormat,
   referenceLines = [],
   thresholdBands = [],
   annotations = [],
@@ -164,6 +177,8 @@ export function buildBarOptions({
   barLayoutsRef: React.MutableRefObject<BarLayout[]>;
   stackTotalsRef: React.MutableRefObject<Map<number, StackBarTotal>>;
 }): uPlot.Options {
+  const formatLabel = (value: number, suffix = ""): string =>
+    formatChartValue(value, { format: valueFormat, suffix });
   const {
     thresholdBands: thresholdBandsResolved,
     referenceLines: referenceLinesResolved,
@@ -182,6 +197,7 @@ export function buildBarOptions({
 
   const chrome = resolveChromeColors(theme);
   const compact = height < 72;
+  const plotStyle = annotationStyle(theme);
   const gridStroke = chromeGridStroke(theme, compact);
   const gapPx = ordinalBarGapPx(categories.length, theme.bar.gap);
   const stackSeries = shouldStackSeries(stacked, series.length);
@@ -306,8 +322,12 @@ export function buildBarOptions({
     };
   });
 
+  const drawBandsHook = createBandDrawHook(
+    horizontal ? [] : thresholdBandsResolved,
+    plotStyle,
+  );
   const drawBarHook = createAnnotationDrawHook({
-    bands: horizontal ? [] : thresholdBandsResolved,
+    style: plotStyle,
     referenceLines: horizontal ? [] : referenceLinesResolved,
     verticalLines: horizontal ? [] : verticalLines,
     labels: horizontal ? [] : plotLabels,
@@ -345,13 +365,13 @@ export function buildBarOptions({
       if (showBarValues) {
         ctx.save();
         ctx.fillStyle = chrome.axis;
-        ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
+        ctx.font = themeFont(theme, { delta: -1 });
 
         if (horizontal) {
           ctx.textAlign = "left";
           ctx.textBaseline = "middle";
           for (const layout of layouts) {
-            const label = formatValue(layout.value, valueSuffix);
+            const label = formatLabel(layout.value, valueSuffix);
             const x = layout.left + layout.width + 4;
             const y = layout.top + layout.height / 2;
             ctx.fillText(label, x, y);
@@ -360,7 +380,7 @@ export function buildBarOptions({
           ctx.textAlign = "center";
           ctx.textBaseline = "bottom";
           for (const layout of layouts) {
-            const label = formatValue(layout.value, valueSuffix);
+            const label = formatLabel(layout.value, valueSuffix);
             const x = layout.left + layout.width / 2;
             const y = layout.top - 4;
             ctx.fillText(label, x, y);
@@ -376,8 +396,9 @@ export function buildBarOptions({
           stackTotalsRef.current,
           valueSuffix,
           chrome.axis,
-          formatValue,
+          formatLabel,
           orientation,
+          themeFont(theme, { delta: -1 }),
         );
       }
     },
@@ -428,7 +449,7 @@ export function buildBarOptions({
               ticks: { show: true, stroke: chrome.axis, size: 4 },
               values: axisCategoryValues(categories),
               size: leftAxisSize,
-              font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+              font: themeFont(theme),
               gap: horizontalCategoryAxisGap(),
             },
             {
@@ -444,14 +465,15 @@ export function buildBarOptions({
               incrs: horizontalValueAxisIncrs(horizontalAxisMax),
               size: compact ? 0 : 32,
               font: theme.values.monospace
-                ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-                : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+                ? themeFont(theme, { mono: true })
+                : themeFont(theme),
               gap: 4,
             },
           ] as unknown as uPlot.Axis[])
         : [],
       series: [{}, ...barSeriesPaths],
       hooks: {
+        drawAxes: [drawBandsHook],
         draw: [drawBarHook],
       },
     };
@@ -487,7 +509,7 @@ export function buildBarOptions({
             ticks: { show: false },
             values: axisCategoryValues(categories, compact ? undefined : width),
             size: compact ? 0 : categoryAxisSize(),
-            font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+            font: themeFont(theme),
             gap: 8,
           },
           {
@@ -498,14 +520,15 @@ export function buildBarOptions({
             ticks: { show: false },
             size: compact ? 0 : 32,
             font: theme.values.monospace
-              ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-              : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+              ? themeFont(theme, { mono: true })
+              : themeFont(theme),
             gap: 4,
           },
         ]
       : [],
     series: [{}, ...barSeriesPaths],
     hooks: {
+      drawAxes: [drawBandsHook],
       draw: [drawBarHook],
     },
   };

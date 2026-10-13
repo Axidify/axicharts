@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanTheme } from "@axicharts/charts-theme";
+import { cleanTheme, createTheme, liveTheme } from "@axicharts/charts-theme";
 import { chromeGridStroke, isDarkChartTheme, withAlpha } from "./colors";
 import { resolveSeriesColor } from "./seriesColor";
 
@@ -34,6 +34,8 @@ describe("chart colors", () => {
   it("detects dark chart themes", () => {
     expect(isDarkChartTheme("clean")).toBe(false);
     expect(isDarkChartTheme("live")).toBe(true);
+    // createTheme forks must be renamed; surface keeps them dark.
+    expect(isDarkChartTheme(createTheme(liveTheme, { name: "acme-dark" }))).toBe(true);
   });
 
   it("cycles a distinct palette for 4+ untuned series (stacked ramp)", () => {
@@ -42,5 +44,15 @@ describe("chart colors", () => {
     );
     expect(new Set(colors).size).toBe(4);
     expect(colors).toEqual(["#2563eb", "#0891b2", "#16a34a", "#d97706"]);
+  });
+});
+
+describe("withAlpha", () => {
+  it("applies alpha to hex, rgb and hsl colors", async () => {
+    const { withAlpha } = await import("./colors");
+    expect(withAlpha("#d97706", 0.14)).toBe("rgba(217, 119, 6, 0.14)");
+    expect(withAlpha("hsl(32 95% 44%)", 0.14)).toBe("hsl(32 95% 44% / 0.14)");
+    expect(withAlpha("hsl(32, 95%, 44%)", 0.4)).toBe("hsla(32, 95%, 44%, 0.4)");
+    expect(withAlpha("hsl(32 95% 44% / 0.9)", 0.4)).toBe("hsl(32 95% 44% / 0.4)");
   });
 });

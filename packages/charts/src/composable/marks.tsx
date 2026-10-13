@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
+import type { LegendVariant, TooltipVariant } from "../chrome/chromeVariants";
 import type { SeriesTone } from "@axicharts/charts-canvas";
-import type { BuiltinTickFormat } from "@axicharts/charts-core";
+import type { BuiltinTickFormat, ValueFormat } from "@axicharts/charts-core";
 import type { BarRenderFn, PathRenderFn } from "./customMarks";
 
 export type LineMarkProps = {
@@ -35,7 +36,8 @@ export type XAxisMarkProps = {
 };
 
 export type YAxisMarkProps = {
-  tickFormat?: BuiltinTickFormat;
+  /** Built-in / registered format id or function — formats ticks, tooltips and value labels. */
+  tickFormat?: ValueFormat;
   orientation?: "left" | "right";
   yAxisId?: string;
 };
@@ -45,7 +47,24 @@ export type GridMarkProps = {
   vertical?: boolean;
 };
 
-export type ChromeMarkProps = Record<string, never>;
+export type TooltipMarkProps = {
+  /** Tooltip chrome variant for this chart (overrides the container's). */
+  variant?: TooltipVariant;
+  /** Hide the tooltip for this chart. */
+  hidden?: boolean;
+  /** Tooltip value format (overrides the chart's `valueFormat` for tooltips only). */
+  formatter?: ValueFormat;
+};
+
+export type LegendMarkProps = {
+  /** Legend variant for this chart (overrides the container's). */
+  variant?: LegendVariant;
+  /** Hide the legend for this chart. */
+  hidden?: boolean;
+};
+
+/** @deprecated Use `TooltipMarkProps` / `LegendMarkProps`. */
+export type ChromeMarkProps = TooltipMarkProps | LegendMarkProps;
 
 export type PieMarkProps = {
   dataKey?: string;
@@ -137,7 +156,11 @@ function gridMark(_props: GridMarkProps): null {
   return null;
 }
 
-function chromeMark(_props: ChromeMarkProps): null {
+function tooltipMark(_props: TooltipMarkProps): null {
+  return null;
+}
+
+function legendMark(_props: LegendMarkProps): null {
   return null;
 }
 
@@ -183,8 +206,8 @@ export const Area = Object.assign(areaMark, { markKind: "area" as const });
 export const XAxis = Object.assign(xAxisMark, { markKind: "xAxis" as const });
 export const YAxis = Object.assign(yAxisMark, { markKind: "yAxis" as const });
 export const Grid = Object.assign(gridMark, { markKind: "grid" as const });
-export const Tooltip = Object.assign(chromeMark, { markKind: "tooltip" as const });
-export const Legend = Object.assign(chromeMark, { markKind: "legend" as const });
+export const Tooltip = Object.assign(tooltipMark, { markKind: "tooltip" as const });
+export const Legend = Object.assign(legendMark, { markKind: "legend" as const });
 export const Pie = Object.assign(pieMark, { markKind: "pie" as const });
 export const Cell = Object.assign(cellMark, { markKind: "cell" as const });
 export const Funnel = Object.assign(funnelMark, { markKind: "funnel" as const });

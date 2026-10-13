@@ -1,4 +1,5 @@
 import type {
+  ChartAnnotation,
   ComboSeries,
   DualAxisMode,
   ReferenceLine,
@@ -13,6 +14,8 @@ export type BlockMarksChartProps = {
   series: ComboSeries[];
   referenceLines: ReferenceLine[];
   thresholdBands: ThresholdBand[];
+  /** Overlays the reference-line / band channels can't express: vertical rules, text, markers. */
+  annotations: ChartAnnotation[];
   /** Chart-level fill — only when all data marks are area (no bars). */
   fill: boolean;
   showValues?: boolean;
@@ -56,6 +59,16 @@ export function isSeriesBlockMark(
   return SERIES_KINDS.has(mark.type);
 }
 
+/** Vertical / x-positioned rules render through chart `annotations`, not `referenceLines`. */
+export function isAnnotationRule(mark: ChartBlockMarkSpec): boolean {
+  return mark.type === "rule" && (mark.orientation === "vertical" || mark.x != null);
+}
+
+/** Overlay marks that compile to chart `annotations` (vertical rules, text, markers). */
+export function blockMarksToAnnotations(marks: ChartBlockMarkSpec[]): ChartAnnotation[] {
+  return blockMarksToChartProps([], marks).annotations;
+}
+
 export function blockMarksToChartProps(
   rows: Record<string, unknown>[],
   marks: ChartBlockMarkSpec[],
@@ -63,6 +76,7 @@ export function blockMarksToChartProps(
   const series: ComboSeries[] = [];
   const referenceLines: ReferenceLine[] = [];
   const thresholdBands: ThresholdBand[] = [];
+  const annotations: ChartAnnotation[] = [];
 
   for (const mark of marks) {
     if (isSeriesBlockMark(mark)) {
@@ -79,6 +93,45 @@ export function blockMarksToChartProps(
         ...(mark.type === "area" ? { fill: true } : {}),
         ...(mark.type === "point" ? { showPoints: true } : {}),
         ...(mark.curve && mark.type !== "bar" ? { curve: mark.curve } : {}),
+      });
+      continue;
+    }
+
+    if (mark.type === "rule" && isAnnotationRule(mark)) {
+      annotations.push({
+        type: "line",
+        value: mark.value,
+        orientation: mark.orientation ?? "vertical",
+        ...(mark.x != null ? { x: mark.x } : {}),
+        ...(mark.label ? { label: mark.label } : {}),
+        ...(mark.tone ? { tone: mark.tone as SeriesTone } : {}),
+        ...(mark.id ? { id: mark.id } : {}),
+      });
+      continue;
+    }
+
+    if (mark.type === "text") {
+      annotations.push({
+        type: "label",
+        text: mark.text,
+        y: mark.y,
+        ...(mark.x != null ? { x: mark.x } : {}),
+        ...(mark.position ? { position: mark.position } : {}),
+        ...(mark.tone ? { tone: mark.tone as SeriesTone } : {}),
+        ...(mark.id ? { id: mark.id } : {}),
+      });
+      continue;
+    }
+
+    if (mark.type === "marker") {
+      annotations.push({
+        type: "marker",
+        y: mark.y,
+        ...(mark.x != null ? { x: mark.x } : {}),
+        ...(mark.label ? { label: mark.label } : {}),
+        ...(mark.draggable ? { draggable: true } : {}),
+        ...(mark.tone ? { tone: mark.tone as SeriesTone } : {}),
+        ...(mark.id ? { id: mark.id } : {}),
       });
       continue;
     }
@@ -110,6 +163,7 @@ export function blockMarksToChartProps(
     series,
     referenceLines,
     thresholdBands,
+    annotations,
     fill: !hasBar && allArea,
     showValues: resolveShowValues(marks),
     stacked: resolveStacked(marks),

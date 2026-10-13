@@ -196,5 +196,6 @@ describe("create-dashboard scaffold", () => {
     await expect(readFile(path.join(dir, "package.json"), "utf8")).resolves.toContain(
       "@axicharts/charts",
     );
-  });
+    // Spawns a real Node process; under parallel turbo load startup alone can pass 5s.
+  }, 20_000);
 });

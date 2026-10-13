@@ -1,4 +1,5 @@
 import { useMemo, type ReactNode } from "react";
+import type { ValueFormat } from "@axicharts/charts-core";
 import type { LineCurve } from "@axicharts/charts-theme";
 import type { PlotSeries } from "@axicharts/charts-canvas";
 import type { ChartConfig } from "../container/ChartLayoutContext";
@@ -11,6 +12,7 @@ export type CartesianDataProps = {
   data?: Record<string, unknown>[];
   children?: ReactNode;
   valueSuffix?: string;
+  valueFormat?: ValueFormat;
   curve?: LineCurve;
 };
 
@@ -22,9 +24,10 @@ export function useResolvedCartesianProps(
   categories: string[];
   series: PlotSeries[];
   valueSuffix?: string;
+  valueFormat?: ValueFormat;
   curve?: LineCurve;
 } {
-  const { categories, series, data, children, valueSuffix, curve } = props;
+  const { categories, series, data, children, valueSuffix, valueFormat, curve } = props;
 
   return useMemo(() => {
     if (data && children) {
@@ -32,7 +35,8 @@ export function useResolvedCartesianProps(
       return {
         categories: composed.categories,
         series: composed.series,
-        valueSuffix: valueSuffix ?? composed.valueSuffix,
+        valueSuffix,
+        valueFormat: valueFormat ?? composed.valueFormat,
         curve: curve ?? composed.curve,
       };
     }
@@ -41,6 +45,7 @@ export function useResolvedCartesianProps(
       categories: categories ?? [],
       series: series ?? [],
       valueSuffix,
+      valueFormat,
       curve,
     };
   }, [
@@ -51,6 +56,7 @@ export function useResolvedCartesianProps(
     config,
     seriesKinds,
     valueSuffix,
+    valueFormat,
     curve,
   ]);
 }

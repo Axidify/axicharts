@@ -83,6 +83,9 @@ export type ChartBlockRuleMark = {
   label?: string;
   tone?: "default" | "info" | "success" | "warning" | "critical";
   orientation?: "horizontal" | "vertical";
+  /** Category / x position for a vertical rule. */
+  x?: number | string;
+  id?: string;
 };
 
 export type ChartBlockBandMark = {
@@ -91,13 +94,38 @@ export type ChartBlockBandMark = {
   max: number;
   label?: string;
   tone?: "default" | "info" | "success" | "warning" | "critical";
+  id?: string;
+};
+
+/** Free text pinned to a y value (and optional x category). */
+export type ChartBlockTextMark = {
+  type: "text";
+  text: string;
+  y: number;
+  x?: number | string;
+  tone?: "default" | "info" | "success" | "warning" | "critical";
+  position?: "top" | "bottom" | "left" | "right" | "center";
+  id?: string;
+};
+
+/** Point marker at a y value (and optional x category). */
+export type ChartBlockMarkerMark = {
+  type: "marker";
+  y: number;
+  x?: number | string;
+  label?: string;
+  tone?: "default" | "info" | "success" | "warning" | "critical";
+  draggable?: boolean;
+  id?: string;
 };
 
 /** Mix-and-match cartesian building blocks — compiles to ComboChart + overlays. */
 export type ChartBlockMarkSpec =
   | ChartBlockSeriesMark
   | ChartBlockRuleMark
-  | ChartBlockBandMark;
+  | ChartBlockBandMark
+  | ChartBlockTextMark
+  | ChartBlockMarkerMark;
 
 export type DistributionArcMark = {
   type: "arc";
@@ -243,6 +271,16 @@ export type PanelSpec = {
   height?: number;
   width?: number | string;
   valueSuffix?: string;
+  /**
+   * Value-axis / tooltip / value-label format: a built-in (`number`, `currency`,
+   * `percent`, `compact`, `bps`) or `registerTickFormat` id. JSON-safe — the
+   * React props also accept a function.
+   */
+  valueFormat?: string;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
+  yDomain?: [number | "auto", number | "auto"];
+  /** Approximate number of value-axis ticks (placed at round values). */
+  yTickCount?: number;
   fill?: boolean;
   stacked?: boolean;
   /** Bar chart orientation — horizontal for long category labels. */

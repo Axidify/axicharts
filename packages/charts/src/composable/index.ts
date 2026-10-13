@@ -24,6 +24,8 @@ export {
   type BarMarkProps,
   type CellMarkProps,
   type ChromeMarkProps,
+  type LegendMarkProps,
+  type TooltipMarkProps,
   type FunnelMarkProps,
   type GridMarkProps,
   type LineMarkProps,

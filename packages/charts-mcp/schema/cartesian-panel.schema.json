@@ -299,6 +299,102 @@
         }
       ]
     },
+    "pointMark": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "mark",
+            "field"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "mark": {
+              "const": "point"
+            },
+            "field": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "tone": {
+              "enum": [
+                "default",
+                "info",
+                "success",
+                "warning",
+                "critical"
+              ]
+            },
+            "yAxisId": {
+              "enum": [
+                "left",
+                "right"
+              ]
+            },
+            "stack": {
+              "type": "string"
+            },
+            "labels": {
+              "type": "boolean"
+            },
+            "curve": {
+              "enum": [
+                "linear",
+                "monotone"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "field"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "const": "point"
+            },
+            "field": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "tone": {
+              "enum": [
+                "default",
+                "info",
+                "success",
+                "warning",
+                "critical"
+              ]
+            },
+            "yAxisId": {
+              "enum": [
+                "left",
+                "right"
+              ]
+            },
+            "stack": {
+              "type": "string"
+            },
+            "labels": {
+              "type": "boolean"
+            },
+            "curve": {
+              "enum": [
+                "linear",
+                "monotone"
+              ]
+            }
+          }
+        }
+      ]
+    },
     "ruleMark": {
       "oneOf": [
         {
@@ -332,6 +428,15 @@
                 "horizontal",
                 "vertical"
               ]
+            },
+            "x": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "id": {
+              "type": "string"
             }
           }
         },
@@ -366,6 +471,15 @@
                 "horizontal",
                 "vertical"
               ]
+            },
+            "x": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "id": {
+              "type": "string"
             }
           }
         }
@@ -402,6 +516,9 @@
                 "warning",
                 "critical"
               ]
+            },
+            "id": {
+              "type": "string"
             }
           }
         },
@@ -434,6 +551,191 @@
                 "warning",
                 "critical"
               ]
+            },
+            "id": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "textMark": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "mark",
+            "text",
+            "y"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "mark": {
+              "const": "text"
+            },
+            "text": {
+              "type": "string"
+            },
+            "y": {
+              "type": "number"
+            },
+            "x": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "tone": {
+              "enum": [
+                "default",
+                "info",
+                "success",
+                "warning",
+                "critical"
+              ]
+            },
+            "position": {
+              "enum": [
+                "top",
+                "bottom",
+                "left",
+                "right",
+                "center"
+              ]
+            },
+            "id": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "text",
+            "y"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "const": "text"
+            },
+            "text": {
+              "type": "string"
+            },
+            "y": {
+              "type": "number"
+            },
+            "x": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "tone": {
+              "enum": [
+                "default",
+                "info",
+                "success",
+                "warning",
+                "critical"
+              ]
+            },
+            "position": {
+              "enum": [
+                "top",
+                "bottom",
+                "left",
+                "right",
+                "center"
+              ]
+            },
+            "id": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "markerMark": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "mark",
+            "y"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "mark": {
+              "const": "marker"
+            },
+            "y": {
+              "type": "number"
+            },
+            "x": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "label": {
+              "type": "string"
+            },
+            "tone": {
+              "enum": [
+                "default",
+                "info",
+                "success",
+                "warning",
+                "critical"
+              ]
+            },
+            "draggable": {
+              "type": "boolean"
+            },
+            "id": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "y"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "const": "marker"
+            },
+            "y": {
+              "type": "number"
+            },
+            "x": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "label": {
+              "type": "string"
+            },
+            "tone": {
+              "enum": [
+                "default",
+                "info",
+                "success",
+                "warning",
+                "critical"
+              ]
+            },
+            "draggable": {
+              "type": "boolean"
+            },
+            "id": {
+              "type": "string"
             }
           }
         }
@@ -470,6 +772,29 @@
     "height": {
       "type": "number",
       "minimum": 80
+    },
+    "valueFormat": {
+      "type": "string",
+      "description": "Built-in (number | currency | percent | compact | bps) or registerTickFormat id"
+    },
+    "yDomain": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "oneOf": [
+          {
+            "type": "number"
+          },
+          {
+            "const": "auto"
+          }
+        ]
+      }
+    },
+    "yTickCount": {
+      "type": "integer",
+      "minimum": 2
     },
     "encoding": {
       "type": "object",
@@ -508,10 +833,19 @@
             "$ref": "#/$defs/areaMark"
           },
           {
+            "$ref": "#/$defs/pointMark"
+          },
+          {
             "$ref": "#/$defs/ruleMark"
           },
           {
             "$ref": "#/$defs/bandMark"
+          },
+          {
+            "$ref": "#/$defs/textMark"
+          },
+          {
+            "$ref": "#/$defs/markerMark"
           }
         ]
       }

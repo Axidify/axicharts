@@ -5,6 +5,7 @@ export {
   presentationTheme,
   studioTheme,
   type ChartTheme,
+  type ChartThemeFont,
   type ChartThemeSvgPolish,
   type LineCurve,
 } from "./themes";
@@ -29,6 +30,15 @@ export {
   type ChartColorTokens,
   type SeriesTone as ChartSeriesTone,
 } from "./cssTokens";
+export { isDarkTheme } from "./surface";
+export {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  DEFAULT_MONO_FAMILY,
+  resolveThemeFont,
+  themeFont,
+  type ResolvedThemeFont,
+} from "./typography";
 export {
   contrastRatio,
   isAcceptableChromeColor,

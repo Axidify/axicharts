@@ -15,8 +15,10 @@ export const CARTESIAN_MARK_CATALOG: CartesianMarkCatalogEntry[] = [
   { mark: "line", role: "data", required: ["field"], optional: ["label", "tone", "curve", "yAxisId"] },
   { mark: "area", role: "data", required: ["field"], optional: ["label", "tone", "curve", "yAxisId"] },
   { mark: "point", role: "data", required: ["field"], optional: ["label", "tone", "yAxisId"] },
-  { mark: "rule", role: "overlay", required: ["value"], optional: ["label", "tone", "orientation"] },
-  { mark: "band", role: "overlay", required: ["min", "max"], optional: ["label", "tone"] },
+  { mark: "rule", role: "overlay", required: ["value"], optional: ["label", "tone", "orientation", "x", "id"] },
+  { mark: "band", role: "overlay", required: ["min", "max"], optional: ["label", "tone", "id"] },
+  { mark: "text", role: "overlay", required: ["text", "y"], optional: ["x", "tone", "position", "id"] },
+  { mark: "marker", role: "overlay", required: ["y"], optional: ["x", "label", "tone", "draggable", "id"] },
 ];
 
 export function listCartesianMarks(): CartesianMarkCatalogEntry[] {

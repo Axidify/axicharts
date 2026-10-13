@@ -1,6 +1,8 @@
 "use client";
 
 import type { ReactElement, ReactNode } from "react";
+import { readChromeMarks } from "../composable/readChromeMarks";
+import type { ValueFormat, YDomain } from "@axicharts/charts-core";
 import { useMemo } from "react";
 import {
   UPlotBar,
@@ -61,6 +63,12 @@ export type BarChartProps<TMeta = unknown> = CartesianPointerChartProps<TMeta> &
   showAxes?: boolean;
   showValues?: boolean;
   valueSuffix?: string;
+  /** Format for value-axis ticks, tooltips and value labels (built-in id or function). */
+  valueFormat?: ValueFormat;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
+  yDomain?: YDomain;
+  /** Approximate number of value-axis ticks (placed at round values). */
+  yTickCount?: number;
   referenceLines?: ReferenceLine[];
   stacked?: boolean;
   renderer?: RendererPreference;
@@ -84,6 +92,12 @@ type BarPlotProps = {
   showAxes?: boolean;
   showValues?: boolean;
   valueSuffix?: string;
+  /** Format for value-axis ticks, tooltips and value labels (built-in id or function). */
+  valueFormat?: ValueFormat;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
+  yDomain?: YDomain;
+  /** Approximate number of value-axis ticks (placed at round values). */
+  yTickCount?: number;
   referenceLines?: ReferenceLine[];
   stacked?: boolean;
   thresholdBands?: ThresholdBand[];
@@ -112,6 +126,9 @@ function BarPlot({
   showAxes,
   showValues,
   valueSuffix,
+  valueFormat,
+  yDomain,
+  yTickCount,
   referenceLines,
   stacked = false,
   thresholdBands,
@@ -154,7 +171,7 @@ function BarPlot({
           series={series}
           theme={theme}
           showAxes={showAxes}
-          stacked={stacked}
+          stacked={stacked}          yDomain={yDomain}
         />
       ) : (
         <UPlotBar
@@ -166,6 +183,9 @@ function BarPlot({
           showAxes={showAxes}
           showValues={showValues}
           valueSuffix={valueSuffix}
+          valueFormat={valueFormat}
+          yDomain={yDomain}
+          yTickCount={yTickCount}
           referenceLines={referenceLines}
           stacked={stacked}
           thresholdBands={thresholdBands}
@@ -235,6 +255,9 @@ export function BarChart({
   showAxes,
   showValues = false,
   valueSuffix: valueSuffixProp,
+  valueFormat: valueFormatProp,
+  yDomain,
+  yTickCount,
   referenceLines,
   stacked = false,
   orientation = "vertical",
@@ -262,18 +285,25 @@ export function BarChart({
     children,
   });
   const chartGraphics = useChartGraphics({ graphics, children });
+  const chromeSettings = useMemo(() => readChromeMarks(children), [children]);
   const { effectiveRange, onBrushRangeChange } = useCartesianBrush({
     brush,
     brushEnd,
   });
   const normalizedCategories = useCartesianCategoryMeta(categoriesProp);
-  const { categories, series: resolvedSeries, valueSuffix } = useResolvedCartesianProps(
+  const {
+    categories,
+    series: resolvedSeries,
+    valueSuffix,
+    valueFormat,
+  } = useResolvedCartesianProps(
     {
       categories: normalizedCategories.labels,
       series: seriesProp,
       data,
       children,
       valueSuffix: valueSuffixProp,
+      valueFormat: valueFormatProp,
     },
     config,
     [...BAR_SERIES_KINDS],
@@ -349,9 +379,11 @@ export function BarChart({
       }}
     >
       <CartesianChartShell
+        chromeSettings={chromeSettings}
         categories={plotCategories}
         series={plotSeries}
         valueSuffix={valueSuffix}
+        valueFormat={valueFormat}
         compact={compact}
         plotMotionStyle={plotMotionStyle}
         plotKey={motion.plotKey}
@@ -364,6 +396,9 @@ export function BarChart({
             showAxes={axes}
             showValues={showValues}
             valueSuffix={valueSuffix}
+            valueFormat={valueFormat}
+            yDomain={yDomain}
+            yTickCount={yTickCount}
             referenceLines={annotationProps.referenceLines}
             stacked={stacked}
             thresholdBands={annotationProps.thresholdBands}

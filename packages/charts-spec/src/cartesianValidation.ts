@@ -1,7 +1,12 @@
 import type { DataProfile, PanelSpec } from "./types";
 import type { ChartBlockMarkSpec } from "./types";
 import { asRows } from "./data";
-import { normalizeBlockMark, isDataMark, isOverlayMark } from "./cartesianMarks";
+import {
+  normalizeBlockMark,
+  isDataMark,
+  isOverlayMark,
+  OVERLAY_MARK_TYPES,
+} from "./cartesianMarks";
 import { suggestField } from "./fieldSuggest";
 import { readPanelAnnotations } from "./panelAnnotations";
 
@@ -47,7 +52,7 @@ function pushCartesianIssue(
 }
 
 const DATA_MARKS = new Set(["bar", "line", "area", "point"]);
-const OVERLAY_MARKS = new Set(["rule", "band"]);
+const OVERLAY_MARKS = OVERLAY_MARK_TYPES;
 const ALL_MARKS = new Set([...DATA_MARKS, ...OVERLAY_MARKS]);
 
 function fieldKeys(
@@ -105,6 +110,37 @@ const CARTESIAN_LIKE_TYPES = new Set([
   "combo",
 ]);
 
+function nonEmptyArray(value: unknown): boolean {
+  return Array.isArray(value) && value.length > 0;
+}
+
+/**
+ * Legacy overlay channels superseded by overlay marks (E-102). Still compiled
+ * (normalized into `marks[]`) through 0.5; slated for removal in 0.6.
+ * Inspect the raw spec — normalization strips these props.
+ */
+export function detectLegacyOverlayProps(
+  spec: PanelSpec,
+): CartesianValidationIssue | null {
+  if (!CARTESIAN_LIKE_TYPES.has(spec.type)) return null;
+  const props = spec.props ?? {};
+  const used = [
+    nonEmptyArray(props.referenceLines) && "props.referenceLines",
+    nonEmptyArray(props.thresholdBands) && "props.thresholdBands",
+    nonEmptyArray(spec.annotations) && "annotations",
+    nonEmptyArray(props.annotations) && "props.annotations",
+  ].filter((path): path is string => typeof path === "string");
+  if (used.length === 0) return null;
+  return {
+    code: "LEGACY_OVERLAY_PROPS",
+    path: used[0]!,
+    message: `${used.join(", ")} ${used.length > 1 ? "are" : "is"} deprecated — use rule / band / text / marker marks in marks[] (removal planned for 0.6)`,
+    suggestion:
+      "referenceLines → { type: \"rule\" }, thresholdBands → { type: \"band\" }, annotations line/band/label/marker → rule/band/text/marker",
+    severity: "warning",
+  };
+}
+
 /**
  * Detect warnings on the raw panel spec before `normalizeToCartesian` merges
  * legacy overlay props into `marks[]` (which would hide duplicate-channel issues).
@@ -147,6 +183,11 @@ export function detectPreNormalizeWarnings(
         "Overlay marks in marks[] and legacy referenceLines/thresholdBands props both set — prefer marks[] only",
       severity: "warning",
     }, strict);
+  }
+
+  const legacy = detectLegacyOverlayProps(spec);
+  if (legacy) {
+    pushCartesianIssue(bucket, legacy, strict);
   }
 
   return [...bucket.errors, ...bucket.warnings];

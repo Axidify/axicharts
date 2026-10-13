@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactElement } from "react";
+import { useDefaultSurface } from "../container/useDefaultSurface";
 import type { AlertItem, AlertSeverity, AlertSurface } from "./types";
 
 const SEVERITY_STYLES: Record<
@@ -44,12 +45,14 @@ function formatTimestamp(value?: number): string | null {
 
 export function AlertPanel({
   alarms,
-  surface = "dark",
+  surface: surfaceProp,
   title = "Active alarms",
   onAck,
   onShelve,
   style,
 }: AlertPanelProps): ReactElement | null {
+  const defaultSurface = useDefaultSurface();
+  const surface = surfaceProp ?? defaultSurface;
   const active = alarms.filter((alarm) => !alarm.acknowledged && !alarm.shelved);
   if (!active.length) return null;
 

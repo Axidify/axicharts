@@ -13,6 +13,7 @@ vi.mock("./useEChart", () => ({
 }));
 
 import { EChartsViolin } from "./EChartsViolin";
+import { countFilledShapes, renderOptionToSvg, svgTexts } from "./testing/renderOptionToSvg";
 
 const sampleItems = [
   {
@@ -67,5 +68,19 @@ describe("EChartsViolin", () => {
 
     const call = useEChartCalls.at(-1);
     expect(call?.mergeOption).toBe(true);
+  });
+  it("draws a filled shape per category through real ECharts", () => {
+    renderAdapter(
+      <EChartsViolin width={640} height={360} theme={cleanTheme} items={sampleItems} />,
+    );
+    const option = useEChartCalls.at(-1)?.option as Record<string, unknown>;
+    const svg = renderOptionToSvg(option);
+
+    // Regression: KDE arrays used to ride in custom-series `value`, which ECharts
+    // coerces to numbers — renderItem saw NaN and drew nothing.
+    expect(countFilledShapes(svg)).toBeGreaterThanOrEqual(sampleItems.length);
+    // Value axis spans the samples, not the category indices (0..n-1).
+    const ticks = svgTexts(svg).map(Number).filter(Number.isFinite);
+    expect(Math.max(...ticks)).toBeGreaterThanOrEqual(100);
   });
 });

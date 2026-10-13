@@ -1,5 +1,33 @@
 import type uPlot from "uplot";
 import { parseRgbChannels, SERIES_COLORS, withAlpha } from "./colors";
+import type { SeriesTone } from "./types";
+import {
+  resolveThemeFont,
+  resolveToneColors,
+  type ChartTheme,
+  type ResolvedThemeFont,
+} from "@axicharts/charts-theme";
+
+/** Tone colors and typography for annotations, resolved once per chart from the theme. */
+export type AnnotationStyle = {
+  toneColors: Record<SeriesTone, string>;
+  font: ResolvedThemeFont;
+};
+
+const DEFAULT_ANNOTATION_STYLE: AnnotationStyle = {
+  toneColors: SERIES_COLORS,
+  font: resolveThemeFont(),
+};
+
+/** Annotation style for a theme: its tone tokens and font. */
+export function annotationStyle(theme?: Pick<ChartTheme, "tokens" | "font">): AnnotationStyle {
+  return { toneColors: resolveToneColors(theme), font: resolveThemeFont(theme) };
+}
+
+function annotationFont(style: AnnotationStyle, delta: number, weight?: number): string {
+  const size = Math.max(6, style.font.size + delta);
+  return `${weight ? `${weight} ` : ""}${size}px ${style.font.family}`;
+}
 import type {
   PlotLabelAnnotation,
   PlotMarkerAnnotation,
@@ -22,8 +50,9 @@ function drawBandLabel(
   x: number,
   y: number,
   toneColor: string,
+  style: AnnotationStyle = DEFAULT_ANNOTATION_STYLE,
 ): void {
-  ctx.font = "600 10px ui-sans-serif, system-ui, sans-serif";
+  ctx.font = annotationFont(style, -1, 600);
   const metrics = ctx.measureText(text);
   const padX = 5;
   const padY = 3;
@@ -42,6 +71,7 @@ function drawBandLabel(
   }
 
   ctx.fillStyle = contrastingTextColor(toneColor);
+  ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillText(text, labelX + padX, labelY + labelHeight / 2);
   ctx.textBaseline = "alphabetic";
@@ -75,12 +105,20 @@ export function expandYRange(
   return [min - pad, max + pad];
 }
 
-export function drawThresholdBands(u: uPlot, bands: ThresholdBand[]): void {
+export function drawThresholdBands(
+  u: uPlot,
+  bands: ThresholdBand[],
+  style: AnnotationStyle = DEFAULT_ANNOTATION_STYLE,
+): void {
   if (bands.length === 0) return;
 
   const ctx = u.ctx;
-  const left = u.bbox.left;
-  const width = u.bbox.width;
+  const { left, top, width, height } = u.bbox;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(left, top, width, height);
+  ctx.clip();
 
   for (const band of bands) {
     const low = Math.min(band.min, band.max);
@@ -88,7 +126,7 @@ export function drawThresholdBands(u: uPlot, bands: ThresholdBand[]): void {
     const yTop = u.valToPos(high, "y", true);
     const yBottom = u.valToPos(low, "y", true);
     const tone = band.tone ?? "warning";
-    const color = SERIES_COLORS[tone];
+    const color = style.toneColors[tone];
 
     ctx.save();
     ctx.fillStyle = withAlpha(color, 0.14);
@@ -103,15 +141,18 @@ export function drawThresholdBands(u: uPlot, bands: ThresholdBand[]): void {
         bandHeight >= 22
           ? yTop + bandHeight / 2
           : Math.min(yBottom - 4, yTop + 14);
-      drawBandLabel(ctx, band.label, left + 6, labelY, color);
+      drawBandLabel(ctx, band.label, left + 6, labelY, color, style);
     }
     ctx.restore();
   }
+
+  ctx.restore();
 }
 
 export function drawReferenceLines(
   u: uPlot,
   referenceLines: ReferenceLine[],
+  style: AnnotationStyle = DEFAULT_ANNOTATION_STYLE,
 ): void {
   if (referenceLines.length === 0) return;
 
@@ -120,7 +161,7 @@ export function drawReferenceLines(
   for (const line of referenceLines) {
     const y = u.valToPos(line.value, "y", true);
     const tone = line.tone ?? "warning";
-    const stroke = SERIES_COLORS[tone];
+    const stroke = style.toneColors[tone];
 
     ctx.save();
     ctx.strokeStyle = stroke;
@@ -134,7 +175,7 @@ export function drawReferenceLines(
 
     if (line.label) {
       ctx.fillStyle = stroke;
-      ctx.font = "11px ui-sans-serif, system-ui, sans-serif";
+      ctx.font = annotationFont(style, 0);
       const textWidth = ctx.measureText(line.label).width;
       ctx.fillText(
         line.label,
@@ -150,6 +191,7 @@ export function drawVerticalLines(
   u: uPlot,
   verticalLines: PlotVerticalLine[],
   categories: string[],
+  style: AnnotationStyle = DEFAULT_ANNOTATION_STYLE,
 ): void {
   if (verticalLines.length === 0) return;
 
@@ -161,7 +203,7 @@ export function drawVerticalLines(
 
     const x = u.valToPos(index, "x", true);
     const tone = line.tone ?? "info";
-    const stroke = SERIES_COLORS[tone];
+    const stroke = style.toneColors[tone];
 
     ctx.save();
     ctx.strokeStyle = stroke;
@@ -175,7 +217,7 @@ export function drawVerticalLines(
 
     if (line.label) {
       ctx.fillStyle = stroke;
-      ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
+      ctx.font = annotationFont(style, -1);
       ctx.fillText(line.label, x + 4, u.bbox.top + 12);
     }
     ctx.restore();
@@ -204,6 +246,7 @@ export function drawPlotLabels(
   u: uPlot,
   labels: PlotLabelAnnotation[],
   categories: string[],
+  style: AnnotationStyle = DEFAULT_ANNOTATION_STYLE,
 ): void {
   if (labels.length === 0) return;
 
@@ -217,12 +260,12 @@ export function drawPlotLabels(
         : u.bbox.left + u.bbox.width / 2;
     const y = u.valToPos(label.y, "y", true);
     const tone = label.tone ?? "default";
-    const color = SERIES_COLORS[tone];
+    const color = style.toneColors[tone];
     const { dx, dy, align } = labelOffset(label.position);
 
     ctx.save();
     ctx.fillStyle = color;
-    ctx.font = "11px ui-sans-serif, system-ui, sans-serif";
+    ctx.font = annotationFont(style, 0);
     ctx.textAlign = align;
     ctx.fillText(label.text, x + dx, y + dy);
     ctx.restore();
@@ -233,6 +276,7 @@ export function drawPlotMarkers(
   u: uPlot,
   markers: PlotMarkerAnnotation[],
   categories: string[],
+  style: AnnotationStyle = DEFAULT_ANNOTATION_STYLE,
 ): void {
   const staticMarkers = markers.filter((marker) => !marker.draggable);
   if (staticMarkers.length === 0) return;
@@ -246,7 +290,7 @@ export function drawPlotMarkers(
     const x = u.valToPos(index, "x", true);
     const y = u.valToPos(marker.y, "y", true);
     const tone = marker.tone ?? "warning";
-    const color = SERIES_COLORS[tone];
+    const color = style.toneColors[tone];
 
     ctx.save();
     ctx.fillStyle = color;
@@ -259,7 +303,7 @@ export function drawPlotMarkers(
 
     if (marker.label) {
       ctx.fillStyle = color;
-      ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
+      ctx.font = annotationFont(style, -1);
       ctx.textAlign = "left";
       ctx.fillText(marker.label, x + 8, y + 4);
     }
@@ -267,17 +311,31 @@ export function drawPlotMarkers(
   }
 }
 
+/**
+ * Paints threshold bands behind the series. Register on uPlot's `drawAxes`
+ * hook, which fires after the grid and before any series are drawn; the
+ * `draw` hook fires after the series (and gets no series index).
+ */
+export function createBandDrawHook(
+  bands: ThresholdBand[],
+  style: AnnotationStyle = DEFAULT_ANNOTATION_STYLE,
+): (u: uPlot) => void {
+  return (u) => drawThresholdBands(u, bands, style);
+}
+
+/** Paints the foreground annotations. Register on uPlot's `draw` hook. */
 export function createAnnotationDrawHook({
-  bands,
   referenceLines,
   verticalLines = [],
   labels = [],
   markers = [],
   categories = [],
+  style = DEFAULT_ANNOTATION_STYLE,
   onDraw,
 }: {
-  bands: ThresholdBand[];
   referenceLines: ReferenceLine[];
+  /** Pass `annotationStyle(theme)` so brand tones and fonts reach annotations. */
+  style?: AnnotationStyle;
   verticalLines?: PlotVerticalLine[];
   labels?: PlotLabelAnnotation[];
   markers?: PlotMarkerAnnotation[];
@@ -285,16 +343,13 @@ export function createAnnotationDrawHook({
   onDraw?: (u: uPlot, seriesIdx: number) => void;
 }): (u: uPlot, seriesIdx?: number) => void {
   return (u, seriesIdx) => {
-    if (seriesIdx === 1) {
-      drawThresholdBands(u, bands);
-    }
     const onFinalPass =
       seriesIdx === undefined || seriesIdx === u.series.length - 1;
     if (onFinalPass) {
-      drawReferenceLines(u, referenceLines);
-      drawVerticalLines(u, verticalLines, categories);
-      drawPlotLabels(u, labels, categories);
-      drawPlotMarkers(u, markers, categories);
+      drawReferenceLines(u, referenceLines, style);
+      drawVerticalLines(u, verticalLines, categories, style);
+      drawPlotLabels(u, labels, categories, style);
+      drawPlotMarkers(u, markers, categories, style);
       onDraw?.(u, seriesIdx ?? u.series.length - 1);
     }
   };

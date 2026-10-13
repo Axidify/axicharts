@@ -1,5 +1,11 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
-import { resolveChartChrome, resolveHoverChrome, resolveToneColors } from "@axicharts/charts-theme";
+import {
+  isDarkTheme,
+  resolveChartChrome,
+  resolveThemeFont,
+  resolveHoverChrome,
+  resolveToneColors,
+} from "@axicharts/charts-theme";
 import { echartsColor } from "./echartsColor";
 
 export { toneColor, seriesPalette } from "./palette";
@@ -37,7 +43,7 @@ export function segmentItemStyle(theme: Pick<ChartTheme, "name">): {
   borderWidth: number;
   gapWidth?: number;
 } {
-  const dark = theme.name === "live" || theme.name === "industrial";
+  const dark = isDarkTheme(theme);
   if (dark) {
     return { borderColor: "#0f172a", borderWidth: 0.5, gapWidth: 1 };
   }
@@ -65,12 +71,12 @@ export function gridOptions(theme: ChartTheme, compact = false) {
 
 export function axisLabelStyle(theme: ChartTheme) {
   const chrome = resolveChartChrome(theme);
+  const font = resolveThemeFont(theme);
   return {
     color: echartsColor(chrome.axis),
-    fontSize: 11,
-    fontFamily: theme.values.monospace
-      ? "ui-monospace, SFMono-Regular, Menlo, monospace"
-      : "inherit",
+    fontSize: font.size,
+    // "inherit" is the historical default; a theme `font.family` opts into a brand font.
+    fontFamily: theme.values.monospace ? font.monoFamily : (theme.font?.family ?? "inherit"),
   };
 }
 

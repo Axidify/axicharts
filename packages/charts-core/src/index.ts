@@ -7,6 +7,14 @@ export {
   type BuiltinTickFormat,
 } from "./formatters";
 export {
+  applyYDomain,
+  niceTicks,
+  formatChartValue,
+  resolveValueFormat,
+  type ValueFormat,
+  type YDomain,
+} from "./valueFormat";
+export {
   downsampleIndicesLTTB,
   downsampleLTTB,
   type LttbPoint,

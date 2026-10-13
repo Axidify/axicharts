@@ -6,19 +6,45 @@ import { normalizeToCartesian } from "./normalizeToCartesian";
 import { normalizeToDistribution } from "./normalizeToDistribution";
 import { normalizeToMatrix } from "./normalizeToMatrix";
 import type { PanelSpec } from "./types";
-import { validateCartesianSpec } from "./cartesianValidation";
+import { detectLegacyOverlayProps, validateCartesianSpec } from "./cartesianValidation";
 import { validateDistributionSpec } from "./distributionValidation";
 import { validateMatrixSpec } from "./matrixValidation";
 import type { ValidatePanelOptions, ValidatePanelResult } from "./validatePanel";
+
+const LEGACY_SERIES_TYPES = new Set(["line", "bar", "area", "combo"]);
+
+/**
+ * Legacy `type: "line" | "bar" | "area" | "combo"` panels that carry chart-ready
+ * `props.categories` / `props.series` instead of row encoding. `compilePanel`
+ * renders them directly; they can't normalize to `marks[]` (no fields).
+ */
+function isLegacySeriesPropsPanel(spec: PanelSpec): boolean {
+  if (!LEGACY_SERIES_TYPES.has(spec.type)) return false;
+  const y = spec.encoding?.y;
+  const hasRowEncoding = Array.isArray(y) ? y.length > 0 : Boolean(y?.field);
+  return !hasRowEncoding && Array.isArray(spec.props?.series);
+}
 
 function cartesianValidate(
   spec: PanelSpec,
   options: ValidatePanelOptions,
 ): ValidatePanelResult {
   const family = "cartesian" as const;
+  const strict = options.strict ?? false;
+  if (isLegacySeriesPropsPanel(spec)) {
+    const issue = {
+      code: strict ? "LEGACY_PANEL_NOT_AGENT_SAFE" : "LEGACY_PANEL",
+      path: "props.series",
+      message: `Panel type "${spec.type}" with props.series is Tier-2 — renders, but is not agent grammar`,
+      suggestion: "Use type cartesian with encoding.x + marks[] over row data",
+      family,
+    };
+    return strict
+      ? { ok: false, family, errors: [{ ...issue, severity: "error" as const }] }
+      : { ok: true, family, spec, warnings: [{ ...issue, severity: "warning" as const }] };
+  }
   const normalized =
     spec.type === "cartesian" || spec.type === "blocks" ? spec : normalizeToCartesian(spec);
-  const strict = options.strict ?? false;
   const result = validateCartesianSpec(normalized, { ...options, strict });
   if (!result.ok) {
     return {
@@ -27,11 +53,15 @@ function cartesianValidate(
       errors: result.errors.map((issue) => ({ ...issue, family })),
     };
   }
+  const legacy = detectLegacyOverlayProps(spec);
   return {
     ok: true,
     family,
     spec: normalized,
-    warnings: result.warnings.map((issue) => ({ ...issue, family })),
+    warnings: [...(legacy ? [legacy] : []), ...result.warnings].map((issue) => ({
+      ...issue,
+      family,
+    })),
   };
 }
 

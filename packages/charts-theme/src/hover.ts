@@ -1,4 +1,5 @@
 import type { ChartTheme } from "./themes";
+import { isDarkTheme } from "./surface";
 
 export type ChartThemeHover = {
   /** Inactive mark opacity for region/item hover (map, geo, ECharts blur). */
@@ -33,8 +34,9 @@ export type PluginHoverPalette = {
   taskDimOpacity: number;
 };
 
+/** @deprecated Use `isDarkTheme(theme)` — name checks miss `createTheme` forks. */
 export function isDarkHoverSurface(themeName: string): boolean {
-  return themeName === "live" || themeName === "industrial";
+  return isDarkTheme({ name: themeName });
 }
 
 export function resolveHoverTokens(
@@ -44,10 +46,10 @@ export function resolveHoverTokens(
 }
 
 export function resolveHoverChrome(
-  theme: Pick<ChartTheme, "name" | "hover">,
+  theme: Pick<ChartTheme, "name" | "surface" | "hover">,
 ): HoverChrome {
   const tokens = resolveHoverTokens(theme);
-  const dark = isDarkHoverSurface(theme.name);
+  const dark = isDarkTheme(theme);
 
   if (dark) {
     return {

@@ -1,4 +1,5 @@
 import { useMemo, type CSSProperties, type ReactElement } from "react";
+import { useDefaultSurface } from "../container/useDefaultSurface";
 import type { StatSurface, StatTone } from "../stat/Stat";
 import { buildSingleValueA11yDescriptor } from "../a11y/singleValueDescriptor";
 import { SingleValueChartA11yRoot } from "../a11y/SingleValueChartA11yRoot";
@@ -33,9 +34,11 @@ export function Digital({
   label,
   unit,
   tone = "neutral",
-  surface = "dark",
+  surface: surfaceProp,
   style,
 }: DigitalProps): ReactElement {
+  const defaultSurface = useDefaultSurface();
+  const surface = surfaceProp ?? defaultSurface;
   const layout = useOptionalChartLayout();
   const width = layout?.ready ? layout.size.width : undefined;
   const height = layout?.ready ? layout.size.height : undefined;

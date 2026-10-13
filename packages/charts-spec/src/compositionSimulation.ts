@@ -1,6 +1,7 @@
 import { shouldUseDualAxis } from "@axicharts/charts-canvas";
 import type { ChartBlockMarkSpec, ChartBlockSeriesMark, PanelSpec } from "./types";
 import { blockMarksToChartProps, marksCurve, marksNeedFill } from "./blockMarks";
+import { OVERLAY_MARK_TYPES } from "./cartesianMarks";
 import { compilePanel } from "./compilePanel";
 import {
   CartesianSpecValidationError,
@@ -107,7 +108,7 @@ function evaluate(
   if (
     props.series.length === 0 &&
     marks.length > 0 &&
-    marks.every((m) => m.type === "rule" || m.type === "band") &&
+    marks.every((m) => OVERLAY_MARK_TYPES.has(m.type)) &&
     validation.ok
   ) {
     outcome = "silent_bad";
@@ -120,10 +121,14 @@ function evaluate(
   }
 
   const unknownTypes = marks.filter(
-    (m) => !["bar", "line", "area", "rule", "band"].includes(m.type),
+    (m) => !["bar", "line", "area"].includes(m.type) && !OVERLAY_MARK_TYPES.has(m.type),
   );
   if (unknownTypes.length > 0 && validation.ok) {
-    const recognized = props.series.length + props.referenceLines.length + props.thresholdBands.length;
+    const recognized =
+      props.series.length +
+      props.referenceLines.length +
+      props.thresholdBands.length +
+      props.annotations.length;
     if (recognized < marks.length) {
       outcome = "ignored";
       notes.push(`unknown mark type(s) silently skipped: ${unknownTypes.map((m) => m.type).join(", ")}`);

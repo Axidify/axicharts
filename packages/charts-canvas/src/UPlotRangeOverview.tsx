@@ -54,7 +54,7 @@ function buildOptions(
   onRangeChange: (range: BrushRangePercent) => void,
   applyingRangeRef: React.MutableRefObject<boolean>,
 ): uPlot.Options {
-  const dark = isDarkChartTheme(theme.name);
+  const dark = isDarkChartTheme(theme);
 
   return {
     width,
@@ -124,7 +124,7 @@ export function UPlotRangeOverview({
 
   const total = categories.length;
   const data = useMemo(() => buildData(categories, series), [categories, series]);
-  const dark = isDarkChartTheme(theme.name);
+  const dark = isDarkChartTheme(theme);
 
   const options = useMemo(
     () =>

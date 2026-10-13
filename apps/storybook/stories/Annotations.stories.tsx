@@ -144,6 +144,31 @@ function SpecCompileDemo(): ReactElement {
   );
 }
 
+/** E-103 — canonical spec path: every overlay as a cartesian mark @ 360×280. */
+function SpecMarksDemo(): ReactElement {
+  return (
+    <div style={{ width: 360 }}>
+      {compilePanel(
+        {
+          type: "cartesian",
+          theme: "clean",
+          height: 280,
+          encoding: { x: { field: "hour" } },
+          marks: [
+            { type: "line", field: "temp", label: "Reactor temp", tone: "info" },
+            { type: "band", min: 75, max: 85, label: "Warning band", tone: "warning" },
+            { type: "rule", value: 75, label: "High limit", tone: "warning" },
+            { type: "rule", value: 0, orientation: "vertical", x: "10:00", label: "Shift change" },
+            { type: "text", text: "Nominal", x: "08:00", y: 68, position: "top", tone: "success" },
+            { type: "marker", x: "14:00", y: 88, label: "Peak incident", tone: "critical", id: "peak" },
+          ],
+        },
+        ROWS,
+      )}
+    </div>
+  );
+}
+
 const meta = {
   title: "Charts/Annotations",
   component: OpsFinanceWallDemo,
@@ -170,6 +195,12 @@ export const ComposableMarks: Story = {
   render: () => <ComposableAnnotationsDemo />,
 };
 
+/** Legacy `annotations` on `type: "line"` — normalizes to marks[] and logs LEGACY_OVERLAY_PROPS. */
 export const SpecCompile: Story = {
   render: () => <SpecCompileDemo />,
+};
+
+/** E-103 — spec-path cartesian overlays (rule, band, text, marker) @ 360×280. */
+export const SpecMarks: Story = {
+  render: () => <SpecMarksDemo />,
 };

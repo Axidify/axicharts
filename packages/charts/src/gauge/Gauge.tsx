@@ -1,4 +1,5 @@
 import { useMemo, type ReactElement } from "react";
+import { useDefaultSurface } from "../container/useDefaultSurface";
 import type { StatTone, StatSurface } from "../stat/Stat";
 import { buildSingleValueA11yDescriptor } from "../a11y/singleValueDescriptor";
 import { SingleValueChartA11yRoot } from "../a11y/SingleValueChartA11yRoot";
@@ -78,9 +79,10 @@ export function Gauge({
   criticalAt,
 }: GaugeProps): ReactElement {
   const layout = useOptionalChartLayout();
+  const defaultSurface = useDefaultSurface();
   const presentation = layout?.mode === "presentation";
   const surface: StatSurface =
-    surfaceProp ?? (presentation ? "light" : "dark");
+    surfaceProp ?? (presentation ? "light" : defaultSurface);
   const animatedValue = usePresentationNumericCountUp(value, presentation);
   const resolvedTone =
     tone ??

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement } from "react";
+import type { ValueFormat, YDomain } from "@axicharts/charts-core";
 import { useMemo } from "react";
 import {
   UPlotCombo,
@@ -46,6 +47,12 @@ export type ComboChartProps = {
   showAxes?: boolean;
   showValues?: boolean;
   valueSuffix?: string;
+  /** Format for value-axis ticks, tooltips and value labels (built-in id or function). */
+  valueFormat?: ValueFormat;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
+  yDomain?: YDomain;
+  /** Approximate number of value-axis ticks (placed at round values). */
+  yTickCount?: number;
   curve?: LineCurve;
   dualAxis?: DualAxisMode;
   stacked?: boolean;
@@ -69,6 +76,9 @@ function ComboPlot({
   showAxes,
   showValues,
   valueSuffix,
+  valueFormat,
+  yDomain,
+  yTickCount,
   curve,
   dualAxis,
   stacked,
@@ -112,6 +122,9 @@ function ComboPlot({
       showAxes={showAxes}
       showValues={showValues}
       valueSuffix={valueSuffix}
+      valueFormat={valueFormat}
+      yDomain={yDomain}
+      yTickCount={yTickCount}
       dualAxis={dualAxis}
       stacked={stacked}
       referenceLines={referenceLines}
@@ -160,6 +173,9 @@ export function ComboChart({
   showAxes,
   showValues = false,
   valueSuffix,
+  valueFormat,
+  yDomain,
+  yTickCount,
   curve,
   dualAxis = "auto",
   stacked = false,
@@ -251,6 +267,7 @@ export function ComboChart({
         categories={prepared.categories}
         series={prepared.series}
         valueSuffix={valueSuffix}
+        valueFormat={valueFormat}
         compact={compact}
         plotMotionStyle={plotMotionStyle}
         plotKey={motion.plotKey}
@@ -263,6 +280,9 @@ export function ComboChart({
             showAxes={axes}
             showValues={showValues}
             valueSuffix={valueSuffix}
+            valueFormat={valueFormat}
+            yDomain={yDomain}
+            yTickCount={yTickCount}
             curve={curve}
             dualAxis={dualAxis}
             stacked={stacked}

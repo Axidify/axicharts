@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { themeFont } from "@axicharts/charts-theme";
 import type { ReactElement } from "react";
 import uPlot from "uplot";
+import { applyValueAxisOptions } from "./valueAxis";
 import "uplot/dist/uPlot.min.css";
 import {
   CANVAS_BG,
@@ -14,7 +16,9 @@ import type { UPlotLineProps } from "./types";
 import { shouldUseDualAxis } from "./dualAxis";
 import { applySyncedCursor } from "./plotCursor";
 import {
+  annotationStyle,
   createAnnotationDrawHook,
+  createBandDrawHook,
   expandYRange,
 } from "./plotAnnotations";
 import { resolveAnnotationPlotProps } from "./annotations";
@@ -35,7 +39,19 @@ import {
   categoryXScale,
 } from "./categoricalScale";
 
-function buildOptions({
+/** Builds options, then applies `valueFormat` / `yDomain` / `yTickCount` (see valueAxis.ts). */
+export function buildLineOptions(
+  props: Parameters<typeof buildLineOptionsBase>[0],
+): ReturnType<typeof buildLineOptionsBase> {
+  return applyValueAxisOptions(buildLineOptionsBase(props), {
+    valueFormat: props.valueFormat,
+    yDomain: props.yDomain,
+    yTickCount: props.yTickCount,
+    compact: props.height < 72,
+  }) as ReturnType<typeof buildLineOptionsBase>;
+}
+
+function buildLineOptionsBase({
   width,
   height,
   categories,
@@ -72,6 +88,7 @@ function buildOptions({
   });
 
   const compact = height < 72;
+  const plotStyle = annotationStyle(theme);
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme, compact);
   const gridWidth = compact ? 1 : theme.grid.strokeWidth;
@@ -185,7 +202,7 @@ function buildOptions({
             values: axisCategoryValues(categories, compact ? undefined : width),
             gap: 8,
             size: compact ? 0 : categoryAxisSize(),
-            font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+            font: themeFont(theme),
           },
           {
             scale: "y",
@@ -196,8 +213,8 @@ function buildOptions({
             ticks: { show: false },
             size: compact ? 0 : 32,
             font: theme.values.monospace
-              ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-              : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+              ? themeFont(theme, { mono: true })
+              : themeFont(theme),
           },
           ...(useDualAxis
             ? [
@@ -209,8 +226,8 @@ function buildOptions({
                   ticks: { show: false },
                   size: 32,
                   font: theme.values.monospace
-                    ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-                    : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+                    ? themeFont(theme, { mono: true })
+                    : themeFont(theme),
                 },
               ]
             : []),
@@ -271,9 +288,10 @@ function buildOptions({
       segmentedDraw ||
       variablePointDraw
         ? {
+            drawAxes: [createBandDrawHook(thresholdBandsResolved, plotStyle)],
             draw: [
               createAnnotationDrawHook({
-                bands: thresholdBandsResolved,
+                style: plotStyle,
                 referenceLines: referenceLinesResolved,
                 verticalLines,
                 labels: plotLabels,
@@ -326,7 +344,7 @@ export function UPlotLine(props: UPlotLineProps): ReactElement {
   onSyncIndexRef.current = onSyncIndex;
 
   const options = useMemo(() => {
-    const base = buildOptions(props);
+    const base = buildLineOptions(props);
     if (!showCursor && !onSyncIndexRef.current) {
       return base;
     }

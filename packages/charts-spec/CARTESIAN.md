@@ -9,7 +9,7 @@
 Cartesian chart = shell + marks[]
 
 encoding.x  →  shared category/time axis (all rows)
-marks[]     →  data marks (bar, line, area) + overlays (rule, band)
+marks[]     →  data marks (bar, line, area, point) + overlays (rule, band, text, marker)
 compiler    →  SVG (static) or uPlot (live) — authors don't pick
 ```
 
@@ -42,8 +42,13 @@ Example fixture: [examples/cartesian-revenue-target.panel.json](./examples/carte
 | `bar` | Data | `field` |
 | `line` | Data | `field` |
 | `area` | Data | `field` |
-| `rule` | Overlay (reference line) | `value` |
+| `point` | Data | `field` |
+| `rule` | Overlay (reference line; `orientation: "vertical"` + `x` for a category marker line) | `value` |
 | `band` | Overlay (threshold zone) | `min`, `max` |
+| `text` | Overlay (free text at `y`, optional `x` / `position`) | `text`, `y` |
+| `marker` | Overlay (point marker at `y`, optional `x` / `draggable`) | `y` |
+
+Overlays accept an optional `id`. `marks[]` is the single annotation surface — vertical rules, `text` and `marker` compile to the chart `annotations` prop under the hood, and `ejectPanel` emits them as that prop.
 
 JSX uses `dataKey` as an alias for `field`. Legacy `type` on marks is accepted; canonical key is `mark`.
 
@@ -112,6 +117,7 @@ if (!result.ok) {
 | `INVALID_BAND_RANGE` | `band.min >= band.max` |
 | `UNKNOWN_MARK` | Mark not in v1 catalog |
 | `DUPLICATE_OVERLAY_CHANNEL` | Warning — `marks[]` + legacy `referenceLines` props |
+| `LEGACY_OVERLAY_PROPS` | Warning (non-blocking, even in strict) — `props.referenceLines`, `props.thresholdBands` or `annotations` used; removal planned for 0.6 |
 
 ## Normalization
 
@@ -120,7 +126,9 @@ if (!result.ok) {
 | `type: "line"` / `"bar"` / `"area"` | `cartesian` + one data mark |
 | `type: "combo"` | `cartesian` + marks from `encoding.y[]` |
 | `type: "blocks"` | `cartesian` (deprecated alias) |
-| `props.referenceLines` | `rule` marks |
+| `props.referenceLines` *(deprecated)* | `rule` marks |
+| `props.thresholdBands` *(deprecated)* | `band` marks |
+| `annotations` / `props.annotations` *(deprecated)* | `line` → `rule`, `band` → `band`, `label` → `text`, `marker` → `marker` (keeps `x`, `id`, `tone`) |
 
 ## Composition rules (summary)
 

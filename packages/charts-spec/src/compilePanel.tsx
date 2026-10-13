@@ -70,6 +70,7 @@ import { normalizeToMatrix } from "./normalizeToMatrix";
 import { normalizeDistributionMarks } from "./distributionMarks";
 import {
   CartesianSpecValidationError,
+  detectLegacyOverlayProps,
   validateCartesianSpec,
 } from "./cartesianValidation";
 import { validateDistributionSpec } from "./distributionValidation";
@@ -267,6 +268,29 @@ function objectDataFromSpec(data: SpecData): Record<string, unknown> {
   return {};
 }
 
+/** Panel `valueFormat` / `yDomain` / `yTickCount` → cartesian chart props (only when set). */
+function valueAxisSpecProps(spec: PanelSpec): {
+  valueFormat?: string;
+  yDomain?: [number | "auto", number | "auto"];
+  yTickCount?: number;
+} {
+  return {
+    ...(spec.valueFormat ? { valueFormat: spec.valueFormat } : {}),
+    ...(spec.yDomain ? { yDomain: spec.yDomain } : {}),
+    ...(spec.yTickCount ? { yTickCount: spec.yTickCount } : {}),
+  };
+}
+
+const warnedLegacyOverlay = new WeakSet<PanelSpec>();
+
+function warnLegacyOverlayProps(spec: PanelSpec): void {
+  if (process.env.NODE_ENV === "production" || warnedLegacyOverlay.has(spec)) return;
+  const issue = detectLegacyOverlayProps(spec);
+  if (!issue) return;
+  warnedLegacyOverlay.add(spec);
+  console.warn(`[axicharts] ${issue.code}: ${issue.message}`);
+}
+
 /** First-party plugin panel types → package that registers them. */
 const PLUGIN_PANEL_PACKAGES: Record<string, string> = {
   sankey: "@axicharts/charts-sankey",
@@ -348,6 +372,7 @@ export function compilePanel(
     case "area":
     case "bar":
     case "combo": {
+      warnLegacyOverlayProps(resolved);
       if (hasCartesianRowEncoding(resolved)) {
         return compilePanel(normalizeToCartesian(resolved), data, options);
       }
@@ -370,6 +395,7 @@ export function compilePanel(
           series: applyTagTonesToSeries(baseSeries, tagTones) as ComboSeries[],
           fill: resolved.fill,
           valueSuffix: resolved.valueSuffix,
+          ...valueAxisSpecProps(resolved),
           animate: readPanelAnimation(resolved),
           ...(resolved.fill ? { renderer: "canvas" as const } : {}),
           ...(panelLiveAnimate != null ? { liveAnimate: panelLiveAnimate } : {}),
@@ -439,6 +465,7 @@ export function compilePanel(
         fill: resolved.fill,
         stacked: resolved.stacked,
         valueSuffix: resolved.valueSuffix,
+        ...valueAxisSpecProps(resolved),
         animate: readPanelAnimation(resolved),
         ...panelOrientationProps(resolved),
         ...(resolved.fill ? { renderer: "canvas" as const } : {}),
@@ -463,6 +490,7 @@ export function compilePanel(
         );
       }
 
+      warnLegacyOverlayProps(resolved);
       const cartesian = normalizeToCartesian(resolved);
       if (rows.length === 0) {
         return compileCartesianLoadingShell(resolved, options, tagTones);
@@ -506,6 +534,7 @@ export function compilePanel(
         series: applyTagTonesToSeries(seriesWithColor, tagTones) as ComboSeries[],
         fill: cartesian.fill ?? fromMarks.fill,
         valueSuffix: cartesian.valueSuffix,
+        ...valueAxisSpecProps(cartesian),
         ...(fromMarks.showValues || cartesian.showValues
           ? { showValues: true }
           : {}),
@@ -525,6 +554,9 @@ export function compilePanel(
           ...((props.thresholdBands as typeof fromMarks.thresholdBands | undefined) ??
             []),
         ],
+        ...(fromMarks.annotations.length > 0
+          ? { annotations: fromMarks.annotations }
+          : {}),
         ...(curve ? { curve } : {}),
         animate: readPanelAnimation(cartesian),
         ...panelOrientationProps(cartesian),

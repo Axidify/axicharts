@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { themeFont } from "@axicharts/charts-theme";
 import type { ReactElement, MutableRefObject } from "react";
 import uPlot from "uplot";
+import { formatChartValue } from "@axicharts/charts-core";
+import { applyValueAxisOptions } from "./valueAxis";
 import "uplot/dist/uPlot.min.css";
 import {
   CANVAS_BG,
@@ -13,7 +16,9 @@ import {
 import type { ComboSeries, UPlotComboProps } from "./types";
 import { applySyncedCursor } from "./plotCursor";
 import {
+  annotationStyle,
   createAnnotationDrawHook,
+  createBandDrawHook,
   expandYRange,
 } from "./plotAnnotations";
 import { resolveAnnotationPlotProps } from "./annotations";
@@ -44,13 +49,20 @@ type BarLayout = {
   fill: string;
 };
 
-function formatValue(value: number, suffix = ""): string {
-  const rounded =
-    Math.abs(value) >= 100 ? value.toFixed(0) : value.toFixed(1);
-  return `${rounded}${suffix}`;
+
+/** Builds options, then applies `valueFormat` / `yDomain` / `yTickCount` (see valueAxis.ts). */
+export function buildComboOptions(
+  props: Parameters<typeof buildComboOptionsBase>[0],
+): ReturnType<typeof buildComboOptionsBase> {
+  return applyValueAxisOptions(buildComboOptionsBase(props), {
+    valueFormat: props.valueFormat,
+    yDomain: props.yDomain,
+    yTickCount: props.yTickCount,
+    compact: props.height < 72,
+  }) as ReturnType<typeof buildComboOptionsBase>;
 }
 
-export function buildComboOptions(
+function buildComboOptionsBase(
   props: UPlotComboProps & {
     barLayoutsRef: MutableRefObject<BarLayout[]>;
     stackTotalsRef: MutableRefObject<Map<number, StackBarTotal>>;
@@ -67,6 +79,7 @@ export function buildComboOptions(
     showAxes = true,
     showValues = false,
     valueSuffix = "",
+    valueFormat,
     dualAxis = "auto",
     stacked = false,
     referenceLines = [],
@@ -98,7 +111,10 @@ export function buildComboOptions(
   });
 
   const chrome = resolveChromeColors(theme);
+  const formatLabel = (value: number, suffix = ""): string =>
+    formatChartValue(value, { format: valueFormat, suffix });
   const compact = height < 72;
+  const plotStyle = annotationStyle(theme);
   const gridStroke = chromeGridStroke(theme, compact);
   const gapPx = ordinalBarGapPx(categories.length, theme.bar.gap);
   const fillOpacity = theme.area.fillOpacity;
@@ -186,7 +202,7 @@ export function buildComboOptions(
             ticks: { show: false },
             values: axisCategoryValues(categories, compact ? undefined : width),
             size: compact ? 0 : categoryAxisSize(),
-            font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+            font: themeFont(theme),
             gap: 8,
           },
           {
@@ -197,8 +213,8 @@ export function buildComboOptions(
             ticks: { show: false },
             size: compact ? 0 : 32,
             font: theme.values.monospace
-              ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-              : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+              ? themeFont(theme, { mono: true })
+              : themeFont(theme),
             gap: 4,
           },
           ...(useDualAxis
@@ -211,8 +227,8 @@ export function buildComboOptions(
                   ticks: { show: false },
                   size: compact ? 0 : 32,
                   font: theme.values.monospace
-                    ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-                    : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+                    ? themeFont(theme, { mono: true })
+                    : themeFont(theme),
                   gap: 4,
                 },
               ]
@@ -300,9 +316,10 @@ export function buildComboOptions(
       }),
     ],
     hooks: {
+      drawAxes: [createBandDrawHook(thresholdBandsResolved, plotStyle)],
       draw: [
         createAnnotationDrawHook({
-          bands: thresholdBandsResolved,
+                style: plotStyle,
           referenceLines: referenceLinesResolved,
           verticalLines,
           labels: plotLabels,
@@ -315,13 +332,13 @@ export function buildComboOptions(
                   ctx.save();
                   ctx.fillStyle = chrome.axis;
                   ctx.font = theme.values.monospace
-                    ? "10px ui-monospace, SFMono-Regular, Menlo, monospace"
-                    : "10px ui-sans-serif, system-ui, -apple-system, sans-serif";
+                    ? themeFont(theme, { delta: -1, mono: true })
+                    : themeFont(theme, { delta: -1 });
                   ctx.textAlign = "center";
                   ctx.textBaseline = "bottom";
                   for (const layout of barLayoutsRef.current) {
                     ctx.fillText(
-                      formatValue(layout.value, valueSuffix),
+                      formatLabel(layout.value, valueSuffix),
                       layout.left + layout.width / 2,
                       layout.top - 4,
                     );
@@ -334,7 +351,9 @@ export function buildComboOptions(
                     stackTotalsRef.current,
                     valueSuffix,
                     chrome.axis,
-                    formatValue,
+                    formatLabel,
+                    "vertical",
+                    themeFont(theme, { delta: -1 }),
                   );
                 }
               }

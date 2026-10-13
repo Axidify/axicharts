@@ -1,5 +1,5 @@
 import type { ChartTheme } from "@axicharts/charts-theme";
-import { resolveChartChrome, sanitizeChromeToken } from "@axicharts/charts-theme";
+import { isDarkTheme, resolveChartChrome, sanitizeChromeToken } from "@axicharts/charts-theme";
 import type { SeriesTone } from "./types";
 
 /** shadcn-inspired series palette — modern, saturated but not harsh */
@@ -35,8 +35,9 @@ const DARK_CHROME: ChromeColors = {
   axis: "#94a3b8",
 };
 
-export function isDarkChartTheme(themeName: string): boolean {
-  return themeName === "live" || themeName === "industrial";
+/** Dark-surface check; pass the theme (not just its name) so `theme.surface` is honored. */
+export function isDarkChartTheme(theme: string | Pick<ChartTheme, "name" | "surface">): boolean {
+  return isDarkTheme(typeof theme === "string" ? { name: theme } : theme);
 }
 
 export function resolveChromeColors(
@@ -50,7 +51,7 @@ export function resolveChromeColors(
     };
   }
 
-  return isDarkChartTheme(theme.name) ? DARK_CHROME : LIGHT_CHROME;
+  return isDarkChartTheme(theme) ? DARK_CHROME : LIGHT_CHROME;
 }
 
 export function chromeGridStroke(
@@ -143,6 +144,15 @@ export function withAlpha(color: string, alpha: number): string {
 
   if (color.startsWith("rgba(")) {
     return color.replace(/,\s*[\d.]+\)$/, `, ${alpha})`);
+  }
+
+  // shadcn tokens resolve to hsl(); without this, tone fills fell back to blue.
+  const hsl = color.trim().match(/^hsla?\(([^)]*)\)$/i);
+  if (hsl?.[1]) {
+    const inner = hsl[1].split("/")[0]!.trim();
+    return inner.includes(",")
+      ? `hsla(${inner.split(",").slice(0, 3).join(",")}, ${alpha})`
+      : `hsl(${inner} / ${alpha})`;
   }
 
   return `rgba(37, 99, 235, ${alpha})`;
