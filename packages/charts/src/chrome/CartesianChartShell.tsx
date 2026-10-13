@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type CSSProperties, type ReactElement, type ReactNode } from "react";
+import type { ValueFormat } from "@axicharts/charts-core";
 import type { PlotSeries } from "@axicharts/charts-canvas";
 import { useChartLayout } from "../container/ChartLayoutContext";
 import {
@@ -23,6 +24,7 @@ export type CartesianChromeProps = {
   categories: string[];
   series?: PlotSeries[];
   valueSuffix?: string;
+  valueFormat?: ValueFormat;
   compact?: boolean;
   getRows?: (index: number) => TooltipRow[] | null;
   plot: ReactNode;
@@ -36,6 +38,7 @@ function CartesianChromeInner({
   categories,
   series = [],
   valueSuffix,
+  valueFormat,
   compact = false,
   getRows,
   plot,
@@ -99,6 +102,7 @@ function CartesianChromeInner({
               categories={categories}
               series={series}
               valueSuffix={valueSuffix}
+              valueFormat={valueFormat}
               getRows={getRows}
             />
           ) : null}

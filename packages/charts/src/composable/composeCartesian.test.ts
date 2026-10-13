@@ -33,7 +33,8 @@ describe("composeCartesianMarks", () => {
       data: [120, 132, 101],
     });
     expect(composed.series[1]?.tone).toBe("warning");
-    expect(composed.valueSuffix).toBe(" USD");
+    // <YAxis tickFormat="currency"> now formats values (was a " USD" suffix).
+    expect(composed.valueFormat).toBe("currency");
   });
 
   it("collects only bar marks for bar charts", () => {

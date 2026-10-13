@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement, ReactNode } from "react";
+import type { ValueFormat, YDomain } from "@axicharts/charts-core";
 import { useMemo } from "react";
 import {
   UPlotCombo,
@@ -52,6 +53,12 @@ export type CartesianChartProps = {
   showAxes?: boolean;
   showValues?: boolean;
   valueSuffix?: string;
+  /** Format for value-axis ticks, tooltips and value labels (built-in id or function). */
+  valueFormat?: ValueFormat;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
+  yDomain?: YDomain;
+  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  yTickCount?: number;
   curve?: LineCurve;
   dualAxis?: DualAxisMode;
   stacked?: boolean;
@@ -73,6 +80,12 @@ type CartesianPlotProps = {
   showAxes?: boolean;
   showValues?: boolean;
   valueSuffix?: string;
+  /** Format for value-axis ticks, tooltips and value labels (built-in id or function). */
+  valueFormat?: ValueFormat;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
+  yDomain?: YDomain;
+  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  yTickCount?: number;
   curve?: LineCurve;
   dualAxis?: DualAxisMode;
   stacked?: boolean;
@@ -92,6 +105,9 @@ function CartesianPlot({
   showAxes,
   showValues,
   valueSuffix,
+  valueFormat,
+  yDomain,
+  yTickCount,
   curve,
   dualAxis,
   stacked,
@@ -130,6 +146,9 @@ function CartesianPlot({
         showAxes={showAxes}
         showValues={showValues}
         valueSuffix={valueSuffix}
+        valueFormat={valueFormat}
+        yDomain={yDomain}
+        yTickCount={yTickCount}
         dualAxis={dualAxis}
         stacked={stacked}
         referenceLines={referenceLines}
@@ -194,6 +213,9 @@ export function CartesianChart({
   showAxes,
   showValues = false,
   valueSuffix: valueSuffixProp,
+  valueFormat: valueFormatProp,
+  yDomain,
+  yTickCount,
   curve: curveProp,
   dualAxis = "auto",
   stacked = false,
@@ -226,7 +248,8 @@ export function CartesianChart({
 
   const categories = composed?.categories ?? categoriesProp ?? [];
   const resolvedSeries = composed?.series ?? seriesProp ?? [];
-  const valueSuffix = valueSuffixProp ?? composed?.valueSuffix;
+  const valueSuffix = valueSuffixProp;
+  const valueFormat = valueFormatProp ?? composed?.valueFormat;
   const curve = curveProp ?? composed?.curve;
 
   const series = useMemo(() => {
@@ -305,6 +328,7 @@ export function CartesianChart({
         categories={prepared.categories}
         series={prepared.series}
         valueSuffix={valueSuffix}
+        valueFormat={valueFormat}
         compact={compact}
         plotMotionStyle={plotMotionStyle}
         plotKey={motion.plotKey}
@@ -317,6 +341,9 @@ export function CartesianChart({
             showAxes={axes}
             showValues={showValues}
             valueSuffix={valueSuffix}
+            valueFormat={valueFormat}
+            yDomain={yDomain}
+            yTickCount={yTickCount}
             curve={curve}
             dualAxis={dualAxis}
             stacked={stacked}

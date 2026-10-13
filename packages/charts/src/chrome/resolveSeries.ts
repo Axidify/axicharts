@@ -1,4 +1,5 @@
 import type { PlotSeries } from "@axicharts/charts-canvas";
+import { formatChartValue } from "@axicharts/charts-core";
 import { resolveSeriesColor as resolveCanvasSeriesColor } from "@axicharts/charts-canvas";
 import type { ChartConfig } from "../container/ChartLayoutContext";
 import { configLookupKey } from "../config/applyChartConfig";
@@ -26,7 +27,5 @@ export function resolveSeriesLabel(
 }
 
 export function formatSeriesValue(value: number, suffix = ""): string {
-  const rounded =
-    Math.abs(value) >= 100 ? value.toFixed(0) : value.toFixed(1);
-  return `${rounded}${suffix}`;
+  return formatChartValue(value, { suffix });
 }

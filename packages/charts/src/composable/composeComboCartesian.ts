@@ -1,4 +1,5 @@
 import { Children, isValidElement, type ReactNode } from "react";
+import type { ValueFormat } from "@axicharts/charts-core";
 import type { ComboSeries } from "@axicharts/charts-canvas";
 import { resolveSeriesColor } from "@axicharts/charts-canvas";
 import type { ChartConfig } from "../container/ChartLayoutContext";
@@ -33,7 +34,7 @@ export function composeComboCartesianMarks(
   config: ChartConfig | undefined,
 ): ComposedComboCartesian {
   let xKey = "date";
-  let valueSuffix: string | undefined;
+  let valueFormat: ValueFormat | undefined;
   let curve: ComposedCartesian["curve"];
   const series: ComboSeries[] = [];
   const cellBindings: MarkCellBinding[] = [];
@@ -52,13 +53,8 @@ export function composeComboCartesianMarks(
         break;
       case "yAxis": {
         const tickFormat = props.tickFormat ?? props.format;
-        if (typeof tickFormat === "string") {
-          const Y_AXIS_SUFFIX: Partial<Record<string, string>> = {
-            currency: " USD",
-            percent: "%",
-            bps: " bps",
-          };
-          valueSuffix = Y_AXIS_SUFFIX[tickFormat];
+        if (typeof tickFormat === "string" || typeof tickFormat === "function") {
+          valueFormat = tickFormat as ValueFormat;
         }
         break;
       }
@@ -129,5 +125,5 @@ export function composeComboCartesianMarks(
     };
   });
 
-  return { categories, series: withCellStyles, valueSuffix, curve };
+  return { categories, series: withCellStyles, valueFormat, curve };
 }

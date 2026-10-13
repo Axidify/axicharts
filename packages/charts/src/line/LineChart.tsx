@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement, ReactNode } from "react";
+import type { ValueFormat, YDomain } from "@axicharts/charts-core";
 import { useMemo } from "react";
 import {
   UPlotLine,
@@ -64,6 +65,12 @@ export type LineChartProps<TMeta = unknown> = CartesianPointerChartProps<TMeta> 
   fill?: boolean;
   showAxes?: boolean;
   valueSuffix?: string;
+  /** Format for value-axis ticks, tooltips and value labels (built-in id or function). */
+  valueFormat?: ValueFormat;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
+  yDomain?: YDomain;
+  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  yTickCount?: number;
   dualAxis?: boolean | "auto";
   stacked?: boolean;
   renderer?: RendererPreference;
@@ -88,6 +95,12 @@ type LinePlotProps = {
   fill?: boolean;
   showAxes?: boolean;
   valueSuffix?: string;
+  /** Format for value-axis ticks, tooltips and value labels (built-in id or function). */
+  valueFormat?: ValueFormat;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side (e.g. `[0, "auto"]`). */
+  yDomain?: YDomain;
+  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  yTickCount?: number;
   dualAxis?: boolean | "auto";
   stacked?: boolean;
   curve?: LineCurve;
@@ -119,6 +132,9 @@ function LinePlot({
   fill,
   showAxes,
   valueSuffix,
+  valueFormat,
+  yDomain,
+  yTickCount,
   dualAxis,
   compact,
   stacked,
@@ -169,7 +185,7 @@ function LinePlot({
           theme={theme}
           fill={fill}
           showAxes={showAxes}
-          stacked={stacked}
+          stacked={stacked}          yDomain={yDomain}
           seriesEnterDelayMs={seriesEnterDelayMs}
         />
       ) : (
@@ -183,6 +199,9 @@ function LinePlot({
           fill={fill}
           showAxes={showAxes}
           valueSuffix={valueSuffix}
+          valueFormat={valueFormat}
+          yDomain={yDomain}
+          yTickCount={yTickCount}
           dualAxis={stacked ? false : dualAxis}
           stacked={stacked}
           thresholdBands={thresholdBands}
@@ -254,6 +273,9 @@ export function LineChart({
   fill = false,
   showAxes,
   valueSuffix: valueSuffixProp,
+  valueFormat: valueFormatProp,
+  yDomain,
+  yTickCount,
   dualAxis = "auto",
   stacked = false,
   renderer = "auto",
@@ -287,13 +309,20 @@ export function LineChart({
     brushEnd,
   });
   const normalizedCategories = useCartesianCategoryMeta(categoriesProp);
-  const { categories, series: resolvedSeries, valueSuffix, curve } = useResolvedCartesianProps(
+  const {
+    categories,
+    series: resolvedSeries,
+    valueSuffix,
+    valueFormat,
+    curve,
+  } = useResolvedCartesianProps(
     {
       categories: normalizedCategories.labels,
       series: seriesProp,
       data,
       children,
       valueSuffix: valueSuffixProp,
+      valueFormat: valueFormatProp,
       curve: curveProp,
     },
     config,
@@ -373,6 +402,7 @@ export function LineChart({
         categories={plotCategories}
         series={plotSeries}
         valueSuffix={valueSuffix}
+        valueFormat={valueFormat}
         compact={compact}
         plotMotionStyle={plotMotionStyle}
         plotClassName={motion.plotClassName}
@@ -386,6 +416,9 @@ export function LineChart({
             fill={fill}
             showAxes={axes}
             valueSuffix={valueSuffix}
+            valueFormat={valueFormat}
+            yDomain={yDomain}
+            yTickCount={yTickCount}
             dualAxis={dualAxis}
             stacked={stacked}
             curve={curve}

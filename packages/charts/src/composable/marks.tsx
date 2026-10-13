@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { SeriesTone } from "@axicharts/charts-canvas";
-import type { BuiltinTickFormat } from "@axicharts/charts-core";
+import type { BuiltinTickFormat, ValueFormat } from "@axicharts/charts-core";
 import type { BarRenderFn, PathRenderFn } from "./customMarks";
 
 export type LineMarkProps = {
@@ -35,7 +35,8 @@ export type XAxisMarkProps = {
 };
 
 export type YAxisMarkProps = {
-  tickFormat?: BuiltinTickFormat;
+  /** Built-in / registered format id or function — formats ticks, tooltips and value labels. */
+  tickFormat?: ValueFormat;
   orientation?: "left" | "right";
   yAxisId?: string;
 };

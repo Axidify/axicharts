@@ -8,7 +8,7 @@ import { useChartInteraction } from "../interaction/ChartInteractionContext";
 export function Crosshair(): ReactElement | null {
   const { cursor } = useChartInteraction();
   const { theme } = useChartLayout();
-  const dark = isDarkChartTheme(theme.name);
+  const dark = isDarkChartTheme(theme);
 
   if (!cursor || cursor.index < 0) return null;
 

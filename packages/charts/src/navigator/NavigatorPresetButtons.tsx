@@ -23,7 +23,7 @@ export function NavigatorPresetButtons({
   theme,
   overviewId,
 }: NavigatorPresetButtonsProps): ReactElement {
-  const dark = isDarkChartTheme(theme.name);
+  const dark = isDarkChartTheme(theme);
   const groupId = useId();
   const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
 

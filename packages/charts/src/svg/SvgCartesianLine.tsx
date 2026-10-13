@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement } from "react";
+import { applyYDomain, type YDomain } from "@axicharts/charts-core";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import {
   resolveSeriesColor,
@@ -39,6 +40,8 @@ export type SvgCartesianLineProps = {
   fill?: boolean;
   showAxes?: boolean;
   stacked?: boolean;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side. */
+  yDomain?: YDomain;
   seriesEnterDelayMs?: (seriesIndex: number) => number;
 };
 
@@ -51,10 +54,12 @@ export function SvgCartesianLine({
   fill = false,
   showAxes = true,
   stacked = false,
+  yDomain,
   seriesEnterDelayMs,
 }: SvgCartesianLineProps): ReactElement {
   const plot = plotRect(width, height);
-  const { min, max } = computeValueExtents(series, stacked);
+  const extents = computeValueExtents(series, stacked);
+  const [min, max] = applyYDomain([extents.min, extents.max], yDomain);
   const scales = buildChartScales({
     width,
     height,

@@ -1,4 +1,5 @@
 import { Children, isValidElement, type ReactNode } from "react";
+import type { ValueFormat } from "@axicharts/charts-core";
 import { resolveSeriesColor } from "@axicharts/charts-canvas";
 import type { ChartConfig } from "../container/ChartLayoutContext";
 import type { ComposableMarkKind } from "./marks";
@@ -9,14 +10,9 @@ import type { BarRenderFn, CartesianPlotSeries, PathRenderFn } from "./customMar
 export type ComposedCartesian = {
   categories: string[];
   series: CartesianPlotSeries[];
-  valueSuffix?: string;
+  /** From `<YAxis tickFormat>` — formats ticks, tooltips and value labels. */
+  valueFormat?: ValueFormat;
   curve?: import("@axicharts/charts-theme").LineCurve;
-};
-
-const Y_AXIS_SUFFIX: Partial<Record<string, string>> = {
-  currency: " USD",
-  percent: "%",
-  bps: " bps",
 };
 
 type MarkCellBinding = {
@@ -32,7 +28,7 @@ export function composeCartesianMarks(
   seriesKinds: ComposableMarkKind[],
 ): ComposedCartesian {
   let xKey = "date";
-  let valueSuffix: string | undefined;
+  let valueFormat: ValueFormat | undefined;
   let curve: ComposedCartesian["curve"];
   const series: CartesianPlotSeries[] = [];
   const cellBindings: MarkCellBinding[] = [];
@@ -51,8 +47,8 @@ export function composeCartesianMarks(
         break;
       case "yAxis": {
         const tickFormat = props.tickFormat;
-        if (typeof tickFormat === "string") {
-          valueSuffix = Y_AXIS_SUFFIX[tickFormat];
+        if (typeof tickFormat === "string" || typeof tickFormat === "function") {
+          valueFormat = tickFormat as ValueFormat;
         }
         break;
       }
@@ -125,5 +121,5 @@ export function composeCartesianMarks(
     };
   });
 
-  return { categories, series: withCellStyles, valueSuffix, curve };
+  return { categories, series: withCellStyles, valueFormat, curve };
 }

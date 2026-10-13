@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanTheme } from "@axicharts/charts-theme";
+import { cleanTheme, createTheme, liveTheme } from "@axicharts/charts-theme";
 import { chromeGridStroke, isDarkChartTheme, withAlpha } from "./colors";
 import { resolveSeriesColor } from "./seriesColor";
 
@@ -34,6 +34,8 @@ describe("chart colors", () => {
   it("detects dark chart themes", () => {
     expect(isDarkChartTheme("clean")).toBe(false);
     expect(isDarkChartTheme("live")).toBe(true);
+    // createTheme forks must be renamed; surface keeps them dark.
+    expect(isDarkChartTheme(createTheme(liveTheme, { name: "acme-dark" }))).toBe(true);
   });
 
   it("cycles a distinct palette for 4+ untuned series (stacked ramp)", () => {
