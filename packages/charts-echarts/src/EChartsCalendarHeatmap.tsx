@@ -112,7 +112,7 @@ export function EChartsCalendarHeatmap({
           ? resolvedCellSize
           : (["auto", resolvedCellSize] as [number | "auto", number]),
         itemStyle: {
-          borderWidth: 2,
+          borderWidth: 1,
           borderColor: "#fff",
         },
         yearLabel: {

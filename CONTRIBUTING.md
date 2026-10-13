@@ -56,6 +56,7 @@ See [GOVERNANCE → RFC process](https://github.com/Axidify/axiboard/blob/main/d
 ### Documentation
 
 - API and usage: Storybook stories and package READMEs in this repo.
+- **Engineering roadmap:** [docs/roadmap.md](./docs/roadmap.md) — prioritized backlog (links to design-audit, render-audit, RFC-005).
 - Product direction and RFCs: [axiboard `docs/`](https://github.com/Axidify/axiboard/tree/main/docs).
 
 ## Reporting bugs

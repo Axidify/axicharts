@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
-import { hiddenTooltip, itemEmphasisOptions } from "./themeBridge";
+import { hiddenTooltip, itemEmphasisOptions, segmentItemStyle } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { flattenTreemapValues, mapTreemapData } from "./treemapData";
@@ -49,6 +49,7 @@ export function EChartsTreemap({
   const total = leafValues.reduce((sum, value) => sum + value, 0);
   const drillOptions = buildTreemapDrillOptions({ drilldown });
   const layout = resolveTreemapLayout(width, height, showLabels);
+  const segmentStyle = segmentItemStyle(theme);
 
   const option: EChartsOption = withPresentationAnimation(
     {
@@ -71,13 +72,7 @@ export function EChartsTreemap({
           color: "#0f172a",
           fontSize: layout.labelFontSize,
         },
-        itemStyle: {
-          borderColor: theme.name === "live" || theme.name === "industrial"
-            ? "#0f172a"
-            : "#ffffff",
-          borderWidth: 1,
-          gapWidth: 1,
-        },
+        itemStyle: segmentStyle,
         levels: [
           {
             itemStyle: {

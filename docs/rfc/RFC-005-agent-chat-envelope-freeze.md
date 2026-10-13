@@ -2,7 +2,7 @@
 
 **Status:** Accepted (frozen at platform `0.4.37`)  
 **Audience:** Server adapters (Nest, Express), chat UIs (Next.js), MCP integrators  
-**Related:** [Agent chat integration guide](https://axidify.github.io/axicharts/guides/agent-chat-integration) · RFC-004 agent chart families (axiboard)
+**Related:** [roadmap.md](../roadmap.md) · [Agent chat integration guide](https://axidify.github.io/axicharts/guides/agent-chat-integration) · RFC-004 agent chart families (axiboard)
 
 ## Summary
 

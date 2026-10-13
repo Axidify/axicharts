@@ -50,7 +50,7 @@ describe("MapChart", () => {
     const region = container.querySelector("g");
     expect(region).toBeTruthy();
     fireEvent.mouseEnter(region!);
-    expect(container.querySelector('[stroke-width="1.5"]')).toBeTruthy();
+    expect(container.querySelector('[stroke-width="1"]')).toBeTruthy();
   });
 
   it("renders dark surface palette", () => {

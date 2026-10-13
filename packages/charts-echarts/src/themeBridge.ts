@@ -31,6 +31,19 @@ export function itemEmphasisOptions(
   };
 }
 
+/** Treemap / sunburst / funnel — gap separation instead of heavy white outlines on dashboard themes. */
+export function segmentItemStyle(theme: Pick<ChartTheme, "name">): {
+  borderColor: string;
+  borderWidth: number;
+  gapWidth?: number;
+} {
+  const dark = theme.name === "live" || theme.name === "industrial";
+  if (dark) {
+    return { borderColor: "#0f172a", borderWidth: 0.5, gapWidth: 1 };
+  }
+  return { borderColor: "transparent", borderWidth: 0, gapWidth: 2 };
+}
+
 /** Dashboard tile (~360px wide or short height) — tighter ECharts grid margins. */
 export function isCompactTile(width?: number, height?: number): boolean {
   if (width === undefined || height === undefined) return false;

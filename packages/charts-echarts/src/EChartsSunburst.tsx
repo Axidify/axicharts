@@ -5,7 +5,7 @@ import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { resolveSunburstLayout } from "./nicheCompactLayout";
-import { hiddenTooltip } from "./themeBridge";
+import { hiddenTooltip, segmentItemStyle } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import { flattenTreemapValues, mapTreemapData } from "./treemapData";
@@ -62,13 +62,7 @@ export function EChartsSunburst({
           fontSize: layout.labelFontSize,
           color: "#0f172a",
         },
-        itemStyle: {
-          borderColor:
-            theme.name === "live" || theme.name === "industrial"
-              ? "#0f172a"
-              : "#ffffff",
-          borderWidth: 1,
-        },
+        itemStyle: segmentItemStyle(theme),
         levels: [
           {},
           {

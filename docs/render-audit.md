@@ -4,7 +4,7 @@ Living tracker for axicharts render quality — especially compact dashboard emb
 
 **Harness:** `pnpm render-sandbox` → http://localhost:3010
 
-**Backlog issue:** [axicharts#9](https://github.com/Axidify/axicharts/issues/9)
+**Roadmap:** [roadmap.md](./roadmap.md) · **Backlog issue:** [axicharts#9](https://github.com/Axidify/axicharts/issues/9)
 
 ## Status legend
 
