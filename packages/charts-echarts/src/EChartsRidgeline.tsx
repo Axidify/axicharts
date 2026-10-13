@@ -30,6 +30,7 @@ import {
   type RidgelineItem,
   type RidgelineSeries,
 } from "./ridgelineTypes";
+import { kdeValueExtent } from "./kdeExtent";
 
 export type EChartsRidgelineProps = {
   width: number;
@@ -53,24 +54,34 @@ function formatValue(value: number, suffix = ""): string {
   return `${rounded}${suffix}`;
 }
 
+/**
+ * Per-item ridge data, looked up by `dataIndex`. ECharts stores custom series
+ * `value` dimensions as numbers, so the KDE array can't ride along in `value`.
+ */
+type RidgeShape = { kdePoints: KdePoint[]; median: number | null };
+
 function createRidgelineRenderItem({
+  shapes,
   color,
   ridgeHeightRatio,
   showMedianLine,
   medianLineWidth,
 }: {
+  shapes: RidgeShape[];
   color: string;
   ridgeHeightRatio: number;
   showMedianLine: boolean;
   medianLineWidth: number;
 }) {
   return (
-    _params: CustomSeriesRenderItemParams,
+    params: CustomSeriesRenderItemParams,
     api: CustomSeriesRenderItemAPI,
   ) => {
-    const categoryIndex = api.value(0) as number;
-    const kdePoints = api.value(1) as unknown as KdePoint[];
-    const median = api.value(2) as number | null;
+    // value = [x anchor on the value axis, category index on the y axis]
+    const categoryIndex = api.value(1) as number;
+    const shape = shapes[params.dataIndex];
+    if (!shape) return null;
+    const { kdePoints, median } = shape;
 
     if (!kdePoints.length) {
       return null;
@@ -174,6 +185,14 @@ export function EChartsRidgeline({
     fontSize: layout.axisFontSize,
   };
 
+  const groupShapes: RidgeShape[][] = groups.map((group) =>
+    group.items.map((item) => ({
+      kdePoints: resolveRidgelineDensity(item, bandwidth),
+      median: resolveRidgelineMedian(item),
+    })),
+  );
+  const valueExtent = kdeValueExtent(groupShapes.flat());
+
   const option: EChartsOption = withPresentationAnimation(
     {
       grid: {
@@ -191,6 +210,7 @@ export function EChartsRidgeline({
       tooltip: hiddenTooltip(),
       xAxis: {
         type: "value",
+        ...valueExtent,
         show: showAxes,
         axisLabel: axisStyle,
         splitLine: splitLineStyle(theme),
@@ -209,24 +229,26 @@ export function EChartsRidgeline({
       series: groups.map((group, groupIndex) => {
         const color =
           toneColor(group.tone, theme) ?? palette[groupIndex % palette.length]!;
+        const shapes = groupShapes[groupIndex]!;
         return {
           type: "custom" as const,
           name: group.name,
           renderItem: createRidgelineRenderItem({
+            shapes,
             color,
             ridgeHeightRatio: ridgeHeight,
             showMedianLine,
             medianLineWidth: theme.line.strokeWidth,
           }),
-          data: group.items.map((item) => {
-            const categoryIndex = categories.indexOf(item.category);
+          data: group.items.map((item, itemIndex) => {
+            const shape = shapes[itemIndex]!;
+            // x must be a real value-axis number or ECharts drops the item
+            // before renderItem runs; the shape itself comes from `shapes`.
+            const anchor = shape.median ?? shape.kdePoints[0]?.value ?? 0;
             return {
               name: item.category,
-              value: [
-                categoryIndex,
-                resolveRidgelineDensity(item, bandwidth),
-                resolveRidgelineMedian(item),
-              ],
+              value: [anchor, categories.indexOf(item.category)],
+              median: shape.median,
             };
           }),
           emphasis: itemEmphasisOptions(theme),
@@ -249,8 +271,8 @@ export function EChartsRidgeline({
 
       const category =
         typeof params.name === "string" ? params.name : "Category";
-      const raw = params.value;
-      const median = Array.isArray(raw) ? (raw[2] as number | null) : null;
+      const median =
+        (params.data as { median?: number | null } | undefined)?.median ?? null;
       const rows =
         median != null
           ? [{ label: "Median", value: formatValue(median, valueSuffix) }]
