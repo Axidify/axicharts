@@ -2,7 +2,7 @@ import { isDarkTheme } from "@axicharts/charts-theme";
 import { useOptionalChartLayout } from "./useOptionalChartLayout";
 
 /**
- * Default `surface` for KPI / panel components (Stat, Digital, AlertPanel,
+ * Default `surface` for KPI / panel components (Stat, Digital, Gauge, AlertPanel,
  * MarkdownPanel, DataTable). Inside a ChartContainer it follows the theme, so
  * light themes no longer get pale dark-surface text; standalone it keeps the
  * historical `"dark"` default.
