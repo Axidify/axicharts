@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseRuntimeSpec, serializeRuntimeSpec, toPortableRuntimeSpec } from "./runtimeSpec";
 import { validateRuntimeSpecRaw } from "./runtimeValidation";
 import type { RuntimeDashboardSpec } from "./types";
+import { embedDashboard, hybridLayout, mosaicWall } from "./testing/runtimeSpecLayouts";
 
 const embedSpec: RuntimeDashboardSpec = {
   layout: "embed",
@@ -25,8 +26,8 @@ describe("runtimeSpec", () => {
     const json = serializeRuntimeSpec(embedSpec);
     const parsed = parseRuntimeSpec(json);
     expect(parsed.layout).toBe("embed");
-    expect(parsed.dashboard.template).toBe("ops-2x2");
-    expect(parsed.dashboard.dataSources?.[0]?.id).toBe("ops");
+    expect(embedDashboard(parsed).template).toBe("ops-2x2");
+    expect(embedDashboard(parsed).dataSources?.[0]?.id).toBe("ops");
   });
 
   it("strips non-serializable fields", () => {
@@ -43,7 +44,7 @@ describe("runtimeSpec", () => {
     };
 
     const portable = toPortableRuntimeSpec(spec);
-    expect(portable.dashboard.dataSource).toEqual({
+    expect(embedDashboard(portable).dataSource).toEqual({
       type: "rest",
       url: "/api/metrics",
     });
@@ -61,7 +62,7 @@ describe("runtimeSpec", () => {
     );
 
     expect(parsed.layout).toBe("mosaic");
-    expect(parsed.wall.cells).toHaveLength(1);
+    expect(mosaicWall(parsed).cells).toHaveLength(1);
   });
 
   it("parses hybrid layout specs (C172)", () => {
@@ -101,8 +102,8 @@ describe("runtimeSpec", () => {
     );
 
     expect(parsed.layout).toBe("hybrid");
-    expect(parsed.hybrid.panels.columns).toBe(2);
-    expect(parsed.hybrid.wall.dataSource?.type).toBe("mqtt");
+    expect(hybridLayout(parsed).panels.columns).toBe(2);
+    expect(hybridLayout(parsed).wall.dataSource?.type).toBe("mqtt");
   });
 
   it("rejects unknown templates", () => {

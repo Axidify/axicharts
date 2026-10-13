@@ -5,7 +5,7 @@ import { DEFAULT_OPS_PROFILE } from "./index";
 describe("requestDashboardPlan", () => {
   it("plans locally when no server URL is provided", async () => {
     const plan = await requestDashboardPlan({
-      profile: DEFAULT_OPS_PROFILE,
+      profile: { metrics: [...DEFAULT_OPS_PROFILE.metrics] },
       intent: "Line 3 night shift overview",
     });
     expect(plan.template).toBe("ops-2x2");

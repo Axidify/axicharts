@@ -135,6 +135,9 @@ describe("map path rendering", () => {
       SAMPLE_US_TOPOLOGY,
       SAMPLE_US_TOPOLOGY.objects.states,
     );
+    if (collection.type !== "FeatureCollection") {
+      throw new Error("expected states to be a FeatureCollection");
+    }
     const projection = geoAlbersUsa().fitSize([280, 160], collection);
     const path = geoPath(projection);
     for (const mapFeature of collection.features) {

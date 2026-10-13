@@ -72,10 +72,10 @@ describe("DataTable", () => {
       />,
     );
 
-    const header = container.querySelector("th");
+    const header = container.querySelector<HTMLTableCellElement>("th");
     expect(header?.style.position).toBe("sticky");
     expect(header?.style.background).toBe("rgb(248, 250, 252)");
-    const rows = container.querySelectorAll("tbody tr");
+    const rows = container.querySelectorAll<HTMLTableRowElement>("tbody tr");
     expect(rows[1]?.style.background).toBe("rgb(248, 250, 252)");
   });
 });

@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
+import type { DataZoomComponentOption, SliderDataZoomComponentOption } from "echarts";
 import { cleanTheme, liveTheme } from "@axicharts/charts-theme";
 import { buildDataZoom } from "./dataZoom";
+
+function isSlider(
+  option: DataZoomComponentOption | undefined,
+): option is SliderDataZoomComponentOption {
+  return option?.type === "slider";
+}
 
 describe("buildDataZoom", () => {
   it("links both x axes when volume pane is present", () => {
@@ -18,6 +25,9 @@ describe("buildDataZoom", () => {
   it("themes the slider for dark live surfaces", () => {
     const zoom = buildDataZoom({ withVolume: false, theme: liveTheme });
     const slider = zoom[1];
-    expect(slider.borderColor).toBe("#334155");
+    expect(isSlider(slider)).toBe(true);
+    if (isSlider(slider)) {
+      expect(slider.borderColor).toBe("#334155");
+    }
   });
 });
