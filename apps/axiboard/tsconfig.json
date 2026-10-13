@@ -4,7 +4,9 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      // charts-mcp ships no .d.ts; type the server's imports against its source.
+      "@axicharts/charts-mcp": ["../../packages/charts-mcp/src/index.ts"]
     }
   },
   "include": ["src", "server", "src/vite-env.d.ts", "vite.config.ts"]

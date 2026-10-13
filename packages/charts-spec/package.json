@@ -17,7 +17,9 @@
     "schema"
   ],
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/entry/plugins.js"
+  ],
   "bin": {
     "charts-spec": "./dist/cli.js"
   },
@@ -61,15 +63,19 @@
     "./schema/cartesian-panel.schema.json": "./schema/cartesian-panel.schema.json",
     "./schema/distribution-panel.schema.json": "./schema/distribution-panel.schema.json",
     "./schema/matrix-panel.schema.json": "./schema/matrix-panel.schema.json",
-    "./schema/data-profile.schema.json": "./schema/data-profile.schema.json"
+    "./schema/data-profile.schema.json": "./schema/data-profile.schema.json",
+    "./plugins": {
+      "types": "./dist/entry/plugins.d.ts",
+      "import": "./dist/entry/plugins.js"
+    }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/planning.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --external @axicharts/charts-tank --external @axicharts/charts-andon --clean",
-    "dev": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/planning.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --external @axicharts/charts-tank --external @axicharts/charts-andon --watch",
+    "build": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/planning.ts src/entry/plugins.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --external @axicharts/charts-tank --external @axicharts/charts-andon --clean",
+    "dev": "tsup src/index.ts src/cli.ts src/entry/cartesian.ts src/entry/distribution.ts src/entry/financial.ts src/entry/matrix.ts src/entry/industrial.ts src/entry/kpi.ts src/entry/full.ts src/entry/planning.ts src/entry/plugins.ts --format esm --dts --external react --external react-dom --external @axicharts/charts --external @axicharts/charts-canvas --external @axicharts/charts-theme --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --external @axicharts/charts-tank --external @axicharts/charts-andon --watch",
     "test": "vitest run",
     "test:render-battery": "vitest run src/renderBattery.test.tsx",
     "export:schemas": "node scripts/export-schemas.mjs",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit"
   },
   "peerDependencies": {
     "@axicharts/charts": "workspace:*",
@@ -86,12 +92,7 @@
   "dependencies": {
     "@axicharts/charts": "workspace:*",
     "@axicharts/charts-canvas": "workspace:*",
-    "@axicharts/charts-gantt": "workspace:*",
-    "@axicharts/charts-geo": "workspace:*",
-    "@axicharts/charts-map": "workspace:*",
-    "@axicharts/charts-sankey": "workspace:*",
-    "@axicharts/charts-tank": "workspace:*",
-    "@axicharts/charts-andon": "workspace:*",
+    "@axicharts/charts-echarts": "workspace:*",
     "@axicharts/charts-theme": "workspace:*",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1"
@@ -107,6 +108,32 @@
     "typescript": "^5.8.2",
     "vitest": "^3.0.8",
     "jsdom": "^26.0.0",
-    "@napi-rs/canvas": "^1.0.2"
+    "@napi-rs/canvas": "^1.0.2",
+    "@axicharts/charts-gantt": "workspace:*",
+    "@axicharts/charts-geo": "workspace:*",
+    "@axicharts/charts-map": "workspace:*",
+    "@axicharts/charts-sankey": "workspace:*",
+    "@axicharts/charts-tank": "workspace:*",
+    "@axicharts/charts-andon": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@axicharts/charts-gantt": {
+      "optional": true
+    },
+    "@axicharts/charts-geo": {
+      "optional": true
+    },
+    "@axicharts/charts-map": {
+      "optional": true
+    },
+    "@axicharts/charts-sankey": {
+      "optional": true
+    },
+    "@axicharts/charts-tank": {
+      "optional": true
+    },
+    "@axicharts/charts-andon": {
+      "optional": true
+    }
   }
 }

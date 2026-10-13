@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import {
   AreaChart,
@@ -13,7 +13,7 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
 const REVENUE = [820, 932, 901, 1034, 1290, 1330];
 const REVENUE_TARGET = 1280;
 
-function KpiTile({ children }: { children: ReactElement }): ReactElement {
+function KpiTile({ children }: { children: ReactNode }): ReactElement {
   return (
     <div
       style={{
@@ -133,7 +133,7 @@ function FinanceOverviewMockup(): ReactElement {
             <div style={{ fontSize: 10, color: "#15803d" }}>+1.2 pts vs Q1</div>
           </KpiTile>
           <KpiTile>
-            <Stat value="+18%" label="QoQ growth" tone="info" surface="light" />
+            <Stat value="+18%" label="QoQ growth" tone="neutral" surface="light" />
             <div style={{ fontSize: 10, color: "#64748b" }}>
               Jun {momGrowth >= 0 ? "+" : ""}
               {momGrowth.toFixed(1)}% MoM

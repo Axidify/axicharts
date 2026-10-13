@@ -23,4 +23,4 @@
 | `@axicharts/charts-canvas` | 0.4.6 | **0.4.22** |
 | `@axicharts/charts-planner` | 0.2.2 | **0.2.2** (peer `^0.4.22`) |
 
-Triggered by GitHub release `v0.4.22` → [publish workflow](.github/workflows/publish.yml).
+Triggered by GitHub release `v0.4.22` → [publish workflow](../../.github/workflows/publish.yml).

@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { RuntimeDashboardSpec } from "../types";
+import { embedDashboard } from "../testing/runtimeSpecLayouts";
 import { SHARE_EXPORT_SCHEMA_URL } from "../schemaUrls";
 import {
   createDefaultWorkspaceStore,
@@ -51,7 +52,7 @@ describe("dashboard export", () => {
     expect(exported.name).toBe("Ops wall");
     expect(exported.meta?.presentation).toBe(true);
     expect(exported.meta?.presentationDeck?.slides).toHaveLength(1);
-    expect(exported.spec.dashboard?.template).toBe("ops-2x2");
+    expect(embedDashboard(exported.spec).template).toBe("ops-2x2");
   });
 
   it("accepts imports that include $schema", () => {
@@ -62,7 +63,7 @@ describe("dashboard export", () => {
 
   it("parses legacy bare runtime JSON", () => {
     const parsed = parseDashboardExport(JSON.stringify(spec));
-    expect(parsed.spec.dashboard?.template).toBe("ops-2x2");
+    expect(embedDashboard(parsed.spec).template).toBe("ops-2x2");
   });
 });
 
@@ -145,7 +146,7 @@ describe("share import meta", () => {
     );
     const exported = parseDashboardExport(json);
     expect(exported.meta?.chartConfig).toEqual(chartConfig);
-    expect(exported.spec.dashboard?.chartConfig).toEqual(chartConfig);
+    expect(embedDashboard(exported.spec).chartConfig).toEqual(chartConfig);
   });
 
   it("importSharedWorkspace preserves per-dashboard meta", () => {

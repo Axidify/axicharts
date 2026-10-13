@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { cleanTheme } from "@axicharts/charts-theme";
-import { gridOptions, isCompactTile } from "./themeBridge";
+import { cleanTheme, liveTheme } from "@axicharts/charts-theme";
+import { gridOptions, isCompactTile, segmentItemStyle } from "./themeBridge";
 
 describe("themeBridge", () => {
   it("detects compact dashboard tiles", () => {
@@ -16,5 +16,14 @@ describe("themeBridge", () => {
     expect(compact.left).toBeLessThan(regular.left);
     expect(compact.top).toBeLessThan(regular.top);
     expect(compact.bottom).toBeLessThan(regular.bottom);
+  });
+
+  it("drops white segment outlines on dashboard themes", () => {
+    expect(segmentItemStyle(cleanTheme)).toEqual({
+      borderColor: "transparent",
+      borderWidth: 0,
+      gapWidth: 2,
+    });
+    expect(segmentItemStyle(liveTheme).borderWidth).toBe(0.5);
   });
 });

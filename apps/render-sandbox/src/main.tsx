@@ -1,5 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import "@axicharts/charts-andon/register";
+import "@axicharts/charts-tank/register";
 import { App } from "./App";
 import "./global.css";
 

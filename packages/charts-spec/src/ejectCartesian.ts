@@ -1,3 +1,4 @@
+import type { PanelSpec } from "./types";
 import { ejectGraphicsProp } from "./panelGraphics";
 import { readPanelStyle } from "./panelStyle";
 import { readPanelOrientation } from "./panelOrientation";

@@ -3,7 +3,7 @@ import { createDefaultDashboard, parseDashboardSpec, parseRuntimeSpec, serialize
 import { buildTabularRuntimeSpec } from "./tabularRuntimeSpec";
 import type { OrchestratorChatResult } from "../api/orchestratorClient";
 
-const samplePlan = {
+const samplePlan: OrchestratorChatResult = {
   dashboardIntent: "ledger overview",
   dashboardPlan: {
     title: "Ledger",
@@ -13,6 +13,7 @@ const samplePlan = {
     feed: "static",
     presentation: false,
     panels: [],
+    source: "rules",
   },
   kpis: [
     {
@@ -35,15 +36,22 @@ const samplePlan = {
   decisions: [
     { step: "L1 Profile", api: "profileTabular", status: "ok", notes: "3 fields" },
   ],
-  dataProfile: { fields: [] },
+  dataProfile: { metrics: [], fields: [] },
   persona: "manager",
   vertical: "ledger",
-  domain: { vertical: "ledger", confidence: 0.9, needsReview: false, signals: [] },
+  domain: {
+    vertical: "ledger",
+    confidence: 0.9,
+    needsReview: false,
+    scores: { finance: 0, ledger: 1, trading: 0, ops: 0, attendance: 0, sales: 0 },
+    entities: [],
+    signals: [],
+  },
   summary: { kpiCount: 1, chartCount: 1, needsReview: false },
   followUpIntents: [],
   assistantMessage: "Planned dashboard",
   llm: { used: false },
-} as OrchestratorChatResult;
+};
 
 const sourceCsv = "Date,Amount\n2026-01-01,10";
 

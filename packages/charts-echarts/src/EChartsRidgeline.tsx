@@ -57,10 +57,12 @@ function createRidgelineRenderItem({
   color,
   ridgeHeightRatio,
   showMedianLine,
+  medianLineWidth,
 }: {
   color: string;
   ridgeHeightRatio: number;
   showMedianLine: boolean;
+  medianLineWidth: number;
 }) {
   return (
     _params: CustomSeriesRenderItemParams,
@@ -131,7 +133,7 @@ function createRidgelineRenderItem({
                       ridgeHeightRatio,
                     ),
                 },
-                style: { stroke: color, lineWidth: 2 },
+                style: { stroke: color, lineWidth: medianLineWidth },
               },
             ]
           : []),
@@ -214,6 +216,7 @@ export function EChartsRidgeline({
             color,
             ridgeHeightRatio: ridgeHeight,
             showMedianLine,
+            medianLineWidth: theme.line.strokeWidth,
           }),
           data: group.items.map((item) => {
             const categoryIndex = categories.indexOf(item.category);

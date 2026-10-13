@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import {
   BarChart,
@@ -14,7 +14,7 @@ const DAILY_THROUGHPUT = [120, 90, 150, 110, 180, 130, 145];
 const WEEKLY_TOTALS = [120, 90, 150, 110, 180];
 const WEEKLY_TARGET = 150;
 
-function KpiTile({ children }: { children: ReactElement }): ReactElement {
+function KpiTile({ children }: { children: ReactNode }): ReactElement {
   return (
     <div
       style={{

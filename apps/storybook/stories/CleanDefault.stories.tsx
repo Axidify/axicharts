@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { ChartContainer, LineChart, Stat } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
@@ -8,7 +8,7 @@ const LATENCY = [42, 38, 55, 49, 62, 58, 71];
 const P50 = [34, 31, 40, 38, 44, 41, 49];
 const ERROR_RATE = [0.8, 0.6, 1.1, 0.9, 1.4, 1.0, 1.2];
 
-function KpiTile({ children }: { children: ReactElement }): ReactElement {
+function KpiTile({ children }: { children: ReactNode }): ReactElement {
   return (
     <div
       style={{

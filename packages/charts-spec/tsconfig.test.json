@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Some tests exercise charts-planner and axiboard sources end to end, so
+    // the test program spans files outside src/ and has no rootDir.
+    "rootDir": null,
+    // Those sources import charts-spec by package name; resolve it to src so
+    // the check never depends on (or races) this package's own dist build.
+    "paths": {
+      "@axicharts/charts-spec": ["./src/index.ts"],
+      "@axicharts/charts-spec/*": ["./src/entry/*.ts"]
+    }
+  },
+  "include": ["src", "test"],
+  "exclude": ["dist", "node_modules"]
+}

@@ -74,7 +74,7 @@ describe("C173/C175 generic compose", () => {
       plan!.charts.some(
         (block) =>
           block.questionId === "generic.table.below_reorder" ||
-          block.panel.title.toLowerCase().includes("reorder"),
+          block.panel.title?.toLowerCase().includes("reorder"),
       ),
     ).toBe(true);
   });

@@ -6,6 +6,7 @@ Prescriptive reference for **how AxiCharts should look and behave** in dashboard
 
 | Doc | Role |
 |-----|------|
+| [roadmap.md](./roadmap.md) | Consolidated engineering priorities (P0–P5) |
 | [chart-design-audit.md](./chart-design-audit.md) | Recharts parity matrix, D-xxx backlog, review harnesses |
 | [render-audit.md](./render-audit.md) | Layout/engine bugs (R-xxx), clipping, scale math |
 | `pnpm docs` → `/compare/design` | Side-by-side wall @ 360×280 |
@@ -37,10 +38,10 @@ Source: `packages/charts-theme/src/themes.ts`
 
 | Token | Value | Intent |
 |-------|-------|--------|
-| Grid | horizontal only, opacity **0.42** | Soft guides; never heavy cross-hatch |
-| Line | stroke **2.25**, curve **monotone** | Smooth trend lines |
+| Grid | horizontal only, opacity **0.38** | Soft guides; never heavy cross-hatch |
+| Line | stroke **1.75**, curve **monotone** | Smooth trend lines |
 | Area | fill opacity **0.24** | Readable gradient under line |
-| Bar | radius **5**, gap **0.28** | Rounded caps; even spacing |
+| Bar | radius **4**, gap **0.28** | Rounded caps; even spacing |
 | Axis | shown | Tick labels always readable |
 | Values | sans-serif | Dashboard default |
 

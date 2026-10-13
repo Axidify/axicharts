@@ -1,20 +1,3 @@
-import type { MapHierarchy } from "@axicharts/charts-map";
-
-export function resolveMapHierarchy(
-  props: Record<string, unknown>,
-): MapHierarchy | undefined {
-  return props.hierarchy as MapHierarchy | undefined;
-}
-
-export function resolveMapDrillProps(props: Record<string, unknown>) {
-  return {
-    drilldown: props.drilldown as boolean | undefined,
-    hierarchy: resolveMapHierarchy(props),
-    drillPath: props.drillPath as string[] | undefined,
-    drillLabels: props.drillLabels as string[] | undefined,
-  };
-}
-
 export function mapDrillEjectProps(props: Record<string, unknown>): string {
   const lines: string[] = [];
   if (props.drilldown) {

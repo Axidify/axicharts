@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
-import { axisLabelStyle, hiddenTooltip, isCompactTile, itemEmphasisOptions, seriesPalette, splitLineStyle, toneColor } from "./themeBridge";
+import { axisLabelStyle, hiddenTooltip, isCompactTile, itemEmphasisOptions, segmentItemStyle, seriesPalette, splitLineStyle, toneColor } from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { RadarIndicator, RadarSeries } from "./radarTypes";
@@ -117,7 +117,7 @@ export function EChartsRadar({
           name: item.name,
           value: item.values,
           areaStyle: areaFill ? { opacity: 0.18 } : undefined,
-          lineStyle: { width: 2 },
+          lineStyle: { width: theme.line.strokeWidth },
           itemStyle: {
             color:
               item.color ??

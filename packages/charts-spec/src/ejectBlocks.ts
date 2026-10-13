@@ -1,7 +1,13 @@
-import type { PanelSpec } from "./types";
+import type { ChartBlockSeriesMark, PanelMarkSpec, PanelSpec } from "./types";
 import { readPanelAnimation, animationToSpecField } from "./panelAnimation";
 import { readPanelLiveAnimate } from "./panelLiveAnimate";
 import { ejectGraphicsProp } from "./panelGraphics";
+
+type BlockDataMark = ChartBlockSeriesMark & { type: "line" | "bar" | "area" };
+
+function isBlockDataMark(mark: PanelMarkSpec): mark is BlockDataMark {
+  return mark.type === "line" || mark.type === "bar" || mark.type === "area";
+}
 
 function markComponent(type: string): "Bar" | "Line" | "Area" {
   if (type === "area") return "Area";
@@ -31,7 +37,7 @@ export function ejectBlocksImperativeBody(spec: PanelSpec, dataVar: string): str
   const xField = spec.encoding?.x?.field ?? "category";
   const marks = spec.marks ?? [];
   const lines = marks
-    .filter((mark) => mark.type === "line" || mark.type === "bar" || mark.type === "area")
+    .filter(isBlockDataMark)
     .map((mark) => {
       const kind = mark.type === "bar" ? "bar" : "line";
       const name = mark.label ?? mark.field;
@@ -86,7 +92,7 @@ export function ejectBlocksComposableBody(spec: PanelSpec, dataVar: string): str
   const xField = spec.encoding?.x?.field ?? "category";
   const marks = spec.marks ?? [];
   const dataMarks = marks
-    .filter((mark) => mark.type === "line" || mark.type === "bar" || mark.type === "area")
+    .filter(isBlockDataMark)
     .map((mark) => {
       const Mark = markComponent(mark.type);
       const attrs = [

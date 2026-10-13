@@ -35,6 +35,7 @@ export function axichartsMonorepoAliases(repoRoot: string): AliasOptions {
     { find: "@axicharts/charts-spec/industrial", replacement: pkgEntry("charts-spec", "industrial") },
     { find: "@axicharts/charts-spec/kpi", replacement: pkgEntry("charts-spec", "kpi") },
     { find: "@axicharts/charts-spec/full", replacement: pkgEntry("charts-spec", "full") },
+    { find: "@axicharts/charts-spec/plugins", replacement: pkgEntry("charts-spec", "plugins") },
 
     // @axicharts/charts-planner subpath exports
     { find: "@axicharts/charts-planner/tabular", replacement: pkgEntry("charts-planner", "tabular") },

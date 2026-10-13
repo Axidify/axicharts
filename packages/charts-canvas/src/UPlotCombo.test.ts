@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cleanTheme } from "@axicharts/charts-theme";
+import { seriesStackGroup } from "./stackTestUtils";
 import { buildComboOptions } from "./UPlotCombo";
 
 describe("UPlotCombo", () => {
@@ -68,9 +69,9 @@ describe("UPlotCombo", () => {
       stackTotalsRef,
     });
 
-    expect(options.series?.[1]?.stack).toBeDefined();
-    expect(options.series?.[2]?.stack).toBeDefined();
-    expect(options.series?.[3]?.stack).toBeUndefined();
+    expect(seriesStackGroup(options.series?.[1])).toBeDefined();
+    expect(seriesStackGroup(options.series?.[2])).toBeDefined();
+    expect(seriesStackGroup(options.series?.[3])).toBeUndefined();
     expect(options.scales?.y2).toBeUndefined();
   });
 
@@ -118,7 +119,11 @@ describe("UPlotCombo", () => {
       stackTotalsRef,
     });
 
-    expect(options.scales?.x?.range?.(null as never, 0, 1)).toEqual([-0.5, 1.5]);
+    const xRange = options.scales?.x?.range;
+    expect(typeof xRange).toBe("function");
+    if (typeof xRange === "function") {
+      expect(xRange(null as never, 0, 1, "x")).toEqual([-0.5, 1.5]);
+    }
     expect(options.padding?.[3]).toBeGreaterThanOrEqual(14);
   });
 });

@@ -38,6 +38,7 @@ import {
   isShareImportPreset,
 } from "../schemaUrls";
 import { serializeDashboardExport } from "../workspace/share";
+import { embedDashboard } from "../testing/runtimeSpecLayouts";
 import {
   detectImportShape,
   validatePortableImportJson,
@@ -89,7 +90,7 @@ describe("validatePortableImportJson", () => {
     expect(result.schemaOk).toBe(true);
     expect(result.semanticOk).toBe(true);
     expect(result.ok).toBe(true);
-    expect(result.export?.spec.dashboard?.template).toBe("ops-2x2");
+    expect(result.export).toMatchObject({ spec: { dashboard: { template: "ops-2x2" } } });
   });
 
   it("surfaces schema and semantic errors separately", () => {
@@ -137,7 +138,7 @@ describe("validateRuntimeSpecDualJson", () => {
     expect(result.ok).toBe(true);
     expect(result.schemaOk).toBe(true);
     expect(result.semanticOk).toBe(true);
-    expect(result.spec?.dashboard?.template).toBe("ops-2x2");
+    expect(embedDashboard(result.spec).template).toBe("ops-2x2");
   });
 });
 

@@ -240,7 +240,6 @@ export {
   type DashboardTemplateRegistration,
   type DashboardTemplateRenderer,
 } from "./templateRegistry";
-export { registerPluginChartTypes } from "./registerPluginChartTypes";
 export {
   assertPanelCategoryEnabled,
   clearCategoryRegistration,

@@ -5,7 +5,8 @@ import { cleanTheme } from "@axicharts/charts-theme";
 
 type DayMeta = { date: string };
 
-const DAYS: ChartCategoryInput<DayMeta>[] = [
+// Object categories only, so the selected day exposes its label and meta.
+const DAYS: Exclude<ChartCategoryInput<DayMeta>, string>[] = [
   { label: "Mon", meta: { date: "2026-07-13" } },
   { label: "Tue", meta: { date: "2026-07-14" } },
   { label: "Wed", meta: { date: "2026-07-15" } },

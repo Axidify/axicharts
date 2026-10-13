@@ -154,7 +154,7 @@ export function GeoMapChart({
               rx={4}
               fill={fill}
               stroke={active ? palette.hoverStroke : palette.stroke}
-              strokeWidth={active ? 2 : 1}
+              strokeWidth={active ? 1 : 0.5}
               opacity={hoverId && !active ? hover.dimOpacity : 1}
             />
             {showLabels ? (

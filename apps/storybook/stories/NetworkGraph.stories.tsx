@@ -5,9 +5,11 @@ import {
   ChartContainer,
   type GraphChartData,
 } from "@axicharts/charts/network";
-import { compilePanel } from "@axicharts/charts-spec";
+import { compilePanel, normalizePanelSpec } from "@axicharts/charts-spec";
 import { cleanTheme } from "@axicharts/charts-theme";
-import graphFixture from "../../../packages/charts-spec/examples/graph-service-topology.panel.json";
+import graphFixtureJson from "../../../packages/charts-spec/examples/graph-service-topology.panel.json";
+
+const graphFixture = normalizePanelSpec(graphFixtureJson);
 
 const SERVICE_TOPOLOGY: GraphChartData = {
   categories: [

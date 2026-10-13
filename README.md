@@ -142,7 +142,7 @@ Full platform stack — optional until you need embed, planner, or breadth chart
 pnpm add @axicharts/charts-full echarts uplot
 ```
 
-Product RFCs and roadmap: [axiboard docs](https://github.com/Axidify/axiboard/tree/main/docs/charts)
+**Engineering roadmap:** [docs/roadmap.md](./docs/roadmap.md) · Product RFCs: [axiboard docs](https://github.com/Axidify/axiboard/tree/main/docs/charts)
 
 ---
 

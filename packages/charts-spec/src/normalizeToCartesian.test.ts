@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { normalizeToCartesian } from "./normalizeToCartesian";
+import { withMarkKeyAlias } from "./testing/markKeyAlias";
 
 describe("normalizeToCartesian", () => {
   it("renames blocks to cartesian", () => {
@@ -16,7 +17,7 @@ describe("normalizeToCartesian", () => {
     const spec = normalizeToCartesian({
       type: "cartesian",
       encoding: { x: { field: "week" } },
-      marks: [{ mark: "line", field: "target", label: "Target" }],
+      marks: withMarkKeyAlias([{ mark: "line", field: "target", label: "Target" }]),
     });
     expect(spec.marks[0]).toEqual({
       type: "line",

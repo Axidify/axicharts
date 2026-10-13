@@ -15,6 +15,8 @@ export type LineMarkProps = {
    * Ignored on canvas/uPlot renderers.
    */
   renderPath?: PathRenderFn;
+  /** `<Cell>` children — per-point colors, read by the cartesian composers. */
+  children?: ReactNode;
 };
 
 export type BarMarkProps = Omit<LineMarkProps, "renderPath"> & {

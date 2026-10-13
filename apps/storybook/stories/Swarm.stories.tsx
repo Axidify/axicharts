@@ -5,9 +5,11 @@ import {
   ChartContainer,
   type SwarmItem,
 } from "@axicharts/charts/swarm";
-import { compilePanel } from "@axicharts/charts-spec";
+import { compilePanel, normalizePanelSpec } from "@axicharts/charts-spec";
 import { cleanTheme } from "@axicharts/charts-theme";
-import swarmFixture from "../../../packages/charts-spec/examples/swarm-latency.panel.json";
+import swarmFixtureJson from "../../../packages/charts-spec/examples/swarm-latency.panel.json";
+
+const swarmFixture = normalizePanelSpec(swarmFixtureJson);
 
 function sampleFrom(mean: number, spread: number, count: number): number[] {
   return Array.from({ length: count }, () => {

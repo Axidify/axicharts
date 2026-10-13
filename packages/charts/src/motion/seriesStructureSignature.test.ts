@@ -2,17 +2,21 @@ import { describe, expect, it } from "vitest";
 import { seriesDataSignature, seriesStructureSignature } from "./resolve";
 
 const CATEGORIES = ["Q1", "Q2", "Q3"];
+
+function item(name: string, data: number[]): { name: string; data: number[] } {
+  return { name, data };
+}
 const SERIES = [
-  { name: "Revenue", data: [100, 200, 150] },
-  { name: "Cost", data: [80, 120, 90] },
+  item("Revenue", [100, 200, 150]),
+  item("Cost", [80, 120, 90]),
 ];
 
 describe("seriesStructureSignature", () => {
   it("is stable when only values change", () => {
     const base = seriesStructureSignature(CATEGORIES, SERIES);
     const valueOnly = seriesStructureSignature(CATEGORIES, [
-      { name: "Revenue", data: [110, 210, 160] },
-      { name: "Cost", data: [85, 125, 95] },
+      item("Revenue", [110, 210, 160]),
+      item("Cost", [85, 125, 95]),
     ]);
     expect(valueOnly).toBe(base);
   });
@@ -41,8 +45,8 @@ describe("seriesStructureSignature", () => {
   it("changes when series names change", () => {
     const base = seriesStructureSignature(CATEGORIES, SERIES);
     const renamed = seriesStructureSignature(CATEGORIES, [
-      { name: "Revenue", data: SERIES[0]!.data },
-      { name: "Opex", data: SERIES[1]!.data },
+      item("Revenue", SERIES[0]!.data),
+      item("Opex", SERIES[1]!.data),
     ]);
     expect(renamed).not.toBe(base);
   });
@@ -51,13 +55,13 @@ describe("seriesStructureSignature", () => {
     const structure = seriesStructureSignature(CATEGORIES, SERIES);
     const dataSigA = seriesDataSignature(CATEGORIES, SERIES);
     const dataSigB = seriesDataSignature(CATEGORIES, [
-      { name: "Revenue", data: [999, 888, 777] },
-      { name: "Cost", data: [111, 222, 333] },
+      item("Revenue", [999, 888, 777]),
+      item("Cost", [111, 222, 333]),
     ]);
     expect(dataSigA).not.toBe(dataSigB);
     expect(seriesStructureSignature(CATEGORIES, [
-      { name: "Revenue", data: [999, 888, 777] },
-      { name: "Cost", data: [111, 222, 333] },
+      item("Revenue", [999, 888, 777]),
+      item("Cost", [111, 222, 333]),
     ])).toBe(structure);
   });
 });

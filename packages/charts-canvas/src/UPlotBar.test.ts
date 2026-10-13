@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { cleanTheme } from "@axicharts/charts-theme";
 import { STACK_GROUP } from "./stack";
+import { seriesStackGroup } from "./stackTestUtils";
 import { buildBarOptions } from "./UPlotBar";
 
 describe("UPlotBar stacked", () => {
@@ -22,8 +23,8 @@ describe("UPlotBar stacked", () => {
       stackTotalsRef,
     });
 
-    expect(options.series?.[1]?.stack).toBe(STACK_GROUP);
-    expect(options.series?.[2]?.stack).toBe(STACK_GROUP);
+    expect(seriesStackGroup(options.series?.[1])).toBe(STACK_GROUP);
+    expect(seriesStackGroup(options.series?.[2])).toBe(STACK_GROUP);
   });
 
   it("uses tighter y headroom than grouped bars for stacked dashboards", () => {

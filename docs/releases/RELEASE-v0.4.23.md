@@ -27,4 +27,4 @@ Dashboard tile polish from the Recharts design audit: stacked bars, horizontal b
 | `@axicharts/charts-echarts` | 0.4.6 | **0.4.7** |
 | `@axicharts/charts-planner` | 0.2.2 | **0.2.2** (peer `^0.4.23`) |
 
-Triggered by GitHub release `v0.4.23` → [publish workflow](.github/workflows/publish.yml).
+Triggered by GitHub release `v0.4.23` → [publish workflow](../../.github/workflows/publish.yml).

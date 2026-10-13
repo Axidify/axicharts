@@ -62,7 +62,7 @@ export function resolveLiquidFillLayout(width: number, height: number) {
     compact: industrial || catalog,
     radius: industrial ? "80%" : catalog ? "84%" : "88%",
     labelFontSize: industrial ? 14 : catalog ? 18 : 28,
-    borderWidth: industrial ? 1 : 2,
+    borderWidth: 1,
   };
 }
 

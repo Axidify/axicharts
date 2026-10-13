@@ -1,6 +1,6 @@
 # Chart design audit — Recharts parity matrix
 
-Living tracker for **visual and UX quality** per chart type. Complements [render-audit.md](./render-audit.md) (layout/engine bugs, R-xxx) and [chart-design-language.md](./chart-design-language.md) (prescriptive design rules).
+Living tracker for **visual and UX quality** per chart type. Complements [render-audit.md](./render-audit.md) (layout/engine bugs, R-xxx), [chart-design-language.md](./chart-design-language.md) (prescriptive design rules), and [roadmap.md](./roadmap.md) (consolidated priorities).
 
 **Design north star:** [Recharts](https://recharts.org/) — *“Would this feel at home in a shadcn/Tremor-style dashboard next to a well-built Recharts chart?”*
 
@@ -17,7 +17,7 @@ We are **not** copying Recharts’ engine or API surface. We use it as the **def
 | [chart-design-language.md](./chart-design-language.md) | Prescriptive design rules — reference before implementing |
 | Visual CI `benchmarks/e2e/visual.spec.ts` | Regression snapshots |
 
-**Related docs:** axiboard [TAXONOMY.md](https://github.com/Axidify/axiboard/blob/main/docs/charts/TAXONOMY.md) · [COMPETITIVE.md](https://github.com/Axidify/axiboard/blob/main/docs/charts/COMPETITIVE.md)
+**Related docs:** [roadmap.md](./roadmap.md) (consolidated priorities) · axiboard [TAXONOMY.md](https://github.com/Axidify/axiboard/blob/main/docs/charts/TAXONOMY.md) · [COMPETITIVE.md](https://github.com/Axidify/axiboard/blob/main/docs/charts/COMPETITIVE.md)
 
 ---
 

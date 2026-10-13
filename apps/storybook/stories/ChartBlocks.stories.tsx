@@ -1,8 +1,10 @@
 import type { ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Chart } from "@axicharts/charts-spec";
-import blocksSpec from "../../../packages/charts-spec/examples/blocks-revenue-target.panel.json";
+import { Chart, normalizePanelSpec } from "@axicharts/charts-spec";
+import blocksSpecJson from "../../../packages/charts-spec/examples/blocks-revenue-target.panel.json";
 import { StudioLiveDashboard } from "../demo/StudioLiveDashboard";
+
+const blocksSpec = normalizePanelSpec(blocksSpecJson);
 
 const BLOCK_ROWS = [
   { week: "W1", revenue: 42, target: 40 },

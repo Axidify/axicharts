@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import {
   BarChart,
@@ -15,7 +15,7 @@ const VCPU_TARGET = 550;
 const CPU_POOL = 78;
 const MEMORY_POOL = 64;
 
-function KpiTile({ children }: { children: ReactElement }): ReactElement {
+function KpiTile({ children }: { children: ReactNode }): ReactElement {
   return (
     <div
       style={{

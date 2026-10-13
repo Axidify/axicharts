@@ -67,7 +67,7 @@ describe("SyncHighlight", () => {
           ready: true,
           theme: cleanTheme,
           mode: "interactive",
-          syncId: null,
+          syncId: undefined,
           dataState: "ready",
           isStale: false,
         }}

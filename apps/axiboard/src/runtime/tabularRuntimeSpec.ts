@@ -1,17 +1,20 @@
 import type { RuntimeDashboardSpec } from "@axicharts/charts-runtime";
 import type { OrchestratorChatResult } from "../api/orchestratorClient";
 
+export type PanelsRuntimeSpec = Extract<RuntimeDashboardSpec, { layout: "panels" }>;
+
 export function buildTabularRuntimeSpec(
   plan: OrchestratorChatResult,
   sourceCsv: string,
-): RuntimeDashboardSpec {
+): PanelsRuntimeSpec {
   const layout = plan.layout;
   return {
     layout: "panels",
     panels: {
       title: plan.dashboardPlan.title,
       subtitle: plan.dashboardPlan.subtitle,
-      theme: plan.dashboardPlan.theme,
+      // Planner plans carry the theme as a plain string drawn from the theme names.
+      theme: plan.dashboardPlan.theme as PanelsRuntimeSpec["panels"]["theme"],
       mode: "static",
       vertical: plan.vertical,
       columns: layout?.columns ?? 2,
@@ -43,8 +46,6 @@ export function buildTabularRuntimeSpec(
   };
 }
 
-export function isPanelsRuntimeSpec(
-  spec: RuntimeDashboardSpec,
-): spec is Extract<RuntimeDashboardSpec, { layout: "panels" }> {
+export function isPanelsRuntimeSpec(spec: RuntimeDashboardSpec): spec is PanelsRuntimeSpec {
   return spec.layout === "panels";
 }

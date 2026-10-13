@@ -21,6 +21,7 @@ import {
   validateShareExportDualJson,
 } from "@axicharts/charts-runtime/validation";
 import { ErrorList, importSummary, LayerStatus, ShareImportDocsLinks, ValidateCommandCopy } from "./validationChrome";
+import { adapterFixtureLayout } from "./runtime/buildRuntimeSpec";
 
 const overlayStyle = {
   position: "fixed" as const,
@@ -124,7 +125,7 @@ export function ShareDialog({
   const plannerFixtures =
     meta?.feed != null
       ? plannerAdapterFixtures({
-          layout: meta.layout ?? "embed",
+          layout: adapterFixtureLayout(meta.layout),
           feed: meta.feed,
         })
       : [];
@@ -334,7 +335,7 @@ export function ShareDialog({
             {meta.feed ? (
               <>
                 <a
-                  href={feedAdapterGalleryDeepLink(meta.feed, meta.layout)}
+                  href={feedAdapterGalleryDeepLink(meta.feed, adapterFixtureLayout(meta.layout))}
                   style={{ color: "#93c5fd" }}
                   target="_blank"
                   rel="noreferrer"

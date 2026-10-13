@@ -12,7 +12,10 @@ import { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
 import { compilePanel } from "./compilePanel";
 import { ejectPanel } from "./eject";
 import { assertChartsSpecTestHarness } from "./testHarness";
-import stackedBarSpec from "../examples/velocity-stacked-bar.panel.json";
+import { normalizePanelSpec } from "./parseSpec";
+import stackedBarSpecJson from "../examples/velocity-stacked-bar.panel.json";
+
+const stackedBarSpec = normalizePanelSpec(stackedBarSpecJson);
 
 describe("compilePanel registered types", () => {
   it("compiles community plugin panels via registerChartType", () => {

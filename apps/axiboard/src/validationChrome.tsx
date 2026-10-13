@@ -110,7 +110,9 @@ export function importSummary(exported: ShareExport, shape: ImportShape | null =
     const title =
       exported.spec.layout === "mosaic"
         ? exported.spec.wall?.title
-        : exported.spec.dashboard?.title;
+        : "dashboard" in exported.spec
+          ? exported.spec.dashboard?.title
+          : undefined;
     return `Runtime spec · ${title ?? exported.name}`;
   }
 

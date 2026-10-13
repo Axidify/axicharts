@@ -3,10 +3,12 @@ import {
   fieldProfilesToDataProfile,
   inferFieldRoles,
   profileTabular,
+  type DataProfile,
   type DomainSemantics,
   type FieldProfile,
-  type FieldRole,
 } from "@axicharts/charts-spec/planning";
+
+type FieldRole = FieldProfile["role"];
 
 export type DataProfileLike = {
   fields?: string[];
@@ -95,7 +97,7 @@ export function describeDataProfile(input: {
             role: inferFieldRoles([{ [name]: 0 }], { hints: {} })[0]?.role ?? "dimension",
           }));
 
-  const tabularProfile =
+  const tabularProfile: DataProfile =
     rows.length > 0 ? profileTabular(rows) : fieldProfilesToDataProfile(fieldProfiles);
 
   return {

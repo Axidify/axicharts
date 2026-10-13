@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { BarChart, ChartContainer, Stat } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
@@ -7,7 +7,7 @@ const WEEKS = ["W1", "W2", "W3", "W4", "W5"];
 const THROUGHPUT = [120, 90, 150, 110, 180];
 const TARGET = 150;
 
-function KpiTile({ children }: { children: ReactElement }): ReactElement {
+function KpiTile({ children }: { children: ReactNode }): ReactElement {
   return (
     <div
       style={{

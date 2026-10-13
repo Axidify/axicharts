@@ -30,7 +30,7 @@ describe("validatePanel (RFC-004 C180)", () => {
     if (result.ok) {
       expect(result.family).toBe("cartesian");
       expect(result.spec.type).toBe("cartesian");
-      expect(result.spec.marks?.[0]?.field).toBe("revenue");
+      expect(result.spec.marks?.[0]).toMatchObject({ field: "revenue" });
     }
   });
 

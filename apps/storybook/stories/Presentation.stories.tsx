@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import {
   BarChart,
@@ -13,7 +13,7 @@ const QUARTERS = ["Q1", "Q2", "Q3", "Q4"];
 const REVENUE = [820, 932, 901, 1034];
 const ARR_GROWTH = ((REVENUE[3]! - REVENUE[2]!) / REVENUE[2]!) * 100;
 
-function KpiTile({ children }: { children: ReactElement }): ReactElement {
+function KpiTile({ children }: { children: ReactNode }): ReactElement {
   return (
     <div
       style={{

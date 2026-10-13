@@ -305,7 +305,7 @@ describe("live mode merge wiring", () => {
         <BoxplotChart
           items={[
             {
-              name: "Latency",
+              category: "Latency",
               min: 1,
               q1: 4,
               median: 8,
@@ -514,7 +514,7 @@ describe("presentation mode animation wiring", () => {
         <BoxplotChart
           items={[
             {
-              name: "Latency",
+              category: "Latency",
               min: 1,
               q1: 4,
               median: 8,

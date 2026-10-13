@@ -167,9 +167,9 @@ const BLOCKS_PARITY_SPEC = {
     x: { field: "week", label: "Week" },
   },
   marks: [
-    { mark: "bar", field: "revenue", label: "Revenue", tone: "default" },
-    { mark: "line", field: "target", label: "Target", tone: "info", curve: "monotone" },
-    { mark: "rule", value: 50, label: "Quota", tone: "warning" },
+    { type: "bar", field: "revenue", label: "Revenue", tone: "default" },
+    { type: "line", field: "target", label: "Target", tone: "info", curve: "monotone" },
+    { type: "rule", value: 50, label: "Quota", tone: "warning" },
   ],
 } satisfies PanelSpec;
 
@@ -225,7 +225,7 @@ const BROWSER_SHARE_CHART_CONFIG = Object.fromEntries(
 );
 
 /** Tile compare: no in-panel title (row label only) + Recharts-matched slice colors. */
-export const DONUT_PARITY_SPEC = {
+export const DONUT_PARITY_SPEC: PanelSpec = {
   ...(donutSpec as PanelSpec),
   title: undefined,
   props: {
@@ -233,7 +233,7 @@ export const DONUT_PARITY_SPEC = {
     chartConfig: BROWSER_SHARE_CHART_CONFIG,
     centerMetric: "largest",
   },
-} satisfies PanelSpec;
+};
 
 const PRIORITY_PANEL: PanelSpec = {
   specVersion: 1,

@@ -8,6 +8,13 @@ import {
 } from "./familyRegistry";
 import { resetChartFamilyRegistry, registerBuiltinChartFamilies } from "./registerBuiltinChartFamilies";
 import { validatePanel } from "./validatePanel";
+import type { PanelFamily } from "./resolvePanelFamily";
+
+// Registrations take any string family id, but ValidatePanelResult.family is
+// the closed built-in PanelFamily union, so a plugin's own id needs a cast.
+function pluginFamily(id: string): PanelFamily {
+  return id as PanelFamily;
+}
 
 afterEach(() => {
   resetChartFamilyRegistry();
@@ -32,7 +39,7 @@ describe("familyRegistry (B6)", () => {
       markCatalog: [{ mark: "value", role: "data", required: ["field"] }],
       validate: (spec) => ({
         ok: true,
-        family: "demo-plugin",
+        family: pluginFamily("demo-plugin"),
         spec,
         warnings: [],
       }),
@@ -56,7 +63,7 @@ describe("familyRegistry (B6)", () => {
       markCatalog: [],
       validate: () => ({
         ok: true,
-        family: "one",
+        family: pluginFamily("one"),
         spec: { type: "shared-type" },
         warnings: [],
       }),
@@ -70,7 +77,7 @@ describe("familyRegistry (B6)", () => {
         markCatalog: [],
         validate: () => ({
           ok: true,
-          family: "two",
+          family: pluginFamily("two"),
           spec: { type: "shared-type" },
           warnings: [],
         }),

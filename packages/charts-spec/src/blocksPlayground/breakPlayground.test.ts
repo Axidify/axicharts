@@ -57,9 +57,10 @@ describe("blocksPlayground adversarial cases", () => {
   });
 
   it("parsePlaygroundData rejects invalid JSON and non-array data", () => {
-    expect(parsePlaygroundData("{ not json").ok).toBe(false);
-    if (!parsePlaygroundData("{ not json").ok) {
-      expect(parsePlaygroundData("{ not json").error).toBeTruthy();
+    const invalidJson = parsePlaygroundData("{ not json");
+    expect(invalidJson.ok).toBe(false);
+    if (!invalidJson.ok) {
+      expect(invalidJson.error).toBeTruthy();
     }
     const objectResult = parsePlaygroundData('{"week":"W1"}');
     expect(objectResult.ok).toBe(false);

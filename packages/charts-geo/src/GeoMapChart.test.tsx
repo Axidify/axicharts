@@ -18,7 +18,7 @@ describe("GeoMapChart", () => {
     const region = container.querySelector("g");
     expect(region).toBeTruthy();
     fireEvent.mouseEnter(region!);
-    expect(container.querySelector('[stroke-width="2"]')).toBeTruthy();
+    expect(container.querySelector('[stroke-width="1"]')).toBeTruthy();
   });
 
   it("renders dark surface palette", () => {

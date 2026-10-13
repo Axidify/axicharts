@@ -38,6 +38,7 @@ import {
   DataTable,
   MarkdownPanel,
   EChartsOptionChart,
+  registerEChartsOptionChart,
   type ChartDataState,
   type AlertItem,
   type PlotSeries,
@@ -49,10 +50,6 @@ import {
   applyTagTonesToSeries,
   resolveTagStatTone,
 } from "@axicharts/charts";
-import { GanttChart } from "@axicharts/charts-gantt";
-import { GeoMapChart } from "@axicharts/charts-geo";
-import { MapChart } from "@axicharts/charts-map";
-import { SankeyChart } from "@axicharts/charts-sankey";
 import { getChartType } from "@axicharts/charts/registry";
 import type { FieldEncoding, PanelSpec, SpecData, ThemeName, ChartMode } from "./types";
 import { asRows, pluckField } from "./data";
@@ -100,14 +97,12 @@ import {
   readPanelStyle,
   themeWithPanelStyle,
 } from "./panelStyle";
-import { registerPluginChartTypes } from "./registerPluginChartTypes";
 import { panelChartHeight } from "./resolvePanelHeight";
 import { assertPanelCategoryEnabled } from "./panelCategories";
 import { radarFromRows, resolveHeatmapMatrix } from "./heatmapEncoding";
 import { resolveCalendarHeatmapData } from "./calendarEncoding";
 import { resolvePictorialBarData } from "./pictorialBarEncoding";
 import { resolveLiquidFillValue } from "./liquidFillEncoding";
-import { resolveMapDrillProps } from "./mapEncoding";
 import { parallelFromRows, themeRiverFromRows } from "./parallelEncoding";
 import { bumpFromRows } from "./bumpEncoding";
 import { graphFromRows } from "./graphEncoding";
@@ -272,6 +267,16 @@ function objectDataFromSpec(data: SpecData): Record<string, unknown> {
   return {};
 }
 
+/** First-party plugin panel types → package that registers them. */
+const PLUGIN_PANEL_PACKAGES: Record<string, string> = {
+  sankey: "@axicharts/charts-sankey",
+  geo: "@axicharts/charts-geo",
+  map: "@axicharts/charts-map",
+  gantt: "@axicharts/charts-gantt",
+  tank: "@axicharts/charts-tank",
+  andon: "@axicharts/charts-andon",
+};
+
 function compileRegisteredPanel(
   spec: PanelSpec,
   data: SpecData,
@@ -281,14 +286,19 @@ function compileRegisteredPanel(
 ): ReactElement {
   const registration = getChartType(spec.type);
   if (!registration) {
-    throw new Error(`Unsupported panel type: ${spec.type}`);
+    const pluginPackage = PLUGIN_PANEL_PACKAGES[spec.type];
+    throw new Error(
+      pluginPackage
+        ? `[AxiCharts] Panel type "${spec.type}" needs the ${pluginPackage} plugin. Install it and import "${pluginPackage}/register" (or import "@axicharts/charts-spec/plugins" to register every first-party plugin).`
+        : `Unsupported panel type: ${spec.type}`,
+    );
   }
 
-  const chartProps = {
-    ...objectDataFromSpec(data),
-    ...(rows[0] ?? {}),
-    ...chartPropsFromPanel(spec.props ?? {}),
-  };
+  const panelProps = chartPropsFromPanel(spec.props ?? {});
+  const objectData = objectDataFromSpec(data);
+  const chartProps = registration.fromSpec
+    ? registration.fromSpec({ props: panelProps, data: objectData, rows })
+    : { ...objectData, ...(rows[0] ?? {}), ...panelProps };
 
   return wrapChart(
     spec,
@@ -322,7 +332,7 @@ export function compilePanel(
       "compilePanel: panel spec is required (use the Chart `panel` prop, not `spec`)",
     );
   }
-  registerPluginChartTypes();
+  registerEChartsOptionChart();
 
   const resolved = applySpecCompilers(spec, data);
   assertPanelCategoryEnabled(resolved.type);
@@ -1267,84 +1277,6 @@ export function compilePanel(
         surface: props.surface as "light" | "dark" | undefined,
         title: String(props.title ?? resolved.title ?? ""),
       });
-    }
-
-    case "sankey": {
-      const nodes =
-        (props.nodes as Parameters<typeof SankeyChart>[0]["nodes"]) ??
-        (objectData.nodes as Parameters<typeof SankeyChart>[0]["nodes"]);
-      const links =
-        (props.links as Parameters<typeof SankeyChart>[0]["links"]) ??
-        (objectData.links as Parameters<typeof SankeyChart>[0]["links"]);
-      return wrap(
-        createElement(SankeyChart, {
-          nodes: nodes ?? [],
-          links: links ?? [],
-          surface: props.surface as "light" | "dark" | undefined,
-        }),
-      );
-    }
-
-    case "geo": {
-      const regions =
-        (props.regions as Parameters<typeof GeoMapChart>[0]["regions"]) ??
-        (objectData.regions as Parameters<typeof GeoMapChart>[0]["regions"]);
-      return wrap(
-        createElement(GeoMapChart, {
-          regions: regions ?? [],
-          min: props.min as number | undefined,
-          max: props.max as number | undefined,
-          showLabels: props.showLabels as boolean | undefined,
-          showScale: props.showScale as boolean | undefined,
-          surface: props.surface as "light" | "dark" | undefined,
-        }),
-      );
-    }
-
-    case "map": {
-      const topology =
-        (props.topology as Parameters<typeof MapChart>[0]["topology"]) ??
-        (objectData.topology as Parameters<typeof MapChart>[0]["topology"]);
-      const values =
-        (props.values as Parameters<typeof MapChart>[0]["values"]) ??
-        (objectData.values as Parameters<typeof MapChart>[0]["values"]);
-      const drillProps = resolveMapDrillProps(props);
-      return wrap(
-        createElement(MapChart, {
-          topology: topology!,
-          values: values ?? {},
-          objectKey: props.objectKey as string | undefined,
-          featureId: props.featureId as string | undefined,
-          nameKey: props.nameKey as string | undefined,
-          projection: props.projection as Parameters<typeof MapChart>[0]["projection"],
-          min: props.min as number | undefined,
-          max: props.max as number | undefined,
-          showLabels: props.showLabels as boolean | undefined,
-          showScale: props.showScale as boolean | undefined,
-          surface: props.surface as "light" | "dark" | undefined,
-          ...drillProps,
-        }),
-      );
-    }
-
-    case "gantt": {
-      const tasks =
-        (props.tasks as Parameters<typeof GanttChart>[0]["tasks"]) ??
-        (objectData.tasks as Parameters<typeof GanttChart>[0]["tasks"]);
-      const milestones =
-        (props.milestones as Parameters<typeof GanttChart>[0]["milestones"]) ??
-        (objectData.milestones as Parameters<typeof GanttChart>[0]["milestones"]);
-      return wrap(
-        createElement(GanttChart, {
-          tasks: tasks ?? [],
-          milestones,
-          unit: props.unit as string | undefined,
-          rangeStart: props.rangeStart as number | undefined,
-          rangeEnd: props.rangeEnd as number | undefined,
-          today: props.today as number | undefined,
-          surface: props.surface as "light" | "dark" | undefined,
-        }),
-      );
     }
 
     case "echarts": {

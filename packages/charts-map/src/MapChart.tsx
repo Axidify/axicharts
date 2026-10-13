@@ -405,7 +405,7 @@ export function MapChart({
                 transform={`translate(0, ${mapOffsetY})`}
                 fill={fill}
                 stroke={active ? palette.hoverStroke : palette.stroke}
-                strokeWidth={active ? 1.5 : 0.75}
+                strokeWidth={active ? 1 : 0.5}
                 opacity={hoverKey && !active ? hover.dimOpacity : 1}
               />
               {showLabels && centroid ? (

@@ -59,8 +59,10 @@ function createViolinRenderItem({
   seriesIndex,
   showBoxplot,
   showMedianLine,
+  medianLineWidth,
 }: {
   color: string;
+  medianLineWidth: number;
   seriesCount: number;
   seriesIndex: number;
   showBoxplot: boolean;
@@ -128,7 +130,7 @@ function createViolinRenderItem({
                   x2: centerX + maxHalfWidth * 0.35,
                   y2: api.coord([categoryIndex, stats.median])[1]!,
                 },
-                style: { stroke: color, lineWidth: 2 },
+                style: { stroke: color, lineWidth: medianLineWidth },
               },
             ]
           : []),
@@ -243,6 +245,7 @@ export function EChartsViolin({
             seriesIndex: groupIndex,
             showBoxplot,
             showMedianLine,
+            medianLineWidth: theme.line.strokeWidth,
           }),
           data: group.items.map((item, categoryIndex) => ({
             name: item.category,

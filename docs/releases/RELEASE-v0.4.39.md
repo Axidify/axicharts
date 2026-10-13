@@ -20,4 +20,4 @@
 | `@axicharts/charts-echarts` | 0.4.17 | **0.4.18** (peer `^0.4.39`) |
 | `@axicharts/charts-planner` | 0.2.5 | **0.2.6** (peer `^0.4.39`) |
 
-Triggered by GitHub release `v0.4.39` → [publish workflow](.github/workflows/publish.yml).
+Triggered by GitHub release `v0.4.39` → [publish workflow](../../.github/workflows/publish.yml).

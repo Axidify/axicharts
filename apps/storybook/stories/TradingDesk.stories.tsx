@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import {
   CandlestickChart,
@@ -80,7 +80,7 @@ const RSI_LAST = RSI[RSI.length - 1] ?? 0;
 const RSI_WARN = RSI_LAST >= 70 || RSI_LAST <= 30;
 const TOTAL_VOLUME = VOLUME.reduce((sum, value) => sum + value, 0);
 
-function KpiTile({ children }: { children: ReactElement }): ReactElement {
+function KpiTile({ children }: { children: ReactNode }): ReactElement {
   return (
     <div
       style={{

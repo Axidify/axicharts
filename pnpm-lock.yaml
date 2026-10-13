@@ -23,6 +23,9 @@ importers:
       typescript:
         specifier: ^5.8.2
         version: 5.9.3
+      vite:
+        specifier: ^6.2.2
+        version: 6.4.3(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.32.0)
 
   apps/axiboard:
     dependencies:
@@ -32,6 +35,9 @@ importers:
       '@axicharts/charts-andon':
         specifier: workspace:*
         version: link:../../packages/charts-andon
+      '@axicharts/charts-gantt':
+        specifier: workspace:*
+        version: link:../../packages/charts-gantt
       '@axicharts/charts-geo':
         specifier: workspace:*
         version: link:../../packages/charts-geo
@@ -273,9 +279,15 @@ importers:
       '@axicharts/charts':
         specifier: workspace:*
         version: link:../../packages/charts
+      '@axicharts/charts-andon':
+        specifier: workspace:*
+        version: link:../../packages/charts-andon
       '@axicharts/charts-spec':
         specifier: workspace:*
         version: link:../../packages/charts-spec
+      '@axicharts/charts-tank':
+        specifier: workspace:*
+        version: link:../../packages/charts-tank
       '@axicharts/charts-theme':
         specifier: workspace:*
         version: link:../../packages/charts-theme
@@ -322,6 +334,9 @@ importers:
       '@axicharts/charts-map':
         specifier: workspace:*
         version: link:../../packages/charts-map
+      '@axicharts/charts-planner':
+        specifier: workspace:*
+        version: link:../../packages/charts-planner
       '@axicharts/charts-runtime':
         specifier: workspace:*
         version: link:../../packages/charts-runtime
@@ -572,6 +587,9 @@ importers:
       '@axicharts/charts':
         specifier: workspace:*
         version: link:../charts
+      '@axicharts/charts-andon':
+        specifier: workspace:*
+        version: link:../charts-andon
       '@axicharts/charts-canvas':
         specifier: workspace:*
         version: link:../charts-canvas
@@ -581,12 +599,27 @@ importers:
       '@axicharts/charts-echarts':
         specifier: workspace:*
         version: link:../charts-echarts
+      '@axicharts/charts-gantt':
+        specifier: workspace:*
+        version: link:../charts-gantt
+      '@axicharts/charts-geo':
+        specifier: workspace:*
+        version: link:../charts-geo
+      '@axicharts/charts-map':
+        specifier: workspace:*
+        version: link:../charts-map
       '@axicharts/charts-runtime':
         specifier: workspace:*
         version: link:../charts-runtime
+      '@axicharts/charts-sankey':
+        specifier: workspace:*
+        version: link:../charts-sankey
       '@axicharts/charts-spec':
         specifier: workspace:*
         version: link:../charts-spec
+      '@axicharts/charts-tank':
+        specifier: workspace:*
+        version: link:../charts-tank
       '@axicharts/charts-theme':
         specifier: workspace:*
         version: link:../charts-theme
@@ -885,12 +918,25 @@ importers:
       '@axicharts/charts':
         specifier: workspace:*
         version: link:../charts
-      '@axicharts/charts-andon':
-        specifier: workspace:*
-        version: link:../charts-andon
       '@axicharts/charts-canvas':
         specifier: workspace:*
         version: link:../charts-canvas
+      '@axicharts/charts-echarts':
+        specifier: workspace:*
+        version: link:../charts-echarts
+      '@axicharts/charts-theme':
+        specifier: workspace:*
+        version: link:../charts-theme
+      ajv:
+        specifier: ^8.17.1
+        version: 8.20.0
+      ajv-formats:
+        specifier: ^3.0.1
+        version: 3.0.1(ajv@8.20.0)
+    devDependencies:
+      '@axicharts/charts-andon':
+        specifier: workspace:*
+        version: link:../charts-andon
       '@axicharts/charts-gantt':
         specifier: workspace:*
         version: link:../charts-gantt
@@ -906,16 +952,6 @@ importers:
       '@axicharts/charts-tank':
         specifier: workspace:*
         version: link:../charts-tank
-      '@axicharts/charts-theme':
-        specifier: workspace:*
-        version: link:../charts-theme
-      ajv:
-        specifier: ^8.17.1
-        version: 8.20.0
-      ajv-formats:
-        specifier: ^3.0.1
-        version: 3.0.1(ajv@8.20.0)
-    devDependencies:
       '@napi-rs/canvas':
         specifier: ^1.0.2
         version: 1.0.2

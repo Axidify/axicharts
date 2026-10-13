@@ -4,9 +4,11 @@ import {
   ChartContainer,
   LiquidFillChart,
 } from "@axicharts/charts/liquid-fill";
-import { compilePanel } from "@axicharts/charts-spec";
+import { compilePanel, normalizePanelSpec } from "@axicharts/charts-spec";
 import { cleanTheme } from "@axicharts/charts-theme";
-import tankFixture from "../../../packages/charts-spec/examples/liquid-fill-tank.panel.json";
+import tankFixtureJson from "../../../packages/charts-spec/examples/liquid-fill-tank.panel.json";
+
+const tankFixture = normalizePanelSpec(tankFixtureJson);
 
 function LiquidFillStaticDemo(): ReactElement {
   return (
