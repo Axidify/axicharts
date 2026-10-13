@@ -22,6 +22,8 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ### Added
 
+- **charts-theme** — `ChartTheme.surface` (`"light" | "dark"`) and `isDarkTheme(theme)`; `liveTheme` / `industrialTheme` set `"dark"` and `createTheme` forks inherit it (dark detection used theme names, so renamed forks rendered light chrome)
+- **charts** — Stat, Digital, Gauge, AlertPanel, MarkdownPanel and DataTable default their `surface` to the container theme (standalone stays `"dark"`; explicit `surface` wins)
 - **charts-spec** — cartesian `text` and `marker` overlay marks; `rule` marks accept `x` / `id`, `band` marks accept `id`. `marks[]` is now the single spec annotation surface (**E-101**); `point`, `text` and `marker` added to the exported cartesian JSON schema
 - **charts-spec** — `LEGACY_OVERLAY_PROPS` deprecation warning for `props.referenceLines`, `props.thresholdBands` and `annotations` on cartesian-family panels (**E-102**); non-blocking in 0.5, removal planned for 0.6
 - **storybook** — `Charts/Annotations/SpecMarks` spec-path overlay example @ 360×280 (**E-103**)
@@ -34,6 +36,14 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ### Fixed
 
+- **charts-echarts** — violin and ridgeline rendered no shapes (KDE arrays rode in custom-series `value`, which ECharts coerces to numbers); value axes now span the data
+- **charts-echarts** — untoned series, groups and segments all used the first palette color (`toneColor` never returned "no tone") — sunburst/treemap parents, multi-group boxplot/violin/swarm, bump, parallel, radar, scatter, graph, funnel
+- **charts-echarts** — treemap / sunburst labels pick dark or white text per segment fill for contrast
+- **charts-echarts** — theme river: label times (`W1`, `Q3`) drew no streams; compact gutters; dated tick labels
+- **charts-echarts** — calendar heatmap: themed month dividers (were 2px black), surface-matched gutters, quarter month labels in compact tiles
+- **charts-echarts** — waterfall: axis headroom so top delta labels clear the plot edge
+- **charts-canvas** — threshold bands never drew on uPlot line / area / combo / bar charts; they now paint behind the series
+- **charts-spec** — `<Chart>` rejected legacy `type: "bar" | "line"` panels with `props.series` (Tier-2 warning now; error in strict mode)
 - **charts-echarts** — violin / ridgeline median line referenced an out-of-scope `theme` (DTS build failure)
 
 ## [0.4.39] - 2026-07-23
