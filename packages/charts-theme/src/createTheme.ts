@@ -25,5 +25,8 @@ export function createTheme(
     hover: overrides.hover
       ? { ...(base.hover ?? {}), ...overrides.hover }
       : base.hover,
+    font: overrides.font
+      ? { ...(base.font ?? {}), ...overrides.font }
+      : base.font,
   };
 }

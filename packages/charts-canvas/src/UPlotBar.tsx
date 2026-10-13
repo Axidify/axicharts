@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { resolveToneColors } from "@axicharts/charts-theme";
+import { themeFont } from "@axicharts/charts-theme";
 import type { ReactElement } from "react";
 import uPlot from "uplot";
 import { formatChartValue } from "@axicharts/charts-core";
@@ -15,6 +15,7 @@ import {
 import type { UPlotBarProps, BarOrientation } from "./types";
 import { applySyncedCursor } from "./plotCursor";
 import {
+  annotationStyle,
   createAnnotationDrawHook,
   createBandDrawHook,
   expandYRange,
@@ -196,7 +197,7 @@ function buildBarOptionsBase({
 
   const chrome = resolveChromeColors(theme);
   const compact = height < 72;
-  const toneColors = resolveToneColors(theme);
+  const plotStyle = annotationStyle(theme);
   const gridStroke = chromeGridStroke(theme, compact);
   const gapPx = ordinalBarGapPx(categories.length, theme.bar.gap);
   const stackSeries = shouldStackSeries(stacked, series.length);
@@ -323,10 +324,10 @@ function buildBarOptionsBase({
 
   const drawBandsHook = createBandDrawHook(
     horizontal ? [] : thresholdBandsResolved,
-    toneColors,
+    plotStyle,
   );
   const drawBarHook = createAnnotationDrawHook({
-    toneColors,
+    style: plotStyle,
     referenceLines: horizontal ? [] : referenceLinesResolved,
     verticalLines: horizontal ? [] : verticalLines,
     labels: horizontal ? [] : plotLabels,
@@ -364,7 +365,7 @@ function buildBarOptionsBase({
       if (showBarValues) {
         ctx.save();
         ctx.fillStyle = chrome.axis;
-        ctx.font = "10px ui-sans-serif, system-ui, sans-serif";
+        ctx.font = themeFont(theme, { delta: -1 });
 
         if (horizontal) {
           ctx.textAlign = "left";
@@ -397,6 +398,7 @@ function buildBarOptionsBase({
           chrome.axis,
           formatLabel,
           orientation,
+          themeFont(theme, { delta: -1 }),
         );
       }
     },
@@ -447,7 +449,7 @@ function buildBarOptionsBase({
               ticks: { show: true, stroke: chrome.axis, size: 4 },
               values: axisCategoryValues(categories),
               size: leftAxisSize,
-              font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+              font: themeFont(theme),
               gap: horizontalCategoryAxisGap(),
             },
             {
@@ -463,8 +465,8 @@ function buildBarOptionsBase({
               incrs: horizontalValueAxisIncrs(horizontalAxisMax),
               size: compact ? 0 : 32,
               font: theme.values.monospace
-                ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-                : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+                ? themeFont(theme, { mono: true })
+                : themeFont(theme),
               gap: 4,
             },
           ] as unknown as uPlot.Axis[])
@@ -507,7 +509,7 @@ function buildBarOptionsBase({
             ticks: { show: false },
             values: axisCategoryValues(categories, compact ? undefined : width),
             size: compact ? 0 : categoryAxisSize(),
-            font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+            font: themeFont(theme),
             gap: 8,
           },
           {
@@ -518,8 +520,8 @@ function buildBarOptionsBase({
             ticks: { show: false },
             size: compact ? 0 : 32,
             font: theme.values.monospace
-              ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-              : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+              ? themeFont(theme, { mono: true })
+              : themeFont(theme),
             gap: 4,
           },
         ]

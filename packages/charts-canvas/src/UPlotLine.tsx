@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { resolveToneColors } from "@axicharts/charts-theme";
+import { themeFont } from "@axicharts/charts-theme";
 import type { ReactElement } from "react";
 import uPlot from "uplot";
 import { applyValueAxisOptions } from "./valueAxis";
@@ -16,6 +16,7 @@ import type { UPlotLineProps } from "./types";
 import { shouldUseDualAxis } from "./dualAxis";
 import { applySyncedCursor } from "./plotCursor";
 import {
+  annotationStyle,
   createAnnotationDrawHook,
   createBandDrawHook,
   expandYRange,
@@ -87,7 +88,7 @@ function buildLineOptionsBase({
   });
 
   const compact = height < 72;
-  const toneColors = resolveToneColors(theme);
+  const plotStyle = annotationStyle(theme);
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme, compact);
   const gridWidth = compact ? 1 : theme.grid.strokeWidth;
@@ -201,7 +202,7 @@ function buildLineOptionsBase({
             values: axisCategoryValues(categories, compact ? undefined : width),
             gap: 8,
             size: compact ? 0 : categoryAxisSize(),
-            font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+            font: themeFont(theme),
           },
           {
             scale: "y",
@@ -212,8 +213,8 @@ function buildLineOptionsBase({
             ticks: { show: false },
             size: compact ? 0 : 32,
             font: theme.values.monospace
-              ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-              : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+              ? themeFont(theme, { mono: true })
+              : themeFont(theme),
           },
           ...(useDualAxis
             ? [
@@ -225,8 +226,8 @@ function buildLineOptionsBase({
                   ticks: { show: false },
                   size: 32,
                   font: theme.values.monospace
-                    ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-                    : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+                    ? themeFont(theme, { mono: true })
+                    : themeFont(theme),
                 },
               ]
             : []),
@@ -287,10 +288,10 @@ function buildLineOptionsBase({
       segmentedDraw ||
       variablePointDraw
         ? {
-            drawAxes: [createBandDrawHook(thresholdBandsResolved, toneColors)],
+            drawAxes: [createBandDrawHook(thresholdBandsResolved, plotStyle)],
             draw: [
               createAnnotationDrawHook({
-                toneColors,
+                style: plotStyle,
                 referenceLines: referenceLinesResolved,
                 verticalLines,
                 labels: plotLabels,

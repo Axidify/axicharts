@@ -194,6 +194,8 @@ export function ChartContainer({
           paddingBottom: chromeInset > 0 ? chromeInset : undefined,
           position: "relative",
           boxSizing: "border-box",
+          // React chrome (tooltip, legend, captions) inherits the theme font.
+          ...(resolvedTheme.font?.family ? { fontFamily: resolvedTheme.font.family } : {}),
           ...style,
         }}
       >

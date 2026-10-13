@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { resolveToneColors } from "@axicharts/charts-theme";
+import { themeFont } from "@axicharts/charts-theme";
 import type { ReactElement, MutableRefObject } from "react";
 import uPlot from "uplot";
 import { formatChartValue } from "@axicharts/charts-core";
@@ -16,6 +16,7 @@ import {
 import type { ComboSeries, UPlotComboProps } from "./types";
 import { applySyncedCursor } from "./plotCursor";
 import {
+  annotationStyle,
   createAnnotationDrawHook,
   createBandDrawHook,
   expandYRange,
@@ -113,7 +114,7 @@ function buildComboOptionsBase(
   const formatLabel = (value: number, suffix = ""): string =>
     formatChartValue(value, { format: valueFormat, suffix });
   const compact = height < 72;
-  const toneColors = resolveToneColors(theme);
+  const plotStyle = annotationStyle(theme);
   const gridStroke = chromeGridStroke(theme, compact);
   const gapPx = ordinalBarGapPx(categories.length, theme.bar.gap);
   const fillOpacity = theme.area.fillOpacity;
@@ -201,7 +202,7 @@ function buildComboOptionsBase(
             ticks: { show: false },
             values: axisCategoryValues(categories, compact ? undefined : width),
             size: compact ? 0 : categoryAxisSize(),
-            font: "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+            font: themeFont(theme),
             gap: 8,
           },
           {
@@ -212,8 +213,8 @@ function buildComboOptionsBase(
             ticks: { show: false },
             size: compact ? 0 : 32,
             font: theme.values.monospace
-              ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-              : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+              ? themeFont(theme, { mono: true })
+              : themeFont(theme),
             gap: 4,
           },
           ...(useDualAxis
@@ -226,8 +227,8 @@ function buildComboOptionsBase(
                   ticks: { show: false },
                   size: compact ? 0 : 32,
                   font: theme.values.monospace
-                    ? "11px ui-monospace, SFMono-Regular, Menlo, monospace"
-                    : "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+                    ? themeFont(theme, { mono: true })
+                    : themeFont(theme),
                   gap: 4,
                 },
               ]
@@ -315,10 +316,10 @@ function buildComboOptionsBase(
       }),
     ],
     hooks: {
-      drawAxes: [createBandDrawHook(thresholdBandsResolved, toneColors)],
+      drawAxes: [createBandDrawHook(thresholdBandsResolved, plotStyle)],
       draw: [
         createAnnotationDrawHook({
-                toneColors,
+                style: plotStyle,
           referenceLines: referenceLinesResolved,
           verticalLines,
           labels: plotLabels,
@@ -331,8 +332,8 @@ function buildComboOptionsBase(
                   ctx.save();
                   ctx.fillStyle = chrome.axis;
                   ctx.font = theme.values.monospace
-                    ? "10px ui-monospace, SFMono-Regular, Menlo, monospace"
-                    : "10px ui-sans-serif, system-ui, -apple-system, sans-serif";
+                    ? themeFont(theme, { delta: -1, mono: true })
+                    : themeFont(theme, { delta: -1 });
                   ctx.textAlign = "center";
                   ctx.textBaseline = "bottom";
                   for (const layout of barLayoutsRef.current) {
@@ -351,6 +352,8 @@ function buildComboOptionsBase(
                     valueSuffix,
                     chrome.axis,
                     formatLabel,
+                    "vertical",
+                    themeFont(theme, { delta: -1 }),
                   );
                 }
               }

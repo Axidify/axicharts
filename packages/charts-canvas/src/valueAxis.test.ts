@@ -72,3 +72,28 @@ describe("compact tiles", () => {
     expect((axis?.splits as AxisSplits)(u, 1, 0, 100)).not.toHaveLength(6);
   });
 });
+
+describe("theme typography", () => {
+  it("reaches axis fonts on line / bar / combo", () => {
+    const brand = { ...cleanTheme, font: { family: "Inter, sans-serif", size: 13 } };
+    for (const options of [
+      buildLineOptions({ ...base, theme: brand }),
+      buildBarOptions({ ...base, ...refs(), theme: brand }),
+      buildComboOptions({
+        ...base,
+        theme: brand,
+        series: [{ name: "Revenue", data: [1, 2, 3, 4], kind: "bar" as const }],
+        ...refs(),
+      }),
+    ]) {
+      expect(options.axes?.[0]?.font).toBe("13px Inter, sans-serif");
+      expect(options.axes?.[1]?.font).toBe("13px Inter, sans-serif");
+    }
+  });
+
+  it("keeps the historical 11px system font by default", () => {
+    expect(buildLineOptions(base).axes?.[1]?.font).toBe(
+      "11px ui-sans-serif, system-ui, -apple-system, sans-serif",
+    );
+  });
+});

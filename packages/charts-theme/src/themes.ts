@@ -9,10 +9,24 @@ export type ChartThemeSvgPolish = {
   lineGlow?: boolean;
 };
 
+export type ChartThemeFont = {
+  /** CSS font-family list (default system UI sans). */
+  family?: string;
+  /** Family for `values.monospace` numbers (default system monospace). */
+  monoFamily?: string;
+  /** Base axis-label size in px (default 11). */
+  size?: number;
+};
+
 export type ChartTheme = {
   name: string;
   /** Background the chart sits on. Drives dark chrome, hover and KPI defaults; inherited by `createTheme`. */
   surface?: "light" | "dark";
+  /**
+   * Typography for axes, value labels, annotations, tooltips and legends.
+   * `size` is the base axis-label size in px (default 11); smaller labels scale from it.
+   */
+  font?: ChartThemeFont;
   tokens?: ChartColorTokens;
   svg?: ChartThemeSvgPolish;
   hover?: Partial<ChartThemeHover>;

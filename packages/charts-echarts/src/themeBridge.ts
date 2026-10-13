@@ -2,6 +2,7 @@ import type { ChartTheme } from "@axicharts/charts-theme";
 import {
   isDarkTheme,
   resolveChartChrome,
+  resolveThemeFont,
   resolveHoverChrome,
   resolveToneColors,
 } from "@axicharts/charts-theme";
@@ -70,12 +71,12 @@ export function gridOptions(theme: ChartTheme, compact = false) {
 
 export function axisLabelStyle(theme: ChartTheme) {
   const chrome = resolveChartChrome(theme);
+  const font = resolveThemeFont(theme);
   return {
     color: echartsColor(chrome.axis),
-    fontSize: 11,
-    fontFamily: theme.values.monospace
-      ? "ui-monospace, SFMono-Regular, Menlo, monospace"
-      : "inherit",
+    fontSize: font.size,
+    // "inherit" is the historical default; a theme `font.family` opts into a brand font.
+    fontFamily: theme.values.monospace ? font.monoFamily : (theme.font?.family ?? "inherit"),
   };
 }
 
