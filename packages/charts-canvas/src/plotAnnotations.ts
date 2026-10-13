@@ -42,6 +42,7 @@ function drawBandLabel(
   }
 
   ctx.fillStyle = contrastingTextColor(toneColor);
+  ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillText(text, labelX + padX, labelY + labelHeight / 2);
   ctx.textBaseline = "alphabetic";

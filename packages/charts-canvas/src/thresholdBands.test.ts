@@ -124,6 +124,32 @@ describe("threshold bands render on the canvas", () => {
     expect(bandCoverage(u)).toBeGreaterThan(0.8);
   });
 
+  it("draws band label text inside its pill", async () => {
+    const options = buildLineOptions({
+      width: 360,
+      height: 220,
+      categories,
+      series: [{ name: "Temp", data }],
+      theme: cleanTheme,
+      showAxes: true,
+      thresholdBands: [{ ...band, label: "Critical" }],
+    });
+    const u = await mount(options, 1);
+    const yTop = u.valToPos(band.max, "y", true);
+    const yBottom = u.valToPos(band.min, "y", true);
+    const y = Math.round((yTop + yBottom) / 2 - 4);
+    // drawBandLabel: pill at left + 6, text starts 5px further in.
+    const x = Math.round(u.bbox.left + 11);
+    const pixels = u.ctx.getImageData(x, y - 4, 30, 9).data;
+    let textPixels = 0;
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (pixels[i]! > 200 && pixels[i + 1]! > 200 && pixels[i + 2]! > 200) {
+        textPixels += 1;
+      }
+    }
+    expect(textPixels).toBeGreaterThan(5);
+  });
+
   it("paints bands before the series, not over them", () => {
     const options = buildLineOptions({
       width: 360,
