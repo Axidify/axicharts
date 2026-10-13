@@ -4,8 +4,10 @@ import type { ReactElement } from "react";
 import { useMemo } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
+import { isDarkTheme, resolveChartChrome } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
 import { axisLabelStyle, hiddenTooltip, seriesPalette } from "./themeBridge";
+import { echartsColor } from "./echartsColor";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { CalendarHeatmapData } from "./types";
@@ -98,6 +100,8 @@ export function EChartsCalendarHeatmap({
   const computedMax = max ?? (values.length > 0 ? Math.max(...values) : 1);
   const layout = resolveCalendarHeatmapLayout(width, height, { showLabels });
   const resolvedCellSize = cellSize ?? layout.cellSize;
+  const dark = isDarkTheme(theme);
+  const gridColor = echartsColor(resolveChartChrome(theme).grid);
 
   const option: EChartsOption = withPresentationAnimation(
     {
@@ -113,7 +117,14 @@ export function EChartsCalendarHeatmap({
           : (["auto", resolvedCellSize] as [number | "auto", number]),
         itemStyle: {
           borderWidth: 1,
-          borderColor: "#fff",
+          // Cell gutters match the surface (was white on every theme).
+          borderColor: dark ? "#0f172a" : "#ffffff",
+        },
+        // ECharts' default month dividers are 2px black — the heavy vertical
+        // strokes across the grid. Use the theme's grid chrome instead.
+        splitLine: {
+          show: true,
+          lineStyle: { color: gridColor, width: 1 },
         },
         yearLabel: {
           show: !layout.compact,
@@ -122,6 +133,13 @@ export function EChartsCalendarHeatmap({
         monthLabel: {
           ...axisLabelStyle(theme),
           fontSize: layout.compact ? 9 : 11,
+          // Twelve labels don't fit a compact tile; keep quarter starts.
+          ...(layout.compact
+            ? {
+                formatter: (params: { nameMap: string; M: number | string }) =>
+                  (Number(params.M) - 1) % 3 === 0 ? params.nameMap : "",
+              }
+            : {}),
         },
         dayLabel: {
           firstDay: 1,
