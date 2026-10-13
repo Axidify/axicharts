@@ -15,6 +15,7 @@ import { shouldUseDualAxis } from "./dualAxis";
 import { applySyncedCursor } from "./plotCursor";
 import {
   createAnnotationDrawHook,
+  createBandDrawHook,
   expandYRange,
 } from "./plotAnnotations";
 import { resolveAnnotationPlotProps } from "./annotations";
@@ -35,7 +36,7 @@ import {
   categoryXScale,
 } from "./categoricalScale";
 
-function buildOptions({
+export function buildLineOptions({
   width,
   height,
   categories,
@@ -271,9 +272,9 @@ function buildOptions({
       segmentedDraw ||
       variablePointDraw
         ? {
+            drawAxes: [createBandDrawHook(thresholdBandsResolved)],
             draw: [
               createAnnotationDrawHook({
-                bands: thresholdBandsResolved,
                 referenceLines: referenceLinesResolved,
                 verticalLines,
                 labels: plotLabels,
@@ -326,7 +327,7 @@ export function UPlotLine(props: UPlotLineProps): ReactElement {
   onSyncIndexRef.current = onSyncIndex;
 
   const options = useMemo(() => {
-    const base = buildOptions(props);
+    const base = buildLineOptions(props);
     if (!showCursor && !onSyncIndexRef.current) {
       return base;
     }

@@ -42,6 +42,7 @@ function drawBandLabel(
   }
 
   ctx.fillStyle = contrastingTextColor(toneColor);
+  ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillText(text, labelX + padX, labelY + labelHeight / 2);
   ctx.textBaseline = "alphabetic";
@@ -79,8 +80,12 @@ export function drawThresholdBands(u: uPlot, bands: ThresholdBand[]): void {
   if (bands.length === 0) return;
 
   const ctx = u.ctx;
-  const left = u.bbox.left;
-  const width = u.bbox.width;
+  const { left, top, width, height } = u.bbox;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(left, top, width, height);
+  ctx.clip();
 
   for (const band of bands) {
     const low = Math.min(band.min, band.max);
@@ -107,6 +112,8 @@ export function drawThresholdBands(u: uPlot, bands: ThresholdBand[]): void {
     }
     ctx.restore();
   }
+
+  ctx.restore();
 }
 
 export function drawReferenceLines(
@@ -267,8 +274,17 @@ export function drawPlotMarkers(
   }
 }
 
+/**
+ * Paints threshold bands behind the series. Register on uPlot's `drawAxes`
+ * hook, which fires after the grid and before any series are drawn; the
+ * `draw` hook fires after the series (and gets no series index).
+ */
+export function createBandDrawHook(bands: ThresholdBand[]): (u: uPlot) => void {
+  return (u) => drawThresholdBands(u, bands);
+}
+
+/** Paints the foreground annotations. Register on uPlot's `draw` hook. */
 export function createAnnotationDrawHook({
-  bands,
   referenceLines,
   verticalLines = [],
   labels = [],
@@ -276,7 +292,6 @@ export function createAnnotationDrawHook({
   categories = [],
   onDraw,
 }: {
-  bands: ThresholdBand[];
   referenceLines: ReferenceLine[];
   verticalLines?: PlotVerticalLine[];
   labels?: PlotLabelAnnotation[];
@@ -285,9 +300,6 @@ export function createAnnotationDrawHook({
   onDraw?: (u: uPlot, seriesIdx: number) => void;
 }): (u: uPlot, seriesIdx?: number) => void {
   return (u, seriesIdx) => {
-    if (seriesIdx === 1) {
-      drawThresholdBands(u, bands);
-    }
     const onFinalPass =
       seriesIdx === undefined || seriesIdx === u.series.length - 1;
     if (onFinalPass) {
