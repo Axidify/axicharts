@@ -15,7 +15,7 @@ import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartCursorEvent } from "./useEChart";
 import type { WaterfallItem } from "./types";
 import { buildWaterfallBridge } from "./waterfallBridge";
-import { resolveWaterfallLayout } from "./waterfallLayout";
+import { resolveWaterfallLayout, waterfallAxisMax } from "./waterfallLayout";
 
 export type EChartsWaterfallProps = {
   width: number;
@@ -93,6 +93,7 @@ export function EChartsWaterfall({
     },
     yAxis: {
       type: "value",
+      ...(showLabels ? { max: waterfallAxisMax } : {}),
       axisLabel: {
         ...axisLabelStyle(theme),
         fontSize: layout.axisFontSize,
