@@ -11,6 +11,18 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+type MarkTone = NonNullable<ChartBlockMarkSpec["tone"]>;
+
+function readTone(value: unknown): { tone: MarkTone } | Record<string, never> {
+  return value === "default" ||
+    value === "info" ||
+    value === "success" ||
+    value === "warning" ||
+    value === "critical"
+    ? { tone: value }
+    : {};
+}
+
 function encodingYToDataMark(item: FieldEncoding): ChartBlockMarkSpec | null {
   const markKind: "line" | "bar" | "area" =
     item.kind === "bar" ? "bar" : item.kind === "area" ? "area" : "line";
@@ -34,6 +46,7 @@ function legacyReferenceLinesToMarks(
       type: "rule",
       value: raw.value,
       ...(typeof raw.label === "string" ? { label: raw.label } : {}),
+      ...readTone(raw.tone),
     });
   }
   return marks;
@@ -59,6 +72,7 @@ function legacyBandsToMarks(
       min: raw.min,
       max: raw.max,
       ...(typeof raw.label === "string" ? { label: raw.label } : {}),
+      ...readTone(raw.tone),
     });
   }
   return marks;
@@ -74,6 +88,8 @@ function annotationsToMarks(annotations: AnnotationSpec[]): ChartBlockMarkSpec[]
         ...(annotation.label ? { label: annotation.label } : {}),
         ...(annotation.tone ? { tone: annotation.tone } : {}),
         ...(annotation.orientation ? { orientation: annotation.orientation } : {}),
+        ...(annotation.x != null ? { x: annotation.x } : {}),
+        ...(annotation.id ? { id: annotation.id } : {}),
       });
     } else if (annotation.type === "band") {
       marks.push({
@@ -82,16 +98,31 @@ function annotationsToMarks(annotations: AnnotationSpec[]): ChartBlockMarkSpec[]
         max: annotation.max,
         ...(annotation.label ? { label: annotation.label } : {}),
         ...(annotation.tone ? { tone: annotation.tone } : {}),
+        ...(annotation.id ? { id: annotation.id } : {}),
+      });
+    } else if (annotation.type === "label") {
+      marks.push({
+        type: "text",
+        text: annotation.text,
+        y: annotation.y,
+        ...(annotation.x != null ? { x: annotation.x } : {}),
+        ...(annotation.tone ? { tone: annotation.tone } : {}),
+        ...(annotation.position ? { position: annotation.position } : {}),
+        ...(annotation.id ? { id: annotation.id } : {}),
+      });
+    } else if (annotation.type === "marker") {
+      marks.push({
+        type: "marker",
+        y: annotation.y,
+        ...(annotation.x != null ? { x: annotation.x } : {}),
+        ...(annotation.label ? { label: annotation.label } : {}),
+        ...(annotation.tone ? { tone: annotation.tone } : {}),
+        ...(annotation.draggable ? { draggable: true } : {}),
+        ...(annotation.id ? { id: annotation.id } : {}),
       });
     }
   }
   return marks;
-}
-
-function remainingAnnotations(annotations: AnnotationSpec[]): AnnotationSpec[] {
-  return annotations.filter(
-    (annotation) => annotation.type === "label" || annotation.type === "marker",
-  );
 }
 
 /**
@@ -143,19 +174,15 @@ export function normalizeToCartesian(spec: PanelSpec): NormalizedCartesianSpec {
     ...annotationsToMarks(readPanelAnnotations(spec) ?? []),
   ];
 
-  const sourceAnnotations = readPanelAnnotations(spec) ?? [];
-  const annotations = remainingAnnotations(sourceAnnotations);
-
   return {
     ...base,
     type: "cartesian",
     marks,
-    ...(annotations.length > 0 ? { annotations } : { annotations: undefined }),
+    annotations: undefined,
     props: spec.props
       ? {
           ...spec.props,
-          annotations:
-            annotations.length > 0 ? annotations : undefined,
+          annotations: undefined,
           referenceLines: undefined,
           thresholdBands: undefined,
         }

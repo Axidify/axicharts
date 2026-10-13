@@ -1,7 +1,15 @@
-import type { ChartBlockSeriesMark, PanelMarkSpec, PanelSpec } from "./types";
+import type {
+  ChartBlockBandMark,
+  ChartBlockRuleMark,
+  ChartBlockSeriesMark,
+  PanelMarkSpec,
+  PanelSpec,
+} from "./types";
 import { readPanelAnimation, animationToSpecField } from "./panelAnimation";
 import { readPanelLiveAnimate } from "./panelLiveAnimate";
 import { ejectGraphicsProp } from "./panelGraphics";
+import { blockMarksToAnnotations, isAnnotationRule } from "./blockMarks";
+import { normalizeMarksArray } from "./cartesianMarks";
 
 type BlockDataMark = ChartBlockSeriesMark & { type: "line" | "bar" | "area" };
 
@@ -29,6 +37,10 @@ function blocksChartFlags(spec: PanelSpec): string[] {
   if (liveAnimate) flags.push(`liveAnimate="${liveAnimate}"`);
   const graphics = ejectGraphicsProp(spec);
   if (graphics) flags.push(graphics);
+  const annotations = blockMarksToAnnotations(
+    normalizeMarksArray((spec.marks ?? []) as unknown[]),
+  );
+  if (annotations.length > 0) flags.push(`annotations={${JSON.stringify(annotations)}}`);
   return flags;
 }
 
@@ -52,7 +64,10 @@ export function ejectBlocksImperativeBody(spec: PanelSpec, dataVar: string): str
     });
 
   const flags = blocksChartFlags(spec);
-  const ruleMarks = marks.filter((mark) => mark.type === "rule");
+  const ruleMarks = marks.filter(
+    (mark): mark is ChartBlockRuleMark =>
+      mark.type === "rule" && !isAnnotationRule(mark),
+  );
   if (ruleMarks.length > 0) {
     flags.push(
       `referenceLines={${JSON.stringify(
@@ -108,7 +123,10 @@ export function ejectBlocksComposableBody(spec: PanelSpec, dataVar: string): str
     .join("\n");
 
   const overlayMarks = marks
-    .filter((mark) => mark.type === "rule" || mark.type === "band")
+    .filter(
+      (mark): mark is ChartBlockRuleMark | ChartBlockBandMark =>
+        (mark.type === "rule" && !isAnnotationRule(mark)) || mark.type === "band",
+    )
     .map((mark) => {
       if (mark.type === "rule") {
         const attrs = [

@@ -33,66 +33,56 @@ function seriesMarkDef(mark) {
   };
 }
 
+/** RFC marks accept either `mark` or `type` as the discriminator. */
+function overlayMarkDef(mark, required, properties) {
+  return {
+    oneOf: ["mark", "type"].map((key) => ({
+      type: "object",
+      required: [key, ...required],
+      additionalProperties: false,
+      properties: { [key]: { const: mark }, ...properties },
+    })),
+  };
+}
+
+const xPosition = { type: ["number", "string"] };
+
 const markDefs = {
   barMark: seriesMarkDef("bar"),
   lineMark: seriesMarkDef("line"),
   areaMark: seriesMarkDef("area"),
-  ruleMark: {
-    oneOf: [
-      {
-        type: "object",
-        required: ["mark", "value"],
-        additionalProperties: false,
-        properties: {
-          mark: { const: "rule" },
-          value: { type: "number" },
-          label: { type: "string" },
-          tone: { enum: toneEnum },
-          orientation: { enum: ["horizontal", "vertical"] },
-        },
-      },
-      {
-        type: "object",
-        required: ["type", "value"],
-        additionalProperties: false,
-        properties: {
-          type: { const: "rule" },
-          value: { type: "number" },
-          label: { type: "string" },
-          tone: { enum: toneEnum },
-          orientation: { enum: ["horizontal", "vertical"] },
-        },
-      },
-    ],
-  },
-  bandMark: {
-    oneOf: [
-      {
-        type: "object",
-        required: ["mark", "min", "max"],
-        additionalProperties: false,
-        properties: {
-          mark: { const: "band" },
-          min: { type: "number" },
-          max: { type: "number" },
-          label: { type: "string" },
-          tone: { enum: toneEnum },
-        },
-      },
-      {
-        type: "object",
-        required: ["type", "min", "max"],
-        additionalProperties: false,
-        properties: {
-          type: { const: "band" },
-          min: { type: "number" },
-          max: { type: "number" },
-          label: { type: "string" },
-          tone: { enum: toneEnum },
-        },
-      },
-    ],
-  },
+  pointMark: seriesMarkDef("point"),
+  ruleMark: overlayMarkDef("rule", ["value"], {
+    value: { type: "number" },
+    label: { type: "string" },
+    tone: { enum: toneEnum },
+    orientation: { enum: ["horizontal", "vertical"] },
+    x: xPosition,
+    id: { type: "string" },
+  }),
+  bandMark: overlayMarkDef("band", ["min", "max"], {
+    min: { type: "number" },
+    max: { type: "number" },
+    label: { type: "string" },
+    tone: { enum: toneEnum },
+    id: { type: "string" },
+  }),
+  textMark: overlayMarkDef("text", ["text", "y"], {
+    text: { type: "string" },
+    y: { type: "number" },
+    x: xPosition,
+    tone: { enum: toneEnum },
+    position: { enum: ["top", "bottom", "left", "right", "center"] },
+    id: { type: "string" },
+  }),
+  markerMark: overlayMarkDef("marker", ["y"], {
+    y: { type: "number" },
+    x: xPosition,
+    label: { type: "string" },
+    tone: { enum: toneEnum },
+    draggable: { type: "boolean" },
+    id: { type: "string" },
+  }),
 };
 
 /** @type {Record<string, object>} */
@@ -136,8 +126,11 @@ const exportedSchemas = {
             { $ref: "#/$defs/barMark" },
             { $ref: "#/$defs/lineMark" },
             { $ref: "#/$defs/areaMark" },
+            { $ref: "#/$defs/pointMark" },
             { $ref: "#/$defs/ruleMark" },
             { $ref: "#/$defs/bandMark" },
+            { $ref: "#/$defs/textMark" },
+            { $ref: "#/$defs/markerMark" },
           ],
         },
       },
@@ -175,6 +168,34 @@ const exportedSchemas = {
       fields: {
         type: "array",
         items: { type: "string" },
+      },
+      fieldProfiles: {
+        type: "array",
+        items: {
+          type: "object",
+          required: ["name", "role"],
+          additionalProperties: false,
+          properties: {
+            name: { type: "string" },
+            role: { enum: ["time", "dimension", "measure", "identifier"] },
+            format: { enum: ["number", "currency", "percent", "compact"] },
+          },
+        },
+      },
+      grain: { enum: ["transaction", "entity", "daily", "unknown"] },
+      timeSpan: {
+        type: "object",
+        required: ["field", "from", "to"],
+        additionalProperties: false,
+        properties: {
+          field: { type: "string" },
+          from: { type: "string" },
+          to: { type: "string" },
+        },
+      },
+      cardinalities: {
+        type: "object",
+        additionalProperties: { type: "number" },
       },
     },
   },

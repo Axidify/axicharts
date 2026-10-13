@@ -46,8 +46,11 @@ describe("exported JSON schemas", () => {
       "#/$defs/barMark",
       "#/$defs/lineMark",
       "#/$defs/areaMark",
+      "#/$defs/pointMark",
       "#/$defs/ruleMark",
       "#/$defs/bandMark",
+      "#/$defs/textMark",
+      "#/$defs/markerMark",
     ]);
   });
 

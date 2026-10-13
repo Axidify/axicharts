@@ -152,7 +152,16 @@ describe("listMarks", () => {
   it("lists cartesian catalog", () => {
     const result = listMarks("cartesian");
     expect(result.family).toBe("cartesian");
-    expect(result.closedSet).toEqual(["bar", "line", "area", "point", "rule", "band"]);
+    expect(result.closedSet).toEqual([
+      "bar",
+      "line",
+      "area",
+      "point",
+      "rule",
+      "band",
+      "text",
+      "marker",
+    ]);
   });
 
   it("lists distribution catalog", () => {

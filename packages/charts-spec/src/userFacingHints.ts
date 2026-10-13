@@ -36,6 +36,8 @@ const HINTS: Record<string, HintResolver> = {
       : "Unknown mark type. Use list_marks or create_panel to pick a valid mark.",
   DUPLICATE_OVERLAY_CHANNEL:
     "Remove legacy props.referenceLines — use rule marks in marks[] instead.",
+  LEGACY_OVERLAY_PROPS:
+    "Move reference lines, threshold bands and annotations into marks[] as rule, band, text or marker marks.",
   INVALID_BAND_RANGE: "Band overlay min must be less than max.",
   INVALID_RULE_VALUE: "Reference line overlays need a finite numeric value.",
   CELL_WITHOUT_COLOR_ENCODING:

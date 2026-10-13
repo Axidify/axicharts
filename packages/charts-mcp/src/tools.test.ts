@@ -56,7 +56,16 @@ describe("charts-mcp tools", () => {
 
   it("list_marks returns cartesian catalog", () => {
     const payload = JSON.parse(handleListMarks({ family: "cartesian" }).content[0]!.text);
-    expect(payload.closedSet).toEqual(["bar", "line", "area", "point", "rule", "band"]);
+    expect(payload.closedSet).toEqual([
+      "bar",
+      "line",
+      "area",
+      "point",
+      "rule",
+      "band",
+      "text",
+      "marker",
+    ]);
   });
 
   it("list_marks returns distribution catalog", () => {
@@ -260,6 +269,7 @@ describe("charts-mcp tools", () => {
     expect(schema.properties.type.const).toBe("cartesian");
     expect(schema.required).toContain("marks");
     expect(schema.properties.marks.type).toBe("array");
-    expect(schema.properties.marks.items.oneOf.length).toBe(5);
+    // bar, line, area, point + rule, band, text, marker
+    expect(schema.properties.marks.items.oneOf.length).toBe(8);
   });
 });

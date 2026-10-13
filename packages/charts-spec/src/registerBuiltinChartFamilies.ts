@@ -6,7 +6,7 @@ import { normalizeToCartesian } from "./normalizeToCartesian";
 import { normalizeToDistribution } from "./normalizeToDistribution";
 import { normalizeToMatrix } from "./normalizeToMatrix";
 import type { PanelSpec } from "./types";
-import { validateCartesianSpec } from "./cartesianValidation";
+import { detectLegacyOverlayProps, validateCartesianSpec } from "./cartesianValidation";
 import { validateDistributionSpec } from "./distributionValidation";
 import { validateMatrixSpec } from "./matrixValidation";
 import type { ValidatePanelOptions, ValidatePanelResult } from "./validatePanel";
@@ -27,11 +27,15 @@ function cartesianValidate(
       errors: result.errors.map((issue) => ({ ...issue, family })),
     };
   }
+  const legacy = detectLegacyOverlayProps(spec);
   return {
     ok: true,
     family,
     spec: normalized,
-    warnings: result.warnings.map((issue) => ({ ...issue, family })),
+    warnings: [...(legacy ? [legacy] : []), ...result.warnings].map((issue) => ({
+      ...issue,
+      family,
+    })),
   };
 }
 

@@ -22,10 +22,14 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ### Added
 
+- **charts-spec** — cartesian `text` and `marker` overlay marks; `rule` marks accept `x` / `id`, `band` marks accept `id`. `marks[]` is now the single spec annotation surface (**E-101**); `point`, `text` and `marker` added to the exported cartesian JSON schema
+- **charts-spec** — `LEGACY_OVERLAY_PROPS` deprecation warning for `props.referenceLines`, `props.thresholdBands` and `annotations` on cartesian-family panels (**E-102**); non-blocking in 0.5, removal planned for 0.6
+- **storybook** — `Charts/Annotations/SpecMarks` spec-path overlay example @ 360×280 (**E-103**)
 - **charts** — `ChartTypeRegistration.fromSpec` lets registered chart types map panel specs to component props; `ChartSpecInput` type exported from `@axicharts/charts/registry`
 
 ### Changed
 
+- **charts-spec** — `normalizeToCartesian` converts every legacy overlay (including `label` / `marker` annotations, vertical lines with `x`, and `id` / `tone`) into `marks[]` instead of leaving label / marker in `annotations`
 - **theme** — `cleanTheme` grid opacity / line stroke / bar radius tightened; thinner line strokes across themes; `segmentItemStyle()` gap separation for treemap, sunburst, funnel
 
 ### Fixed

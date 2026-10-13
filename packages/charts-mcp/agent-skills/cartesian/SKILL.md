@@ -47,7 +47,7 @@ Schema: `@axicharts/charts-spec/schema/cartesian-panel.schema.json` · data prof
 
 - `type: "combo"`, `type: "line"`, `type: "blocks"` — use `cartesian` + `marks[]` only.
 - Unknown marks (`point`, `scatter`, `text`) — not in v1 catalog.
-- Legacy `referenceLines` / `thresholdBands` — use `rule` / `band` marks.
+- Legacy `referenceLines` / `thresholdBands` / `annotations` — use `rule` / `band` / `text` / `marker` marks (`LEGACY_OVERLAY_PROPS` warning).
 
 ## Few-shot intents
 

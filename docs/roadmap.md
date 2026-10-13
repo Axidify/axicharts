@@ -79,9 +79,9 @@ Highest leverage for dashboard tiles (static) and agent-generated panels.
 |----|------|--------|-------|
 | — | Land theme token + `segmentItemStyle` changes | **In progress** | Affects every dashboard tile; re-run **E-202** after merge |
 | **E-202** | Re-run `pnpm bench:all`; update `benchmarks/BENCHMARKS.md` | **Open** | Last published: 2026-07-17 |
-| **E-101** | Unify annotation surfaces | **Open** | Three paths coexist: imperative `annotations` / `referenceLines`; legacy spec `type: "line"` + `annotations`; cartesian `marks[]` rule/band. Canonical = cartesian `marks[]` |
-| **E-102** | Deprecation path for legacy `props.referenceLines` / `thresholdBands` / `annotations` on non-cartesian specs | **Open** | `validatePanel` strict warning exists for overlap; extend `userFacingHints` + `CARTESIAN.md` |
-| **E-103** | Spec-path cartesian annotation example @ 360×280 | **Partial** | `Charts/Annotations` + visual CI exist for imperative/composable paths; add `type: "cartesian"` + `marks[]` rule/band on compare wall or audit story |
+| **E-101** | Unify annotation surfaces | **Shipped (spec)** | Cartesian `marks[]` is the single spec surface: `rule` (+ `x` / `id`), `band` (+ `id`), new `text` + `marker` overlay marks. Legacy `annotations` / `referenceLines` / `thresholdBands` normalize losslessly into marks. Imperative chart props unchanged |
+| **E-102** | Deprecation path for legacy `props.referenceLines` / `thresholdBands` / `annotations` on non-cartesian specs | **Shipped** | `LEGACY_OVERLAY_PROPS` warning (non-blocking, even strict) in `validatePanel`, `detectPreNormalizeWarnings`, dev `compilePanel`; `userFacingHints` + `CARTESIAN.md` updated. Removal planned for 0.6 |
+| **E-103** | Spec-path cartesian annotation example @ 360×280 | **Partial** | `Charts/Annotations/SpecMarks` story added (rule, vertical rule, band, text, marker). Open: visual CI snapshot; `band` fill not drawn on line charts (also in `Chrome/Threshold Bands`) — render bug to triage |
 | **D-507** | Waterfall value-bar hover emphasis | **Open** | Small ECharts pass on value series (category-hover chart) |
 
 **Not P0:** **D-506** — deferred by design for static-first tiles; schedule when `interactive` mode is a release theme.
