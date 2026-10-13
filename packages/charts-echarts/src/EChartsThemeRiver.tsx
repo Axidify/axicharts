@@ -4,7 +4,13 @@ import type { ReactElement } from "react";
 import type { EChartsOption } from "echarts";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { ChartGraphicElement } from "@axicharts/charts-canvas";
-import { axisLabelStyle, hiddenTooltip, seriesPalette, toneColor } from "./themeBridge";
+import {
+  axisLabelStyle,
+  hiddenTooltip,
+  isCompactTile,
+  seriesPalette,
+  toneColor,
+} from "./themeBridge";
 import { withPresentationAnimation } from "./presentationAnimation";
 import { useEChart, type EChartItemHoverEvent } from "./useEChart";
 import type { ThemeRiverPoint } from "./themeRiverTypes";
@@ -55,6 +61,11 @@ export function EChartsThemeRiver({
   const palette = seriesPalette(theme);
   const labelStyle = axisLabelStyle(theme);
   const seriesNames = [...new Set(points.map((point) => point.series))];
+  // Fixed 36px gutters left ~48px of stream in 120px dashboard tiles.
+  const compact = isCompactTile(width, height);
+  const gutter = compact
+    ? { top: 8, bottom: showAxes ? 22 : 8, left: 12, right: 12 }
+    : { top: 36, bottom: 36, left: 48, right: 48 };
 
   const option: EChartsOption = withPresentationAnimation(
     {
@@ -63,13 +74,21 @@ export function EChartsThemeRiver({
         resolveSeriesColor(name, points, palette, theme),
       ),
       singleAxis: {
-        top: 36,
-        bottom: 36,
-        left: 48,
-        right: 48,
+        ...gutter,
         type: "time",
         show: showAxes,
-        axisLabel: labelStyle,
+        // Default time ticks read "2026, 3, 5, 7…" (bare day numbers).
+        axisLabel: {
+          ...labelStyle,
+          hideOverlap: true,
+          formatter: {
+            year: "{yyyy}",
+            month: "{MMM}",
+            day: "{MMM} {d}",
+            hour: "{HH}:{mm}",
+            minute: "{HH}:{mm}",
+          },
+        },
         splitLine: {
           show: true,
           lineStyle: {
