@@ -542,7 +542,7 @@ importers:
         specifier: workspace:*
         version: link:../charts-canvas
       '@axicharts/charts-spec':
-        specifier: ^0.4.39
+        specifier: ^0.5.0
         version: link:../charts-spec
       '@axicharts/charts-theme':
         specifier: workspace:*
