@@ -14,6 +14,7 @@ import type { ComboSeries, UPlotComboProps } from "./types";
 import { applySyncedCursor } from "./plotCursor";
 import {
   createAnnotationDrawHook,
+  createBandDrawHook,
   expandYRange,
 } from "./plotAnnotations";
 import { resolveAnnotationPlotProps } from "./annotations";
@@ -300,9 +301,9 @@ export function buildComboOptions(
       }),
     ],
     hooks: {
+      drawAxes: [createBandDrawHook(thresholdBandsResolved)],
       draw: [
         createAnnotationDrawHook({
-          bands: thresholdBandsResolved,
           referenceLines: referenceLinesResolved,
           verticalLines,
           labels: plotLabels,

@@ -15,6 +15,7 @@ import { shouldUseDualAxis } from "./dualAxis";
 import { applySyncedCursor } from "./plotCursor";
 import {
   createAnnotationDrawHook,
+  createBandDrawHook,
   expandYRange,
 } from "./plotAnnotations";
 import { resolveAnnotationPlotProps } from "./annotations";
@@ -271,9 +272,9 @@ function buildOptions({
       segmentedDraw ||
       variablePointDraw
         ? {
+            drawAxes: [createBandDrawHook(thresholdBandsResolved)],
             draw: [
               createAnnotationDrawHook({
-                bands: thresholdBandsResolved,
                 referenceLines: referenceLinesResolved,
                 verticalLines,
                 labels: plotLabels,

@@ -13,6 +13,7 @@ import type { UPlotBarProps, BarOrientation } from "./types";
 import { applySyncedCursor } from "./plotCursor";
 import {
   createAnnotationDrawHook,
+  createBandDrawHook,
   expandYRange,
 } from "./plotAnnotations";
 import { resolveAnnotationPlotProps } from "./annotations";
@@ -306,8 +307,10 @@ export function buildBarOptions({
     };
   });
 
+  const drawBandsHook = createBandDrawHook(
+    horizontal ? [] : thresholdBandsResolved,
+  );
   const drawBarHook = createAnnotationDrawHook({
-    bands: horizontal ? [] : thresholdBandsResolved,
     referenceLines: horizontal ? [] : referenceLinesResolved,
     verticalLines: horizontal ? [] : verticalLines,
     labels: horizontal ? [] : plotLabels,
@@ -452,6 +455,7 @@ export function buildBarOptions({
         : [],
       series: [{}, ...barSeriesPaths],
       hooks: {
+        drawAxes: [drawBandsHook],
         draw: [drawBarHook],
       },
     };
@@ -506,6 +510,7 @@ export function buildBarOptions({
       : [],
     series: [{}, ...barSeriesPaths],
     hooks: {
+      drawAxes: [drawBandsHook],
       draw: [drawBarHook],
     },
   };
