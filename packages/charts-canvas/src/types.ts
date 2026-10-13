@@ -1,3 +1,4 @@
+import type { ValueFormat, YDomain } from "@axicharts/charts-core";
 import type { ChartTheme } from "@axicharts/charts-theme";
 import type { LineCurve } from "@axicharts/charts-theme";
 import type {
@@ -69,6 +70,12 @@ export type UPlotLineProps = {
   fill?: boolean;
   showAxes?: boolean;
   valueSuffix?: string;
+  /** Format for value-axis ticks, tooltips and value labels (built-in id or function). */
+  valueFormat?: ValueFormat;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side. */
+  yDomain?: YDomain;
+  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  yTickCount?: number;
   dualAxis?: DualAxisMode;
   stacked?: boolean;
   thresholdBands?: ThresholdBand[];
@@ -98,6 +105,12 @@ export type UPlotBarProps = {
   showAxes?: boolean;
   showValues?: boolean;
   valueSuffix?: string;
+  /** Format for value-axis ticks, tooltips and value labels (built-in id or function). */
+  valueFormat?: ValueFormat;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side. */
+  yDomain?: YDomain;
+  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  yTickCount?: number;
   referenceLines?: ReferenceLine[];
   stacked?: boolean;
   thresholdBands?: ThresholdBand[];
@@ -125,6 +138,12 @@ export type UPlotComboProps = {
   showAxes?: boolean;
   showValues?: boolean;
   valueSuffix?: string;
+  /** Format for value-axis ticks, tooltips and value labels (built-in id or function). */
+  valueFormat?: ValueFormat;
+  /** Value-axis bounds; `"auto"` keeps the data-derived side. */
+  yDomain?: YDomain;
+  /** Number of value-axis ticks (evenly spaced, inclusive). */
+  yTickCount?: number;
   dualAxis?: DualAxisMode;
   stacked?: boolean;
   referenceLines?: ReferenceLine[];

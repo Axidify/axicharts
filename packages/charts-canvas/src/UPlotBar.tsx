@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef } from "react";
 import type { ReactElement } from "react";
 import uPlot from "uplot";
+import { formatChartValue } from "@axicharts/charts-core";
+import { applyValueAxisOptions } from "./valueAxis";
 import "uplot/dist/uPlot.min.css";
 import {
   CANVAS_BG,
@@ -134,13 +136,20 @@ function stackCapKeys(
   );
 }
 
-function formatValue(value: number, suffix = ""): string {
-  const rounded =
-    Math.abs(value) >= 100 ? value.toFixed(0) : value.toFixed(1);
-  return `${rounded}${suffix}`;
+
+/** Builds options, then applies `valueFormat` / `yDomain` / `yTickCount` (see valueAxis.ts). */
+export function buildBarOptions(
+  props: Parameters<typeof buildBarOptionsBase>[0],
+): ReturnType<typeof buildBarOptionsBase> {
+  return applyValueAxisOptions(buildBarOptionsBase(props), {
+    valueFormat: props.valueFormat,
+    yDomain: props.yDomain,
+    yTickCount: props.yTickCount,
+    compact: props.height < 72,
+  }) as ReturnType<typeof buildBarOptionsBase>;
 }
 
-export function buildBarOptions({
+function buildBarOptionsBase({
   width,
   height,
   categories,
@@ -149,6 +158,7 @@ export function buildBarOptions({
   showAxes = true,
   showValues = false,
   valueSuffix = "",
+  valueFormat,
   referenceLines = [],
   thresholdBands = [],
   annotations = [],
@@ -165,6 +175,8 @@ export function buildBarOptions({
   barLayoutsRef: React.MutableRefObject<BarLayout[]>;
   stackTotalsRef: React.MutableRefObject<Map<number, StackBarTotal>>;
 }): uPlot.Options {
+  const formatLabel = (value: number, suffix = ""): string =>
+    formatChartValue(value, { format: valueFormat, suffix });
   const {
     thresholdBands: thresholdBandsResolved,
     referenceLines: referenceLinesResolved,
@@ -354,7 +366,7 @@ export function buildBarOptions({
           ctx.textAlign = "left";
           ctx.textBaseline = "middle";
           for (const layout of layouts) {
-            const label = formatValue(layout.value, valueSuffix);
+            const label = formatLabel(layout.value, valueSuffix);
             const x = layout.left + layout.width + 4;
             const y = layout.top + layout.height / 2;
             ctx.fillText(label, x, y);
@@ -363,7 +375,7 @@ export function buildBarOptions({
           ctx.textAlign = "center";
           ctx.textBaseline = "bottom";
           for (const layout of layouts) {
-            const label = formatValue(layout.value, valueSuffix);
+            const label = formatLabel(layout.value, valueSuffix);
             const x = layout.left + layout.width / 2;
             const y = layout.top - 4;
             ctx.fillText(label, x, y);
@@ -379,7 +391,7 @@ export function buildBarOptions({
           stackTotalsRef.current,
           valueSuffix,
           chrome.axis,
-          formatValue,
+          formatLabel,
           orientation,
         );
       }

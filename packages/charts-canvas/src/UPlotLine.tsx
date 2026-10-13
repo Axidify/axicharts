@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import type { ReactElement } from "react";
 import uPlot from "uplot";
+import { applyValueAxisOptions } from "./valueAxis";
 import "uplot/dist/uPlot.min.css";
 import {
   CANVAS_BG,
@@ -36,7 +37,19 @@ import {
   categoryXScale,
 } from "./categoricalScale";
 
-export function buildLineOptions({
+/** Builds options, then applies `valueFormat` / `yDomain` / `yTickCount` (see valueAxis.ts). */
+export function buildLineOptions(
+  props: Parameters<typeof buildLineOptionsBase>[0],
+): ReturnType<typeof buildLineOptionsBase> {
+  return applyValueAxisOptions(buildLineOptionsBase(props), {
+    valueFormat: props.valueFormat,
+    yDomain: props.yDomain,
+    yTickCount: props.yTickCount,
+    compact: props.height < 72,
+  }) as ReturnType<typeof buildLineOptionsBase>;
+}
+
+function buildLineOptionsBase({
   width,
   height,
   categories,
