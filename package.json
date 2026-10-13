@@ -28,7 +28,7 @@
     "check:vite-aliases": "node scripts/check-vite-aliases.mjs",
     "validate:runtime": "pnpm --filter @axicharts/charts-runtime validate:examples",
     "typecheck": "turbo run typecheck",
-    "ci": "pnpm build && pnpm test && pnpm test:perf && pnpm check:versions && pnpm check:vite-aliases && pnpm validate:runtime && pnpm test:registry && pnpm test:visual",
+    "ci": "pnpm build && pnpm typecheck && pnpm test && pnpm test:perf && pnpm check:versions && pnpm check:vite-aliases && pnpm validate:runtime && pnpm test:registry && pnpm test:visual",
     "create:dashboard": "node packages/charts/scripts/create-dashboard.mjs"
   },
   "devDependencies": {
