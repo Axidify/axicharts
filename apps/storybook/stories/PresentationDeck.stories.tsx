@@ -42,7 +42,7 @@ const meta = {
 } satisfies Meta<typeof PresentationDeckRuntime>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof PresentationDeckRuntime>;
 
 export const FinanceBoardDeck: Story = {
   render: () => (

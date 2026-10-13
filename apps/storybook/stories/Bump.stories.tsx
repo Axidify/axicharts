@@ -5,9 +5,11 @@ import {
   ChartContainer,
   type BumpChartData,
 } from "@axicharts/charts/bump";
-import { compilePanel } from "@axicharts/charts-spec";
+import { compilePanel, normalizePanelSpec } from "@axicharts/charts-spec";
 import { cleanTheme } from "@axicharts/charts-theme";
-import bumpFixture from "../../../packages/charts-spec/examples/bump-country-rankings.panel.json";
+import bumpFixtureJson from "../../../packages/charts-spec/examples/bump-country-rankings.panel.json";
+
+const bumpFixture = normalizePanelSpec(bumpFixtureJson);
 
 const countryRankings: BumpChartData = {
   categories: ["2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"],

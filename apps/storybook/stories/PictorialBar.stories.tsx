@@ -6,9 +6,11 @@ import {
   type PictorialBarData,
   type PictorialBarItem,
 } from "@axicharts/charts/pictorial-bar";
-import { compilePanel } from "@axicharts/charts-spec";
+import { compilePanel, normalizePanelSpec } from "@axicharts/charts-spec";
 import { cleanTheme } from "@axicharts/charts-theme";
-import resourcesFixture from "../../../packages/charts-spec/examples/pictorial-bar-resources.panel.json";
+import resourcesFixtureJson from "../../../packages/charts-spec/examples/pictorial-bar-resources.panel.json";
+
+const resourcesFixture = normalizePanelSpec(resourcesFixtureJson);
 
 const STATIC_ITEMS: PictorialBarItem[] = [
   { category: "CPU", value: 72, symbol: "roundRect", tone: "info" },

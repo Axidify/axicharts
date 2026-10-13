@@ -6,9 +6,11 @@ import {
   type CalendarHeatmapData,
   type CalendarHeatmapPoint,
 } from "@axicharts/charts";
-import { compilePanel } from "@axicharts/charts-spec";
+import { compilePanel, normalizePanelSpec } from "@axicharts/charts-spec";
 import { cleanTheme } from "@axicharts/charts-theme";
-import activityFixture from "../../../packages/charts-spec/examples/calendar-activity.panel.json";
+import activityFixtureJson from "../../../packages/charts-spec/examples/calendar-activity.panel.json";
+
+const activityFixture = normalizePanelSpec(activityFixtureJson);
 
 const YEAR = 2026;
 

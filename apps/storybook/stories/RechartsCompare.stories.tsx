@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import {
   Bar,
@@ -60,7 +60,7 @@ const HEADER: React.CSSProperties = {
   borderBottom: "1px solid #e2e8f0",
 };
 
-function KpiTile({ children }: { children: ReactElement }): ReactElement {
+function KpiTile({ children }: { children: ReactNode }): ReactElement {
   return (
     <div
       style={{

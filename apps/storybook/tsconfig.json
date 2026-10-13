@@ -1,7 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      // Included axiboard sources use axiboard's own "@/" alias.
+      "@/*": ["../axiboard/src/*"]
+    }
   },
   "include": [".storybook", "stories", "demo", "../axiboard/src"]
 }

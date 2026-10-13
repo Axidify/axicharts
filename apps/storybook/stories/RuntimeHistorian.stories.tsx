@@ -36,9 +36,9 @@ export const OpsHistorianMock: Story = {
           tags: ["cpu", "memory", "errors", "p95"],
           windowMs: 3_600_000,
           intervalMs: 2000,
-          fetch: async () => ({
-            ok: true,
-            json: async () => ({
+          fetch: async () =>
+            new Response(
+              JSON.stringify({
               tags: [
                 {
                   name: "CPU",
@@ -66,8 +66,8 @@ export const OpsHistorianMock: Story = {
                   suffix: "ms",
                 },
               ],
-            }),
-          }),
+              }),
+            ),
         },
       }}
     />

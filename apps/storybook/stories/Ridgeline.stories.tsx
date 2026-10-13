@@ -5,9 +5,11 @@ import {
   ChartContainer,
   type RidgelineItem,
 } from "@axicharts/charts/ridgeline";
-import { compilePanel } from "@axicharts/charts-spec";
+import { compilePanel, normalizePanelSpec } from "@axicharts/charts-spec";
 import { cleanTheme } from "@axicharts/charts-theme";
-import ridgelineFixture from "../../../packages/charts-spec/examples/ridgeline-metrics.panel.json";
+import ridgelineFixtureJson from "../../../packages/charts-spec/examples/ridgeline-metrics.panel.json";
+
+const ridgelineFixture = normalizePanelSpec(ridgelineFixtureJson);
 
 function sampleFrom(mean: number, spread: number, count: number): number[] {
   return Array.from({ length: count }, () => {

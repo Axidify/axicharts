@@ -334,6 +334,9 @@ importers:
       '@axicharts/charts-map':
         specifier: workspace:*
         version: link:../../packages/charts-map
+      '@axicharts/charts-planner':
+        specifier: workspace:*
+        version: link:../../packages/charts-planner
       '@axicharts/charts-runtime':
         specifier: workspace:*
         version: link:../../packages/charts-runtime

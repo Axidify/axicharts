@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Stat } from "@axicharts/charts";
 import { compileTemplate } from "@axicharts/charts-spec";
@@ -7,7 +7,7 @@ import "@axicharts/charts-tank/register";
 
 const PLUGIN_CHIPS = ["tank", "geo", "andon", "sankey", "gantt"] as const;
 
-function KpiTile({ children }: { children: ReactElement }): ReactElement {
+function KpiTile({ children }: { children: ReactNode }): ReactElement {
   return (
     <div
       style={{

@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { ChartContainer, LineChart, Stat } from "@axicharts/charts";
 import { cleanTheme } from "@axicharts/charts-theme";
@@ -15,7 +15,7 @@ function formatDelta(current: number, previous: number, suffix = ""): string {
   return `${sign}${pct.toFixed(0)}%${suffix}`;
 }
 
-function KpiTile({ children }: { children: ReactElement }): ReactElement {
+function KpiTile({ children }: { children: ReactNode }): ReactElement {
   return (
     <div
       style={{

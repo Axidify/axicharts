@@ -162,14 +162,6 @@ function buildCalendarWeeks(data: CalendarHeatmapData): {
   return { weeks, monthLabels };
 }
 
-function compactCurrency(value: number): string {
-  const abs = Math.abs(value);
-  if (abs >= 1000) {
-    return `$${(value / 1000).toFixed(abs >= 10000 ? 0 : 1)}k`;
-  }
-  return `$${value}`;
-}
-
 type DashboardCase = {
   id: string;
   title: string;
@@ -778,7 +770,7 @@ function buildDashboardCases(): DashboardCase[] {
           <ChartContainer theme={cleanTheme} width={DASHBOARD_TILE_W} height={DASHBOARD_TILE_H}>
             <WaterfallChart
               items={WATERFALL_ITEMS}
-              valueFormat={compactCurrency}
+              valueFormat="compact"
               showLabels
               showSigns
               connectorStyle="dashed"

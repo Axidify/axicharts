@@ -5,9 +5,11 @@ import {
   ChartContainer,
   type ViolinItem,
 } from "@axicharts/charts/violin";
-import { compilePanel } from "@axicharts/charts-spec";
+import { compilePanel, normalizePanelSpec } from "@axicharts/charts-spec";
 import { cleanTheme } from "@axicharts/charts-theme";
-import violinFixture from "../../../packages/charts-spec/examples/violin-latency.panel.json";
+import violinFixtureJson from "../../../packages/charts-spec/examples/violin-latency.panel.json";
+
+const violinFixture = normalizePanelSpec(violinFixtureJson);
 
 function sampleFrom(mean: number, spread: number, count: number): number[] {
   return Array.from({ length: count }, () => {

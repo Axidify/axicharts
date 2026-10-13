@@ -13,8 +13,10 @@ import {
   Band,
 } from "@axicharts/charts/cartesian";
 import { studioTheme } from "@axicharts/charts-theme";
-import { Chart } from "@axicharts/charts-spec";
-import cartesianSpec from "../../../packages/charts-spec/examples/cartesian-revenue-target.panel.json";
+import { Chart, normalizePanelSpec } from "@axicharts/charts-spec";
+import cartesianSpecJson from "../../../packages/charts-spec/examples/cartesian-revenue-target.panel.json";
+
+const cartesianSpec = normalizePanelSpec(cartesianSpecJson);
 
 const ROWS = [
   { week: "W1", revenue: 42, target: 40 },
