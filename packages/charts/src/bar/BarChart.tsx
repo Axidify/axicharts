@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement, ReactNode } from "react";
+import { readChromeMarks } from "../composable/readChromeMarks";
 import type { ValueFormat, YDomain } from "@axicharts/charts-core";
 import { useMemo } from "react";
 import {
@@ -284,6 +285,7 @@ export function BarChart({
     children,
   });
   const chartGraphics = useChartGraphics({ graphics, children });
+  const chromeSettings = useMemo(() => readChromeMarks(children), [children]);
   const { effectiveRange, onBrushRangeChange } = useCartesianBrush({
     brush,
     brushEnd,
@@ -377,6 +379,7 @@ export function BarChart({
       }}
     >
       <CartesianChartShell
+        chromeSettings={chromeSettings}
         categories={plotCategories}
         series={plotSeries}
         valueSuffix={valueSuffix}

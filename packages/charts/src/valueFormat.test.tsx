@@ -35,7 +35,7 @@ const rows = [
 
 function inContainer(chart: ReactElement) {
   return render(
-    <ChartContainer theme={cleanTheme} width={480} height={240} renderer="canvas">
+    <ChartContainer theme={cleanTheme} width={480} height={240}>
       {chart}
     </ChartContainer>,
   );

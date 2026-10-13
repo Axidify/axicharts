@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactElement, ReactNode } from "react";
+import { readChromeMarks } from "../composable/readChromeMarks";
 import type { ValueFormat, YDomain } from "@axicharts/charts-core";
 import { useMemo } from "react";
 import {
@@ -238,6 +239,7 @@ export function CartesianChart({
     children,
   });
   const chartGraphics = useChartGraphics({ graphics, children });
+  const chromeSettings = useMemo(() => readChromeMarks(children), [children]);
 
   const composed = useMemo(() => {
     if (data && children) {
@@ -325,6 +327,7 @@ export function CartesianChart({
       }}
     >
       <CartesianChartShell
+        chromeSettings={chromeSettings}
         categories={prepared.categories}
         series={prepared.series}
         valueSuffix={valueSuffix}

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, type CSSProperties, type ReactElement, type ReactNode } from "react";
+import { useEffect, useMemo, type CSSProperties, type ReactElement, type ReactNode } from "react";
 import type { ValueFormat } from "@axicharts/charts-core";
 import type { PlotSeries } from "@axicharts/charts-canvas";
-import { useChartLayout } from "../container/ChartLayoutContext";
+import { ChartLayoutContext, useChartLayout } from "../container/ChartLayoutContext";
+import type { CartesianChromeSettings } from "../composable/readChromeMarks";
 import {
   Crosshair,
   getLegendHeight,
@@ -32,6 +33,8 @@ export type CartesianChromeProps = {
   plotClassName?: string;
   plotKey?: string;
   skipPresentationPlotEnter?: boolean;
+  /** From composable `<Tooltip>` / `<Legend>` children. */
+  chromeSettings?: CartesianChromeSettings;
 };
 
 function CartesianChromeInner({
@@ -46,14 +49,18 @@ function CartesianChromeInner({
   plotClassName,
   plotKey,
   skipPresentationPlotEnter = false,
+  chromeSettings,
 }: CartesianChromeProps): ReactElement {
   const { mode, legendVariant } = useChartLayout();
   const chrome = getInteractionChrome(mode);
-  const showLegend = shouldShowCartesianLegend({
-    mode,
-    seriesCount: series.length,
-    compact,
-  });
+  const showTooltip = chrome.showTooltip && !chromeSettings?.tooltip?.hidden;
+  const showLegend =
+    !chromeSettings?.legend?.hidden &&
+    shouldShowCartesianLegend({
+      mode,
+      seriesCount: series.length,
+      compact,
+    });
   const legendHeight = getLegendHeight(showLegend, legendVariant);
 
   useEffect(() => {
@@ -97,12 +104,12 @@ function CartesianChromeInner({
           {plot}
           {chrome.showCrosshair ? <SyncHighlight categories={categories} /> : null}
           {chrome.showCrosshair ? <Crosshair /> : null}
-          {chrome.showTooltip ? (
+          {showTooltip ? (
             <Tooltip
               categories={categories}
               series={series}
               valueSuffix={valueSuffix}
-              valueFormat={valueFormat}
+              valueFormat={chromeSettings?.tooltip?.formatter ?? valueFormat}
               getRows={getRows}
             />
           ) : null}
@@ -125,8 +132,34 @@ function CartesianChromeInner({
   );
 }
 
+/** Scope `<Tooltip variant>` / `<Legend variant>` overrides to this chart's chrome. */
+function ChromeVariantScope({
+  settings,
+  children,
+}: {
+  settings?: CartesianChromeSettings;
+  children: ReactNode;
+}): ReactElement {
+  const layout = useChartLayout();
+  const tooltipVariant = settings?.tooltip?.variant;
+  const legendVariant = settings?.legend?.variant;
+  const scoped = useMemo(
+    () =>
+      tooltipVariant || legendVariant
+        ? {
+            ...layout,
+            tooltipVariant: tooltipVariant ?? layout.tooltipVariant,
+            legendVariant: legendVariant ?? layout.legendVariant,
+          }
+        : layout,
+    [layout, tooltipVariant, legendVariant],
+  );
+  return <ChartLayoutContext.Provider value={scoped}>{children}</ChartLayoutContext.Provider>;
+}
+
 export function CartesianChartShell(props: CartesianChromeProps): ReactElement {
   return (
+    <ChromeVariantScope settings={props.chromeSettings}>
     <ChartInteractionProvider>
       <div
         style={{
@@ -139,6 +172,7 @@ export function CartesianChartShell(props: CartesianChromeProps): ReactElement {
         <CartesianChromeInner {...props} />
       </div>
     </ChartInteractionProvider>
+    </ChromeVariantScope>
   );
 }
 
