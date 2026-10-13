@@ -130,3 +130,31 @@ describe("LEGACY_OVERLAY_PROPS deprecation (E-102)", () => {
     );
   });
 });
+
+describe("legacy props.series panels", () => {
+  const legacySeries: PanelSpec = {
+    type: "bar",
+    stacked: true,
+    props: {
+      categories: ["S1", "S2"],
+      series: [{ name: "Done", data: [22, 26] }],
+    },
+  };
+
+  it("validates as a Tier-2 warning instead of failing on encoding.x", () => {
+    const result = validatePanel(legacySeries, {});
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.spec).toBe(legacySeries);
+      expect(result.warnings.map((w) => w.code)).toEqual(["LEGACY_PANEL"]);
+    }
+  });
+
+  it("is rejected in strict (agent) mode", () => {
+    const result = validatePanel(legacySeries, { strict: true });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.map((e) => e.code)).toEqual(["LEGACY_PANEL_NOT_AGENT_SAFE"]);
+    }
+  });
+});
