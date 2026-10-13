@@ -34,7 +34,8 @@
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.3",
     "uplot": "^1.6.31",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "@axicharts/charts-gantt": "workspace:*"
   },
   "devDependencies": {
     "@axicharts/charts-mcp": "workspace:*",

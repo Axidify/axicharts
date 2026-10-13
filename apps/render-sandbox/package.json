@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@axicharts/charts": "workspace:*",
+    "@axicharts/charts-andon": "workspace:*",
     "@axicharts/charts-spec": "workspace:*",
+    "@axicharts/charts-tank": "workspace:*",
     "@axicharts/charts-theme": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

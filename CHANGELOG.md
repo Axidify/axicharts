@@ -8,7 +8,29 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
-_Nothing yet._
+### Breaking (0.5)
+
+- **charts-spec** — plugin panel types (`sankey`, `geo`, `map`, `gantt`, `tank`, `andon`) are now **opt-in**. `@axicharts/charts-spec` no longer depends on the six plugin packages (they are optional peers), so spec users stop installing them by default. Panel JSON is unchanged. To migrate, install the plugin and register it once at startup:
+
+  ```ts
+  import "@axicharts/charts-sankey/register"; // one plugin
+  import "@axicharts/charts-spec/plugins";    // or every first-party plugin
+  ```
+
+  Compiling an unregistered plugin type throws an error naming the package to install. `@axicharts/charts-full` still registers every plugin.
+- **charts-spec** — `registerPluginChartTypes` moved from the package root to `@axicharts/charts-spec/plugins`; `resolveMapDrillProps` removed (drill props are mapped by `@axicharts/charts-map`).
+
+### Added
+
+- **charts** — `ChartTypeRegistration.fromSpec` lets registered chart types map panel specs to component props; `ChartSpecInput` type exported from `@axicharts/charts/registry`
+
+### Changed
+
+- **theme** — `cleanTheme` grid opacity / line stroke / bar radius tightened; thinner line strokes across themes; `segmentItemStyle()` gap separation for treemap, sunburst, funnel
+
+### Fixed
+
+- **charts-echarts** — violin / ridgeline median line referenced an out-of-scope `theme` (DTS build failure)
 
 ## [0.4.39] - 2026-07-23
 

@@ -1,26 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { mapDrillEjectProps, resolveMapDrillProps } from "./mapEncoding";
+import { mapDrillEjectProps } from "./mapEncoding";
 
 describe("mapEncoding", () => {
-  it("resolves drill props from panel spec", () => {
-    const hierarchy = {
-      levels: [{ objectKey: "regions" }, { objectKey: "states", parentIdKey: "region" }],
-    };
-    expect(
-      resolveMapDrillProps({
-        drilldown: true,
-        hierarchy,
-        drillPath: ["west"],
-        drillLabels: ["West"],
-      }),
-    ).toEqual({
-      drilldown: true,
-      hierarchy,
-      drillPath: ["west"],
-      drillLabels: ["West"],
-    });
-  });
-
   it("emits drill props for eject", () => {
     const jsx = mapDrillEjectProps({
       drilldown: true,

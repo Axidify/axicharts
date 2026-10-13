@@ -166,4 +166,8 @@ export {
   listChartTypes,
   registerChartType,
 } from "./registry";
-export type { ChartRenderer, ChartTypeRegistration } from "./types";
+export type {
+  ChartRenderer,
+  ChartSpecInput,
+  ChartTypeRegistration,
+} from "./types";

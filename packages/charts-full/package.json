@@ -16,7 +16,10 @@
     "README.md"
   ],
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/index.js",
+    "./dist/spec.js"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -36,8 +39,8 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/spec.ts src/runtime.ts src/theme.ts --format esm --dts --external react --external react-dom --external echarts --external uplot --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-runtime --external @axicharts/charts-theme --external @axicharts/charts-core --external @axicharts/charts-canvas --external @axicharts/charts-echarts --clean",
-    "dev": "tsup src/index.ts src/spec.ts src/runtime.ts src/theme.ts --format esm --dts --external react --external react-dom --external echarts --external uplot --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-runtime --external @axicharts/charts-theme --external @axicharts/charts-core --external @axicharts/charts-canvas --external @axicharts/charts-echarts --watch",
+    "build": "tsup src/index.ts src/spec.ts src/runtime.ts src/theme.ts --format esm --dts --external react --external react-dom --external echarts --external uplot --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-runtime --external @axicharts/charts-theme --external @axicharts/charts-core --external @axicharts/charts-canvas --external @axicharts/charts-echarts --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --external @axicharts/charts-tank --external @axicharts/charts-andon --clean",
+    "dev": "tsup src/index.ts src/spec.ts src/runtime.ts src/theme.ts --format esm --dts --external react --external react-dom --external echarts --external uplot --external @axicharts/charts --external @axicharts/charts-spec --external @axicharts/charts-runtime --external @axicharts/charts-theme --external @axicharts/charts-core --external @axicharts/charts-canvas --external @axicharts/charts-echarts --external @axicharts/charts-sankey --external @axicharts/charts-geo --external @axicharts/charts-map --external @axicharts/charts-gantt --external @axicharts/charts-tank --external @axicharts/charts-andon --watch",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -54,7 +57,13 @@
     "@axicharts/charts-echarts": "workspace:*",
     "@axicharts/charts-runtime": "workspace:*",
     "@axicharts/charts-spec": "workspace:*",
-    "@axicharts/charts-theme": "workspace:*"
+    "@axicharts/charts-theme": "workspace:*",
+    "@axicharts/charts-sankey": "workspace:*",
+    "@axicharts/charts-geo": "workspace:*",
+    "@axicharts/charts-map": "workspace:*",
+    "@axicharts/charts-gantt": "workspace:*",
+    "@axicharts/charts-tank": "workspace:*",
+    "@axicharts/charts-andon": "workspace:*"
   },
   "devDependencies": {
     "@axicharts/charts": "workspace:*",
