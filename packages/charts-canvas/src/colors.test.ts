@@ -16,7 +16,7 @@ describe("chart colors", () => {
   });
 
   it("uses light grid strokes on clean theme", () => {
-    expect(chromeGridStroke(cleanTheme)).toBe("rgba(226, 232, 240, 0.42)");
+    expect(chromeGridStroke(cleanTheme)).toBe("rgba(226, 232, 240, 0.38)");
   });
 
   it("ignores malformed host grid tokens that canvas would render as yellow", () => {
@@ -28,7 +28,7 @@ describe("chart colors", () => {
         axis: "#64748b",
       },
     };
-    expect(chromeGridStroke(theme)).toBe("rgba(226, 232, 240, 0.42)");
+    expect(chromeGridStroke(theme)).toBe("rgba(226, 232, 240, 0.38)");
   });
 
   it("detects dark chart themes", () => {
