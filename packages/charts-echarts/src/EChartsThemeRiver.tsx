@@ -47,6 +47,11 @@ function resolveSeriesColor(
   return palette[index >= 0 ? index % palette.length : 0] ?? palette[0] ?? "#3b82f6";
 }
 
+/** Numbers are timestamps; strings must parse as dates for a time axis. */
+function isTemporal(time: string | number): boolean {
+  return typeof time === "number" || !Number.isNaN(Date.parse(time));
+}
+
 export function EChartsThemeRiver({
   width,
   height,
@@ -61,6 +66,16 @@ export function EChartsThemeRiver({
   const palette = seriesPalette(theme);
   const labelStyle = axisLabelStyle(theme);
   const seriesNames = [...new Set(points.map((point) => point.series))];
+  // Labels like "W1" / "Q3" on a time axis parse as invalid dates and collapse
+  // every stream. ECharts themeRiver can't lay out on a category axis either
+  // (empty stream paths), so labels map to indices on a value axis and the
+  // tick formatter prints the label back.
+  const temporal = points.every((point) => isTemporal(point.time));
+  const categories = temporal
+    ? undefined
+    : [...new Set(points.map((point) => String(point.time)))];
+  const axisPosition = (time: string | number) =>
+    categories ? categories.indexOf(String(time)) : time;
   // Fixed 36px gutters left ~48px of stream in 120px dashboard tiles.
   const compact = isCompactTile(width, height);
   const gutter = compact
@@ -75,19 +90,30 @@ export function EChartsThemeRiver({
       ),
       singleAxis: {
         ...gutter,
-        type: "time",
+        ...(categories
+          ? {
+              type: "value" as const,
+              min: 0,
+              max: Math.max(categories.length - 1, 1),
+              interval: 1,
+            }
+          : { type: "time" as const }),
         show: showAxes,
-        // Default time ticks read "2026, 3, 5, 7…" (bare day numbers).
         axisLabel: {
           ...labelStyle,
           hideOverlap: true,
-          formatter: {
-            year: "{yyyy}",
-            month: "{MMM}",
-            day: "{MMM} {d}",
-            hour: "{HH}:{mm}",
-            minute: "{HH}:{mm}",
-          },
+          // Default time ticks read "2026, 3, 5, 7…" (bare day numbers).
+          ...(categories
+            ? { formatter: (value: number) => categories[value] ?? "" }
+            : {
+                formatter: {
+                  year: "{yyyy}",
+                  month: "{MMM}",
+                  day: "{MMM} {d}",
+                  hour: "{HH}:{mm}",
+                  minute: "{HH}:{mm}",
+                },
+              }),
         },
         splitLine: {
           show: true,
@@ -107,7 +133,7 @@ export function EChartsThemeRiver({
             },
           },
           data: points.map((point) => [
-            point.time,
+            axisPosition(point.time),
             point.value,
             point.series,
           ]),
@@ -131,7 +157,11 @@ export function EChartsThemeRiver({
       return {
         title: String(series),
         rows: [
-          { label: "Time", value: String(time), color: params.color },
+          {
+            label: "Time",
+            value: categories ? (categories[Number(time)] ?? String(time)) : String(time),
+            color: params.color,
+          },
           { label: "Value", value: String(value), color: params.color },
         ],
         left: mouse.offsetX,

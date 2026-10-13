@@ -24,13 +24,17 @@ export function renderOptionToSvg(
 }
 
 /**
- * Count filled `<path>` / `<polygon>` elements — drawn data shapes, not axis or
- * grid strokes. Custom-series polygons serialize as `<polygon>`.
+ * Count filled `<path>` / `<polygon>` elements with geometry — drawn data shapes,
+ * not axis or grid strokes. Custom-series polygons serialize as `<polygon>`;
+ * degenerate series still emit filled `<path d="">`, so empty geometry is skipped.
  */
 export function countFilledShapes(svg: string): number {
   const tags = svg.match(/<(path|polygon)\s[^>]*>/g) ?? [];
   return tags.filter(
-    (tag) => /\sfill="[^"]+"/.test(tag) && !/\sfill="(none|transparent)"/.test(tag),
+    (tag) =>
+      /\sfill="[^"]+"/.test(tag) &&
+      !/\sfill="(none|transparent)"/.test(tag) &&
+      /\s(d|points)="[^"]+"/.test(tag),
   ).length;
 }
 

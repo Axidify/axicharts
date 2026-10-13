@@ -47,4 +47,27 @@ describe("EChartsThemeRiver", () => {
     expect(compact.top + compact.bottom).toBeLessThan(full.top + full.bottom);
     expect(120 - compact.top - compact.bottom).toBeGreaterThanOrEqual(80);
   });
+
+  it("lays label times (not dates) out in order on an indexed axis", () => {
+    useEChartCalls.length = 0;
+    const weekly = ["W1", "W2", "W3"].flatMap((time, index) => [
+      { time, value: 42 + index, series: "API" },
+      { time, value: 28 + index, series: "Workers" },
+    ]);
+    render(<EChartsThemeRiver width={240} height={140} theme={cleanTheme} points={weekly} />);
+    const option = useEChartCalls.at(-1)?.option as Record<string, unknown> & {
+      singleAxis: { type: string };
+    };
+    // themeRiver can't lay out on a category axis (empty stream paths).
+    expect(option.singleAxis.type).toBe("value");
+
+    const svg = renderOptionToSvg(option, { width: 240, height: 140 });
+    expect(svgTexts(svg)).toEqual(expect.arrayContaining(["W1", "W2", "W3"]));
+    expect(countFilledShapes(svg)).toBeGreaterThanOrEqual(2);
+  });
+
+  it("keeps a time axis for ISO dates and timestamps", () => {
+    expect(optionFor(640, 240).singleAxis).toMatchObject({ type: "time" });
+  });
 });
+
