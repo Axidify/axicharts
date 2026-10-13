@@ -8,7 +8,11 @@ Older release detail may also appear in [GitHub Releases](https://github.com/Axi
 
 ## [Unreleased]
 
-### Breaking (0.5)
+_Nothing yet._
+
+## [0.5.0] - 2026-10-13
+
+### Breaking
 
 - **charts-spec** — plugin panel types (`sankey`, `geo`, `map`, `gantt`, `tank`, `andon`) are now **opt-in**. `@axicharts/charts-spec` no longer depends on the six plugin packages (they are optional peers), so spec users stop installing them by default. Panel JSON is unchanged. To migrate, install the plugin and register it once at startup:
 
