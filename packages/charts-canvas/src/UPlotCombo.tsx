@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { resolveToneColors } from "@axicharts/charts-theme";
 import type { ReactElement, MutableRefObject } from "react";
 import uPlot from "uplot";
 import { formatChartValue } from "@axicharts/charts-core";
@@ -112,6 +113,7 @@ function buildComboOptionsBase(
   const formatLabel = (value: number, suffix = ""): string =>
     formatChartValue(value, { format: valueFormat, suffix });
   const compact = height < 72;
+  const toneColors = resolveToneColors(theme);
   const gridStroke = chromeGridStroke(theme, compact);
   const gapPx = ordinalBarGapPx(categories.length, theme.bar.gap);
   const fillOpacity = theme.area.fillOpacity;
@@ -313,9 +315,10 @@ function buildComboOptionsBase(
       }),
     ],
     hooks: {
-      drawAxes: [createBandDrawHook(thresholdBandsResolved)],
+      drawAxes: [createBandDrawHook(thresholdBandsResolved, toneColors)],
       draw: [
         createAnnotationDrawHook({
+                toneColors,
           referenceLines: referenceLinesResolved,
           verticalLines,
           labels: plotLabels,

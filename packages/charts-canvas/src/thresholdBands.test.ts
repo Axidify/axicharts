@@ -162,3 +162,43 @@ describe("threshold bands render on the canvas", () => {
     expect(options.hooks?.drawAxes).toHaveLength(1);
   });
 });
+
+describe("threshold band tone colors", () => {
+  it("come from the theme's tone tokens, not the fixed palette", async () => {
+    const brand = {
+      ...cleanTheme,
+      name: "brand",
+      tokens: {
+        palette: ["#2563eb", "#0891b2", "#16a34a", "#d97706", "#7c3aed"],
+        grid: "#e2e8f0",
+        axis: "#64748b",
+        alarmCritical: "#16a34a",
+      },
+    };
+    const u = await mount(
+      buildLineOptions({
+        width: 400,
+        height: 240,
+        categories,
+        series: [{ name: "Load", data }],
+        theme: brand,
+        thresholdBands: [band],
+      }),
+      1,
+    );
+    const x = Math.round(u.bbox.left + u.bbox.width / 2);
+    const yTop = Math.ceil(u.valToPos(band.max, "y", true)) + 2;
+    const yBottom = Math.floor(u.valToPos(band.min, "y", true)) - 2;
+    const pixels = u.ctx.getImageData(x, yTop, 1, yBottom - yTop).data;
+    let green = 0;
+    let red = 0;
+    for (let i = 0; i < pixels.length; i += 4) {
+      const [r, g, b, a] = [pixels[i]!, pixels[i + 1]!, pixels[i + 2]!, pixels[i + 3]!];
+      if (a === 0) continue;
+      if (g > r + 20 && g > b) green += 1;
+      if (r > g + 60 && r > b + 60) red += 1;
+    }
+    expect(green).toBeGreaterThan(0);
+    expect(red).toBe(0);
+  });
+});

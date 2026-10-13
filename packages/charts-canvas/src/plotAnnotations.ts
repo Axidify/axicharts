@@ -1,5 +1,9 @@
 import type uPlot from "uplot";
 import { parseRgbChannels, SERIES_COLORS, withAlpha } from "./colors";
+import type { SeriesTone } from "./types";
+
+/** Tone → color map for annotations (defaults to the built-in palette). */
+type ToneColors = Record<SeriesTone, string>;
 import type {
   PlotLabelAnnotation,
   PlotMarkerAnnotation,
@@ -76,7 +80,11 @@ export function expandYRange(
   return [min - pad, max + pad];
 }
 
-export function drawThresholdBands(u: uPlot, bands: ThresholdBand[]): void {
+export function drawThresholdBands(
+  u: uPlot,
+  bands: ThresholdBand[],
+  toneColors: ToneColors = SERIES_COLORS,
+): void {
   if (bands.length === 0) return;
 
   const ctx = u.ctx;
@@ -93,7 +101,7 @@ export function drawThresholdBands(u: uPlot, bands: ThresholdBand[]): void {
     const yTop = u.valToPos(high, "y", true);
     const yBottom = u.valToPos(low, "y", true);
     const tone = band.tone ?? "warning";
-    const color = SERIES_COLORS[tone];
+    const color = toneColors[tone];
 
     ctx.save();
     ctx.fillStyle = withAlpha(color, 0.14);
@@ -119,6 +127,7 @@ export function drawThresholdBands(u: uPlot, bands: ThresholdBand[]): void {
 export function drawReferenceLines(
   u: uPlot,
   referenceLines: ReferenceLine[],
+  toneColors: ToneColors = SERIES_COLORS,
 ): void {
   if (referenceLines.length === 0) return;
 
@@ -127,7 +136,7 @@ export function drawReferenceLines(
   for (const line of referenceLines) {
     const y = u.valToPos(line.value, "y", true);
     const tone = line.tone ?? "warning";
-    const stroke = SERIES_COLORS[tone];
+    const stroke = toneColors[tone];
 
     ctx.save();
     ctx.strokeStyle = stroke;
@@ -157,6 +166,7 @@ export function drawVerticalLines(
   u: uPlot,
   verticalLines: PlotVerticalLine[],
   categories: string[],
+  toneColors: ToneColors = SERIES_COLORS,
 ): void {
   if (verticalLines.length === 0) return;
 
@@ -168,7 +178,7 @@ export function drawVerticalLines(
 
     const x = u.valToPos(index, "x", true);
     const tone = line.tone ?? "info";
-    const stroke = SERIES_COLORS[tone];
+    const stroke = toneColors[tone];
 
     ctx.save();
     ctx.strokeStyle = stroke;
@@ -211,6 +221,7 @@ export function drawPlotLabels(
   u: uPlot,
   labels: PlotLabelAnnotation[],
   categories: string[],
+  toneColors: ToneColors = SERIES_COLORS,
 ): void {
   if (labels.length === 0) return;
 
@@ -224,7 +235,7 @@ export function drawPlotLabels(
         : u.bbox.left + u.bbox.width / 2;
     const y = u.valToPos(label.y, "y", true);
     const tone = label.tone ?? "default";
-    const color = SERIES_COLORS[tone];
+    const color = toneColors[tone];
     const { dx, dy, align } = labelOffset(label.position);
 
     ctx.save();
@@ -240,6 +251,7 @@ export function drawPlotMarkers(
   u: uPlot,
   markers: PlotMarkerAnnotation[],
   categories: string[],
+  toneColors: ToneColors = SERIES_COLORS,
 ): void {
   const staticMarkers = markers.filter((marker) => !marker.draggable);
   if (staticMarkers.length === 0) return;
@@ -253,7 +265,7 @@ export function drawPlotMarkers(
     const x = u.valToPos(index, "x", true);
     const y = u.valToPos(marker.y, "y", true);
     const tone = marker.tone ?? "warning";
-    const color = SERIES_COLORS[tone];
+    const color = toneColors[tone];
 
     ctx.save();
     ctx.fillStyle = color;
@@ -279,8 +291,11 @@ export function drawPlotMarkers(
  * hook, which fires after the grid and before any series are drawn; the
  * `draw` hook fires after the series (and gets no series index).
  */
-export function createBandDrawHook(bands: ThresholdBand[]): (u: uPlot) => void {
-  return (u) => drawThresholdBands(u, bands);
+export function createBandDrawHook(
+  bands: ThresholdBand[],
+  toneColors: ToneColors = SERIES_COLORS,
+): (u: uPlot) => void {
+  return (u) => drawThresholdBands(u, bands, toneColors);
 }
 
 /** Paints the foreground annotations. Register on uPlot's `draw` hook. */
@@ -290,9 +305,12 @@ export function createAnnotationDrawHook({
   labels = [],
   markers = [],
   categories = [],
+  toneColors = SERIES_COLORS,
   onDraw,
 }: {
   referenceLines: ReferenceLine[];
+  /** Tone → color; pass `resolveToneColors(theme)` so brand tones reach annotations. */
+  toneColors?: ToneColors;
   verticalLines?: PlotVerticalLine[];
   labels?: PlotLabelAnnotation[];
   markers?: PlotMarkerAnnotation[];
@@ -303,10 +321,10 @@ export function createAnnotationDrawHook({
     const onFinalPass =
       seriesIdx === undefined || seriesIdx === u.series.length - 1;
     if (onFinalPass) {
-      drawReferenceLines(u, referenceLines);
-      drawVerticalLines(u, verticalLines, categories);
-      drawPlotLabels(u, labels, categories);
-      drawPlotMarkers(u, markers, categories);
+      drawReferenceLines(u, referenceLines, toneColors);
+      drawVerticalLines(u, verticalLines, categories, toneColors);
+      drawPlotLabels(u, labels, categories, toneColors);
+      drawPlotMarkers(u, markers, categories, toneColors);
       onDraw?.(u, seriesIdx ?? u.series.length - 1);
     }
   };

@@ -46,3 +46,13 @@ describe("chart colors", () => {
     expect(colors).toEqual(["#2563eb", "#0891b2", "#16a34a", "#d97706"]);
   });
 });
+
+describe("withAlpha", () => {
+  it("applies alpha to hex, rgb and hsl colors", async () => {
+    const { withAlpha } = await import("./colors");
+    expect(withAlpha("#d97706", 0.14)).toBe("rgba(217, 119, 6, 0.14)");
+    expect(withAlpha("hsl(32 95% 44%)", 0.14)).toBe("hsl(32 95% 44% / 0.14)");
+    expect(withAlpha("hsl(32, 95%, 44%)", 0.4)).toBe("hsla(32, 95%, 44%, 0.4)");
+    expect(withAlpha("hsl(32 95% 44% / 0.9)", 0.4)).toBe("hsl(32 95% 44% / 0.4)");
+  });
+});

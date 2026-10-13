@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { resolveToneColors } from "@axicharts/charts-theme";
 import type { ReactElement } from "react";
 import uPlot from "uplot";
 import { applyValueAxisOptions } from "./valueAxis";
@@ -86,6 +87,7 @@ function buildLineOptionsBase({
   });
 
   const compact = height < 72;
+  const toneColors = resolveToneColors(theme);
   const chrome = resolveChromeColors(theme);
   const gridStroke = chromeGridStroke(theme, compact);
   const gridWidth = compact ? 1 : theme.grid.strokeWidth;
@@ -285,9 +287,10 @@ function buildLineOptionsBase({
       segmentedDraw ||
       variablePointDraw
         ? {
-            drawAxes: [createBandDrawHook(thresholdBandsResolved)],
+            drawAxes: [createBandDrawHook(thresholdBandsResolved, toneColors)],
             draw: [
               createAnnotationDrawHook({
+                toneColors,
                 referenceLines: referenceLinesResolved,
                 verticalLines,
                 labels: plotLabels,

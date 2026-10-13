@@ -146,6 +146,15 @@ export function withAlpha(color: string, alpha: number): string {
     return color.replace(/,\s*[\d.]+\)$/, `, ${alpha})`);
   }
 
+  // shadcn tokens resolve to hsl(); without this, tone fills fell back to blue.
+  const hsl = color.trim().match(/^hsla?\(([^)]*)\)$/i);
+  if (hsl?.[1]) {
+    const inner = hsl[1].split("/")[0]!.trim();
+    return inner.includes(",")
+      ? `hsla(${inner.split(",").slice(0, 3).join(",")}, ${alpha})`
+      : `hsl(${inner} / ${alpha})`;
+  }
+
   return `rgba(37, 99, 235, ${alpha})`;
 }
 

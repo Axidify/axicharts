@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { resolveToneColors } from "@axicharts/charts-theme";
 import type { ReactElement } from "react";
 import uPlot from "uplot";
 import { formatChartValue } from "@axicharts/charts-core";
@@ -195,6 +196,7 @@ function buildBarOptionsBase({
 
   const chrome = resolveChromeColors(theme);
   const compact = height < 72;
+  const toneColors = resolveToneColors(theme);
   const gridStroke = chromeGridStroke(theme, compact);
   const gapPx = ordinalBarGapPx(categories.length, theme.bar.gap);
   const stackSeries = shouldStackSeries(stacked, series.length);
@@ -321,8 +323,10 @@ function buildBarOptionsBase({
 
   const drawBandsHook = createBandDrawHook(
     horizontal ? [] : thresholdBandsResolved,
+    toneColors,
   );
   const drawBarHook = createAnnotationDrawHook({
+    toneColors,
     referenceLines: horizontal ? [] : referenceLinesResolved,
     verticalLines: horizontal ? [] : verticalLines,
     labels: horizontal ? [] : plotLabels,
