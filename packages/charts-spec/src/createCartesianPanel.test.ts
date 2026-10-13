@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { createCartesianPanel, reviseCartesianPanel } from "./createCartesianPanel";
 import { validateCartesianSpec } from "./cartesianValidation";
+import type { ChartBlockSeriesMark, PanelMarkSpec } from "./types";
+
+function isBarMark(mark: PanelMarkSpec): mark is ChartBlockSeriesMark {
+  return mark.type === "bar";
+}
 
 const ROWS = [
   { week: "W1", revenue: 42, target: 40 },
@@ -122,7 +127,7 @@ describe("createCartesianPanel", () => {
 
     expect(needsReview).toBe(false);
     expect(matchedRules).toContain("explicit-stacked-bar");
-    const bars = panel.marks?.filter((mark) => mark.type === "bar") ?? [];
+    const bars = panel.marks?.filter(isBarMark) ?? [];
     expect(bars).toHaveLength(2);
     expect(bars.every((mark) => mark.stack === "default")).toBe(true);
   });
@@ -185,7 +190,7 @@ describe("reviseCartesianPanel", () => {
     const { panel, matchedRules } = reviseCartesianPanel({
       spec: barPanel,
       instruction: "add target line and quota at 50",
-      dataProfile: { fields: ["week", "revenue", "target"] },
+      dataProfile: { metrics: [], fields: ["week", "revenue", "target"] },
     });
 
     expect(panel.type).toBe("cartesian");
@@ -207,7 +212,7 @@ describe("reviseCartesianPanel", () => {
         },
       },
       instruction: "add healthy band 44-52",
-      dataProfile: { fields: ["week", "revenue"] },
+      dataProfile: { metrics: [], fields: ["week", "revenue"] },
     });
 
     expect(panel.type).toBe("cartesian");

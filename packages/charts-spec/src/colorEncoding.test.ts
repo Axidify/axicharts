@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { ComboSeries } from "@axicharts/charts-canvas";
 import {
   applyColorEncodingToBarSeries,
   fillsFromColorField,
@@ -48,10 +49,11 @@ describe("colorEncoding", () => {
       { priority: "P1 – Critical", count: 12 },
       { priority: "P4 – Low", count: 19 },
     ];
-    const series = applyColorEncodingToBarSeries(rows, "priority", [
+    const input: ComboSeries[] = [
       { name: "Tickets", kind: "bar", data: [12, 19] },
       { name: "Trend", kind: "line", data: [1, 2] },
-    ]);
+    ];
+    const series = applyColorEncodingToBarSeries(rows, "priority", input);
     expect(series[0]?.fills).toEqual(["#f43f5e", "#64748b"]);
     expect(series[1]?.fills).toBeUndefined();
   });

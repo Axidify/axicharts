@@ -1,4 +1,4 @@
-import type { ChartBlockMarkSpec, PanelSpec } from "./types";
+import type { PanelMarkSpec, PanelSpec } from "./types";
 
 export type BarOrientation = "horizontal" | "vertical";
 
@@ -13,7 +13,7 @@ export function readPanelOrientation(spec: PanelSpec): BarOrientation | undefine
   return undefined;
 }
 
-function isBarOnlyMarks(marks: ChartBlockMarkSpec[]): boolean {
+function isBarOnlyMarks(marks: PanelMarkSpec[]): boolean {
   return marks.length > 0 && marks.every((mark) => mark.type === "bar");
 }
 

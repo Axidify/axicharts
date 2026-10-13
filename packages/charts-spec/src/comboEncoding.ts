@@ -10,8 +10,10 @@ export function comboSeriesFromEncoding(
   const encodings = Array.isArray(encoding) ? encoding : [encoding];
   return encodings.map((item, index) => {
     const data = pluckField(rows, { ...item, type: "quantitative" }) as number[];
+    // Combo renderers draw every non-bar series as a line, so an `area` y
+    // channel renders as a line here.
     const kind: ComboSeriesKind =
-      item.kind ?? (index === 0 ? "bar" : "line");
+      item.kind === "area" ? "line" : item.kind ?? (index === 0 ? "bar" : "line");
     return {
       name: item.label ?? item.field,
       data,

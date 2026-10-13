@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { validateCartesianSpec } from "./cartesianValidation";
+import { withMarkKeyAlias } from "./testing/markKeyAlias";
+import type { PanelSpec } from "./types";
 
 const ROWS = [
   { week: "W1", revenue: 42, target: 40 },
@@ -137,7 +139,7 @@ describe("validateCartesianSpec (RFC-002 simulation gates)", () => {
       {
         type: "cartesian",
         encoding: { x: { field: "week" } },
-        marks: [{ mark: "point", field: "revenue" }],
+        marks: withMarkKeyAlias([{ mark: "point", field: "revenue" }]),
       },
       { rows: ROWS },
     );
@@ -149,7 +151,7 @@ describe("validateCartesianSpec (RFC-002 simulation gates)", () => {
       {
         type: "cartesian",
         encoding: { x: { field: "week" } },
-        marks: [{ mark: "bubble", field: "revenue" }],
+        marks: withMarkKeyAlias([{ mark: "bubble", field: "revenue" }]),
       },
       { rows: ROWS },
     );
@@ -160,8 +162,8 @@ describe("validateCartesianSpec (RFC-002 simulation gates)", () => {
   });
 
   it("S22b warns on duplicate overlay channels", () => {
-    const spec = {
-      type: "cartesian" as const,
+    const spec: PanelSpec = {
+      type: "cartesian",
       encoding: { x: { field: "week" } },
       marks: [
         { type: "bar", field: "revenue" },

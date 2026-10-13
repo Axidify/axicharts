@@ -14,6 +14,7 @@ import throughputSpec from "../examples/throughput-bar-color.panel.json";
 import violinSpec from "../examples/violin-latency.panel.json";
 import swarmSpec from "../examples/swarm-latency.panel.json";
 import { DEFAULT_PLUGINS_WALL_PANELS } from "./pluginsWallData";
+import { withMarkKeyAlias } from "./testing/markKeyAlias";
 
 const TILE_W = 360;
 const TILE_H = 280;
@@ -203,11 +204,11 @@ const BLOCKS_PANEL: PanelSpec = {
   theme: "clean",
   mode: "static",
   encoding: { x: { field: "week" } },
-  marks: [
+  marks: withMarkKeyAlias([
     { mark: "bar", field: "revenue", label: "Revenue" },
     { mark: "line", field: "target", label: "Target", curve: "monotone" },
     { mark: "rule", value: 50, label: "Quota", tone: "warning" },
-  ],
+  ]),
 };
 
 const BLOCKS_ROWS = [
@@ -489,7 +490,7 @@ export function buildRenderBatteryCases(): RenderBatteryCase[] {
         height: TILE_H,
         width: TILE_W,
         encoding: {
-          stage: { field: "stage", type: "nominal" },
+          name: { field: "stage", type: "nominal" },
           value: { field: "value", type: "quantitative" },
         },
       },

@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest";
 import { compilePanel } from "./compilePanel";
 import { ejectPanel } from "./eject";
 import { normalizeToCartesian } from "./normalizeToCartesian";
-import blocksFixture from "../examples/blocks-revenue-target.panel.json";
-import cartesianFixture from "../examples/cartesian-revenue-target.panel.json";
+import { normalizePanelSpec } from "./parseSpec";
+import blocksFixtureJson from "../examples/blocks-revenue-target.panel.json";
+import cartesianFixtureJson from "../examples/cartesian-revenue-target.panel.json";
+
+const blocksFixture = normalizePanelSpec(blocksFixtureJson);
+const cartesianFixture = normalizePanelSpec(cartesianFixtureJson);
 
 const ROWS = [
   { week: "W1", revenue: 42, target: 40 },

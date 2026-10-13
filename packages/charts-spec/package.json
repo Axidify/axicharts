@@ -75,7 +75,7 @@
     "test": "vitest run",
     "test:render-battery": "vitest run src/renderBattery.test.tsx",
     "export:schemas": "node scripts/export-schemas.mjs",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit"
   },
   "peerDependencies": {
     "@axicharts/charts": "workspace:*",
@@ -92,6 +92,7 @@
   "dependencies": {
     "@axicharts/charts": "workspace:*",
     "@axicharts/charts-canvas": "workspace:*",
+    "@axicharts/charts-echarts": "workspace:*",
     "@axicharts/charts-theme": "workspace:*",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1"

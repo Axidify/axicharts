@@ -15,7 +15,7 @@ export function plannerReviewMessage(reviewReason: PlannerReviewReason): string 
 }
 
 export function dataFieldSignature(rows: SpecData): string {
-  if (rows.length === 0) return "";
+  if (!Array.isArray(rows) || rows.length === 0) return "";
   return Object.keys(rows[0] ?? {})
     .sort()
     .join("\0");

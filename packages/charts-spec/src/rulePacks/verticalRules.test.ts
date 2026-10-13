@@ -190,7 +190,7 @@ describe("vertical rule packs (C90)", () => {
     );
 
     expect(panel.type).toBe("cartesian");
-    expect(panel.encoding?.y?.field).toBe("weightedValue");
+    expect(panel.encoding?.y).toMatchObject({ field: "weightedValue" });
     expect(panel.encoding?.x?.field).toBe("Salesperson");
   });
 
