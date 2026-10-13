@@ -36,7 +36,7 @@ import {
   categoryXScale,
 } from "./categoricalScale";
 
-function buildOptions({
+export function buildLineOptions({
   width,
   height,
   categories,
@@ -327,7 +327,7 @@ export function UPlotLine(props: UPlotLineProps): ReactElement {
   onSyncIndexRef.current = onSyncIndex;
 
   const options = useMemo(() => {
-    const base = buildOptions(props);
+    const base = buildLineOptions(props);
     if (!showCursor && !onSyncIndexRef.current) {
       return base;
     }
