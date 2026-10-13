@@ -33,4 +33,4 @@
 
 ## Publish
 
-Triggered by GitHub release `v0.4.0` → [publish workflow](.github/workflows/publish.yml).
+Triggered by GitHub release `v0.4.0` → [publish workflow](../../.github/workflows/publish.yml).

@@ -22,4 +22,4 @@
 | `@axicharts/charts-mcp` | 0.1.2 | **0.1.3** |
 | `@axicharts/charts-planner` | 0.2.2 | **0.2.2** (peer `^0.4.24`) |
 
-Triggered by GitHub release `v0.4.24` → [publish workflow](.github/workflows/publish.yml).
+Triggered by GitHub release `v0.4.24` → [publish workflow](../../.github/workflows/publish.yml).

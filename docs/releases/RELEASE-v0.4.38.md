@@ -24,4 +24,4 @@
 | `@axicharts/charts-geo` | 0.1.0 | **0.1.1** |
 | `@axicharts/charts-gantt` | 0.1.0 | **0.1.1** |
 
-Triggered by GitHub release `v0.4.38` → [publish workflow](.github/workflows/publish.yml).
+Triggered by GitHub release `v0.4.38` → [publish workflow](../../.github/workflows/publish.yml).

@@ -4,7 +4,7 @@ All notable changes to published `@axicharts/*` packages are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Older release detail may also appear in [GitHub Releases](https://github.com/Axidify/axicharts/releases) and one-off `RELEASE-v*.md` notes in this repo.
+Older release detail may also appear in [GitHub Releases](https://github.com/Axidify/axicharts/releases) and one-off release notes in [`docs/releases/`](./docs/releases/).
 
 ## [Unreleased]
 
@@ -241,7 +241,7 @@ _Nothing yet._
 - **charts-spec** — `resolvePanelHeight` reserves 23px for `spec.title`; nominal color encoding on compile path
 - **charts** — Cartesian plot layout subtracts legend height so labels don’t overlap series names
 
-See [RELEASE-v0.4.23.md](./RELEASE-v0.4.23.md).
+See [RELEASE-v0.4.23.md](./docs/releases/RELEASE-v0.4.23.md).
 
 ## [0.4.22] - 2026-07-20
 
@@ -258,7 +258,7 @@ See [RELEASE-v0.4.23.md](./RELEASE-v0.4.23.md).
 - **charts** — `ChartContainer` `inheritThemeTokens` prop; softer `cleanTheme` grid opacity
 - **charts-spec** — Planner/compile path emits `encoding.color` for priority/status dimensions; gates horizontal bar geometry until uPlot horizontal renderer ships
 
-See [RELEASE-v0.4.22.md](./RELEASE-v0.4.22.md).
+See [RELEASE-v0.4.22.md](./docs/releases/RELEASE-v0.4.22.md).
 
 ## [0.4.21] - 2026-07-20
 
@@ -272,7 +272,7 @@ See [RELEASE-v0.4.22.md](./RELEASE-v0.4.22.md).
 - **charts** — All-zero cartesian series show built-in empty state (respects `emptyMessage` on `ChartContainer`)
 - **charts** — `ChartContainer` `config` keys matching category labels apply per-bar fills for single-series bar charts
 
-See [RELEASE-v0.4.21.md](./RELEASE-v0.4.21.md).
+See [RELEASE-v0.4.21.md](./docs/releases/RELEASE-v0.4.21.md).
 
 ## [0.4.20] - 2026-07-20
 
@@ -289,7 +289,7 @@ See [RELEASE-v0.4.21.md](./RELEASE-v0.4.21.md).
 - **charts-echarts** — Compact tile grid margins via `isCompactTile` (360px axiboard tiles)
 - **charts-spec** — `resolvePanelHeight` plot minimums; `digital` / `status-lamp` compile paths; auto-register `tank` / `andon` in `registerPluginChartTypes`
 
-See [RELEASE-v0.4.20.md](./RELEASE-v0.4.20.md).
+See [RELEASE-v0.4.20.md](./docs/releases/RELEASE-v0.4.20.md).
 
 ## [0.4.19] - 2026-07-19
 
@@ -314,7 +314,7 @@ See [RELEASE-v0.4.20.md](./RELEASE-v0.4.20.md).
 - **C181** — Orchestrator refinement intent fixes; golden tests for tabular compose paths
 - Sample starters: inventory, ledger, project tasks, support cases, IoT sensors
 
-See [RELEASE-v0.4.19.md](./RELEASE-v0.4.19.md).
+See [RELEASE-v0.4.19.md](./docs/releases/RELEASE-v0.4.19.md).
 
 ## [0.4.18] - 2026-07-19
 
@@ -336,7 +336,7 @@ See [RELEASE-v0.4.19.md](./RELEASE-v0.4.19.md).
 - **C169a** — Zod schemas for `/api/orchestrator/*` and workspace POST
 - **C169** — Token auth with signed cookies; per-user workspace + BYOK; `AuthGate` login UI
 
-See [RELEASE-v0.4.17.md](./RELEASE-v0.4.17.md).
+See [RELEASE-v0.4.17.md](./docs/releases/RELEASE-v0.4.17.md).
 
 ## [0.4.16] - 2026-07-19
 
@@ -358,7 +358,7 @@ See [RELEASE-v0.4.17.md](./RELEASE-v0.4.17.md).
 - **C167** — `DecisionLog` on upload + saved dashboard; legacy `src/rnd/*` removed
 - **C167** — Workspace is the only tabular persistence layer
 
-See [RELEASE-v0.4.16.md](./RELEASE-v0.4.16.md).
+See [RELEASE-v0.4.16.md](./docs/releases/RELEASE-v0.4.16.md).
 
 ## [0.4.15] - 2026-07-19
 
@@ -377,7 +377,7 @@ See [RELEASE-v0.4.16.md](./RELEASE-v0.4.16.md).
 - **C166** — Apply tabular orchestrator plan to main workspace; `TabularDashboardView` with chat follow-ups
 - **C166** — Persist `sourceCsv`, persona, and follow-up intents in dashboard meta
 
-See [RELEASE-v0.4.15.md](./RELEASE-v0.4.15.md).
+See [RELEASE-v0.4.15.md](./docs/releases/RELEASE-v0.4.15.md).
 
 ## [0.4.14] - 2026-07-19
 
@@ -395,7 +395,7 @@ See [RELEASE-v0.4.15.md](./RELEASE-v0.4.15.md).
 - **C163** — Workspace + R&D session persistence API
 - **C164** — Unified tabular upload UX (`TabularRndView`)
 
-See [RELEASE-v0.4.14.md](./RELEASE-v0.4.14.md).
+See [RELEASE-v0.4.14.md](./docs/releases/RELEASE-v0.4.14.md).
 
 ## [0.1.2] - 2026-07-19
 
@@ -537,7 +537,7 @@ See [RELEASE-v0.4.14.md](./RELEASE-v0.4.14.md).
 
 ## [0.4.0] - 2026-07-19
 
-Adoption track C141–C146 — see [RELEASE-v0.4.0.md](./RELEASE-v0.4.0.md) for full notes.
+Adoption track C141–C146 — see [RELEASE-v0.4.0.md](./docs/releases/RELEASE-v0.4.0.md) for full notes.
 
 ### Added
 
@@ -561,7 +561,7 @@ Adoption track C141–C146 — see [RELEASE-v0.4.0.md](./RELEASE-v0.4.0.md) for 
 
 ## [0.3.52] - 2026-07-19
 
-RFC-002 cartesian agent loop — see [RELEASE-v0.3.52.md](./RELEASE-v0.3.52.md) for full notes.
+RFC-002 cartesian agent loop — see [RELEASE-v0.3.52.md](./docs/releases/RELEASE-v0.3.52.md) for full notes.
 
 ### Added
 
