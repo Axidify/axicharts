@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { readFileSync } from "node:fs";
 import { mkdir, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
